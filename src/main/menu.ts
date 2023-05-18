@@ -32,7 +32,9 @@ export default class MenuBuilder {
         : this.buildDefaultTemplate();
 
     const menu = Menu.buildFromTemplate(template);
-    Menu.setApplicationMenu(menu);
+    //Menu.setApplicationMenu(menu);
+    // 不显示 menu
+    Menu.setApplicationMenu(null);
 
     return menu;
   }
