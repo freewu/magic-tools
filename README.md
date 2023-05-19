@@ -22,17 +22,20 @@
 ```
 
 
-## 使用组件
+## 组件
 
-<a href="https://github.com/electron-react-boilerplate/electron-react-boilerplate">Electron React Boilerplate</a>  
+<a href="https://github.com/electron-react-boilerplate/electron-react-boilerplate">Electron React Boilerplate</a>   
+<a href="https://react.dev/">React 18</a>   
+<a href="https://www.electronjs.org/">Electron 23</a>  
+<a href="https://ant.design/">Ant Design 5</a>  
 
 
-## 问题
+## Q&A
 ```
 ## windows 打包出现下载 winCodeSign / nsis / nsis-resources 出错
 
     问题:
-    Get "https://github.com/electron-userland/electron-builder-binaries/releases/download/nsis-resources-3.4.1/nsis-resources-3.4.1.7z": read tcp xxx.xxx.xxx.xxx:51480->xxx.xxx.xxx.xxx:443: wsarecv: An existing connection was forcibly closed by the remote host.
+    Get "https://github.com/electron-userland/electron-builder-binaries/releases/download/nsis-resources-3.4.1/nsis-resources-3.4.1.7z": read tcp xxx.xxx.xxx.xxx:zzz->xxx.xxx.xxx.xxx:443: wsarecv: An existing connection was forcibly closed by the remote host.
 
     
     解决：

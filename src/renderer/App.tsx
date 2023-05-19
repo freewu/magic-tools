@@ -1,50 +1,70 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import icon from '../../assets/icon.svg';
-import './App.css';
+import {
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
+  UploadOutlined,
+  UserOutlined,
+  VideoCameraOutlined 
+} from '@ant-design/icons';
+import {  Button, Layout, Menu, theme  } from "antd";
+import {  useState  } from "react";;
+const { Header, Sider, Content } = Layout;
+import "./App.css"
 
-function Hello() {
+const App = () => {
+  const [ collapsed, setCollapsed ] = useState(false);
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
   return (
-    <div>
-      <div className="Hello">
-        <img width="200" alt="icon" src={icon} />
-      </div>
-      <h1>electron-react-boilerplate</h1>
-      <div className="Hello">
-        <a
-          href="https://electron-react-boilerplate.js.org/"
-          target="_blank"
-          rel="noreferrer"
+    <Layout>
+      <Sider trigger={null} collapsible collapsed={collapsed}>
+        <Button
+            title = { collapsed ? "展开" : "收起" }
+            type="link"
+            icon={ collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed(!collapsed)}
+            style={{
+              fontSize: '18px',
+            }}
+        />
+        <div className="demo-logo-vertical" />
+        <Menu
+          theme="dark"
+          mode="inline"
+          defaultSelectedKeys={['1']}
+          items={[
+            {
+              key: '1',
+              icon: <UserOutlined />,
+              label: 'nav 1',
+            },
+            {
+              key: '2',
+              icon: <VideoCameraOutlined />,
+              label: 'nav 2',
+            },
+            {
+              key: '3',
+              icon: <UploadOutlined />,
+              label: 'nav 3',
+            },
+          ]}
+        />
+      </Sider>
+      <Layout>
+        <Content
+          style={{
+            margin: '12px 12px',
+            padding: 24,
+            minHeight: 500,
+            background: colorBgContainer,
+          }}
         >
-          <button type="button">
-            <span role="img" aria-label="books">
-              📚
-            </span>
-            Read our docs11
-          </button>
-        </a>
-        <a
-          href="https://github.com/sponsors/electron-react-boilerplate"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="folded hands">
-              🙏
-            </span>
-            Donate
-          </button>
-        </a>
-      </div>
-    </div>
+          Content
+        </Content>
+      </Layout>
+    </Layout>
   );
-}
+};
 
-export default function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Hello />} />
-      </Routes>
-    </Router>
-  );
-}
+export default App;
