@@ -158,8 +158,8 @@
     "webpack-merge": "^5.8.0"
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "MagicTools",
+    "appId": "vip.bluefrog.magictools",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -217,12 +217,12 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "freewu",
+      "repo": "magic-tools"
     }
   },
   "collective": {
-    "url": "https://opencollective.com/electron-react-boilerplate-594"
+    "url": ""
   },
   "devEngines": {
     "node": ">=14.x",
