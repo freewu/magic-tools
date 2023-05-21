@@ -28,6 +28,8 @@
 <a href="https://react.dev/">React 18</a>   
 <a href="https://www.electronjs.org/">Electron 23</a>  
 <a href="https://ant.design/">Ant Design 5</a>  
+<a href="https://github.com/brix/crypto-js">CryptoJS</a>  
+crypto-js
 
 
 ## Q&A
