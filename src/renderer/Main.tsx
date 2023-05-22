@@ -22,7 +22,7 @@ const Main = () => {
   const [ collapsed, setCollapsed ] = useState(false);
   const { token: { colorBgContainer } } = theme.useToken();
   const navigate = useNavigate()
-  
+
   // menu 点击处理
   const menuClick = ( e:any ) => {
     navigate(e.key, { replace: true })
