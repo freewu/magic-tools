@@ -23,6 +23,7 @@ Hash 值计算 ( MD5 / SHA1 / SHA256 / SHA512 )
 # 打包 
 
     npm run package
+    
 ```
 
 
@@ -33,8 +34,7 @@ Hash 值计算 ( MD5 / SHA1 / SHA256 / SHA512 )
 <a href="https://www.electronjs.org/">Electron 23</a>  
 <a href="https://ant.design/">Ant Design 5</a>  
 <a href="https://github.com/brix/crypto-js">CryptoJS</a>  
-crypto-js
-
+<a href="https://github.com/dankogai/js-base64">js-base64</a>   
 
 ## Q&A
 ```
