@@ -8,3 +8,7 @@
   width: 100%;
   min-height: 98%;
 }
+
+.ant-layout-sider-dark {
+  min-width: 90px !important;
+}

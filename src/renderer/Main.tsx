@@ -1,12 +1,13 @@
-import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons';
-import { Button, Layout, Menu, theme } from "antd";
-import { useState } from "react";;
+import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, SettingOutlined } from '@ant-design/icons';
+import { Button, Layout, Menu, theme, Space } from "antd";
+import { useState, } from "react";
 const { Sider, Content } = Layout;
 import "./Main.css"
-import { useNavigate,Routes, Route, Link } from "react-router-dom"
+import { useNavigate,Routes, Route, Navigate } from "react-router-dom"
 import { appList } from "./App";
 // lazy 需要配合 Suspense 使用
 import { lazy, Suspense } from "react";
+import { getSiderFlag, getDefaultApp } from "./lib/setting";
 
 // 快速导入工具函数
 const lazyLoad = (moduleName: string) => {
@@ -19,9 +20,10 @@ const lazyLoad = (moduleName: string) => {
 };
 
 const Main = () => {
-  const [ collapsed, setCollapsed ] = useState(false);
+  const [ collapsed, setCollapsed ] = useState(!getSiderFlag());
   const { token: { colorBgContainer } } = theme.useToken();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const defaultApp = getDefaultApp();
 
   // menu 点击处理
   const menuClick = ( e:any ) => {
@@ -30,21 +32,45 @@ const Main = () => {
 
   return (
     <Layout>
-      <Sider trigger={null} collapsible collapsed={collapsed}>
-        <Button
-            title = { collapsed ? "展开" : "收起" }
-            type="link"
-            icon={ collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
-            style={{
-              fontSize: '18px',
-            }}
-        />
+      <Sider trigger={null} collapsible collapsed={ collapsed }>
+        <Space>
+          <Button
+              title = { collapsed ? "展开" : "收起" }
+              type="link"
+              icon={ collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed) }
+              style={{
+                fontSize: '18px',
+                width: "24px"
+              }}
+          />
+          <Button
+              title = { "设置" }
+              type="link"
+              icon={ <SettingOutlined /> }
+              onClick={ () => navigate('Setting', { replace: true }) }
+              style={{
+                fontSize: '18px',
+                width: "24px"
+              }}
+          />
+          <Button
+              title = { "应用中心" }
+              type="link"
+              icon={ <AppstoreOutlined />}
+              onClick={() => navigate('AppStore', { replace: true }) }
+              style={{
+                fontSize: '18px',
+                width: "24px"
+              }}
+          />
+        </Space>
+
         <div className="demo-logo-vertical" />
         <Menu
           theme="dark"
           mode="inline"
-          defaultSelectedKeys={['1']}
+          defaultSelectedKeys={[defaultApp]}
           onClick = { menuClick }
           items={ appList }
         />
@@ -59,11 +85,17 @@ const Main = () => {
           }}
         >
           <Routes>
+            // 应用中心
+            <Route path={ "/AppStore" } element={ lazyLoad("AppStore") }></Route>
+            // 设置
+            <Route path={ "/Setting" } element={ lazyLoad("Setting") }></Route>
             {
               appList.map((item, index) => {
                 return <Route path={ "/" + item.key } element={ lazyLoad(item.key) }></Route>
               })
             }
+            // 默认显示应用
+            <Route path="*" element={<Navigate to={"/" + defaultApp } replace />} />
           </Routes>
         </Content>
       </Layout>
