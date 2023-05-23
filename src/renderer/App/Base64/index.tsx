@@ -1,9 +1,8 @@
-import { Checkbox, Divider, Button,Input, Space,notification,Tooltip } from "antd";
+import { Checkbox, Divider, Button,Input, Space, message, Tooltip } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
-import type { NotificationPlacement } from 'antd/es/notification/interface'
 import { Base64 as B64 } from 'js-base64';
 import { default as Base64Intro } from "./intro"
 
@@ -28,13 +27,9 @@ Base64编码后的字符串中可能包含"+/="之类的字符，而"/"，"="等
     openNotification("bottomRight");
   };
 
-  const [api, contextHolder] = notification.useNotification();
+  const [api, contextHolder] = message.useMessage();
   const openNotification = (placement :string ) => {
-    api.success({
-      message: ``,
-      description: "复制到粘贴板成功！！！",
-      placement: (placement as NotificationPlacement)
-    });
+    api.success( "复制到粘贴板成功！！！");
   };
 
   const encode = () => {
@@ -49,12 +44,7 @@ Base64编码后的字符串中可能包含"+/="之类的字符，而"/"，"="等
       try {
         r = B64.decode( decodeValue)
       } catch(err) {
-        api.error({
-          message: ``,
-          description: "解码失败！！！",
-          placement: ('bottomRight' as NotificationPlacement)
-        });
-        console.log(err);
+        api.error("解码失败！！！");
       }
       setEncodeValue(r);
     }

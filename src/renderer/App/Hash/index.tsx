@@ -1,4 +1,4 @@
-import { Checkbox, Form,Input, Divider,notification } from "antd";
+import { Checkbox, Form, Input, Divider, message } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
@@ -8,7 +8,6 @@ import sha1 from 'crypto-js/sha1';
 import sha512 from 'crypto-js/sha512';
 import md5 from 'crypto-js/md5';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
-import type { NotificationPlacement } from 'antd/es/notification/interface'
 
 const Hash = () => {
 
@@ -30,13 +29,9 @@ const Hash = () => {
     openNotification("bottomRight");
   };
 
-  const [api, contextHolder] = notification.useNotification();
+  const [api, contextHolder] = message.useMessage();
   const openNotification = (placement :string ) => {
-    api.success({
-      message: ``,
-      description: "复制到粘贴板成功！！！",
-      placement: (placement as NotificationPlacement)
-    });
+    api.success("复制到粘贴板成功！！！");
   };
 
   const upperLowerFormat = (str :string,flag :boolean) => {
