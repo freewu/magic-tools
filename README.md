@@ -27,7 +27,6 @@ URL 编码 / 解码
     
 ```
 
-
 ## 组件
 
 <a href="https://github.com/electron-react-boilerplate/electron-react-boilerplate">Electron React Boilerplate</a>   
@@ -37,13 +36,18 @@ URL 编码 / 解码
 <a href="https://github.com/brix/crypto-js">CryptoJS</a>  
 <a href="https://github.com/dankogai/js-base64">js-base64</a>   
 
+## 应用截图
+
+![](.\docs\images\hash.png)
+![](.\docs\images\base64.png)
+
+
 ## Q&A
 ```
 ## windows 打包出现下载 winCodeSign / nsis / nsis-resources 出错
 
     问题:
     Get "https://github.com/electron-userland/electron-builder-binaries/releases/download/nsis-resources-3.4.1/nsis-resources-3.4.1.7z": read tcp xxx.xxx.xxx.xxx:zzz->xxx.xxx.xxx.xxx:443: wsarecv: An existing connection was forcibly closed by the remote host.
-
     
     解决：
         1 复制链接，手动下载下来
