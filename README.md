@@ -38,8 +38,8 @@ URL 编码 / 解码
 
 ## 应用截图
 
-![](.\docs\images\hash.png)
-![](.\docs\images\base64.png)
+![](./docs/images/hash.png)
+![](./docs/images/base64.png)
 
 
 ## Q&A
