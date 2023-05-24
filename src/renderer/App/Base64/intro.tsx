@@ -1,6 +1,6 @@
 const Base64Intro = () => {
-    return (
-        <div style={ { "overflow-y": "scroll","height": "300px" }}>
+  return (
+    <div style={ { "overflowY": "scroll","height": "300px" }}>
 <h2>编码方式</h2>
 <blockquote><p>base64编码是一种常见的编码方式，主要用于对8bit的字节进行编码</p>
 </blockquote>
@@ -28,7 +28,7 @@ const Base64Intro = () => {
 <h2>特殊处理(字节数不能被三整除时的)</h2>
 <blockquote><p>如果需要编码的字节不能被3整除怎么办？比如最后剩下一个单字节(如:a)，或者双字节(如:ab)。这时候我们需要特殊处理</p>
 </blockquote>
-<ol start='' >
+<ol>
 <li>不足6个二进制位的补0</li>
 <li>不足4组的，最后补字符串(=)</li>
 
@@ -65,8 +65,8 @@ const Base64Intro = () => {
 </li>
 
 </ul>
-        </div>
-    );
+    </div>
+  );
 }
 
 export default Base64Intro;

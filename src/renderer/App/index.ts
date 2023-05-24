@@ -10,6 +10,11 @@ const appList = [
     icon: "",
     label: 'Base64 编码',
   },
+  {
+    key: 'URL',
+    icon: "",
+    label: 'URL 编码',
+  },
 ];
 
 export {
