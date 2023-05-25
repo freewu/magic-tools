@@ -11,14 +11,14 @@ const AppStore = () => {
     navigate("/" + uri, { replace: true })
   }
 
-  const handStyle = { cursor: "pointer" };
+  const handStyle = { cursor: "pointer",margin: "5px 5px 5px 5px;" };
 
   return (
     <Row gutter={8}>
     {
       appList.map((item, index) => {
         return (
-          <Col span={5} onClick={ colClick } style={ handStyle } data-uri={ item.key }>
+          <Col onClick={ colClick } style={ handStyle } data-uri={ item.key }>
             <Card>
               {/* <MenuUnfoldOutlined /> &nbsp; &nbsp; */}
               { item.label }

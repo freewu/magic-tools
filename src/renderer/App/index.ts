@@ -15,6 +15,16 @@ const appList = [
     icon: "",
     label: 'URL 编码',
   },
+  {
+    key: 'Time',
+    icon: "",
+    label: '时间戳转换',
+  },
+  // {
+  //   key: 'Color',
+  //   icon: "",
+  //   label: 'CSS 配色',
+  // },
 ];
 
 export {
