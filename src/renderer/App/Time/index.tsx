@@ -86,7 +86,7 @@ const Time = () => {
       <TextArea
         value= { value }
         onChange={  textAreaChange }
-        placeholder="输入 10位 / 13位 时间戳 或 UTC 格式字符串 或 YYYY-MM-DD HH:ii:ss 格式字符串"
+        placeholder="输入 10位时间戳 / 13位时间戳 / UTC 格式字符串 / YYYY-MM-DD HH:ii:ss 格式字符串"
         autoSize={{ minRows: 3, maxRows: 3 }}
       />
 
