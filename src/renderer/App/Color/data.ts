@@ -6,9 +6,9 @@ const colorTypeList = [
 
   { label: 'HSL', value: 'HSL' },
   { label: 'HSLA', value: 'HSLA' },
-  { label: 'HSV', value: 'HSV' },
   { label: 'CMYK', value: 'CMYK' },
   
+  { label: 'HSV', value: 'HSV' },
   { label: 'LAB', value: 'LAB' },
   { label: 'LCH', value: 'LCH' },
   { label: 'XYZ', value: 'XYZ' },
