@@ -20,11 +20,11 @@ const appList = [
     icon: "",
     label: '时间戳转换',
   },
-  // {
-  //   key: 'Color',
-  //   icon: "",
-  //   label: 'CSS 配色',
-  // },
+  {
+    key: 'Color',
+    icon: "",
+    label: 'CSS 配色',
+  },
 ];
 
 export {

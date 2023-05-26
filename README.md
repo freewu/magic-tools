@@ -8,14 +8,15 @@ Hash 值计算 ( MD5 / SHA1 / SHA256 / SHA512 )
 Base64 编码 / 解码
 URL 编码 / 解码
 时间戳转换
+CSS 配色
 
 -- 待开发 ------------------
-
+颜色转换 进行中
+进制转换 进行中
 二维码生成 进行中
 AES 加密 / 解密 进行中
 DES 加密 / 解密
 CRC 验证
-CSS 配色
 JSON 格式化
 SQL 格式化
 正则表达式
@@ -50,6 +51,8 @@ CRON表达式
 <a href="https://ant.design/">Ant Design 5</a>  
 <a href="https://github.com/brix/crypto-js">CryptoJS</a>  
 <a href="https://github.com/dankogai/js-base64">js-base64</a>   
+<a href="https://github.com/Qix-/color-convert">color-convert</a>   
+
 
 ## 应用截图
 
