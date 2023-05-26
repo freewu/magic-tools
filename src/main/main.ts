@@ -13,7 +13,8 @@ import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
-import { resolveHtmlPath } from './util';
+import { setTray } from './tray';
+import { resolveHtmlPath, getAssetPath } from './util';
 
 class AppUpdater {
   constructor() {
@@ -62,14 +63,6 @@ const createWindow = async () => {
     await installExtensions();
   }
 
-  const RESOURCES_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, 'assets')
-    : path.join(__dirname, '../../assets');
-
-  const getAssetPath = (...paths: string[]): string => {
-    return path.join(RESOURCES_PATH, ...paths);
-  };
-
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
@@ -86,6 +79,9 @@ const createWindow = async () => {
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
+  // 显示托盘
+  setTray(mainWindow);
+
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
@@ -98,8 +94,19 @@ const createWindow = async () => {
   });
 
   mainWindow.on('closed', () => {
-    mainWindow = null;
+    console.log("mainWindow closed");
+    //mainWindow?.hide();
+    //mainWindow = null; 
   });
+
+  mainWindow.on('show', () => {
+    setTimeout(() => {
+      mainWindow?.setOpacity(1)
+    }, 200)
+  })
+  mainWindow.on('hide', () => {
+    mainWindow?.setOpacity(0)
+  })
 
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
@@ -109,7 +116,7 @@ const createWindow = async () => {
     shell.openExternal(edata.url);
     return { action: 'deny' };
   });
-
+  
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
@@ -118,12 +125,19 @@ const createWindow = async () => {
 /**
  * Add event listeners...
  */
-
+// 窗口关闭就是最小化到托盘
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
   if (process.platform !== 'darwin') {
-    app.quit();
+
+    // app.quit()：
+    //   调用会先触发 app 的 `before-quit` 事件，
+    //   然后再触发所有窗口的关闭事件，\窗口全部关闭了（调用app.quit()关闭窗口是不会触发window-all-closed的，会触发will-quit），
+    //   触发 app 的 quit 事件。但是如果在quit事件前使用 event.preventDefault() 阻止了默认行为（ win的close事件，app 的 before-quit 和 will-quit ），软件还是不会关闭。
+    // app.exit()：
+    //  最粗暴的强制关闭所有窗口，触发 app 的 quit 事件，故 win 的c lose 事件，app的 before-quit 和 will-quit 不会被触发
+    // app.quit();
   }
 });
 
