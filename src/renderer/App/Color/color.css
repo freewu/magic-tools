@@ -19,13 +19,18 @@
 }
 
 .levitation-box {
-  /* background: #1a59b7;
-  color:#ffffff; */
   opacity: 0.6;
   overflow: hidden;
   z-index: 9999;
   position: fixed;
-  padding:5px;
+  right: 20px;
+  top: 70px;
+  padding-top:12px;
+  padding-right:12px;
+}
+
+.levitation-box-content {
+  padding: 5px;
   text-align:center;
   width: 100px;
   border: 1px slategray solid;
@@ -33,9 +38,6 @@
   border-bottom-right-radius: 4px;
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
-
-  right: 32px;
-  top: 80px;
 }
 
 .levitation-box ul {
@@ -46,8 +48,12 @@
 .levitation-box li {
   cursor: pointer;
   list-style: none;
-  border: 1px #fff solid;
+  border-bottom: 1px #fff solid;
   width: 90px;
   height: 32px;
   margin: 1px 0 1px 0;
+}
+
+.levitation-box li:last-child {
+  border-bottom: 0px
 }
