@@ -1,14 +1,40 @@
-import { Checkbox, Space } from "antd";
+import { Checkbox, Tooltip } from "antd";
+import type { BatchPickColorProps } from "./interface"
+
 // 悬浮框
-const LevitationBox = ({ }) => {
+const LevitationBox = ({ colorList, flag, flagChangeEvent, colorListChange } :BatchPickColorProps ) => {
+
+  const switchBatchPick = () => {
+    flagChangeEvent(!flag);
+    if(flag) { // true => false 即关闭时,清空颜色列表
+      colorListChange([])
+    }
+  };
+
+  // 移除选择的元素
+  const removeColor = (color :string) => {
+    const list = colorList.filter((item) => { return item.color !== color});
+    colorListChange(list);
+  }
+
   return (
     <div className="levitation-box">
-      <Checkbox>批量取色</Checkbox>
+      <Tooltip placement="left" title={ "双击剔除不需要的颜色" }>
+        <Checkbox defaultChecked= { flag } onChange={ switchBatchPick }>批量取色</Checkbox>
+      </Tooltip>
       <ul>
-        <li>aaaa</li>
-        <li>bbbd</li>
-        <li>cccc</li>
-        <li>dddd</li>
+        {
+          colorList.map((item) => {
+            return (
+            <li 
+              onDoubleClick={ () => { removeColor(item.color) } }
+              style={ { backgroundColor: item.color } } 
+              title = { item.label }  
+            >
+              {/* { item.label } */}
+            </li>)
+          })
+        }
       </ul>
     </div>
   )

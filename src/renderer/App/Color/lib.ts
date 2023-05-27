@@ -1,4 +1,5 @@
 import { hex } from "color-convert"
+import { colorTypeList } from "./data"
 
 // 获取要写入到粘贴板的数据
 const getColorString = (color :string,label :string,colorType :string, opacity :number) :string => {
@@ -36,6 +37,19 @@ const getColorString = (color :string,label :string,colorType :string, opacity :
   return color;
 };
 
+// 选择颜色类型, 为了展示美观 小窗口不展示那么多颜色类型
+const pickColorTypeList = () => {
+  //return colorTypeList;
+  // 缩放卡顿，先注释
+  if (window.innerWidth > 1200) return colorTypeList;
+  const a = colorTypeList.filter((v) => {
+    if(v.label == 'LAB' || v.label == 'LCH' || v.label == 'XYZ' || v.label == 'HSV') return false
+    return true;
+  });
+  return a;
+}
+
 export {
-  getColorString
+  getColorString,
+  pickColorTypeList
 }

@@ -1,3 +1,4 @@
+// 颜色类型列表
 const colorTypeList = [
   { label: '#HEX', value: 'HEX1' },
   { label: 'HEX', value: 'HEX' },
@@ -16,4 +17,25 @@ const colorTypeList = [
   { label: '颜色名称', value: 'TEXT' },
 ];
 
-export { colorTypeList };
+import { ChinesePainting, ChineseTraditional, JapaneseColor } from "./data/index"
+
+// 颜色数据
+const colorDataList = [
+  {
+    key: 'chinese-traditional',
+    label: `中国传统色彩`,
+    data: ChineseTraditional
+  },
+  {
+    key: 'chinese-painting',
+    label: `国画常用色彩`,
+    data: ChinesePainting
+  },
+  {
+    key: 'japanese-color',
+    label: `日式配色`,
+    data: JapaneseColor
+  },
+];
+
+export { colorTypeList, colorDataList };

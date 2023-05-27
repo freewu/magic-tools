@@ -1,5 +1,6 @@
 import { Divider } from "antd";
 import { default as ColorCard } from "./color-card"
+import type { ColorPadProps } from "./interface"
 
 const ColorPad = ({ colorList, height, colorClickEvent } :ColorPadProps ) => {
 
@@ -23,10 +24,3 @@ const ColorPad = ({ colorList, height, colorClickEvent } :ColorPadProps ) => {
   );
 }
 export default ColorPad;
-
-// ColorPad 接收参数
-export interface ColorPadProps {
-  colorList?: Array<any> // 颜色列表 [{label:"黑",code:"#000000"}]
-  height: string, // 颜色盘高度 窗口缩放需要调整 "800px"
-  colorClickEvent: Function, // 单击颜色的事件
-}
