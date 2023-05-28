@@ -16,6 +16,7 @@ const ColorConvert = () => {
   const [ colorData, setColorData ] = useState(emptyResult); // 转换的结果
   const [ notice, contextHolder] = message.useMessage();
   const [ colorPickerHex, setColorPickerHex ] = useState<Color | string>('#1677ff'); // colorPicker 默认颜色
+  const [ showPercent, setShowPercent ] = useState(false); // 是否显示 % 
 
   const inputStyle = { cursor: "pointer" };
 
@@ -91,7 +92,7 @@ const ColorConvert = () => {
     setColorData(result);
   }
 
-  // 
+  // 取色器选择颜色事件
   const onColorPickerChange = (value: Color, hex: string) => {
     setColorPickerHex(value);
     setColorType('HEX');
@@ -105,6 +106,11 @@ const ColorConvert = () => {
     covertColor(hex);
   }
 
+  // 切换显示 %
+  const handleShowPercentChange = ()  => {
+    setShowPercent(!showPercent);
+  }
+
   return (
     <div>
       {contextHolder}
@@ -116,6 +122,7 @@ const ColorConvert = () => {
           value={ colorType } 
         />
         <Checkbox onChange={ handleCheckboxChange } value={ checked }>大写字符显示</Checkbox>
+        {/* <Checkbox onChange={ handleShowPercentChange } value={ showPercent }>显示 %</Checkbox> */}
 
         <ColorPicker
           format={ 'hex'}

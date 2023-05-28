@@ -30,6 +30,11 @@ const appList = [
     icon: "",
     label: '颜色转换',
   },
+  {
+    key: 'NumberConvert',
+    icon: "",
+    label: '进制转换',
+  },
 ];
 
 export {
