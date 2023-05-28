@@ -21,6 +21,7 @@ const emptyResult = {
   "lch": "",
   "xyz": "",
   "keyword": "",
+  "complementaryColor": "",
 };
 
 export {

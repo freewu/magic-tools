@@ -50,6 +50,7 @@ const ColorConvert = () => {
         "lch": (checked)? colorData.lch.toLowerCase() : colorData.lch.toUpperCase(),
         "xyz": (checked)? colorData.xyz.toLowerCase() : colorData.xyz.toUpperCase(),
         "keyword": (checked)? colorData.keyword.toLowerCase() : colorData.keyword.toUpperCase(),
+        "complementaryColor": (checked)? colorData.complementaryColor.toLowerCase() : colorData.keyword.toUpperCase(), 
       };
       setColorData(result);
     }
@@ -83,6 +84,7 @@ const ColorConvert = () => {
       "lch": upperLowerTranslate(genColorString(colorHex, "LCH")),
       "xyz": upperLowerTranslate(genColorString(colorHex, "XYZ")),
       "keyword": upperLowerTranslate(genColorString(colorHex, "KEYWORD")),
+      "complementaryColor": upperLowerTranslate(genColorString(colorHex, "ComplementaryColor")),
     };
     setColorData(result);
   }
@@ -114,6 +116,13 @@ const ColorConvert = () => {
       <Form name="basic"labelCol={{ span: 2 }} autoComplete="off" size="small">
         <Form.Item label="颜色">
           <Input readOnly style={ { backgroundColor: colorData.hex } } />
+        </Form.Item>
+        <Form.Item label="互补色">
+          <Input 
+            readOnly onClick={ inputClick } 
+            style={ { cursor: "pointer", backgroundColor: colorData.complementaryColor } } 
+            value={ colorData.complementaryColor } 
+          />
         </Form.Item>
         <Form.Item label="Keyword">
           <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.keyword } />

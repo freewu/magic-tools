@@ -29,69 +29,80 @@ const genColorString = (color :string,colorType :string) :string => {
     case 'XYZ': 
       const xyz = hex.xyz(color);
       return `xyz(${xyz[0]}, ${xyz[1]}, ${xyz[2]})`;
+    case 'ComplementaryColor': 
+      return calcComplementaryColor(color);
   }
   return color;
 };
 
-  // 根据传入的值和颜色类型,转成  颜色的 HEX 值 
-  const transalte2Hex = (color:string,colorType:string) :string => {
-    color = color.replaceAll(" ","");
-    color = color.replaceAll("%","");
-    switch(colorType) {
-      case "HEX": return color;
-      case "RGB":
-        let colorRGB = /\((\d+),(\d+),(\d+)\)/.exec(color);
-        if (colorRGB === null) { // 处理 RGBA(R,G,B,A) 的情况
-          colorRGB = /\((\d+),(\d+),(\d+),(\d+)\)/.exec(color);
-        }
-        if (colorRGB !== null) {
-          return rgb.hex(parseInt(colorRGB[1]),parseInt(colorRGB[2]),parseInt(colorRGB[3]));
-        }
-        break;
-      case "HSL":
-        let colorHSL = /\((\d+),(\d+),(\d+)\)/.exec(color);
-        if (colorHSL === null) { // 处理 HSLA(H,S,L,A) 的情况
-          colorHSL = /\((\d+),(\d+),(\d+),(\d+)\)/.exec(color);
-        }
-        if (colorHSL !== null) {
-          return hsl.hex([parseInt(colorHSL[1]), parseInt(colorHSL[2]), parseInt(colorHSL[3])]);
-        }
-        break;
-      case "CMYK":
-        let colorCMYK = /\((\d+),(\d+),(\d+),(\d+)\)/.exec(color);
-        if (colorCMYK !== null) {
-          return cmyk.hex([parseInt(colorCMYK[1]), parseInt(colorCMYK[2]), parseInt(colorCMYK[3]), parseInt(colorCMYK[4])]);
-        }
-        break;
-      case "HSV":
-        let colorHSV = /\((\d+),(\d+),(\d+)\)/.exec(color);
-        if (colorHSV !== null) {
-          return hsl.hex([parseInt(colorHSV[1]), parseInt(colorHSV[2]), parseInt(colorHSV[3])]);
-        }
-        break;
-      case "LAB":
-        let colorLAB = /\((\d+),(\d+),(\d+)\)/.exec(color);
-        if (colorLAB !== null) {
-          return lab.hex([parseInt(colorLAB[1]), parseInt(colorLAB[2]), parseInt(colorLAB[3])]);
-        }
-        break;
-      case "LCH":
-        let colorLCH = /\((\d+),(\d+),(\d+)\)/.exec(color);
-        if (colorLCH !== null) {
-          return lch.hex([parseInt(colorLCH[1]), parseInt(colorLCH[2]), parseInt(colorLCH[3])]);
-        }
-        break;
-      case "XYZ":
-        let colorXYZ = /\((\d+),(\d+),(\d+)\)/.exec(color);
-        if (colorXYZ !== null) {
-          return xyz.hex([parseInt(colorXYZ[1]), parseInt(colorXYZ[2]), parseInt(colorXYZ[3])]);
-        }
-        break;
-    }
-    return "";
+// 根据传入的值和颜色类型,转成  颜色的 HEX 值 
+const transalte2Hex = (color:string,colorType:string) :string => {
+  color = color.replaceAll(" ","");
+  color = color.replaceAll("%","");
+  switch(colorType) {
+    case "HEX": return color;
+    case "RGB":
+      let colorRGB = /\((\d+),(\d+),(\d+)\)/.exec(color);
+      if (colorRGB === null) { // 处理 RGBA(R,G,B,A) 的情况
+        colorRGB = /\((\d+),(\d+),(\d+),(\d+)\)/.exec(color);
+      }
+      if (colorRGB !== null) {
+        return rgb.hex(parseInt(colorRGB[1]),parseInt(colorRGB[2]),parseInt(colorRGB[3]));
+      }
+      break;
+    case "HSL":
+      let colorHSL = /\((\d+),(\d+),(\d+)\)/.exec(color);
+      if (colorHSL === null) { // 处理 HSLA(H,S,L,A) 的情况
+        colorHSL = /\((\d+),(\d+),(\d+),(\d+)\)/.exec(color);
+      }
+      if (colorHSL !== null) {
+        return hsl.hex([parseInt(colorHSL[1]), parseInt(colorHSL[2]), parseInt(colorHSL[3])]);
+      }
+      break;
+    case "CMYK":
+      let colorCMYK = /\((\d+),(\d+),(\d+),(\d+)\)/.exec(color);
+      if (colorCMYK !== null) {
+        return cmyk.hex([parseInt(colorCMYK[1]), parseInt(colorCMYK[2]), parseInt(colorCMYK[3]), parseInt(colorCMYK[4])]);
+      }
+      break;
+    case "HSV":
+      let colorHSV = /\((\d+),(\d+),(\d+)\)/.exec(color);
+      if (colorHSV !== null) {
+        return hsl.hex([parseInt(colorHSV[1]), parseInt(colorHSV[2]), parseInt(colorHSV[3])]);
+      }
+      break;
+    case "LAB":
+      let colorLAB = /\((\d+),(\d+),(\d+)\)/.exec(color);
+      if (colorLAB !== null) {
+        return lab.hex([parseInt(colorLAB[1]), parseInt(colorLAB[2]), parseInt(colorLAB[3])]);
+      }
+      break;
+    case "LCH":
+      let colorLCH = /\((\d+),(\d+),(\d+)\)/.exec(color);
+      if (colorLCH !== null) {
+        return lch.hex([parseInt(colorLCH[1]), parseInt(colorLCH[2]), parseInt(colorLCH[3])]);
+      }
+      break;
+    case "XYZ":
+      let colorXYZ = /\((\d+),(\d+),(\d+)\)/.exec(color);
+      if (colorXYZ !== null) {
+        return xyz.hex([parseInt(colorXYZ[1]), parseInt(colorXYZ[2]), parseInt(colorXYZ[3])]);
+      }
+      break;
   }
+  return "";
+};
+
+// 获取 传入的 hex 的互补色的 hex #FF0000 => #00FFFF
+const calcComplementaryColor = (color: string) :string => {
+  color = color.replace("#","").trim();
+  const colorRGB = hex.rgb(color);
+
+  return "#" + rgb.hex([255 - colorRGB[0],255 - colorRGB[1],255 - colorRGB[2]]);
+}
 
 export {
   genColorString,
-  transalte2Hex
+  transalte2Hex,
+  calcComplementaryColor,
 }
