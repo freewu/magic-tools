@@ -1,10 +1,11 @@
-import { Checkbox, Form, Input, Divider, message, Space, Radio, Button } from "antd";
+import { Checkbox, Form, Input, Divider, message, Space, Radio, Button, ColorPicker } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
 import { genColorString, transalte2Hex } from "./lib"
 import { colorTypeList, emptyResult } from "./data"
 import type { RadioChangeEvent } from 'antd';
+import type { Color } from 'antd/es/color-picker';
 
 const ColorConvert = () => {
 
@@ -14,6 +15,7 @@ const ColorConvert = () => {
   const [ checked, setChecked ] = useState(false); // 输出大小写
   const [ colorData, setColorData ] = useState(emptyResult); // 转换的结果
   const [ notice, contextHolder] = message.useMessage();
+  const [ colorPickerHex, setColorPickerHex ] = useState<Color | string>('#1677ff'); // colorPicker 默认颜色
 
   const inputStyle = { cursor: "pointer" };
 
@@ -50,7 +52,7 @@ const ColorConvert = () => {
         "lch": (checked)? colorData.lch.toLowerCase() : colorData.lch.toUpperCase(),
         "xyz": (checked)? colorData.xyz.toLowerCase() : colorData.xyz.toUpperCase(),
         "keyword": (checked)? colorData.keyword.toLowerCase() : colorData.keyword.toUpperCase(),
-        "complementaryColor": (checked)? colorData.complementaryColor.toLowerCase() : colorData.keyword.toUpperCase(), 
+        "complementaryColor": (checked)? colorData.complementaryColor.toLowerCase() : colorData.complementaryColor.toUpperCase(), 
       };
       setColorData(result);
     }
@@ -89,6 +91,20 @@ const ColorConvert = () => {
     setColorData(result);
   }
 
+  // 
+  const onColorPickerChange = (value: Color, hex: string) => {
+    setColorPickerHex(value);
+    setColorType('HEX');
+    setValue(hex);
+
+    // 更新输入提示信息
+    const tips = colorTypeList.find(item => item.label === 'HEX')?.placeholder;
+    setPlaceholder(tips + "");
+    
+    // 转换 
+    covertColor(hex);
+  }
+
   return (
     <div>
       {contextHolder}
@@ -100,6 +116,13 @@ const ColorConvert = () => {
           value={ colorType } 
         />
         <Checkbox onChange={ handleCheckboxChange } value={ checked }>大写字符显示</Checkbox>
+
+        <ColorPicker
+          format={ 'hex'}
+          value={ colorPickerHex }
+          onChange={ onColorPickerChange }
+        />
+          
         <Button 
           onClick={ () => { setValue(''); setColorData(emptyResult); } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
