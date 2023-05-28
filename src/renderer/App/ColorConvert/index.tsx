@@ -66,19 +66,23 @@ const ColorConvert = () => {
     }
   }
 
+  const upperLowerTranslate = (str :string) :string => {
+    return checked? str.toUpperCase() : str.toLowerCase()
+  }
+
   const covertColor = (value :string) => {
     setValue(value);
-    const hex = transalte2Hex(value, colorType);
+    const colorHex = transalte2Hex(value, colorType);
     const result = {
-      "hex": genColorString(value, "HEX"),
-      "rgb": genColorString(value, "RGB"),
-      "hsl": genColorString(value, "HSL"),
-      "cmyk": genColorString(value, "CMYK"),
-      "hsv": genColorString(value, "HSV"),
-      "lab": genColorString(value, "LAB"),
-      "lch": genColorString(value, "LCH"),
-      "xyz": genColorString(value, "XYZ"),
-      "keyword": genColorString(value, "KEYWORD"),
+      "hex": upperLowerTranslate(genColorString(colorHex, "HEX")),
+      "rgb": upperLowerTranslate(genColorString(colorHex, "RGB")),
+      "hsl": upperLowerTranslate(genColorString(colorHex, "HSL")),
+      "cmyk": upperLowerTranslate(genColorString(colorHex, "CMYK")),
+      "hsv": upperLowerTranslate(genColorString(colorHex, "HSV")),
+      "lab": upperLowerTranslate(genColorString(colorHex, "LAB")),
+      "lch": upperLowerTranslate(genColorString(colorHex, "LCH")),
+      "xyz": upperLowerTranslate(genColorString(colorHex, "XYZ")),
+      "keyword": upperLowerTranslate(genColorString(colorHex, "KEYWORD")),
     };
     setColorData(result);
   }
