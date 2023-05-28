@@ -1,4 +1,4 @@
-import { Tabs, message, Radio, Tooltip, Slider, Space } from "antd";
+import { Tabs, message, Radio, Tooltip, Slider, Space, Badge } from "antd";
 import { default as ColorPad } from "./color-pad"
 import { default as LevitationBox } from "./levitation-box"
 import { useState } from "react";
@@ -31,7 +31,8 @@ const Color = () => {
       setHeight(genColorPadHeight()) 
       // 改变转换颜色类型 ( 为了美观 小窗口不展示那么多)
       setTypeList(pickColorTypeList())
-    },100));
+    },100)
+  );
 
   const onTabChange = (key: any) => {
     console.log(key);

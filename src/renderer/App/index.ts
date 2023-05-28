@@ -25,6 +25,11 @@ const appList = [
     icon: "",
     label: 'CSS 配色',
   },
+  {
+    key: 'ColorConvert',
+    icon: "",
+    label: '颜色转换',
+  },
 ];
 
 export {
