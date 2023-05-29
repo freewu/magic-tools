@@ -30,3 +30,8 @@ export function debounce(operate:Function, delay:number) {
     }
   }
 }
+
+// 每间隔多少字符插入指定了符
+export function insertIntervalString(str :string, disNum :number = 4, insertStr:string  = " ") {
+  return str.replace(new RegExp("(.{" + disNum + "})", "g"), "$1" + insertStr);
+}
