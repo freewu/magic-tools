@@ -1,8 +1,10 @@
 import { Form, Switch, Divider, notification } from "antd";
 import { getSiderFlag } from "../../lib/setting";
 import { useState } from "react";
+import "./setting.css";
 
 import { default as AppStoreSetting } from "../AppStore/setting";
+import { default as HashSetting } from "../Hash/setting";
 
 const Setting = () => {
   const [ siderFlag, setSiderFlag ] = useState(getSiderFlag());
@@ -23,6 +25,7 @@ const Setting = () => {
         <Switch checked={ siderFlag } onChange={ onChangeSiderFlag } />
       </Form.Item>
       <AppStoreSetting />
+      <HashSetting />
     </Form>
   );
 }

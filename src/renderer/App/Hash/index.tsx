@@ -2,22 +2,15 @@ import { Checkbox, Form, Input, Divider, message, Space,Tag } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
-
+import { emptyResult, HashResult } from "./data"
 import sha256 from 'crypto-js/sha256';
 import sha1 from 'crypto-js/sha1';
 import sha512 from 'crypto-js/sha512';
 import md5 from 'crypto-js/md5';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
+import { getPasswordList } from "./lib"
 
 const Hash = () => {
-
-  const emptyResult = {
-    "md5": "",
-    "md516": "",
-    "sha1": "",
-    "sha256": "",
-    "sha512": "",
-  };
 
   const [ value, setValue ] = useState('');
   const [ checked, setChecked ] = useState(false);
@@ -37,16 +30,15 @@ const Hash = () => {
   }
 
   const onChange = (e :CheckboxChangeEvent) => {
-    const flag = e.target.checked;
-    setChecked(e.target.checked);
+    setChecked(!checked);
     // 如果加密内容不为空，处理 hash 值的大小问题
     if ( value.trim() != "") {
       const result = {
-        "md5": upperLowerFormat(hash["md5"],flag),
-        "md516": upperLowerFormat(hash["md516"],flag),
-        "sha1": upperLowerFormat(hash["sha1"],flag),
-        "sha256": upperLowerFormat(hash["sha256"],flag),
-        "sha512": upperLowerFormat(hash["sha512"],flag),
+        "md5": upperLowerFormat(hash["md5"],!checked),
+        "md516": upperLowerFormat(hash["md516"],!checked),
+        "sha1": upperLowerFormat(hash["sha1"],!checked),
+        "sha256": upperLowerFormat(hash["sha256"],!checked),
+        "sha512": upperLowerFormat(hash["sha512"],!checked),
       };
       setHash(result);
     }
@@ -56,13 +48,13 @@ const Hash = () => {
     const value = e.target.value.trim();
     setValue(value);
     if (value != "") {
-      calHash(value);
+      calcHash(value);
     } else {
       setHash(emptyResult);
     }
   }
 
-  const calHash = (value :string) => {
+  const calcHash = (value :string) => {
     setValue(value);
     const result = {
       "md5": upperLowerFormat(md5(value).toString(),checked),
@@ -76,14 +68,31 @@ const Hash = () => {
     setHash(result);
   }
 
+  const calcTagColor = (index :number) => {
+    switch(index % 4) {
+      case 1: return '#2db7f5';
+      case 2: return '#87d068';
+      case 3: return '#108ee9';
+    }
+    return '#ff5500';
+  }
+
   return (
     <div>
       {contextHolder}
       <Space size={[0, 8]} wrap>
-        <Tag color="#ff5500" style={ inputStyle } onClick={ () => { calHash("admin") } } >admin</Tag>
-        <Tag color="#2db7f5" style={ inputStyle } onClick={ () => { calHash("123456") } }>123456</Tag>
-        <Tag color="#87d068" style={ inputStyle } onClick={ () => { calHash("12345678") } }>12345678</Tag>
-        <Tag color="#108ee9" style={ inputStyle } onClick={ () => { calHash("root") } }>root</Tag>
+        {
+           getPasswordList()?.map((password, index) => {
+              // 只展示 10 个
+              if(index < 10) {
+                return (
+                  <Tag 
+                    color={ calcTagColor(index) } style={ inputStyle } 
+                    onClick={ () => { calcHash(password) } } >{ password }</Tag>
+                )
+              }
+           })
+        }
       </Space>
       <TextArea
         style={ { margin: "5px 0 5px 0" }}
