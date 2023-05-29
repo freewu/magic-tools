@@ -64,10 +64,10 @@ const ColorConvert = () => {
 
   const convertHumanRead = (flag :boolean, data :NumberConvertResult) => {
     const result = {
-      "hex": (flag)? reverseString(insertIntervalString(reverseString(data.hex),2)) : data.hex.replaceAll(" ",""),
-      "bin": (flag)? reverseString(insertIntervalString(reverseString(data.bin),4)) : data.bin.replaceAll(" ",""),
-      "oct": (flag)? reverseString(insertIntervalString(reverseString(data.oct),4)) : data.oct.replaceAll(" ",""),
-      "dec": (flag)? reverseString(insertIntervalString(reverseString(data.dec),4)) : data.dec.replaceAll(" ",""),
+      "hex": (flag)? reverseString(insertIntervalString(reverseString(data.hex),2)).trim() : data.hex.replaceAll(" ",""),
+      "bin": (flag)? reverseString(insertIntervalString(reverseString(data.bin),4)).trim() : data.bin.replaceAll(" ",""),
+      "oct": (flag)? reverseString(insertIntervalString(reverseString(data.oct),4)).trim() : data.oct.replaceAll(" ",""),
+      "dec": (flag)? reverseString(insertIntervalString(reverseString(data.dec),4)).trim() : data.dec.replaceAll(" ",""),
     };
     return result
   }
@@ -138,7 +138,7 @@ const ColorConvert = () => {
       <Divider dashed />
       <Form name="basic"labelCol={{ span: 2 }} autoComplete="off">
         <Form.Item label="二进制">
-          <TextArea readOnly style={ inputStyle } onClick={ inputClick } value= { numberData.bin } />
+          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { numberData.bin } />
         </Form.Item>
         <Form.Item label="八进制">
           <Input readOnly style={ inputStyle } onClick={ inputClick } value= { numberData.oct } />
