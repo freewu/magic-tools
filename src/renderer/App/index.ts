@@ -28,7 +28,7 @@ const appList = [
   {
     key: 'ColorConvert',
     icon: "",
-    label: '颜色转换',
+    label: '颜色格式转换',
   },
   {
     key: 'NumberConvert',
