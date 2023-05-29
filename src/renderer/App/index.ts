@@ -8,12 +8,12 @@ const appList = [
   {
     key: 'Base64',
     icon: "",
-    label: 'Base64 编码',
+    label: 'Base64 编解码',
   },
   {
     key: 'URL',
     icon: "",
-    label: 'URL 编码',
+    label: 'URL 编解码',
   },
   {
     key: 'Time',
@@ -35,6 +35,16 @@ const appList = [
     icon: "",
     label: '进制转换',
   },
+  {
+    key: 'QRCodeGenerator',
+    icon: "",
+    label: '二维码生成',
+  },
+  // {
+  //   key: 'AESCrypto',
+  //   icon: "",
+  //   label: 'AES 加解密',
+  // },
 ];
 
 export {

@@ -1,5 +1,5 @@
 import { hex } from "color-convert"
-import { colorTypeList } from "./data"
+import { colorTypeList,colorDataList } from "./data"
 
 // 获取要写入到粘贴板的数据
 const getColorString = (color :string,label :string,colorType :string, opacity :number) :string => {
@@ -47,6 +47,52 @@ const pickColorTypeList = () => {
     return true;
   });
   return a;
+}
+
+const DEFAULT_COLORPAD_ITEM = 'color:default-color-pad';
+
+// 获取默认显示的颜色板
+export function getDefaultColorPad() :string  {
+  const defaultColorPad = localStorage.getItem(DEFAULT_COLORPAD_ITEM);
+  // 如果没有设置默认展示的颜色板，默认显示 chinese-traditional
+  return (defaultColorPad === null)? "chinese-traditional" : defaultColorPad;
+}
+
+// 设置默认显示的颜色板
+export function setDefaultColorPad(pad: string) : void  {
+  localStorage.setItem(DEFAULT_COLORPAD_ITEM,pad);
+}
+
+const DEFAULT_BATCHSWITCH_ITEM = 'color:default-batch-switch';
+
+// 获取是否默认打开批量取色
+export function getDefaultBatchSwitch() :boolean  {
+  const flag = localStorage.getItem(DEFAULT_BATCHSWITCH_ITEM);
+  // 如果没有设置是否默认打开批量取色，默认 false
+  let a = (flag === null)? false : flag === "true";
+  return a;
+}
+
+// 设置是否默认打开批量取色
+export function setDefaultBatchSwitch(flag: boolean) : void  {
+  localStorage.setItem(DEFAULT_BATCHSWITCH_ITEM, flag.toString());
+}
+
+const DEFAULT_OPACITY_ITEM = 'color:default-opacity';
+
+// 获取默认不透明度
+export function getDefaultOpacity() :number {
+  const opacity = localStorage.getItem(DEFAULT_OPACITY_ITEM);
+  // 如果没有设置默认不透明度，默认 0.9
+  if (null === opacity) return 9;
+  let num = parseInt(opacity);
+  if(num > 10 || num < 0) return 9;
+  return num;
+}
+
+// 设置是否默认打开批量取色
+export function setDefaultOpacity(opacity :number) : void  {
+  localStorage.setItem(DEFAULT_OPACITY_ITEM, opacity.toString());
 }
 
 export {

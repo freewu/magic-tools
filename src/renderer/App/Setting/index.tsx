@@ -5,6 +5,8 @@ import "./setting.css";
 
 import { default as AppStoreSetting } from "../AppStore/setting";
 import { default as HashSetting } from "../Hash/setting";
+import { default as ColorSetting } from "../Color/setting";
+import { default as QRCodeGeneratorSetting } from "../QRCodeGenerator/setting";
 
 const Setting = () => {
   const [ siderFlag, setSiderFlag ] = useState(getSiderFlag());
@@ -16,7 +18,7 @@ const Setting = () => {
 
   return (
     <Form
-      labelCol={{ span: 4 }}
+      labelCol={{ span: 5 }}
       wrapperCol={{ span: 18 }}
       layout="horizontal"
       style={{ maxWidth: 800 }}
@@ -26,6 +28,8 @@ const Setting = () => {
       </Form.Item>
       <AppStoreSetting />
       <HashSetting />
+      <ColorSetting />
+      <QRCodeGeneratorSetting />
     </Form>
   );
 }

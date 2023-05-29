@@ -4,7 +4,7 @@ import { default as LevitationBox } from "./levitation-box"
 import { useState } from "react";
 import type { RadioChangeEvent } from 'antd';
 import { copyTextToClipboard, debounce } from "../../lib";
-import { getColorString, pickColorTypeList } from "./lib";
+import { getColorString, pickColorTypeList, getDefaultColorPad, getDefaultBatchSwitch, getDefaultOpacity } from "./lib";
 import "./color.css"
 import { colorDataList } from "./data"
 import type { PickColorEntity } from "./interface"
@@ -19,9 +19,9 @@ const Color = () => {
   const [ height, setHeight ] = useState(genColorPadHeight()); // 颜色板高度
   const [ colorType, setColorType ] = useState('HEX1'); // 选中择颜色类型
   const [ opacityDisabled, setOpacityDisabled ] = useState(true); // 不透明度不可用 开启/关闭透明度选择器 
-  const [ opacity, setOpacity ] = useState(9); // // 不透明度
+  const [ opacity, setOpacity ] = useState(getDefaultOpacity()); // // 不透明度
   const [ typeList, setTypeList ] = useState(pickColorTypeList()); // 颜色类型列表
-  const [ batchPickFlag, setBatchPickFlag ] = useState(false); // 是否开启批量取色
+  const [ batchPickFlag, setBatchPickFlag ] = useState(getDefaultBatchSwitch()); // 是否开启批量取色
   const [ pickColorList, setPickColorList ] = useState(Array<PickColorEntity>); // 批量取色列表
 
   // 窗体大小发生变化,改变窗口大小
@@ -123,7 +123,7 @@ const Color = () => {
       />
       </div>
     </Space>
-    <Tabs defaultValue={ "chinese-traditional" } items={ items } onChange={ onTabChange } />
+    <Tabs activeKey={ getDefaultColorPad() } items={ items } onChange={ onTabChange } />
     {/* 悬浮框 */}
     <LevitationBox colorList={ pickColorList } flag={ batchPickFlag } flagChangeEvent={ setBatchPickFlag } colorListChange={ updatePickColorList } />
     </>
