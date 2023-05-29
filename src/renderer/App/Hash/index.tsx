@@ -45,9 +45,9 @@ const Hash = () => {
   };
 
   const textAreaChange = (e :React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value.trim();
+    const value = e.target.value;
     setValue(value);
-    if (value != "") {
+    if (value.trim() != "") {
       calcHash(value);
     } else {
       setHash(emptyResult);
@@ -56,6 +56,7 @@ const Hash = () => {
 
   const calcHash = (value :string) => {
     setValue(value);
+    value = value.trim();
     const result = {
       "md5": upperLowerFormat(md5(value).toString(),checked),
       "md516": "",
@@ -99,7 +100,7 @@ const Hash = () => {
         value= { value }
         onChange={ textAreaChange }
         placeholder="输入需要计算 Hash 值的内容"
-        autoSize={{ minRows: 3, maxRows: 5 }}
+        autoSize={{ minRows: 5, maxRows: 5 }}
       />
       <Checkbox onChange={onChange} value={ checked }>大写字符显示</Checkbox>
 
