@@ -114,7 +114,7 @@ const ColorConvert = () => {
       {contextHolder}
 
       <Space>
-        <Radio.Group 
+        <Radio.Group
           optionType = "button" buttonStyle="solid"
           options = { numberTypeList } 
           onChange={ onNumberTypeChange } 

@@ -55,6 +55,7 @@ Base64编码后的字符串中可能包含"+/="之类的字符，而"/"，"="等
       {contextHolder}
 
       <TextArea
+        style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setEncodeValue(e.target.value) ;} }
         title="双击复制内容到粘贴板"
@@ -63,26 +64,26 @@ Base64编码后的字符串中可能包含"+/="之类的字符，而"/"，"="等
         autoSize={{ minRows: 5}}
       />
 
-      <Space direction="vertical" style={ { "margin" : "5px 0 5px 0"} }>
-        <Space wrap>
-          <Button 
-            onClick={ encode }
-            style={ {"backgroundColor" : "#007bff","color": "#fff" }} 
-            icon={<ArrowDownOutlined />}
-          >Base64 编码</Button>&nbsp;
-          <Button 
-            onClick={ decode }
-            style={ {"backgroundColor" : "#28a745","color": "#fff" }} 
-            icon={<ArrowUpOutlined />}
-          >Base64 解码</Button>&nbsp;
-          <Tooltip placement="bottomRight" title={ tips }>
-            <Checkbox onChange={ (e) => { setSafe(e.target.checked); } } value={ safe }>安全</Checkbox>
-          </Tooltip>
-          
-        </Space>
-      </Space>
-  
+      <Button 
+        onClick={ encode }
+        style={ {"backgroundColor" : "#007bff","color": "#fff" }} 
+        icon={<ArrowDownOutlined />}
+      >Base64 编码</Button>
+      <Button 
+        onClick={ decode }
+        style={ {"backgroundColor" : "#28a745","color": "#fff" }} 
+        icon={<ArrowUpOutlined />}
+      >Base64 解码</Button>&nbsp;
+      <Tooltip placement="bottomRight" title={ tips }>
+        <Checkbox onChange={ (e) => { setSafe(e.target.checked); } } value={ safe }>安全</Checkbox>
+      </Tooltip>&nbsp;
+      <Button 
+        onClick={ () => { setEncodeValue(''); setDecodeValue(''); } }
+        style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
+      >清除</Button>
+      
       <TextArea
+        style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setDecodeValue(e.target.value) ;} }
         title="双击复制内容到粘贴板"
