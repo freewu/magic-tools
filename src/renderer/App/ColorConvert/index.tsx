@@ -145,7 +145,9 @@ const ColorConvert = () => {
       <Divider dashed />
       <Form name="basic"labelCol={{ span: 2 }} autoComplete="off" size="small">
         <Form.Item label="颜色">
-          <Input readOnly style={ { backgroundColor: colorData.hex } } />
+          <Input readOnly onClick={ inputClick }  
+            style={ { cursor: "pointer", backgroundColor: colorData.hex } } 
+            value= { colorData.hex }/>
         </Form.Item>
         <Form.Item label="互补色">
           <Input 

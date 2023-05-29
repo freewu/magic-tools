@@ -23,6 +23,7 @@ const Color = () => {
   const [ typeList, setTypeList ] = useState(pickColorTypeList()); // 颜色类型列表
   const [ batchPickFlag, setBatchPickFlag ] = useState(getDefaultBatchSwitch()); // 是否开启批量取色
   const [ pickColorList, setPickColorList ] = useState(Array<PickColorEntity>); // 批量取色列表
+  const [ colorPad, setColorPad ] = useState(getDefaultColorPad()); // 默认显示的颜色板
 
   // 窗体大小发生变化,改变窗口大小
   window.addEventListener('resize',
@@ -33,9 +34,10 @@ const Color = () => {
       setTypeList(pickColorTypeList())
     },100)
   );
-
-  const onTabChange = (key: any) => {
-    console.log(key);
+  
+  // 切换颜色板 
+  const onTabChange = (key: string) => {
+    setColorPad(key);
   };
 
   const onColorTypeChange = ({ target: { value } }: RadioChangeEvent) => {
@@ -123,7 +125,7 @@ const Color = () => {
       />
       </div>
     </Space>
-    <Tabs activeKey={ getDefaultColorPad() } items={ items } onChange={ onTabChange } />
+    <Tabs activeKey={ colorPad } items={ items } onChange={ onTabChange } />
     {/* 悬浮框 */}
     <LevitationBox colorList={ pickColorList } flag={ batchPickFlag } flagChangeEvent={ setBatchPickFlag } colorListChange={ updatePickColorList } />
     </>
