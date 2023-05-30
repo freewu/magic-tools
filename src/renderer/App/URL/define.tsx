@@ -1,4 +1,4 @@
-const AppName = '进制转换';
+const AppName = 'URL 编解码';
 const Icon = ''
 
 export {

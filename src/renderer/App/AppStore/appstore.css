@@ -1,0 +1,20 @@
+.appstore {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  overflow-y: auto;
+  align-content: flex-start; /* 处理数据太少 行间问题 */
+}
+
+.app {
+  width: 168px;
+  height: 64px;
+  border: 1px solid #424c50;
+  cursor: pointer;
+  margin: 5px;
+  color: #000;
+  text-align: center;
+  padding-top:20px;
+  opacity: 0.9;
+  border-radius: 4px;
+}

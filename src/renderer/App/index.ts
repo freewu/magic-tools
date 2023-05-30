@@ -33,7 +33,7 @@ const getAppList = async () => {
 const appList = await getAppList();
 
 
-// // 定义 App
+// 定义 App
 // const appList = [
 //   {
 //     key: 'Hash',

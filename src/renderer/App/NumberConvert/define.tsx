@@ -1,4 +1,4 @@
-const AppName = '颜色格式转换';
+const AppName = '进制转换';
 const Icon = ''
 
 export {
