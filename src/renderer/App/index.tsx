@@ -7,7 +7,7 @@ const list = [
   'ColorConvert',
   'NumberConvert',
   'QRCodeGenerator',
-  //'AESCrypto',
+  'AESCrypto',
 ];
 
 // 加载 App 的定义 名称 / icon 
@@ -23,6 +23,7 @@ const getAppList = async () => {
   let p;
   list.forEach( item => {
     p = loadApp(item,({AppName, Icon} : any) => {
+      //const img = (Icon === "")? '' : <Icon component={ Icon } />;
       result.push({key: item, icon: Icon, label: AppName });
     });
   })

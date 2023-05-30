@@ -1,4 +1,4 @@
-import { Checkbox, Form, Input, Divider, message, Space, Radio, Button, ColorPicker } from "antd";
+import { Checkbox, Form, Input, Divider, message, Space, Radio, Button, ColorPicker, Row, Col } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
@@ -143,47 +143,56 @@ const ColorConvert = () => {
         autoSize={{ minRows: 2, maxRows: 2 }}
       />
       <Divider dashed />
-      <Form name="basic"labelCol={{ span: 2 }} autoComplete="off" size="small">
-        <Form.Item label="颜色">
-          <Input readOnly onClick={ inputClick }  
-            style={ { cursor: "pointer", backgroundColor: colorData.hex } } 
-            value= { colorData.hex }/>
-        </Form.Item>
-        <Form.Item label="互补色">
-          <Input 
-            readOnly onClick={ inputClick } 
-            style={ { cursor: "pointer", backgroundColor: colorData.complementaryColor } } 
-            value={ colorData.complementaryColor } 
-          />
-        </Form.Item>
-        <Form.Item label="Keyword">
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.keyword } />
-        </Form.Item>
-        <Form.Item label="HEX">
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.hex } />
-        </Form.Item>
-        <Form.Item label="RGB">
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.rgb } />
-        </Form.Item>
-        <Form.Item label="HSL">
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.hsl } />
-        </Form.Item>
-        <Form.Item label="CMYK">
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.cmyk }/>
-        </Form.Item>
-        <Form.Item label="HSV">
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.hsv }/>
-        </Form.Item>
-        <Form.Item label="LAB">
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.lab }/>
-        </Form.Item>
-        <Form.Item label="LCH">
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.lch }/>
-        </Form.Item>
-        <Form.Item label="XYZ">
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.xyz }/>
-        </Form.Item>
-      </Form>
+      <Row wrap>
+        <Col span={12}>
+          <Form name="basic" labelCol={{ span: 4 }} autoComplete="off">
+            <Form.Item label="颜色">
+              <Input readOnly onClick={ inputClick }  
+                style={ { cursor: "pointer", backgroundColor: colorData.hex } } 
+                value= { colorData.hex }/>
+            </Form.Item>
+            <Form.Item label="HEX">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.hex } />
+            </Form.Item>
+            <Form.Item label="RGB">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.rgb } />
+            </Form.Item>
+            <Form.Item label="HSL">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.hsl } />
+            </Form.Item>
+            <Form.Item label="CMYK">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.cmyk }/>
+            </Form.Item>
+            <Form.Item label="Keyword">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.keyword } />
+            </Form.Item>
+          </Form>
+        </Col>
+        <Col span={12}>
+          <Form name="basic" labelCol={{ span: 4 }} autoComplete="off">
+            <Form.Item label="互补色">
+              <Input 
+                readOnly onClick={ inputClick } 
+                style={ { cursor: "pointer", backgroundColor: colorData.complementaryColor } } 
+                value={ colorData.complementaryColor } 
+              />
+            </Form.Item>
+            <Form.Item label="HSV">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.hsv }/>
+            </Form.Item>
+            <Form.Item label="LAB">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.lab }/>
+            </Form.Item>
+            <Form.Item label="LCH">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.lch }/>
+            </Form.Item>
+            <Form.Item label="XYZ">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.xyz }/>
+            </Form.Item>
+          </Form>
+        </Col>
+      </Row>
+
     </div>
   );
 }

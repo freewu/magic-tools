@@ -2,6 +2,7 @@ import { Space } from "antd";
 import { appList } from "../index";
 import { useNavigate } from "react-router-dom"
 import "./appstore.css"
+import Icon from '@ant-design/icons';
 
 const AppStore = () => {
   const navigate = useNavigate();
@@ -17,14 +18,24 @@ const AppStore = () => {
     <div className="appstore">
     {
       appList.map((item, index) => {
-        return (
-          <div className="app" onClick={ colClick } style={ handStyle } data-uri={ item.key }>
-            <Space>
-              {/* <MenuUnfoldOutlined /> &nbsp; &nbsp; */}
-              { item.label }
-            </Space>
-          </div>
-        );
+        if ("" == item.icon) {
+          return (
+            <div className="app" onClick={ colClick } style={ handStyle } data-uri={ item.key }>
+              <Space>
+                { item.label }
+              </Space>
+            </div>
+          );
+        } else {
+          return (
+            <div className="app" onClick={ colClick } style={ handStyle } data-uri={ item.key }>
+              <Space>
+                { item.icon }
+                { item.label }
+              </Space>
+            </div>
+          );
+        }
       })
     }
     </div>

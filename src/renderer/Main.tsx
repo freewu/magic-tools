@@ -20,14 +20,16 @@ const lazyLoad = (moduleName: string) => {
 };
 
 const Main = () => {
+  const defaultApp = getDefaultApp();
   const [ collapsed, setCollapsed ] = useState(!getSiderFlag());
+  const [ app, setApp ] = useState(defaultApp);
   const { token: { colorBgContainer } } = theme.useToken();
   const navigate = useNavigate();
-  const defaultApp = getDefaultApp();
 
   // menu 点击处理
   const menuClick = ( e:any ) => {
-    navigate(e.key, { replace: true })
+    setApp(e.key);
+    navigate(e.key, { replace: true });
   }
 
   return (
@@ -70,7 +72,7 @@ const Main = () => {
         <Menu
           theme="dark"
           mode="inline"
-          defaultSelectedKeys={[defaultApp]}
+          activeKey={ app }
           onClick = { menuClick }
           items={ appList }
         />

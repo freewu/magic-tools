@@ -1,5 +1,5 @@
 const AppName = '应用中心';
-const Icon = ''
+import { AppstoreOutlined as Icon } from '@ant-design/icons';
 
 export {
   AppName,
