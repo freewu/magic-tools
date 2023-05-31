@@ -4,7 +4,7 @@
 
 ## 功能模块
 ```
-Hash 值计算 ( MD5 / SHA1 / SHA256 / SHA512 )
+Hash 值计算 ( MD5 / SHA1 / SHA3 / SHA256 / SHA512 )
 Base64 编码 / 解码
 URL 编码 / 解码
 时间戳转换
@@ -14,8 +14,10 @@ CSS 配色
 二维码生成 
 
 -- 待开发 ------------------
+Hmac 计算
 AES 加密 / 解密 进行中
 DES 加密 / 解密
+3DES 加密 / 解密
 CRC 计算
 JSON 格式化
 SQL 格式化

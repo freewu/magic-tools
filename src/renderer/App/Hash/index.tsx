@@ -7,6 +7,7 @@ import sha256 from 'crypto-js/sha256';
 import sha1 from 'crypto-js/sha1';
 import sha512 from 'crypto-js/sha512';
 import md5 from 'crypto-js/md5';
+import sha3 from 'crypto-js/sha3';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
 import { getPasswordList } from "./lib"
 
@@ -39,6 +40,7 @@ const Hash = () => {
         "sha1": upperLowerFormat(hash["sha1"],!checked),
         "sha256": upperLowerFormat(hash["sha256"],!checked),
         "sha512": upperLowerFormat(hash["sha512"],!checked),
+        "sha3": upperLowerFormat(hash["sha3"],!checked),
       };
       setHash(result);
     }
@@ -63,6 +65,7 @@ const Hash = () => {
       "sha1": upperLowerFormat(sha1(value).toString(),checked),
       "sha256": upperLowerFormat(sha256(value).toString(),checked),
       "sha512": upperLowerFormat(sha512(value).toString(),checked),
+      "sha3": upperLowerFormat(sha3(value).toString(),checked),
     };
     // 处理 16 位 md5 
     result["md516"] = upperLowerFormat(result["md5"].substring(8,24),checked); // 取 9-24 位
@@ -115,6 +118,9 @@ const Hash = () => {
         </Form.Item>
         <Form.Item label="SHA1">
           <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha1 } />
+        </Form.Item>
+        <Form.Item label="SHA3">
+          <TextArea readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha3 } />
         </Form.Item>
         <Form.Item label="SHA256">
           <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha256 }/>

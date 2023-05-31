@@ -3,6 +3,7 @@ const emptyResult :HashResult = {
   "md5": "",
   "md516": "",
   "sha1": "",
+  "sha3": "",
   "sha256": "",
   "sha512": "",
 };
@@ -12,6 +13,7 @@ type HashResult = {
   "md5": string,
   "md516": string,
   "sha1": string,
+  "sha3": string,
   "sha256": string,
   "sha512": string,
 }
