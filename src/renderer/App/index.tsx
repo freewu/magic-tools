@@ -8,6 +8,7 @@ const list = [
   'NumberConvert',
   'QRCodeGenerator',
   //'AESCrypto',
+  'HmacHash',
 ];
 
 // 加载 App 的定义 名称 / icon 

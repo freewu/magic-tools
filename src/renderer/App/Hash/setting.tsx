@@ -8,11 +8,14 @@ const HashSetting = () => {
 
   const onTextAreaChange = (e :React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-    setValue(value);
-
     let arr = value.trim().split("\n");
     arr = arr.map((item) => { return item.trim().replaceAll(" ",""); }) // 去掉所有空格
     arr = arr.filter((item) => { return "" !== item.trim() });  // remove empty elements. 
+    // if(arr.length >= 10) {
+    //   setValue(arr.join("\n"));
+    //   return false;
+    // }
+    setValue(value);
     // 更新配置信息
     setPasswordList(arr);
   };

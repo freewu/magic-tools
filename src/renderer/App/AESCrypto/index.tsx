@@ -48,7 +48,7 @@ const AESCrypto = () => {
     try {
       const value = CryptoJS.AES.encrypt(
         encodeValue,
-        CryptoJS.enc.Utf8.parse(passphrase), // passphrase, 不能直接传string 要不然会 CryptoJS 会加 salt
+        CryptoJS.enc.Hex.parse(passphrase), // passphrase, 不能直接传string 要不然会 CryptoJS 会加 salt
         {
           mode: getMode(mode),
           padding: getPadding(padding),
@@ -71,7 +71,7 @@ const AESCrypto = () => {
     try {
       const value = aes.decrypt(
         decodeValue,
-        CryptoJS.enc.Utf8.parse(passphrase), // passphrase, 不能直接传string 要不然会 CryptoJS 会加 salt
+        CryptoJS.enc.Hex.parse(passphrase), // passphrase, 不能直接传string 要不然会 CryptoJS 会加 salt
         {
           mode: getMode(mode),
           padding: getPadding(padding),
