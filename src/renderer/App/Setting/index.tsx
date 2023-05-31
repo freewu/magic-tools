@@ -8,7 +8,7 @@ import { default as AppStoreSetting } from "../AppStore/setting";
 import { default as HashSetting } from "../Hash/setting";
 import { default as ColorSetting } from "../Color/setting";
 import { default as QRCodeGeneratorSetting } from "../QRCodeGenerator/setting";
-
+import { default as AESCryptoSetting } from "../AESCrypto/setting";
 
 const Setting = () => {
   const genSettingFormHeight = () => {
@@ -41,6 +41,7 @@ const Setting = () => {
         <HashSetting />
         <ColorSetting />
         <QRCodeGeneratorSetting />
+        <AESCryptoSetting />
       </Form>
     </div>
   );

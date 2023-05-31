@@ -7,7 +7,7 @@ const list = [
   'ColorConvert',
   'NumberConvert',
   'QRCodeGenerator',
-  'AESCrypto',
+  //'AESCrypto',
 ];
 
 // 加载 App 的定义 名称 / icon 
