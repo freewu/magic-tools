@@ -148,7 +148,7 @@ const ColorConvert = () => {
           <Form name="basic" labelCol={{ span: 4 }} autoComplete="off">
             <Form.Item label="颜色">
               <Input readOnly onClick={ inputClick }  
-                style={ { cursor: "pointer", backgroundColor: colorData.hex } } 
+                style={ { cursor: "pointer", backgroundColor: colorData.hex, color: colorData.complementaryColor } } 
                 value= { colorData.hex }/>
             </Form.Item>
             <Form.Item label="HEX">
@@ -173,7 +173,7 @@ const ColorConvert = () => {
             <Form.Item label="互补色">
               <Input 
                 readOnly onClick={ inputClick } 
-                style={ { cursor: "pointer", backgroundColor: colorData.complementaryColor } } 
+                style={ { cursor: "pointer", backgroundColor: colorData.complementaryColor, color: colorData.hex } } 
                 value={ colorData.complementaryColor } 
               />
             </Form.Item>

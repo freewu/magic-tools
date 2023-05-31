@@ -17,7 +17,12 @@ const colorTypeList = [
   { label: '颜色名称', value: 'TEXT' },
 ];
 
-import { ChinesePainting, ChineseTraditional, JapaneseColor } from "./data/index"
+import { 
+  ChinesePainting, 
+  ChineseTraditional, 
+  JapaneseColor,
+  RalClassic 
+} from "./data/index"
 
 // 颜色数据
 const colorDataList = [
@@ -35,6 +40,11 @@ const colorDataList = [
     key: 'japanese-color',
     label: `日式配色`,
     data: JapaneseColor
+  },
+  {
+    key: 'ral-classic',
+    label: `Ral Classic`,
+    data: RalClassic
   },
 ];
 

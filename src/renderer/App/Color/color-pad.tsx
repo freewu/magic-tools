@@ -11,7 +11,7 @@ const ColorPad = ({ colorList, height, colorClickEvent } :ColorPadProps ) => {
         // 如果代码为空 说明需要插入一个分割行
         if(item.code == "") {
           return (
-            <Divider />
+            <Divider orientation="left" plain>{ item.label }</Divider>
           );
         } else {
           return (
