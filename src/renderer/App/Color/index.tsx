@@ -4,7 +4,8 @@ import { default as LevitationBox } from "./levitation-box"
 import { useState } from "react";
 import type { RadioChangeEvent } from 'antd';
 import { copyTextToClipboard, debounce } from "../../lib";
-import { getColorString, pickColorTypeList, getDefaultColorPad, getDefaultBatchSwitch, getDefaultOpacity } from "./lib";
+import { getColorString, pickColorTypeList,} from "./lib";
+import { getDefaultColorPad, getDefaultBatchSwitch, getDefaultOpacity, getDefaultPickMax } from "./lib";
 import "./color.css"
 import { colorDataList } from "./data"
 import type { PickColorEntity } from "./interface"
@@ -24,6 +25,8 @@ const Color = () => {
   const [ batchPickFlag, setBatchPickFlag ] = useState(getDefaultBatchSwitch()); // 是否开启批量取色
   const [ pickColorList, setPickColorList ] = useState(Array<PickColorEntity>); // 批量取色列表
   const [ colorPad, setColorPad ] = useState(getDefaultColorPad()); // 默认显示的颜色板
+
+  const pickMax = getDefaultPickMax();
 
   // 窗体大小发生变化,改变窗口大小
   window.addEventListener('resize',
@@ -69,8 +72,8 @@ const Color = () => {
     if( pickColorList.findIndex((item: PickColorEntity) => item.color === color) >= 0) {
       return ;
     }
-    // 列表大于 `10` 个时, `shift` 出第一个数据
-    if(pickColorList.length >= 10) pickColorList.shift();
+    // 列表大于  pickMax 个时, `shift` 出第一个数据
+    if(pickColorList.length >= pickMax) pickColorList.shift();
     updatePickColorList([...pickColorList,{color,label}]);
   }
 

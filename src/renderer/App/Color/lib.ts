@@ -90,9 +90,26 @@ export function getDefaultOpacity() :number {
   return num;
 }
 
-// 设置是否默认打开批量取色
+// 设置默认不透明度
 export function setDefaultOpacity(opacity :number) : void  {
   localStorage.setItem(DEFAULT_OPACITY_ITEM, opacity.toString());
+}
+
+const DEFAULT_PICK_MAX_ITEM = 'color:pick-max';
+
+// 获取默认最大取色个数
+export function getDefaultPickMax() :number {
+  const max = localStorage.getItem(DEFAULT_PICK_MAX_ITEM);
+  // 如果没有设置默最大取色个数，默认 10
+  if (null === max) return 10;
+  let num = parseInt(max);
+  if(num > 20 || num < 5) return 10;
+  return num;
+}
+
+// 设置默认最大取色个数
+export function setDefaultPickMax(max :number) : void  {
+  localStorage.setItem(DEFAULT_PICK_MAX_ITEM, max.toString());
 }
 
 export {
