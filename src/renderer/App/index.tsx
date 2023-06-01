@@ -1,5 +1,6 @@
 const list = [
   'Hash',
+  'HmacHash',
   'Base64',
   'URL',
   'Time',
@@ -8,7 +9,7 @@ const list = [
   'NumberConvert',
   'QRCodeGenerator',
   //'AESCrypto',
-  'HmacHash',
+  'SQLFormatter',
 ];
 
 // 加载 App 的定义 名称 / icon 

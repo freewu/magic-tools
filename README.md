@@ -13,14 +13,15 @@ CSS 配色
 进制转换 ( BIN / OCT / DEC / HEX )
 二维码生成   
 HmacHash 值计算  
+SQL 格式化
 
 -- 待开发 ------------------
+行数统计 进行中
 AES 加密 / 解密 进行中(页面交互已完成,加解密结果有问题)
 DES 加密 / 解密
 3DES 加密 / 解密
 CRC 计算
 JSON 格式化
-SQL 格式化
 正则表达式
 CRON表达式
 密码管理
@@ -55,6 +56,8 @@ BCD码
 <a href="https://github.com/brix/crypto-js">CryptoJS</a>  
 <a href="https://github.com/dankogai/js-base64">js-base64</a>   
 <a href="https://github.com/Qix-/color-convert">color-convert</a>   
+<a href="https://github.com/sql-formatter-org/sql-formatter">SQL Formatter</a>   
+<a href="https://highlightjs.org/">highlight.js</a>   
 
 
 ## 应用截图
