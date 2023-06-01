@@ -10,6 +10,7 @@ const list = [
   'QRCodeGenerator',
   //'AESCrypto',
   'SQLFormatter',
+  'LineCount',
 ];
 
 // 加载 App 的定义 名称 / icon 

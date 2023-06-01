@@ -21,15 +21,13 @@ Base64编码后的字符串中可能包含"+/="之类的字符，而"/"，"="等
   const [ encodeValue, setEncodeValue ] = useState('');
   const [ decodeValue, setDecodeValue ] = useState('');
   const [ safe, setSafe ] = useState(false);
+  const [ notice, contextHolder ] = message.useMessage(); // 消息提醒
 
-  const textareaDoubleClick = (e :React.MouseEvent<HTMLElement>) => {
-    copyTextToClipboard((e.target as HTMLInputElement).value);
-    openNotification("bottomRight");
-  };
-
-  const [api, contextHolder] = message.useMessage();
-  const openNotification = (placement :string ) => {
-    api.success( "复制到粘贴板成功！！！");
+  const textareaDoubleClick = (e :React.MouseEvent<HTMLTextAreaElement>) => {
+    const value = (e.target as HTMLInputElement).value.trim();
+    if (value === '') return ;
+    copyTextToClipboard(value);
+    notice.success( "复制到粘贴板成功！！！");
   };
 
   const encode = () => {
@@ -44,7 +42,7 @@ Base64编码后的字符串中可能包含"+/="之类的字符，而"/"，"="等
       try {
         r = B64.decode( decodeValue)
       } catch(err) {
-        api.error("解码失败！！！");
+        notice.error("解码失败！！！");
       }
       setEncodeValue(r);
     }

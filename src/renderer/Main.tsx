@@ -32,6 +32,14 @@ const Main = () => {
     navigate(e.key, { replace: true });
   }
 
+  // ctrl + h 进入帮助页面
+  document.addEventListener('keydown',(e) => {
+    // 当按下ctrl、alt、shift键时e对应的ctrlKey、altKey、shiftKey是为true的。Mac电脑的 command 键是metaKey
+    if((e.ctrlKey || e.metaKey) && e.code === 'KeyH') {
+      navigate('Help', { replace: true });
+    }
+  })
+
   return (
     <Layout>
       <Sider trigger={null} collapsible collapsed={ collapsed }>
@@ -50,7 +58,7 @@ const Main = () => {
               title = { "设置" }
               type="link"
               icon={ <SettingOutlined /> }
-              onClick={ () => navigate('Setting', { replace: true }) }
+              onClick={ () => { setApp(''); navigate('Setting', { replace: true }); } }
               style={{
                 fontSize: '18px',
                 width: "24px"
@@ -60,7 +68,7 @@ const Main = () => {
               title = { "应用中心" }
               type="link"
               icon={ <AppstoreOutlined />}
-              onClick={() => navigate('AppStore', { replace: true }) }
+              onClick={() => { setApp(''); navigate('AppStore', { replace: true }); } }
               style={{
                 fontSize: '18px',
                 width: "24px"
@@ -91,6 +99,8 @@ const Main = () => {
             <Route path={ "/AppStore" } element={ lazyLoad("AppStore") }></Route>
             // 设置
             <Route path={ "/Setting" } element={ lazyLoad("Setting") }></Route>
+            // 帮助页面
+            <Route path={ "/Help" } element={ lazyLoad("Help") }></Route>
             {
               appList.map((item, index) => {
                 return <Route path={ "/" + item.key } element={ lazyLoad(item.key) }></Route>

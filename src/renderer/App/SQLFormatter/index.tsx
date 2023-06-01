@@ -21,11 +21,6 @@ const URL = () => {
     return (window.innerHeight - 380) + "px";
   };
 
-  // 窗体大小发生变化,改变窗口大小
-  window.addEventListener('resize',
-    debounce(() => { setResultHight(genResultHeight()) }, 100)
-  );
-
   const [ value, setValue ] = useState(''); // 输入的 SQl 语言
   const [ highLightResult, setHighLightResult ] = useState(''); // 语法高亮后的结果
   const [ result, setResult ] = useState(''); // 格式化后的结果
@@ -36,6 +31,11 @@ const URL = () => {
   // const [ useTab, setUseTab ] = useState(false); // 使用 tab
   // const [ tabWidth, setTabWidth ] = useState(4); // tab 宽度  (等于多个空格)
   const [ resultHight, setResultHight ] = useState(genResultHeight()); // 结果框高度
+
+  // 窗体大小发生变化,改变窗口大小
+  window.addEventListener('resize',
+    debounce(() => { setResultHight(genResultHeight()) }, 100)
+  );
 
   const textareaDoubleClick = (e :React.MouseEvent<HTMLElement>) => {
     if(result.trim() === "") return ;
