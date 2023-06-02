@@ -18,7 +18,12 @@ const ContentCount = () => {
 
   // 计算行数
   const calcLineCount = (value :string) :number => {
-    return ('' === value.trim())? 0 : value.split("\n").length 
+    const arr = value.split("\n")
+    const len = arr.length;
+    // 当只有一行时，内容只有一个 \n 返回 0
+    if(1 === len && arr[0] === "") return 0;
+    return len;
+    // return ('' === value.trim())? 0 : len:  
   }
 
   // 移除空行
