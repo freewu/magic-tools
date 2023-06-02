@@ -1,14 +1,20 @@
 import { Space } from "antd";
+import React,{ useState,useContext } from "react";
 import { appList } from "../index";
 import { useNavigate } from "react-router-dom"
 import "./appstore.css"
 import Icon from '@ant-design/icons';
+import { AppContext } from "../../hook/app-context";
 
 const AppStore = () => {
+
   const navigate = useNavigate();
+  const { app, setApp } = useContext(AppContext)!
 
   const colClick = ( e:any ) => {
     const uri = e.currentTarget.getAttribute('data-uri');
+    // 左边栏需要选中相关应用
+    setApp(uri);
     navigate("/" + uri, { replace: true })
   }
 
