@@ -96,7 +96,7 @@ const ContentCount = () => {
         </span>
         |
         <Button
-          onClick={ () => { setValue('') } }
+          onClick={ () => { setLineCount(0); setValue('') } }
           style={ { backgroundColor: "#dc3545", color: "#fff" } } 
         >清除</Button>
         |
