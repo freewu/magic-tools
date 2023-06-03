@@ -21,7 +21,8 @@ import {
   ChinesePainting, 
   ChineseTraditional, 
   JapaneseColor,
-  RalClassic 
+  RalClassic,
+  CSSColor, 
 } from "./data/index"
 
 // 颜色数据
@@ -45,6 +46,11 @@ const colorDataList = [
     key: 'ral-classic',
     label: `Ral Classic`,
     data: RalClassic
+  },
+  {
+    key: 'css-color',
+    label: `CSS颜色表`,
+    data: CSSColor
   },
 ];
 

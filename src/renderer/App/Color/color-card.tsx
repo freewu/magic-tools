@@ -7,10 +7,11 @@ const ColorCard = ({ color, label, title, colorClickEvent } :ColorCardProps ) =>
     <div 
       onClick={ () => { colorClickEvent(color,label) } }
       className='color-card' 
-      title={ title } 
+      title={ title? title : label } 
       style={ { backgroundColor: color } }
     >
-      {label} ( {color} )
+      { (label.length <= 10)? label : label.substring(0,8) + ".."} 
+      ( {color} )
     </div>
   );
 }
