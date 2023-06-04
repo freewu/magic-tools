@@ -90,7 +90,8 @@ const Hash = () => {
               // 只展示 10 个
               if(index < 10) {
                 return (
-                  <Tag 
+                  <Tag
+                    key={ password }
                     color={ calcTagColor(index) } style={ inputStyle } 
                     onClick={ () => { calcHash(password) } } >{ password }</Tag>
                 )
@@ -105,7 +106,7 @@ const Hash = () => {
         placeholder="输入需要计算 Hash 值的内容"
         autoSize={{ minRows: 5, maxRows: 5 }}
       />
-      <Checkbox onChange={onChange} value={ checked }>大写字符显示</Checkbox>
+      <Checkbox onChange={onChange} checked={ checked }>大写字符显示</Checkbox>
 
       <Divider dashed />
 

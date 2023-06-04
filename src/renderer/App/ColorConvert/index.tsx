@@ -121,7 +121,7 @@ const ColorConvert = () => {
           onChange={ onColorTypeChange } 
           value={ colorType } 
         />
-        <Checkbox onChange={ handleCheckboxChange } value={ checked }>大写字符显示</Checkbox>
+        <Checkbox onChange={ handleCheckboxChange } checked={ checked }>大写字符显示</Checkbox>
         {/* <Checkbox onChange={ handleShowPercentChange } value={ showPercent }>显示 %</Checkbox> */}
 
         <ColorPicker
@@ -145,7 +145,7 @@ const ColorConvert = () => {
       <Divider dashed />
       <Row wrap>
         <Col span={12}>
-          <Form name="basic" labelCol={{ span: 4 }} autoComplete="off">
+          <Form name="basic1" labelCol={{ span: 4 }} autoComplete="off">
             <Form.Item label="颜色">
               <Input readOnly onClick={ inputClick }  
                 style={ { cursor: "pointer", backgroundColor: colorData.hex, color: colorData.complementaryColor } } 
@@ -169,7 +169,7 @@ const ColorConvert = () => {
           </Form>
         </Col>
         <Col span={12}>
-          <Form name="basic" labelCol={{ span: 4 }} autoComplete="off">
+          <Form name="basic2" labelCol={{ span: 4 }} autoComplete="off">
             <Form.Item label="互补色">
               <Input 
                 readOnly onClick={ inputClick } 

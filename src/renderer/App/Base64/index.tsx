@@ -73,7 +73,7 @@ Base64编码后的字符串中可能包含"+/="之类的字符，而"/"，"="等
         icon={<ArrowUpOutlined />}
       >Base64 解码</Button>&nbsp;
       <Tooltip placement="bottomRight" title={ tips }>
-        <Checkbox onChange={ (e) => { setSafe(e.target.checked); } } value={ safe }>安全</Checkbox>
+        <Checkbox onChange={ (e) => { setSafe(e.target.checked); } } checked={ safe }>安全</Checkbox>
       </Tooltip>&nbsp;
       <Button 
         onClick={ () => { setEncodeValue(''); setDecodeValue(''); } }

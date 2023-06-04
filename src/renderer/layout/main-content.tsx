@@ -44,7 +44,7 @@ const MainContent :React.FC = () => {
           <Route path={ "/Help" } element={ lazyLoad("Help") }></Route>
           {
             appList.map((item, index) => {
-              return <Route path={ "/" + item.key } element={ lazyLoad(item.key) }></Route>
+              return <Route path={ "/" + item.key } key={item.key} element={ lazyLoad(item.key) }></Route>
             })
           }
           // 默认显示应用

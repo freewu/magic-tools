@@ -18,7 +18,7 @@ const AppStore = () => {
     navigate("/" + uri, { replace: true })
   }
 
-  const handStyle = { cursor: "pointer",margin: "5px 5px 5px 5px;" };
+  const handStyle = { cursor: "pointer",margin: "5px" };
 
   return (
     <div className="appstore">
@@ -26,7 +26,7 @@ const AppStore = () => {
       appList.map((item, index) => {
         if ("" == item.icon) {
           return (
-            <div className="app" onClick={ colClick } style={ handStyle } data-uri={ item.key }>
+            <div className="app" key={ item.key } onClick={ colClick } style={ handStyle } data-uri={ item.key }>
               <Space>
                 { item.label }
               </Space>

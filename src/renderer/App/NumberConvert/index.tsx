@@ -120,8 +120,8 @@ const ColorConvert = () => {
           onChange={ onNumberTypeChange } 
           value={ numberType } 
         />
-        <Checkbox onChange={ handleCheckboxChange } value={ checked }>大写字符显示</Checkbox>
-        <Checkbox onChange={ handleHumanReadChange } value={ humanRead }>结果插入空格</Checkbox>
+        <Checkbox onChange={ handleCheckboxChange } checked={ checked }>大写字符显示</Checkbox>
+        <Checkbox onChange={ handleHumanReadChange } checked={ humanRead }>结果插入空格</Checkbox>
         <Button 
           onClick={ () => { setValue(''); setNumberData(emptyResult); } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 

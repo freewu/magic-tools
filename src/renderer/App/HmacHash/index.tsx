@@ -91,6 +91,7 @@ const HmacHash = () => {
               if(index < 10) {
                 return (
                   <Tag 
+                    key={ password }
                     color={ calcTagColor(index) } style={ inputStyle } 
                     onClick={ () => { calcHash(password, passphrase) } } >{ password }</Tag>
                 )
@@ -108,7 +109,7 @@ const HmacHash = () => {
       />
 
       <Space>
-        <Checkbox onChange={onChange} value={ checked }>大写字符显示</Checkbox>
+        <Checkbox onChange={onChange} checked={ checked }>大写字符显示</Checkbox>
         <Input
           placeholder="密钥"
           allowClear

@@ -1,6 +1,4 @@
-const Base64Intro = () => {
-  return (
-    <div style={ { "overflowY": "scroll","height": "300px" }}>
+const intro = `
 <h2>编码方式</h2>
 <blockquote><p>base64编码是一种常见的编码方式，主要用于对8bit的字节进行编码</p>
 </blockquote>
@@ -65,6 +63,13 @@ const Base64Intro = () => {
 </li>
 
 </ul>
+`;
+const Base64Intro = () => {
+
+  return (
+    <div 
+      dangerouslySetInnerHTML={{ __html: intro }}
+      style={ { "overflowY": "scroll","height": "300px" }}>
     </div>
   );
 }

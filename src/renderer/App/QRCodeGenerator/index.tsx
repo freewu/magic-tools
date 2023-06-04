@@ -124,18 +124,21 @@ const QRCodeGenerator = () => {
 
       <Divider dashed />
 
-      <div id="myqrcode" onClick = { downloadQRCode } title="点击下载二维码">
-        <QRCode
-          style={{ marginBottom: 16 }}
-          errorLevel={ errorLevel as QRCodeProps['errorLevel'] }
-          value={ value }
-          color={ color }
-          bgColor={ backgroudColor }
-          size={ size }
-          icon={ icon }
-          iconSize={ iconSize } // 按尺寸缩放中间图标
-        />
-      </div>
+      { value.trim() !== ''?
+       (
+        <div id="myqrcode" onClick = { downloadQRCode } title="点击下载二维码">
+          <QRCode
+            style={{ marginBottom: 16 }}
+            errorLevel={ errorLevel as QRCodeProps['errorLevel'] }
+            value={ value? value : '' }
+            color={ color }
+            bgColor={ backgroudColor }
+            size={ size }
+            icon={ icon }
+            iconSize={ iconSize } // 按尺寸缩放中间图标
+          />
+        </div>)
+       : null}
     </>
   );
 }
