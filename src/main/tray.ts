@@ -9,7 +9,8 @@ const setTray = (mainWindow: BrowserWindow) => {
   let trayMenuTemplate = [{ // 系统托盘图标目录
     label: '退出',
     click: function() {
-      app.quit(); // 点击之后退出应用
+      console.log("tray quit");
+      app.exit(); // 点击之后退出应用
     }
   }];
 
@@ -28,7 +29,7 @@ const setTray = (mainWindow: BrowserWindow) => {
   appTray.on('click', function() {
     console.log("tray click")
     // 显示主程序
-    // mainWindow?.show();
+    mainWindow?.show();
     // 关闭托盘显示
     //appTray.destroy();
   });

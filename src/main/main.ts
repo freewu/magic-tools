@@ -93,10 +93,17 @@ const createWindow = async () => {
     }
   });
 
+  mainWindow.on('close', (e) => {
+    console.log("mainWindow close");
+    mainWindow?.hide();
+    e.preventDefault();
+    //mainWindow = null; 
+  });
+
   mainWindow.on('closed', () => {
     console.log("mainWindow closed");
     //mainWindow?.hide();
-    //mainWindow = null; 
+    mainWindow = null; 
   });
 
   mainWindow.on('show', () => {
@@ -137,7 +144,7 @@ app.on('window-all-closed', () => {
     //   触发 app 的 quit 事件。但是如果在quit事件前使用 event.preventDefault() 阻止了默认行为（ win的close事件，app 的 before-quit 和 will-quit ），软件还是不会关闭。
     // app.exit()：
     //  最粗暴的强制关闭所有窗口，触发 app 的 quit 事件，故 win 的c lose 事件，app的 before-quit 和 will-quit 不会被触发
-    // app.quit();
+    app.quit();
   }
 });
 
