@@ -21,6 +21,7 @@ const URL = () => {
     return (window.innerHeight - 380) + "px";
   };
 
+  let inputElement :HTMLInputElement;
   const [ value, setValue ] = useState(''); // 输入的 SQl 语言
   const [ highLightResult, setHighLightResult ] = useState(''); // 语法高亮后的结果
   const [ result, setResult ] = useState(''); // 格式化后的结果
@@ -64,7 +65,6 @@ const URL = () => {
     }
   }
 
-
   // 生成 format 配置
   const genConfig = (key:string = '', value:any = null): FormatOptionsWithLanguage => {
     let config: FormatOptionsWithLanguage = {
@@ -76,6 +76,26 @@ const URL = () => {
     };
     return config;
   }
+
+  // 打开本地 SQL 文件 
+  const fileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files || [];
+    if(0 === files.length) {
+      // notice.error("请选择文件！！！");
+      return;
+    }
+    const reader = new FileReader();
+    // 加载失败
+    reader.onerror = (err) => {
+      console.log(err);
+    }
+    // 文件加载完毕
+    reader.onload = () => {
+      setValue(reader.result as string);
+      doFormatter(reader.result as string, genConfig());
+    }
+    reader.readAsText(files[0]);
+  };
 
   /**
   export interface FormatOptions {
@@ -112,17 +132,25 @@ const URL = () => {
         <label>关键字格式:</label>
         <Select
           value={ keywordCase }
-          style={{ width: 120 }}
+          style={{ width: 100 }}
           onChange={ (v :string) => { setKeywordCase(v); doFormatter(value,genConfig('keywordCase',v)) } }
           options={ arrayToOptions(keywordCaseList) }
         />
         <label>对齐方式:</label>
         <Select
           value={ indentStyle }
-          style={{ width: 120 }}
+          style={{ width: 100 }}
           onChange={ (v :string) => { setIndentStyle(v); doFormatter(value,genConfig('indentStyle',v)) } }
           options={ arrayToOptions(indentStyleList) }
         />
+        <Button 
+          onClick={ ()=> { inputElement?.click() } }
+          style={ { backgroundColor: "#007bff", color: "#fff" } } 
+        >打开 SQL 文件</Button>
+        <input 
+          onChange={ fileChange }
+          ref={ input => inputElement = input as HTMLInputElement }
+          type="file" id="fileInput" style={ { display: 'none'}} accept=".sql" />
       </Space>
 
       <TextArea

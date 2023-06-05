@@ -1,13 +1,13 @@
 // 内容统计页
-import { Checkbox, Divider, Button,Input, Space, message, Row } from "antd";
+import { Button,Input, Space, message } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
-import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "../../lib"
 import { InputStatus } from "antd/es/_util/statusUtils";
+import { calcLineCount, removeEmptyLine } from "./lib"
 
 const ContentCount = () => {
-
+  let inputElement :HTMLInputElement;
   const [ value, setValue ] = useState(''); // 输入的文本
   const [ lineCount, setLineCount ] = useState(0); // 行数
   const [ start, setStart ] = useState(''); // 开始行
@@ -15,28 +15,6 @@ const ContentCount = () => {
   const [ end, setEnd ] = useState(''); // 结束行
   const [ endStatus, setEndStatus ] = useState(''); // 结束行状态
   const [ notice, contextHolder] = message.useMessage();
-
-  // 计算行数
-  const calcLineCount = (value :string) :number => {
-    const arr = value.split("\n")
-    const len = arr.length;
-    // 当只有一行时，内容只有一个 \n 返回 0
-    if(1 === len && arr[0] === "") return 0;
-    return len;
-    // return ('' === value.trim())? 0 : len:  
-  }
-
-  // 移除空行
-  const removeEmptyLine = (v :string) :string => {
-    if('' === v.trim()) return "";
-    let arr:Array<string> = [];
-    v.split("\n").map((line :string) => {
-      if('' !== line.trim() ) { 
-        arr.push(line);
-      }
-    })
-    return arr.join("\n");
-  }
 
   const copyContent = (value :string) => {
     copyTextToClipboard(value);
@@ -53,7 +31,6 @@ const ContentCount = () => {
 
   const onEndChange = (e :React.ChangeEvent<HTMLInputElement>) => {
     const v = parseInt(e.target.value);
-    console.log(v);
     if('NaN' === v.toString()) return setEnd('');
 
     // 不能大于最后一行 或 不能小于等开始行
@@ -86,6 +63,26 @@ const ContentCount = () => {
     // 保存到粘贴板上
     copyContent(r.join("\n"));
   }
+
+  // 打开本地文件 
+  const fileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files || [];
+    if(0 === files.length) {
+      // notice.error("请选择文件！！！");
+      return;
+    }
+    const reader = new FileReader();
+    // 加载失败
+    reader.onerror = (err) => {
+      console.log(err);
+    }
+    // 文件加载完毕
+    reader.onload = () => {
+      setValue(reader.result as string);
+      setLineCount(calcLineCount(reader.result as string));
+    }
+    reader.readAsText(files[0]);
+  };
   
   return (
     <div>
@@ -131,7 +128,16 @@ const ContentCount = () => {
         <Button 
           onClick={ pickContent }
           style={ { backgroundColor: "#007bff", color: "#fff" } } 
-        >提取内容到粘贴板</Button>
+        >提取内容</Button>
+        | 
+        <Button 
+          onClick={ ()=> { inputElement?.click() } }
+          style={ { backgroundColor: "#007bff", color: "#fff" } } 
+        >打开文件</Button>
+        <input 
+          onChange={ fileChange }
+          ref={ input => inputElement = input as HTMLInputElement }
+          type="file" id="fileInput" style={ { display: 'none'}} />
       </Space>
 
       <TextArea
