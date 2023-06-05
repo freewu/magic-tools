@@ -19,9 +19,11 @@ const MainContent :React.FC = () => {
   const lazyLoad = (moduleName: string) => {
     const Module = lazy(() => import(`../App/${moduleName}`));
     return (
+      <>
       <Suspense fallback={<div>应用正在加载中...</div>}>
         <Module />
       </Suspense>
+      </>
     );
   };
 
