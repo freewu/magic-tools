@@ -26,6 +26,7 @@ JSON 格式化
 CRON表达式
 密码管理
 BCD码
+WebSocket 调试
 
 ```
 

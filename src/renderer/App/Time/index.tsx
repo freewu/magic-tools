@@ -1,21 +1,14 @@
 import { Button, Form, Input, Divider, message, Space, Tag } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
-import { copyTextToClipboard } from "./../../lib"
+import { copyTextToClipboard } from "./../../lib";
+import { emptyResult } from "./data";
+import { formatDateTime } from "./lib";
+import { InputStatus } from "antd/es/_util/statusUtils";
 
 const Time = () => {
 
-  const emptyResult = {
-    "ts10": "",
-    "ts13": "",
-    "rfc3339": "",
-    "iso8601": "",
-    "rfc2822": "",
-    "locale": "",
-    "utc": "",
-    "custom": "",
-  };
-
+  const [ status, setStatus ] = useState('');
   const [ value, setValue ] = useState('');
   const [ data, setData ] = useState(emptyResult);
   const [ notice, contextHolder ] = message.useMessage();
@@ -26,23 +19,8 @@ const Time = () => {
     notice.success("复制到粘贴板成功！！！");
   };
 
-  // 格式化时间为 YYYY-MM-DD HH:ii:ss 格式
-  const formatDateTime = (date :Date) => {
-    let year = date.getFullYear();
-    let month = date.getMonth() + 1;
-    let day = date.getDate();
-    let hour = date.getHours();
-    let minute = date.getMinutes();
-    let second = date.getSeconds();
-    return `${year}-${paddingZero(month)}-${paddingZero(day)} ${paddingZero(hour)}:${paddingZero(minute)}:${paddingZero(second)}`;
-  }
-
-  // 补 0 处理
-  const paddingZero = (n :number) => {
-    return (n >= 0 && n <= 9)? "0" + String(n) : String(n);
-  }
-
   const updateDate = (d: Date) => {
+    setStatus('');
     const r = {
       "ts10": "",
       "ts13": d.getTime() + "",
@@ -75,7 +53,8 @@ const Time = () => {
         updateDate(d);
       } catch(e) {
         console.log(e);
-        notice.error("输入时间格式出错!!!");
+        setStatus('error');
+        //notice.error("输入时间格式出错!!!");
       }
     }
   }
@@ -102,21 +81,22 @@ const Time = () => {
       {contextHolder}
       <Space size={[0, 8]} wrap>
         {
-           timeList?.map((t, index) => {
-              // 只展示 10 个
-              if(index < 10) {
-                return (
-                  <Tag 
-                    key={ t.lable }
-                    color={ calcTagColor(index) } style={ inputStyle } 
-                    onClick={ () => { setValue( formatDateTime(t.value)); updateDate(t.value); } } 
-                  >{ t.lable }</Tag>
-                )
-              }
-           })
+          timeList?.map((t, index) => {
+            // 只展示 10 个
+            if(index < 10) {
+              return (
+                <Tag 
+                  key={ t.lable }
+                  color={ calcTagColor(index) } style={ inputStyle } 
+                  onClick={ () => { setValue( formatDateTime(t.value)); updateDate(t.value); } } 
+                >{ t.lable }</Tag>
+              )
+            }
+          })
         }
       </Space>
       <TextArea
+        status={ status as InputStatus }
         style={ { margin: "5px 0 5px 0" }}
         value= { value }
         onChange={  textAreaChange }
