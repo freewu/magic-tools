@@ -1,4 +1,4 @@
-import { Button, Form, Input, Divider, message } from "antd";
+import { Button, Form, Input, Divider, message, Space, Tag } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
@@ -80,9 +80,42 @@ const Time = () => {
     }
   }
 
+  const calcTagColor = (index :number) => {
+    switch(index % 4) {
+      case 1: return '#2db7f5';
+      case 2: return '#87d068';
+      case 3: return '#108ee9';
+    }
+    return '#ff5500';
+  }
+
+  const timeList = [
+    { lable: "当前时间",value: new Date() },
+    { lable: "上一周",value: new Date((new Date()).getTime() - (7 * 24 * 60 * 60 * 1000)) },
+    { lable: "下一周",value: new Date((new Date()).getTime() + (7 * 24 * 60 * 60 * 1000)) },
+    // { lable: "上一月",value: new Date((new Date()).getTime() - (30 * 24 * 60 * 60 * 1000)) },
+    // { lable: "下一月",value: new Date((new Date()).getTime() + (30 * 24 * 60 * 60 * 1000)) },
+  ]
+
   return (
     <div>
       {contextHolder}
+      <Space size={[0, 8]} wrap>
+        {
+           timeList?.map((t, index) => {
+              // 只展示 10 个
+              if(index < 10) {
+                return (
+                  <Tag 
+                    key={ t.lable }
+                    color={ calcTagColor(index) } style={ inputStyle } 
+                    onClick={ () => { setValue( formatDateTime(t.value)); updateDate(t.value); } } 
+                  >{ t.lable }</Tag>
+                )
+              }
+           })
+        }
+      </Space>
       <TextArea
         style={ { margin: "5px 0 5px 0" }}
         value= { value }
@@ -90,16 +123,16 @@ const Time = () => {
         placeholder="输入 10位时间戳 / 13位时间戳 / UTC 格式字符串 / YYYY-MM-DD HH:ii:ss 格式字符串"
         autoSize={{ minRows: 3, maxRows: 3 }}
       />
-
-      <Button 
-        onClick={ () => { setValue( formatDateTime(new Date())); updateDate(new Date()); } }
-        style={ {"backgroundColor" : "#007bff","color": "#fff" }} 
-      >当前时间</Button>
-
-      <Button 
-        onClick={ () => { setValue(''); setData(emptyResult); } }
-        style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-      >清除</Button>
+      <Space>
+        {/* <Button 
+          onClick={ () => {  } }
+          style={ {"backgroundColor" : "#007bff","color": "#fff" }} 
+        >当前时间</Button> */}
+        <Button 
+          onClick={ () => { setValue(''); setData(emptyResult); } }
+          style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
+        >清除</Button>
+      </Space>
 
       <Divider dashed />
 
@@ -127,6 +160,11 @@ const Time = () => {
         </Form.Item>
         <Form.Item label="YYYY-MM-DD HH:ii:ss">
           <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.custom }/>
+        </Form.Item>
+        <Form.Item label="YYYY-MM-DD">
+          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { 
+            data.custom? data.custom.split(" ")["0"] : '' 
+          }/>
         </Form.Item>
       </Form>
 
