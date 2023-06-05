@@ -83,6 +83,8 @@ WebSocket 调试
 ![](./docs/images/sql-formatter.png)
 * 行数统计
 ![](./docs/images/linecount.png)
+* Unicode 编解码
+![](./docs/images/unicode.png)
 
 ## Q&A
 ```
