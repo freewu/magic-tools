@@ -1,4 +1,4 @@
-import { Checkbox, Form, Input, Divider, message, Space,Tag } from "antd";
+import { Checkbox, Form, Input, Divider, message, Space,Tag, Button } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
@@ -109,12 +109,19 @@ const HmacHash = () => {
       />
 
       <Space>
+        <Button 
+          onClick={ () => { setValue(''); setHash(emptyResult); } }
+          style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
+        >清除</Button>
         <Checkbox onChange={onChange} checked={ checked }>大写字符显示</Checkbox>
         <Input
           placeholder="密钥"
           allowClear
           style={ { width: "240px" } }
-          onChange={(e) => { setPassphrase( e.target.value.trim() ),calcHash(value, e.target.value.trim()) } }
+          onChange={ (e) => { 
+            setPassphrase( e.target.value.trim() );
+            if(value.trim() !== '') calcHash(value, e.target.value.trim()) 
+          } }
           value= { passphrase } />
       </Space>
 

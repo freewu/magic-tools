@@ -1,4 +1,4 @@
-import { Checkbox, Form, Input, Divider, message, Space,Tag } from "antd";
+import { Checkbox, Form, Input, Divider, message, Space, Tag, Button } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
@@ -106,7 +106,13 @@ const Hash = () => {
         placeholder="输入需要计算 Hash 值的内容"
         autoSize={{ minRows: 5, maxRows: 5 }}
       />
-      <Checkbox onChange={onChange} checked={ checked }>大写字符显示</Checkbox>
+      <Space>
+        <Button 
+          onClick={ () => { setValue(''); setHash(emptyResult); } }
+          style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
+        >清除</Button>
+        <Checkbox onChange={onChange} checked={ checked }>大写字符显示</Checkbox>
+      </Space>
 
       <Divider dashed />
 
