@@ -2,7 +2,7 @@ import { Button, Form, Input, Divider, message, Space, Tag } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib";
-import { emptyResult } from "./data";
+import { emptyResult, timeList } from "./data";
 import { formatDateTime } from "./lib";
 import { InputStatus } from "antd/es/_util/statusUtils";
 
@@ -68,27 +68,19 @@ const Time = () => {
     return '#ff5500';
   }
 
-  const timeList = [
-    { lable: "当前时间",value: new Date() },
-    { lable: "上一周",value: new Date((new Date()).getTime() - (7 * 24 * 60 * 60 * 1000)) },
-    { lable: "下一周",value: new Date((new Date()).getTime() + (7 * 24 * 60 * 60 * 1000)) },
-    // { lable: "上一月",value: new Date((new Date()).getTime() - (30 * 24 * 60 * 60 * 1000)) },
-    // { lable: "下一月",value: new Date((new Date()).getTime() + (30 * 24 * 60 * 60 * 1000)) },
-  ]
-
   return (
     <div>
       {contextHolder}
       <Space size={[0, 8]} wrap>
         {
           timeList?.map((t, index) => {
-            // 只展示 10 个
-            if(index < 10) {
+            // 只展示 15 个
+            if(index < 15) {
               return (
                 <Tag 
                   key={ t.lable }
                   color={ calcTagColor(index) } style={ inputStyle } 
-                  onClick={ () => { setValue( formatDateTime(t.value)); updateDate(t.value); } } 
+                  onClick={ () => { setValue( t.value ); updateDate(new Date(t.value)); } } 
                 >{ t.lable }</Tag>
               )
             }
