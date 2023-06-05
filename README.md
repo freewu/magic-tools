@@ -61,10 +61,26 @@ BCD码
 
 
 ## 应用截图
-
+* Hash 值计算
 ![](./docs/images/hash.png)
+* Base64 编解码
 ![](./docs/images/base64.png)
-
+* URL 编解码
+![](./docs/images/url.png)
+* 时间戳转换
+![](./docs/images/time.png)
+* CSS 配色
+![](./docs/images/color.png)
+* 颜色格式转换
+![](./docs/images/color-convert.png)
+* 进制转换
+![](./docs/images/number-convert.png)
+* HmacHash 值计算
+![](./docs/images/hmac-hash.png)
+* SQL 格式化
+![](./docs/images/sql-formatter.png)
+* 行数统计
+![](./docs/images/linecount.png)
 
 ## Q&A
 ```
