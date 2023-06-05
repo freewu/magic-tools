@@ -49,15 +49,15 @@ BCD码
 
 ## 组件
 
-<a href="https://github.com/electron-react-boilerplate/electron-react-boilerplate">Electron React Boilerplate</a>   
-<a href="https://react.dev/">React 18</a>   
-<a href="https://www.electronjs.org/">Electron 23</a>  
-<a href="https://ant.design/">Ant Design 5</a>  
-<a href="https://github.com/brix/crypto-js">CryptoJS</a>  
-<a href="https://github.com/dankogai/js-base64">js-base64</a>   
-<a href="https://github.com/Qix-/color-convert">color-convert</a>   
-<a href="https://github.com/sql-formatter-org/sql-formatter">SQL Formatter</a>   
-<a href="https://highlightjs.org/">highlight.js</a>   
+<a target="_blank" href="https://github.com/electron-react-boilerplate/electron-react-boilerplate">Electron React Boilerplate</a>   
+<a target="_blank" href="https://react.dev/">React 18</a>   
+<a target="_blank" href="https://www.electronjs.org/">Electron 23</a>  
+<a target="_blank" href="https://ant.design/">Ant Design 5</a>  
+<a target="_blank" href="https://github.com/brix/crypto-js">CryptoJS</a>  
+<a target="_blank" href="https://github.com/dankogai/js-base64">js-base64</a>   
+<a target="_blank" href="https://github.com/Qix-/color-convert">color-convert</a>   
+<a target="_blank" href="https://github.com/sql-formatter-org/sql-formatter">SQL Formatter</a>   
+<a target="_blank" href="https://highlightjs.org/">highlight.js</a>   
 
 
 ## 应用截图

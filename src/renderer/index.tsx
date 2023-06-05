@@ -6,11 +6,11 @@ import React from 'react';
 const container = document.getElementById('root') as HTMLElement;
 const root = createRoot(container);
 root.render(
-  <React.StrictMode>
+  //<React.StrictMode>
     <BrowserRouter>
       <App />
     </BrowserRouter>
-  </React.StrictMode>
+  //</React.StrictMode>
 );
 
 // calling IPC exposed from preload script
