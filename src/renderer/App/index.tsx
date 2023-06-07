@@ -12,6 +12,7 @@ const list = [
   'SQLFormatter',
   'LineCount',
   'Unicode',
+  'DESCrypto',
 ];
 
 // 加载 App 的定义 名称 / icon 
