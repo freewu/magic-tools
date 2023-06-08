@@ -67,6 +67,10 @@ const ContentCount = () => {
   // 打开本地文件 
   const fileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files || [];
+    openFile(files);
+  };
+
+  const openFile = (files: any) => {
     if(0 === files.length) {
       // notice.error("请选择文件！！！");
       return;
@@ -82,7 +86,7 @@ const ContentCount = () => {
       setLineCount(calcLineCount(reader.result as string));
     }
     reader.readAsText(files[0]);
-  };
+  }
   
   return (
     <div>
@@ -141,6 +145,8 @@ const ContentCount = () => {
       </Space>
 
       <TextArea
+        onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
+        onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files); } }
         style={ { margin: "12px 0 5px 0" }}
         onChange={ (e) => { setValue(e.target.value); setLineCount(calcLineCount(e.target.value)); } }
         value= { value }
