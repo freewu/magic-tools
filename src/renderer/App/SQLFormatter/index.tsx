@@ -166,7 +166,7 @@ const URL = () => {
         style={ { margin: "12px 0 5px 0" }}
         onChange={ onTextAreaChange }
         value= { value }
-        placeholder="输入需要格式化的 SQL 语句"
+        placeholder="输入需要格式化的 SQL 语句 或 拖拽 .sql 文件到框内"
         autoSize={{ minRows: 5,maxRows: 5}}
       />
 

@@ -150,7 +150,7 @@ const ContentCount = () => {
         style={ { margin: "12px 0 5px 0" }}
         onChange={ (e) => { setValue(e.target.value); setLineCount(calcLineCount(e.target.value)); } }
         value= { value }
-        placeholder="输入需要统计的内容"
+        placeholder="输入需要统计的内容 或 拖拽文件到框内"
         autoSize={{ minRows: 26, maxRows: 26 }}
       />
     </div>
