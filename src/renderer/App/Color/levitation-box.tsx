@@ -29,6 +29,7 @@ const LevitationBox = ({ colorList, flag, flagChangeEvent, colorListChange } :Ba
             colorList.map((item) => {
               return (
               <li 
+                key={ item.color }
                 onDoubleClick={ () => { removeColor(item.color) } }
                 style={ { backgroundColor: item.color } } 
                 title = { item.label }  
