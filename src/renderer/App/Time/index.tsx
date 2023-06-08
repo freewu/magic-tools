@@ -80,7 +80,12 @@ const Time = () => {
                 <Tag 
                   key={ t.lable }
                   color={ calcTagColor(index) } style={ inputStyle } 
-                  onClick={ () => { setValue( t.value ); updateDate(new Date(t.value)); } } 
+                  onClick={ () => { 
+                      const v = t.value;
+                      setValue( v ); 
+                      updateDate(new Date(/^\d+$/.test(v)? parseInt(v) : v)); 
+                    } 
+                  } 
                 >{ t.lable }</Tag>
               )
             }
