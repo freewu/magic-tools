@@ -1,5 +1,13 @@
-import { hex } from "color-convert"
-import { colorTypeList,colorDataList } from "./data"
+import { hex, rgb } from "color-convert"
+import { colorTypeList } from "./data"
+
+// 获取 传入的 hex 的互补色的 hex #FF0000 => #00FFFF
+export const calcComplementaryColor = (color: string) :string => {
+  color = color.replace("#","").trim();
+  const colorRGB = hex.rgb(color);
+
+  return "#" + rgb.hex([255 - colorRGB[0],255 - colorRGB[1],255 - colorRGB[2]]);
+}
 
 // 获取要写入到粘贴板的数据
 const getColorString = (color :string,label :string,colorType :string, opacity :number) :string => {
