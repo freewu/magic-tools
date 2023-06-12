@@ -1,4 +1,4 @@
-const DEFAULT_MODE_ITEM = 'aes-crypto:default-mode';
+const DEFAULT_MODE_ITEM = 'des-crypto:default-mode';
 
 // 获取默认模式
 export function getDefaultMode() :string  {
@@ -11,7 +11,7 @@ export function setDefaultMode(mode: string) : void  {
   localStorage.setItem(DEFAULT_MODE_ITEM,mode);
 }
 
-const DEFAULT_PADDING_ITEM = 'aes-crypto:default-padding';
+const DEFAULT_PADDING_ITEM = 'des-crypto:default-padding';
 
 // 获取默认填充
 export function getDefaultPadding() :string  {
@@ -24,7 +24,7 @@ export function setDefaultPadding(padding: string) : void  {
   localStorage.setItem(DEFAULT_PADDING_ITEM,padding);
 }
 
-const DEFAULT_CODE_ITEM = 'aes-crypto:default-code';
+const DEFAULT_CODE_ITEM = 'des-crypto:default-code';
 
 // 获取默认编码 HEX / Base64
 export function getDefaultCode() :string  {
@@ -37,7 +37,7 @@ export function setDefaultCode(code: string) : void  {
   localStorage.setItem(DEFAULT_CODE_ITEM,code);
 }
 
-const DEFAULT_IV_ITEM = 'aes-crypto:default-iv';
+const DEFAULT_IV_ITEM = 'des-crypto:default-iv';
 
 // 获取默认偏移量
 export function getDefaultIV() :string  {
@@ -51,7 +51,7 @@ export function setDefaultIV(iv: string) : void  {
 }
 
 
-const DEFAULT_PASSPHRASE_ITEM = 'aes-crypto:default-passphrase';
+const DEFAULT_PASSPHRASE_ITEM = 'des-crypto:default-passphrase';
 
 // 获取默认密钥
 export function getDefaultPassphrase() :string  {
@@ -66,17 +66,9 @@ export function setDefaultPassphrase(passphrase: string) : void  {
 
 // 根据输入的密钥长度生成密钥长度提示
 export const genPassphraseLimitLength = (length :number) :number => {
-  if(length >= 30) return 32; // 都 30 位了说明需要是 32 位的密钥 (AES-256)
-  if(length >= 20) return 24; // 都 24 位了说明需要是 24 位的密钥 (AES-2192)
-  return 16; // 默认 AES-128
+  return 8; // DES 密钥长度 8位
 }
 
-// 根据密钥长度生成位数
-export const genCapacity = (length: number) :number => {
-  if(length == 24) return 192;
-  if(length == 32) return 256;
-  return 128;
-}
 
 import * as CryptoJS from 'crypto-js';
 // import { BlockCipherMode } from 'crypto-js/';

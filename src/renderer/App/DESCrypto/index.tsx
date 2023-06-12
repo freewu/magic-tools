@@ -7,7 +7,7 @@ import { arrayToOptions } from "../../lib/array"
 import aes from 'crypto-js/aes';
 import * as CryptoJS from 'crypto-js';
 import { modeList, paddingList, codeList } from "./data";
-import { getDefaultIV, getDefaultCode, getDefaultMode, getDefaultPadding, getDefaultPassphrase,genCapacity } from "./lib";
+import { getDefaultIV, getDefaultCode, getDefaultMode, getDefaultPadding, getDefaultPassphrase } from "./lib";
 import { getPadding, getMode } from "./lib";
 import type { InputStatus } from "antd/es/_util/statusUtils";
 
@@ -15,7 +15,7 @@ const AESCrypto = () => {
 
   const genDefaultPassphraseStatus = () :InputStatus => {
     const p = getDefaultPassphrase();
-    return ( (genCapacity(p.length) / 8) === p.length)? '' : 'error';
+    return ( 8 === p.length)? '' : 'error';
   }
 
   const [ notice, contextHolder ] = message.useMessage();
@@ -27,7 +27,7 @@ const AESCrypto = () => {
   const [ iv, setIV ] = useState(getDefaultIV()); // 偏移量
   const [ passphrase, setPassphrase] = useState(getDefaultPassphrase()); // 秘钥
   const [ ivDisabled, setIVDisabled ] = useState(getDefaultMode() == 'ECB'); // iv 是否可用 ECB 模式下不需要 iv
-  const [ ivStatus, setIVStatus ] = useState( ((getDefaultIV().length !== 16)? 'error' : '') as InputStatus); // 偏移量提醒
+  const [ ivStatus, setIVStatus ] = useState( ((getDefaultIV().length !== 8)? 'error' : '') as InputStatus); // 偏移量提醒
   const [ passphraseStatus, setPassphraseStatus ] = useState(genDefaultPassphraseStatus()); // 密钥提醒
 
   const isCanDo = (value :string) :boolean => {
@@ -45,13 +45,13 @@ const AESCrypto = () => {
   const encode = () => {
     if(!isCanDo(encodeValue)) return ;
     try {
-      const value = CryptoJS.AES.encrypt(
+      const value = CryptoJS.DES.encrypt(
         encodeValue,
-        CryptoJS.enc.Hex.parse(passphrase), // passphrase, 不能直接传string 要不然会 CryptoJS 会加 salt
+        CryptoJS.enc.Utf8.parse(passphrase), // passphrase, 不能直接传string 要不然会 CryptoJS 会加 salt
         {
           mode: getMode(mode),
           padding: getPadding(padding),
-          iv: ('ECB' === mode)? CryptoJS.enc.Hex.parse('') : CryptoJS.enc.Hex.parse(iv),
+          iv: ('ECB' === mode)? CryptoJS.enc.Utf8.parse('') : CryptoJS.enc.Utf8.parse(iv),
         }
       );
       switch(code) {
@@ -68,19 +68,17 @@ const AESCrypto = () => {
   const decode = () => {
     if(!isCanDo(decodeValue)) return ;
     try {
-      const value = aes.decrypt(
-        decodeValue,
-        CryptoJS.enc.Hex.parse(passphrase), // passphrase, 不能直接传string 要不然会 CryptoJS 会加 salt
+      const value = CryptoJS.DES.decrypt(
+        (code === "Base64")? decodeValue : CryptoJS.enc.Base64.stringify(CryptoJS.enc.Hex.parse(decodeValue)), // 需传入 base64的值 
+        CryptoJS.enc.Utf8.parse(passphrase), // passphrase, 不能直接传string 要不然会 CryptoJS 会加 salt
         {
           mode: getMode(mode),
           padding: getPadding(padding),
-          iv: ('ECB' === mode)? CryptoJS.enc.Hex.parse('') : CryptoJS.enc.Hex.parse(iv),
+          iv: ('ECB' === mode)? CryptoJS.enc.Utf8.parse('') : CryptoJS.enc.Utf8.parse(iv),
         }
       );
-      switch(code) {
-        case "Base64": return setEncodeValue(value.toString(CryptoJS.enc.Base64));
-        case "HEX": return setEncodeValue(value.toString(CryptoJS.enc.Hex));
-      }
+      // 解密处理是生
+      return setEncodeValue(value.toString(CryptoJS.enc.Utf8));
     } catch (e :any) {
       console.log(e);
       notice.error(e);
@@ -102,7 +100,7 @@ const AESCrypto = () => {
   const onIVChange = (e :React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
     setIV(v); 
-    if(v.length == 16) { // IV长度必须为 0 
+    if(v.length == 8) { // IV长度必须为 8
       setIVStatus("");
     } else {
       setIVStatus("error");
@@ -119,6 +117,11 @@ const AESCrypto = () => {
   const onPassphraseChange = (e :React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value.trim();
     setPassphrase(v);
+    if(v.length == 8) { // IV长度必须为 8
+      setPassphraseStatus("");
+    } else {
+      setPassphraseStatus("error");
+    }
   }
 
   return (
@@ -152,12 +155,12 @@ const AESCrypto = () => {
           <Input 
             allowClear
             status={ ivStatus }
-            maxLength={ 16 }
+            maxLength={ 8 }
             style={ { width: "260px" } }
             disabled={ ivDisabled }
             onChange={ onIVChange }
             value= { iv } />
-          { iv.length } / { 16 }
+          { iv.length } / { 8 }
         </Space>
       </Row>
       <Row style = { { marginTop: "5px" }}>
@@ -165,12 +168,12 @@ const AESCrypto = () => {
           <label>密钥:</label>
           <Input
             allowClear
-            maxLength = { 32 }
+            maxLength = { 8 }
             status={ passphraseStatus }
             style={ { width: "630px"} }
             onChange={ onPassphraseChange }
             value= { passphrase } />
-          { passphrase.length } / { 16 }
+          { passphrase.length } / { 8 }
         </Space>
       </Row>
       <TextArea
@@ -179,7 +182,7 @@ const AESCrypto = () => {
         onChange={ (e) => { setEncodeValue(e.target.value) } }
         title="双击复制内容到粘贴板"
         value= { encodeValue }
-        placeholder="需要进行 AES 加密的内容"
+        placeholder="需要进行 DES 加密的内容"
         autoSize={{ minRows: 8}}
       />
 
@@ -204,7 +207,7 @@ const AESCrypto = () => {
         onChange={ (e) => { setDecodeValue(e.target.value) } }
         title="双击复制内容到粘贴板"
         value= { decodeValue }
-        placeholder="需要进行 AES 解密的内容"
+        placeholder="需要进行 DES 解密的内容"
         autoSize={{ minRows: 8}}
       />
     </div>

@@ -24,7 +24,7 @@ const AppStoreSetting = () => {
   const onIVChange = (e :React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
     setIV(v); 
-    if(v.length === 0 || v.length == 16) { // IV长度必须为 0 
+    if(v.length === 0 || v.length == 8) { // IV长度必须为 0 
       setDefaultIV(v);
       setIVStatus("");
     } else {
@@ -36,8 +36,8 @@ const AppStoreSetting = () => {
   const onPassphraseChange = (e :React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value.trim();
     setPassphrase(v); 
-    // Passphrase 长度必须为 0 / 16 (128位) / 24(192位) / 32(256位)
-    if(v.length === 0 || v.length == 16 || v.length == 24 || v.length == 32) {
+    // Passphrase 长度必须为 0 / 8
+    if(v.length === 0 || v.length == 8) {
       setDefaultPassphrase(v);
       setPassphraseStatus("");
     } else {
@@ -78,24 +78,24 @@ const AppStoreSetting = () => {
         <Space>
           <Input 
             status= { ivStatus }
-            maxLength = { 16 }
+            maxLength = { 8 }
             allowClear
             style={ { width: "520px" } }
             onChange={ onIVChange }
             value= { iv } />
-          { iv.length? iv.length + " / 16" : null }
+          { iv.length? iv.length + " / 8" : null }
         </Space>
       </Form.Item>
       <Form.Item label="默认密钥">
         <Space>
           <Input 
             status= { passphraseStatus }
-            maxLength= { 32 }
+            maxLength= { 8 }
             allowClear
             style={ { width: "520px" } }
             onChange={ onPassphraseChange }
             value= { passphrase } />
-          { passphrase.length? passphrase.length + " / " + 16  : null }
+          { passphrase.length? passphrase.length + " / " + 8  : null }
         </Space>
       </Form.Item>
     </>

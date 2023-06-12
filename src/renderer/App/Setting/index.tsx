@@ -9,6 +9,7 @@ import { default as HashSetting } from "../Hash/setting";
 import { default as ColorSetting } from "../Color/setting";
 import { default as QRCodeGeneratorSetting } from "../QRCodeGenerator/setting";
 import { default as AESCryptoSetting } from "../AESCrypto/setting";
+import { default as DESCryptoSetting } from "../DESCrypto/setting";
 
 const Setting = () => {
   const genSettingFormHeight = () => {
@@ -42,6 +43,7 @@ const Setting = () => {
         <ColorSetting />
         <QRCodeGeneratorSetting />
         <AESCryptoSetting />
+        <DESCryptoSetting />
       </Form>
     </div>
   );

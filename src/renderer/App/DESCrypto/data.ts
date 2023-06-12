@@ -14,7 +14,7 @@ export const paddingList = [
   "Iso10126",
   "Iso97971",
   "ZeroPadding",
-  "NoPadding",
+  // "NoPadding",
 ];
 
 // 输出/输入数据编码列表
