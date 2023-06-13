@@ -24,10 +24,11 @@ Base64编码后的字符串中可能包含"+/="之类的字符，而"/"，"="等
   const [ notice, contextHolder ] = message.useMessage(); // 消息提醒
 
   const textareaDoubleClick = (e :React.MouseEvent<HTMLTextAreaElement>) => {
-    const value = (e.target as HTMLInputElement).value.trim();
-    if (value === '') return ;
-    copyTextToClipboard(value);
-    notice.success( "复制到粘贴板成功！！！");
+    const txt = (e.target as HTMLInputElement).value.trim();
+    if(txt !== '') {
+      copyTextToClipboard(txt);
+      notice.success("复制到粘贴板成功！！！");
+    }
   };
 
   const encode = () => {
