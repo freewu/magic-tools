@@ -1,17 +1,32 @@
 import { Checkbox, Form, Input, Divider, message, Space, Tag, Button } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
-import { copyTextToClipboard } from "./../../lib"
-import { emptyResult, HashResult } from "./data"
+import { copyTextToClipboard, debounce } from "./../../lib"
+import { emptyResult } from "./data"
+
 import HmacSHA256 from 'crypto-js/hmac-sha256';
 import HmacSHA1 from 'crypto-js/hmac-sha1';
 import HmacSHA512 from 'crypto-js/hmac-sha512';
 import HmacMD5 from 'crypto-js/hmac-md5';
 import HmacSHA3 from 'crypto-js/hmac-sha3';
-import type { CheckboxChangeEvent } from 'antd/es/checkbox'
-import { getPasswordList } from "../Hash/lib"
+import HmacRipeMD160 from 'crypto-js/hmac-ripemd160';
+import HmacSHA224 from 'crypto-js/hmac-sha224';
+import HmacSHA384 from 'crypto-js/hmac-sha384';
+
+import type { CheckboxChangeEvent } from 'antd/es/checkbox';
+import { getPasswordList } from "../Hash/lib";
+import "./hmac-hash.css";
 
 const HmacHash = () => {
+
+  const genFormHeight = () => {
+    return (window.innerHeight - 300) + "px";
+  };
+
+  const [ height, setHeight ] = useState(genFormHeight()); // 窗口大小高度
+
+  // 窗体大小发生变化,改变窗口大小
+  window.addEventListener('resize', debounce(() => { setHeight(genFormHeight()) },100) );
 
   const [ value, setValue ] = useState('');
   const [ checked, setChecked ] = useState(false);
@@ -19,12 +34,12 @@ const HmacHash = () => {
   const [ notice, contextHolder] = message.useMessage();
   const [ passphrase, setPassphrase ] = useState(''); // 密钥
 
-
-  const inputStyle = { cursor: "pointer" };
-
   const inputClick = (e :React.MouseEvent<HTMLElement>) => {
-    copyTextToClipboard((e.target as HTMLInputElement).value);
-    notice.success("复制到粘贴板成功！！！");
+    const txt = (e.target as HTMLInputElement).value.trim();
+    if(txt != "") {
+      copyTextToClipboard(txt);
+      notice.success("复制到粘贴板成功！！！");
+    }
   };
 
   const upperLowerFormat = (str :string,flag :boolean) => {
@@ -42,6 +57,9 @@ const HmacHash = () => {
         "sha256": upperLowerFormat(hash["sha256"],!checked),
         "sha512": upperLowerFormat(hash["sha512"],!checked),
         "sha3": upperLowerFormat(hash["sha3"],!checked),
+        "sha224": upperLowerFormat(hash["sha224"],!checked),
+        "sha384": upperLowerFormat(hash["sha384"],!checked),
+        "ripemd160": upperLowerFormat(hash["ripemd160"],!checked),
       };
       setHash(result);
     }
@@ -67,6 +85,9 @@ const HmacHash = () => {
       "sha256": upperLowerFormat(HmacSHA256(value,passphrase).toString(),checked),
       "sha512": upperLowerFormat(HmacSHA512(value,passphrase).toString(),checked),
       "sha3": upperLowerFormat(HmacSHA3(value,passphrase).toString(),checked),
+      "sha224": upperLowerFormat(HmacSHA224(value,passphrase).toString(),checked),
+      "sha384": upperLowerFormat(HmacSHA384(value,passphrase).toString(),checked),
+      "ripemd160": upperLowerFormat(HmacRipeMD160(value,passphrase).toString(),checked),
     };
     setHash(result);
   }
@@ -91,8 +112,9 @@ const HmacHash = () => {
               if(index < 10) {
                 return (
                   <Tag 
+                    className="hash-tag"
                     key={ password }
-                    color={ calcTagColor(index) } style={ inputStyle } 
+                    color={ calcTagColor(index) }
                     onClick={ () => { calcHash(password, passphrase) } } >{ password }</Tag>
                 )
               }
@@ -126,24 +148,35 @@ const HmacHash = () => {
       </Space>
 
       <Divider dashed />
-
-      <Form name="basic"labelCol={{ span: 3 }}autoComplete="off">
-        <Form.Item label="Hmac-MD5">
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.md5 } />
-        </Form.Item>
-        <Form.Item label="Hmac-SHA1">
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha1 } />
-        </Form.Item>
-        <Form.Item label="Hmac-SHA3">
-          <TextArea readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha3 } />
-        </Form.Item>
-        <Form.Item label="Hmac-SHA256">
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha256 }/>
-        </Form.Item>
-        <Form.Item label="Hmac-SHA512">
-          <TextArea readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha512 }/>
-        </Form.Item>
-      </Form>
+      
+      <div className="hash-form" style={ { height: height, overflowY: "auto",paddingRight: 12 } } >
+        <Form name="basic"labelCol={{ span: 4 }}autoComplete="off">
+          <Form.Item label="Hmac-MD5">
+            <Input readOnly showCount onClick={ inputClick } value= { hash.md5 } />
+          </Form.Item>
+          <Form.Item label="Hmac-SHA1">
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sha1 } />
+          </Form.Item>
+          <Form.Item label="Hmac-RipeMD160">
+            <Input readOnly showCount onClick={ inputClick } value= { hash.ripemd160 } />
+          </Form.Item>
+          <Form.Item label="Hmac-SHA256">
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sha256 }/>
+          </Form.Item>
+          <Form.Item label="Hmac-SHA3">
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sha3 } />
+          </Form.Item>
+          <Form.Item label="Hmac-SHA224">
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sha224 } />
+          </Form.Item>
+          <Form.Item label="Hmac-SHA384">
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sha384 } />
+          </Form.Item>
+          <Form.Item label="Hmac-SHA512">
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sha512 }/>
+          </Form.Item>
+        </Form>
+      </div>
 
     </div>
   );

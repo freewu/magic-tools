@@ -15,8 +15,11 @@ const Time = () => {
 
   const inputStyle = { cursor: "pointer" };
   const inputClick = (e :React.MouseEvent<HTMLElement>) => {
-    copyTextToClipboard((e.target as HTMLInputElement).value);
-    notice.success("复制到粘贴板成功！！！");
+    const txt = (e.target as HTMLInputElement).value.trim();
+    if(txt != "") {
+      copyTextToClipboard(txt);
+      notice.success("复制到粘贴板成功！！！");
+    }
   };
 
   const updateDate = (d: Date) => {

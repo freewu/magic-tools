@@ -2,7 +2,8 @@ import { Checkbox, Form, Input, Divider, message, Space, Tag, Button } from "ant
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard, debounce } from "./../../lib"
-import { emptyResult, HashResult } from "./data"
+import { emptyResult } from "./data"
+
 import sha256 from 'crypto-js/sha256';
 import sha1 from 'crypto-js/sha1';
 import sha512 from 'crypto-js/sha512';
@@ -14,11 +15,12 @@ import ripemd160 from 'crypto-js/ripemd160';
 
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
 import { getPasswordList } from "./lib"
+import "./hash.css"
 
 const Hash = () => {
 
   const genFormHeight = () => {
-    return (window.innerHeight - 260) + "px";
+    return (window.innerHeight - 300) + "px";
   };
 
   const [ height, setHeight ] = useState(genFormHeight()); // 窗口大小高度
@@ -31,12 +33,10 @@ const Hash = () => {
   const [ hash, setHash ] = useState(emptyResult);
   const [ notice, contextHolder] = message.useMessage();
 
-  const inputStyle = { cursor: "pointer" };
-
   const inputClick = (e :React.MouseEvent<HTMLElement>) => {
-    const value = (e.target as HTMLInputElement).value;
-    if(value !== "") {
-      copyTextToClipboard(value);
+    const txt = (e.target as HTMLInputElement).value.trim();
+    if(txt != "") {
+      copyTextToClipboard(txt);
       notice.success("复制到粘贴板成功！！！");
     }
   };
@@ -113,8 +113,9 @@ const Hash = () => {
               if(index < 10) {
                 return (
                   <Tag
+                    className="hash-tag"
                     key={ password }
-                    color={ calcTagColor(index) } style={ inputStyle } 
+                    color={ calcTagColor(index) }
                     onClick={ () => { calcHash(password) } } >{ password }</Tag>
                 )
               }
@@ -138,34 +139,34 @@ const Hash = () => {
 
       <Divider dashed />
 
-      <div style={ { height: height, overflowY: "auto",paddingRight: 12 } } >
+      <div className="hash-form" style={ { height: height, overflowY: "auto",paddingRight: 12 } } >
         <Form name="basic"labelCol={{ span: 3 }}autoComplete="off" >
           <Form.Item label="MD5 (16位)">
-            <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.md516 } />
+            <Input readOnly showCount onClick={ inputClick } value= { hash.md516 } />
           </Form.Item>
           <Form.Item label="MD5 (32位)">
-            <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.md5 } />
+            <Input readOnly showCount onClick={ inputClick } value= { hash.md5 } />
           </Form.Item>
           <Form.Item label="RipeMD-160">
-            <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.ripemd160 } />
+            <Input readOnly showCount onClick={ inputClick } value= { hash.ripemd160 } />
           </Form.Item>
           <Form.Item label="SHA1">
-            <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha1 } />
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sha1 } />
           </Form.Item>
           <Form.Item label="SHA256">
-            <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha256 }/>
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sha256 }/>
           </Form.Item>
           <Form.Item label="SHA3">
-            <TextArea readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha3 } />
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sha3 } />
           </Form.Item>
           <Form.Item label="SHA224">
-            <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha224 } />
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sha224 } />
           </Form.Item>
           <Form.Item label="SHA384">
-            <TextArea readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha384 } />
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sha384 } />
           </Form.Item>
           <Form.Item label="SHA512">
-            <TextArea readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha512 }/>
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sha512 }/>
           </Form.Item>
         </Form>
       </div>

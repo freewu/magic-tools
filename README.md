@@ -4,7 +4,7 @@
 
 ## 功能模块
 ```
-Hash 值计算 ( MD5 / SHA1 / SHA3 / SHA256 / SHA512 )
+Hash 值计算 ( MD5 / SHA1 / SHA3 / SHA256 / SHA512 / SHA224 / SHA384 / RipeMD-160 )   
 Base64 编码 / 解码
 URL 编码 / 解码
 时间戳转换
@@ -12,7 +12,7 @@ CSS 配色
 颜色格式转换
 进制转换 ( BIN / OCT / DEC / HEX )
 二维码生成   
-HmacHash 值计算  
+HmacHash 值计算 ( HmacMD5 / HmacSHA1 / HmacSHA3 / HmacSHA256 / HmacSHA512 / HmacSHA224 / HmacSHA384 / HmacRipeMD-160 )     
 SQL 格式化
 行数统计
 Unicode 编码 / 解码
