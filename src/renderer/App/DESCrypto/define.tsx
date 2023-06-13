@@ -1,7 +1,9 @@
 const AppName = 'DES 加解密';
-const Icon = ''
+const Icon = '';
+const Type = 'crypto';
 
 export {
   AppName,
-  Icon
+  Icon,
+  Type,
 }

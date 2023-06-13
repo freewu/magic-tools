@@ -18,18 +18,25 @@ const list = [
 // 加载 App 的定义 名称 / icon 
 const loadApp = (app :string,callback :Function) => {
   return import(`./${app}/define`)
-    .then( ({AppName, Icon}) => { callback({AppName, Icon}) })
+    .then( ({ AppName, Icon, Type }) => { callback({ AppName, Icon, Type }) })
     .catch( (err:any) => console.log(err) );
+}
+
+export type AppItem = {
+  key: string, // app 编号 也是导航的 url 地址
+  icon: any, //  app icon 图标
+  "label": string, // app 名称
+  type: string, // app 类型 
 }
 
 // 获取 App 列表
 const getAppList = async () => {
-  let result:Array<any> = [];
+  let result:Array<AppItem> = [];
   let p;
   list.forEach( item => {
-    p = loadApp(item,({AppName, Icon} : any) => {
+    p = loadApp(item,({ AppName, Icon, Type } : any) => {
       //const img = (Icon === "")? '' : <Icon component={ Icon } />;
-      result.push({key: item, icon: Icon, label: AppName });
+      result.push({ key: item, icon: Icon, label: AppName, type: Type });
     });
   })
   await p;

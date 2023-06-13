@@ -1,7 +1,9 @@
 const AppName = 'Base64 编解码';
-const Icon = ''
+const Icon = '';
+const Type = 'codec';
 
 export {
   AppName,
-  Icon
+  Icon,
+  Type,
 }

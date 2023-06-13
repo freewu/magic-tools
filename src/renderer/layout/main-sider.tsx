@@ -4,7 +4,7 @@ import { Button, Layout, Menu, Space } from "antd";
 import React,{ useState,useContext } from "react";
 const { Sider, Content } = Layout;
 import { useNavigate } from "react-router-dom"
-import { appList } from "../App";
+import { appList, AppItem } from "../App";
 import { getSiderFlag } from "../lib/setting";
 import "./layout.css";
 
@@ -18,6 +18,37 @@ const MainSider: React.FC = () => {
   const menuClick = ( e:any ) => {
     setApp(e.key);
     navigate(e.key, { replace: true });
+  }
+
+  /*
+      key,
+    icon,
+    children,
+    label,
+    type,
+  */
+
+  let menuList = new Map([
+    ["codec", { key: 'codec',  label: '编解码',  icon: '', children: new Array<AppItem> }],
+    ["crypto", { key: 'crypto',  label: '加解密',  icon: '', children: new Array<AppItem> }],
+    ["convert", { key: 'convert',  label: '类型转换',  icon: '', children: new Array<AppItem> }],
+    ["formatter", { key: 'formatter',  label: '格式化',  icon: '', children: new Array<AppItem> }],
+    ["value-calc", { key: 'value-calc',  label: '值计算',  icon: '', children: new Array<AppItem> }],
+    ["misc", { key: 'misc',  label: '其它',  icon: '', children:[] }],
+  ]);
+
+  // 生成
+  const genMenuList = (appList :Array<AppItem>) => {
+    // todo 收藏
+    // 按 app type 分类
+    for(let item of appList) {
+      if(menuList.has(item.type)) {
+        let v = menuList.get(item.type);
+        v?.children?.push(item)
+        if(v !== undefined) menuList.set(item.type,v);
+      }
+    }
+    return Array.from(menuList.values());
   }
 
   return (
@@ -60,10 +91,10 @@ const MainSider: React.FC = () => {
     <Menu
       theme="dark"
       mode="inline"
-      selectedKeys= { [app] }
+      selectedKeys= { [ app ] }
       // activeKey={ '' }
       onClick = { menuClick }
-      items={ appList }
+      items={ genMenuList(appList) }
     />
   </Sider>
   )
