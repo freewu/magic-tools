@@ -1,17 +1,30 @@
 import { Checkbox, Form, Input, Divider, message, Space, Tag, Button } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
-import { copyTextToClipboard } from "./../../lib"
+import { copyTextToClipboard, debounce } from "./../../lib"
 import { emptyResult, HashResult } from "./data"
 import sha256 from 'crypto-js/sha256';
 import sha1 from 'crypto-js/sha1';
 import sha512 from 'crypto-js/sha512';
 import md5 from 'crypto-js/md5';
 import sha3 from 'crypto-js/sha3';
+import sha224 from 'crypto-js/sha224';
+import sha384 from 'crypto-js/sha384';
+import ripemd160 from 'crypto-js/ripemd160';
+
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
 import { getPasswordList } from "./lib"
 
 const Hash = () => {
+
+  const genFormHeight = () => {
+    return (window.innerHeight - 260) + "px";
+  };
+
+  const [ height, setHeight ] = useState(genFormHeight()); // 窗口大小高度
+
+  // 窗体大小发生变化,改变窗口大小
+  window.addEventListener('resize', debounce(() => { setHeight(genFormHeight()) },100) );
 
   const [ value, setValue ] = useState('');
   const [ checked, setChecked ] = useState(false);
@@ -21,8 +34,11 @@ const Hash = () => {
   const inputStyle = { cursor: "pointer" };
 
   const inputClick = (e :React.MouseEvent<HTMLElement>) => {
-    copyTextToClipboard((e.target as HTMLInputElement).value);
-    notice.success("复制到粘贴板成功！！！");
+    const value = (e.target as HTMLInputElement).value;
+    if(value !== "") {
+      copyTextToClipboard(value);
+      notice.success("复制到粘贴板成功！！！");
+    }
   };
 
   const upperLowerFormat = (str :string,flag :boolean) => {
@@ -41,6 +57,9 @@ const Hash = () => {
         "sha256": upperLowerFormat(hash["sha256"],!checked),
         "sha512": upperLowerFormat(hash["sha512"],!checked),
         "sha3": upperLowerFormat(hash["sha3"],!checked),
+        "sha224": upperLowerFormat(hash["sha224"],!checked),
+        "sha384": upperLowerFormat(hash["sha384"],!checked),
+        "ripemd160": upperLowerFormat(hash["ripemd160"],!checked),
       };
       setHash(result);
     }
@@ -66,6 +85,9 @@ const Hash = () => {
       "sha256": upperLowerFormat(sha256(value).toString(),checked),
       "sha512": upperLowerFormat(sha512(value).toString(),checked),
       "sha3": upperLowerFormat(sha3(value).toString(),checked),
+      "sha224": upperLowerFormat(sha224(value).toString(),checked),
+      "sha384": upperLowerFormat(sha384(value).toString(),checked),
+      "ripemd160": upperLowerFormat(ripemd160(value).toString(),checked),
     };
     // 处理 16 位 md5 
     result["md516"] = upperLowerFormat(result["md5"].substring(8,24),checked); // 取 9-24 位
@@ -116,27 +138,37 @@ const Hash = () => {
 
       <Divider dashed />
 
-      <Form name="basic"labelCol={{ span: 3 }}autoComplete="off">
-        <Form.Item label="MD5 (16位)">
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.md516 } />
-        </Form.Item>
-        <Form.Item label="MD5 (32位)">
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.md5 } />
-        </Form.Item>
-        <Form.Item label="SHA1">
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha1 } />
-        </Form.Item>
-        <Form.Item label="SHA3">
-          <TextArea readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha3 } />
-        </Form.Item>
-        <Form.Item label="SHA256">
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha256 }/>
-        </Form.Item>
-        <Form.Item label="SHA512">
-          <TextArea readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha512 }/>
-        </Form.Item>
-      </Form>
-
+      <div style={ { height: height, overflowY: "auto",paddingRight: 12 } } >
+        <Form name="basic"labelCol={{ span: 3 }}autoComplete="off" >
+          <Form.Item label="MD5 (16位)">
+            <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.md516 } />
+          </Form.Item>
+          <Form.Item label="MD5 (32位)">
+            <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.md5 } />
+          </Form.Item>
+          <Form.Item label="RipeMD-160">
+            <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.ripemd160 } />
+          </Form.Item>
+          <Form.Item label="SHA1">
+            <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha1 } />
+          </Form.Item>
+          <Form.Item label="SHA256">
+            <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha256 }/>
+          </Form.Item>
+          <Form.Item label="SHA3">
+            <TextArea readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha3 } />
+          </Form.Item>
+          <Form.Item label="SHA224">
+            <Input readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha224 } />
+          </Form.Item>
+          <Form.Item label="SHA384">
+            <TextArea readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha384 } />
+          </Form.Item>
+          <Form.Item label="SHA512">
+            <TextArea readOnly style={ inputStyle } onClick={ inputClick } value= { hash.sha512 }/>
+          </Form.Item>
+        </Form>
+      </div>
     </div>
   );
 }

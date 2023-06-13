@@ -13,7 +13,6 @@ const list = [
   'LineCount',
   'Unicode',
   'DESCrypto',
-  'RipeMDCalc',
 ];
 
 // 加载 App 的定义 名称 / icon 
