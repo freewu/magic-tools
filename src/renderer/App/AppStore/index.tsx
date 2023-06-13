@@ -6,14 +6,14 @@ import { default as AppType } from "./app-type";
 import { debounce } from "../../lib";
 
 const AppStore = () => {
-  const genSettingFormHeight = () => {
+  const genHeight = () => {
     return (window.innerHeight - 70) + "px";
   };
 
-  const [ height, setHeight ] = useState(genSettingFormHeight()); // 窗口大小高度
+  const [ height, setHeight ] = useState(genHeight()); // 窗口大小高度
 
   // 窗体大小发生变化,改变窗口大小
-  window.addEventListener('resize', debounce(() => { setHeight(genSettingFormHeight()) },100) );
+  window.addEventListener('resize', debounce(() => { setHeight(genHeight()) },100) );
 
   return (
     <div className="appstore" style={ { height: height, overflowY: "auto" } }>
