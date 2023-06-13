@@ -18,8 +18,11 @@ SQL 格式化
 Unicode 编码 / 解码
 DES 加密 / 解密   
 AES 加密 / 解密    
+Rabbit 加密 / 解密    
+RC4 加密 / 解密    
 
 -- 待开发 ------------------
+PBKDF2 值计算
 3DES 加密 / 解密
 CRC 计算
 JSON 格式化

@@ -13,6 +13,8 @@ const list = [
   'LineCount',
   'Unicode',
   'DESCrypto',
+  'RabbitCrypto',
+  'RC4Crypto',
 ];
 
 // 加载 App 的定义 名称 / icon 
