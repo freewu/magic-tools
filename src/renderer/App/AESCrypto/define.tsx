@@ -1,6 +1,6 @@
 const AppName = 'AES 加解密';
-const Icon = ''
-const Type = 'crypto'
+const Icon = '';
+const Type = 'crypto';
 
 export {
   AppName,

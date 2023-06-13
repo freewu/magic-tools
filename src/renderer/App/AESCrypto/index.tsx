@@ -156,7 +156,7 @@ const AESCrypto = () => {
             allowClear
             status={ ivStatus }
             maxLength={ 16 }
-            style={ { width: "260px" } }
+            style={ { width: "80px" } }
             disabled={ ivDisabled }
             onChange={ onIVChange }
             value= { iv } />
@@ -177,7 +177,7 @@ const AESCrypto = () => {
             allowClear
             maxLength = { 32 }
             status={ passphraseStatus }
-            style={ { width: "630px"} }
+            style={ { width: "230px"} }
             onChange={ onPassphraseChange }
             value= { passphrase } />
           { passphrase.length } / { capacity / 8 }

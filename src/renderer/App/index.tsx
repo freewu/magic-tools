@@ -8,7 +8,7 @@ const list = [
   'ColorConvert',
   'NumberConvert',
   'QRCodeGenerator',
-  //'AESCrypto',
+  'AESCrypto',
   'SQLFormatter',
   'LineCount',
   'Unicode',
@@ -45,6 +45,28 @@ const getAppList = async () => {
 
 const appList = await getAppList();
 
+// 生成 menu
+export const genMenuList = (appList :Array<AppItem>) => {
+  let menuList = new Map([
+    ["codec", { key: 'codec',  label: '编解码',  icon: '', children: new Array<AppItem> }],
+    ["crypto", { key: 'crypto',  label: '加解密',  icon: '', children: new Array<AppItem> }],
+    ["convert", { key: 'convert',  label: '类型转换',  icon: '', children: new Array<AppItem> }],
+    ["formatter", { key: 'formatter',  label: '格式化',  icon: '', children: new Array<AppItem> }],
+    ["value-calc", { key: 'value-calc',  label: '值计算',  icon: '', children: new Array<AppItem> }],
+    ["misc", { key: 'misc',  label: '其它',  icon: '', children:[] }],
+  ]);
+
+  // todo 收藏
+  // 按 app type 分类
+  for(let item of appList) {
+    if(menuList.has(item.type)) {
+      let v = menuList.get(item.type);
+      v?.children?.push(item)
+      if(v !== undefined) menuList.set(item.type,v);
+    }
+  }
+  return Array.from(menuList.values());
+}
 
 // 定义 App
 // const appList = [
