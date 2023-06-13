@@ -58,9 +58,9 @@ const AESCrypto = () => {
         case "Base64": return setDecodeValue(CryptoJS.enc.Base64.stringify(value.ciphertext));
         case "HEX": return setDecodeValue(CryptoJS.enc.Hex.stringify(value.ciphertext));
       }
-    } catch (e :any) {
-      console.log(e);
-      notice.error(e);
+    } catch (error) {
+      console.log(error);
+      //notice.error(e);
     }
   };
 
@@ -77,11 +77,15 @@ const AESCrypto = () => {
           iv: ('ECB' === mode)? CryptoJS.enc.Utf8.parse('') : CryptoJS.enc.Utf8.parse(iv),
         }
       );
-      // 解密处理是生
-      return setEncodeValue(value.toString(CryptoJS.enc.Utf8));
-    } catch (e :any) {
-      console.log(e);
-      notice.error(e);
+      // 解密处理
+      const result = value.toString(CryptoJS.enc.Utf8);
+      if("" === result) {
+        notice.error("解密失败");
+      }
+      return setEncodeValue(result);
+    } catch (error) {
+      console.log(error);
+      //notice.error(error);
     }
   };
 
@@ -144,19 +148,12 @@ const AESCrypto = () => {
             onChange={ (v :string) => { setPadding(v) } }
             options={ arrayToOptions(paddingList) }
           />
-          <label>编码:</label>
-          <Select
-            value={ code }
-            style={{ width: 120 }}
-            onChange={ (v :string) => { setCode(v) } }
-            options={ arrayToOptions(codeList) }
-          />
           <label>偏移量(IV):</label>
           <Input 
             allowClear
             status={ ivStatus }
             maxLength={ 8 }
-            style={ { width: "165px" } }
+            style={ { width: 369 } }
             disabled={ ivDisabled }
             onChange={ onIVChange }
             value= { iv } />
@@ -165,12 +162,19 @@ const AESCrypto = () => {
       </Row>
       <Row style = { { marginTop: "5px" }}>
         <Space>
+          <label>编码:</label>
+          <Select
+            value={ code }
+            style={{ width: 120 }}
+            onChange={ (v :string) => { setCode(v) } }
+            options={ arrayToOptions(codeList) }
+          />
           <label>密钥:</label>
           <Input
             allowClear
             maxLength = { 8 }
             status={ passphraseStatus }
-            style={ { width: "700px"} }
+            style={ { width: 570 } }
             onChange={ onPassphraseChange }
             value= { passphrase } />
           { passphrase.length } / { 8 }

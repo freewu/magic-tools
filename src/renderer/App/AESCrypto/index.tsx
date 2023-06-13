@@ -48,20 +48,20 @@ const AESCrypto = () => {
     try {
       const value = CryptoJS.AES.encrypt(
         encodeValue,
-        CryptoJS.enc.Hex.parse(passphrase), // passphrase, 不能直接传string 要不然会 CryptoJS 会加 salt
+        CryptoJS.enc.Utf8.parse(passphrase), // passphrase, 不能直接传string 要不然会 CryptoJS 会加 salt
         {
           mode: getMode(mode),
           padding: getPadding(padding),
-          iv: ('ECB' === mode)? CryptoJS.enc.Hex.parse('') : CryptoJS.enc.Hex.parse(iv),
+          iv: ('ECB' === mode)? CryptoJS.enc.Utf8.parse('') : CryptoJS.enc.Utf8.parse(iv),
         }
       );
       switch(code) {
         case "Base64": return setDecodeValue(CryptoJS.enc.Base64.stringify(value.ciphertext));
         case "HEX": return setDecodeValue(CryptoJS.enc.Hex.stringify(value.ciphertext));
       }
-    } catch (e :any) {
-      console.log(e);
-      notice.error(e);
+    } catch (error) {
+      console.log(error);
+      //notice.error(e);
     }
   };
 
@@ -69,22 +69,23 @@ const AESCrypto = () => {
   const decode = () => {
     if(!isCanDo(decodeValue)) return ;
     try {
-      const value = aes.decrypt(
-        decodeValue,
-        CryptoJS.enc.Hex.parse(passphrase), // passphrase, 不能直接传string 要不然会 CryptoJS 会加 salt
+      const value = CryptoJS.AES.decrypt(
+        (code === "Base64")? decodeValue : CryptoJS.enc.Base64.stringify(CryptoJS.enc.Hex.parse(decodeValue)), // 需传入 base64的值 
+        CryptoJS.enc.Utf8.parse(passphrase), // passphrase, 不能直接传string 要不然会 CryptoJS 会加 salt
         {
           mode: getMode(mode),
           padding: getPadding(padding),
-          iv: ('ECB' === mode)? CryptoJS.enc.Hex.parse('') : CryptoJS.enc.Hex.parse(iv),
+          iv: ('ECB' === mode)? CryptoJS.enc.Utf8.parse('') : CryptoJS.enc.Utf8.parse(iv),
         }
       );
-      switch(code) {
-        case "Base64": return setEncodeValue(value.toString(CryptoJS.enc.Base64));
-        case "HEX": return setEncodeValue(value.toString(CryptoJS.enc.Hex));
+      const result = value.toString(CryptoJS.enc.Utf8);
+      if("" === result) {
+        notice.error("解密失败");
       }
-    } catch (e :any) {
-      console.log(e);
-      notice.error(e);
+      return setEncodeValue(result);
+    } catch (error) {
+      console.log(error);
+      //notice.error(e);
     }
   };
 
@@ -107,6 +108,16 @@ const AESCrypto = () => {
       setIVStatus("");
     } else {
       setIVStatus("error");
+    }
+  }
+
+  // 位数切换
+  const onCapacityChange = (e:number) => { 
+    setCapacity(e);
+    if ((e / 8) == passphrase.length) {
+      setPassphraseStatus('')
+    } else {
+      setPassphraseStatus('error');
     }
   }
  
@@ -144,19 +155,12 @@ const AESCrypto = () => {
             onChange={ (v :string) => { setPadding(v) } }
             options={ arrayToOptions(paddingList) }
           />
-          <label>编码:</label>
-          <Select
-            value={ code }
-            style={{ width: 120 }}
-            onChange={ (v :string) => { setCode(v) } }
-            options={ arrayToOptions(codeList) }
-          />
           <label>偏移量(IV):</label>
           <Input 
             allowClear
             status={ ivStatus }
             maxLength={ 16 }
-            style={ { width: "80px" } }
+            style={ { width: 400 } }
             disabled={ ivDisabled }
             onChange={ onIVChange }
             value= { iv } />
@@ -165,11 +169,18 @@ const AESCrypto = () => {
       </Row>
       <Row style = { { marginTop: "5px" }}>
         <Space>
+          <label>编码:</label>
+          <Select
+            value={ code }
+            style={{ width: 120 }}
+            onChange={ (v :string) => { setCode(v) } }
+            options={ arrayToOptions(codeList) }
+          />
           <label>位数:</label>
           <Select
             value={ capacity }
             style={{ width: 120 }}
-            onChange={ (e:number) => { setCapacity(e) } }
+            onChange={ onCapacityChange }
             options={ arrayToOptions(capacityList) }
           />
           <label>密钥:</label>
@@ -177,7 +188,7 @@ const AESCrypto = () => {
             allowClear
             maxLength = { 32 }
             status={ passphraseStatus }
-            style={ { width: "230px"} }
+            style={ { width: 435 } }
             onChange={ onPassphraseChange }
             value= { passphrase } />
           { passphrase.length } / { capacity / 8 }
