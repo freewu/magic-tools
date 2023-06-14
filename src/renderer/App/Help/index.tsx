@@ -26,6 +26,8 @@ const Help = () => {
         <p><a target="_blank" href="https://github.com/Qix-/color-convert">color-convert</a></p>   
         <p><a target="_blank" href="https://github.com/sql-formatter-org/sql-formatter">SQL Formatter</a></p>   
         <p><a target="_blank" href="https://highlightjs.org/">highlight.js</a></p>   
+        <p><a target="_blank" href="github.com/cryptocoinjs/base-x">base-x</a></p>   
+        
       </Card>
       
     </Layout>

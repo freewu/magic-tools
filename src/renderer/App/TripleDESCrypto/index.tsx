@@ -10,11 +10,11 @@ import { getDefaultIV, getDefaultCode, getDefaultMode, getDefaultPadding, getDef
 import { getPadding, getMode } from "./lib";
 import type { InputStatus } from "antd/es/_util/statusUtils";
 
-const DESCrypto = () => {
+const TripleDESCrypto = () => {
 
   const genDefaultPassphraseStatus = () :InputStatus => {
     const p = getDefaultPassphrase();
-    return ( 8 === p.length)? '' : 'error';
+    return ( 24 === p.length)? '' : 'error';
   }
 
   const [ notice, contextHolder ] = message.useMessage();
@@ -44,7 +44,7 @@ const DESCrypto = () => {
   const encode = () => {
     if(!isCanDo(encodeValue)) return ;
     try {
-      const value = CryptoJS.DES.encrypt(
+      const value = CryptoJS.TripleDES.encrypt(
         encodeValue,
         CryptoJS.enc.Utf8.parse(passphrase), // passphrase, 不能直接传string 要不然会 CryptoJS 会加 salt
         {
@@ -67,7 +67,7 @@ const DESCrypto = () => {
   const decode = () => {
     if(!isCanDo(decodeValue)) return ;
     try {
-      const value = CryptoJS.DES.decrypt(
+      const value = CryptoJS.TripleDES.decrypt(
         (code === "Base64")? decodeValue : CryptoJS.enc.Base64.stringify(CryptoJS.enc.Hex.parse(decodeValue)), // 需传入 base64的值 
         CryptoJS.enc.Utf8.parse(passphrase), // passphrase, 不能直接传string 要不然会 CryptoJS 会加 salt
         {
@@ -123,7 +123,7 @@ const DESCrypto = () => {
   const onPassphraseChange = (e :React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value.trim();
     setPassphrase(v);
-    if(v.length == 8) { // IV长度必须为 8
+    if(v.length == 24) { // 长度必须为 24 位
       setPassphraseStatus("");
     } else {
       setPassphraseStatus("error");
@@ -174,12 +174,12 @@ const DESCrypto = () => {
           <label>密钥:</label>
           <Input
             allowClear
-            maxLength = { 8 }
+            maxLength = { 24 }
             status={ passphraseStatus }
             style={ { width: 510 } }
             onChange={ onPassphraseChange }
             value= { passphrase } />
-          { passphrase.length } / { 8 }
+          { passphrase.length } / { 24 }
         </Space>
       </Row>
       <TextArea
@@ -188,7 +188,7 @@ const DESCrypto = () => {
         onChange={ (e) => { setEncodeValue(e.target.value) } }
         title="双击复制内容到粘贴板"
         value= { encodeValue }
-        placeholder="需要进行 DES 加密的内容"
+        placeholder="需要进行 3DES 加密的内容"
         autoSize={{ minRows: 8}}
       />
 
@@ -213,10 +213,10 @@ const DESCrypto = () => {
         onChange={ (e) => { setDecodeValue(e.target.value) } }
         title="双击复制内容到粘贴板"
         value= { decodeValue }
-        placeholder="需要进行 DES 解密的内容"
+        placeholder="需要进行 3DES 解密的内容"
         autoSize={{ minRows: 8}}
       />
     </div>
   )
 }
-export default DESCrypto;
+export default TripleDESCrypto;

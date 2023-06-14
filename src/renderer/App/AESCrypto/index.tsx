@@ -4,7 +4,6 @@ import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "../../lib"
 import { arrayToOptions } from "../../lib/array"
-import aes from 'crypto-js/aes';
 import * as CryptoJS from 'crypto-js';
 import { modeList, paddingList, codeList, capacityList } from "./data";
 import { getDefaultIV, getDefaultCode, getDefaultMode, getDefaultPadding, getDefaultPassphrase,genCapacity } from "./lib";

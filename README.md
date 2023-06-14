@@ -20,10 +20,11 @@ DES 加密 / 解密
 AES 加密 / 解密    
 Rabbit 加密 / 解密    
 RC4 加密 / 解密    
-
+3DES 加密 / 解密   
+Base58 编码 / 解码
+   
 -- 待开发 ------------------
-PBKDF2 值计算
-3DES 加密 / 解密
+PBKDF2 值计算 
 CRC 计算
 JSON 格式化
 正则表达式
@@ -63,6 +64,7 @@ WebSocket 调试
 <a target="_blank" href="https://github.com/Qix-/color-convert">color-convert</a>   
 <a target="_blank" href="https://github.com/sql-formatter-org/sql-formatter">SQL Formatter</a>   
 <a target="_blank" href="https://highlightjs.org/">highlight.js</a>   
+<a target="_blank" href="github.com/cryptocoinjs/base-x">base-x</a>
 
 
 ## 应用截图
