@@ -3,6 +3,7 @@ import { useState } from "react";
 const { TextArea } = Input;
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "../../lib"
+import { openFile } from "../../lib/file"
 import { default as Base64Intro } from "./intro"
 import { Base58Encode, Base58Decode } from "./lib"
 
@@ -48,8 +49,10 @@ const Base58Codec = () => {
         onChange={ (e) => { setEncodeValue(e.target.value) ;} }
         title="双击复制内容到粘贴板"
         value= { encodeValue }
-        placeholder="输入需要进行 Base58 编码的内容"
-        autoSize={{ minRows: 5}}
+        placeholder="输入需要进行 Base58 编码的内容  或 拖拽文件到框内打开"
+        autoSize={{ minRows: 5, maxRows: 5 }}
+        onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
+        onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setEncodeValue ); } }
       />
 
       <Button 
@@ -73,8 +76,10 @@ const Base58Codec = () => {
         onChange={ (e) => { setDecodeValue(e.target.value) ;} }
         title="双击复制内容到粘贴板"
         value= { decodeValue }
-        placeholder="输入需要进行 Base58 解码的内容"
-        autoSize={{ minRows: 5}}
+        placeholder="输入需要进行 Base58 解码的内容  或 拖拽文件到框内打开"
+        autoSize={{ minRows: 5, maxRows: 5 }}
+        onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
+        onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setDecodeValue ); } }
       />
       
       <Divider> Base58 编码说明 </Divider>

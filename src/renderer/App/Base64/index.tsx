@@ -3,6 +3,7 @@ import { useState } from "react";
 const { TextArea } = Input;
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
+import { openFile } from "../../lib/file"
 import { Base64 as B64 } from 'js-base64';
 import { default as Base64Intro } from "./intro"
 
@@ -59,8 +60,10 @@ Base64编码后的字符串中可能包含"+/="之类的字符，而"/"，"="等
         onChange={ (e) => { setEncodeValue(e.target.value) ;} }
         title="双击复制内容到粘贴板"
         value= { encodeValue }
-        placeholder="需要进行 Base64 编码的内容"
-        autoSize={{ minRows: 5}}
+        placeholder="输入需要进行 Base64 编码的内容  或 拖拽文件到框内打开"
+        autoSize={{ minRows: 5, maxRows: 5 }}
+        onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
+        onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setEncodeValue ); } }
       />
 
       <Button 
@@ -87,8 +90,10 @@ Base64编码后的字符串中可能包含"+/="之类的字符，而"/"，"="等
         onChange={ (e) => { setDecodeValue(e.target.value) ;} }
         title="双击复制内容到粘贴板"
         value= { decodeValue }
-        placeholder="需要进行 Base64 解码的内容"
-        autoSize={{ minRows: 5}}
+        placeholder="输入需要进行 Base64 解码的内容  或 拖拽文件到框内打开"
+        autoSize={{ minRows: 5, maxRows: 5 }}
+        onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
+        onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setDecodeValue ); } }
       />
       
       <Divider> Base64 编码说明 </Divider>

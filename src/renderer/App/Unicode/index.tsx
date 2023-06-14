@@ -3,6 +3,7 @@ import { useState } from "react";
 const { TextArea } = Input;
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
+import { openFile } from "../../lib/file"
 import { default as UnicodeIntro } from "./intro"
 import { unicode2Ascii, ascii2Unicode } from "./lib"
 import { InputStatus } from "antd/es/_util/statusUtils";
@@ -56,8 +57,10 @@ const Unicode = () => {
         onChange={ (e) => { setEncodeValue(e.target.value) ;} }
         title="双击复制内容到粘贴板"
         value= { encodeValue }
-        placeholder="需要进行 Unicode 编码的内容"
-        autoSize={{ minRows: 5}}
+        placeholder="输入需要进行 Unicode 编码的内容  或 拖拽文件到框内打开"
+        autoSize={{ minRows: 5, maxRows: 5 }}
+        onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
+        onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setEncodeValue ); } }
       />
 
       <Button 
@@ -92,8 +95,10 @@ const Unicode = () => {
         onChange={ (e) => { setDecodeValue(e.target.value) ;} }
         title="双击复制内容到粘贴板"
         value= { decodeValue }
-        placeholder="需要进行 Unicode 解码的内容"
-        autoSize={{ minRows: 5}}
+        placeholder="输入需要进行 Unicode 解码的内容  或 拖拽文件到框内打开"
+        autoSize={{ minRows: 5, maxRows: 5 }}
+        onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
+        onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setDecodeValue ); } }
       />
       
       <Divider> Unicode 编码说明 </Divider>

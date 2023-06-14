@@ -2,6 +2,7 @@ import { Checkbox, Form, Input, Divider, message, Space, Tag, Button } from "ant
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard, debounce } from "./../../lib"
+import { openFile } from "../../lib/file"
 import { emptyResult } from "./data"
 
 import HmacSHA256 from 'crypto-js/hmac-sha256';
@@ -65,8 +66,7 @@ const HmacHash = () => {
     }
   };
 
-  const textAreaChange = (e :React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
+  const changeValue = (value :string) => {
     setValue(value);
     if (value.trim() != "") {
       calcHash(value,passphrase);
@@ -125,9 +125,11 @@ const HmacHash = () => {
       <TextArea
         style={ { margin: "5px 0 5px 0" }}
         value= { value }
-        onChange={ textAreaChange }
-        placeholder="输入需要计算 Hash 值的内容"
+        onChange={ (e) => { changeValue(e.target.value) } }
+        placeholder="输入需要计算 Hash 值的内容 或 拖拽文件到框内打开"
         autoSize={{ minRows: 5, maxRows: 5 }}
+        onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
+        onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, changeValue ); } }
       />
 
       <Space>

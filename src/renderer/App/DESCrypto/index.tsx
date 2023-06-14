@@ -3,6 +3,7 @@ import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "../../lib"
+import { openFile } from "../../lib/file"
 import { arrayToOptions } from "../../lib/array"
 import * as CryptoJS from 'crypto-js';
 import { modeList, paddingList, codeList } from "./data";
@@ -188,8 +189,10 @@ const DESCrypto = () => {
         onChange={ (e) => { setEncodeValue(e.target.value) } }
         title="双击复制内容到粘贴板"
         value= { encodeValue }
-        placeholder="需要进行 DES 加密的内容"
-        autoSize={{ minRows: 8}}
+        placeholder="输入需要进行 DES 加密的内容 或 拖拽文件到框内打开"
+        autoSize={{ minRows: 8, maxRows: 8 }}
+        onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
+        onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setEncodeValue ); } }
       />
 
       <Button 
@@ -213,8 +216,10 @@ const DESCrypto = () => {
         onChange={ (e) => { setDecodeValue(e.target.value) } }
         title="双击复制内容到粘贴板"
         value= { decodeValue }
-        placeholder="需要进行 DES 解密的内容"
-        autoSize={{ minRows: 8}}
+        placeholder="输入需要进行 DES 解密的内容 或 拖拽文件到框内打开"
+        autoSize={{ minRows: 8, maxRows: 8 }}
+        onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
+        onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setDecodeValue ); } }
       />
     </div>
   )

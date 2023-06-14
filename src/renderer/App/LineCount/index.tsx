@@ -3,10 +3,12 @@ import { Button,Input, Space, message } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "../../lib"
+import { openFile } from "../../lib/file"
 import { InputStatus } from "antd/es/_util/statusUtils";
 import { calcLineCount, removeEmptyLine } from "./lib"
 
-const ContentCount = () => {
+const LineCount = () => {
+
   let inputElement :HTMLInputElement;
   const [ value, setValue ] = useState(''); // 输入的文本
   const [ lineCount, setLineCount ] = useState(0); // 行数
@@ -64,43 +66,23 @@ const ContentCount = () => {
     copyContent(r.join("\n"));
   }
 
+  // 打开文件后的回调操作
+  const changeContent = (str :string) => {
+    setValue(str);
+    setLineCount(calcLineCount(str));
+  }
+
   // 打开本地文件 
   const fileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files || [];
-    openFile(files);
+    openFile(files, changeContent);
   };
-
-  const openFile = (files: any) => {
-    if(0 === files.length) {
-      // notice.error("请选择文件！！！");
-      return;
-    }
-    const reader = new FileReader();
-    // 加载失败
-    reader.onerror = (err) => {
-      console.log(err);
-    }
-    // 文件加载完毕
-    reader.onload = () => {
-      setValue(reader.result as string);
-      setLineCount(calcLineCount(reader.result as string));
-    }
-    reader.readAsText(files[0]);
-  }
   
   return (
     <div>
       {contextHolder}
 
       <Space>
-
-        <span>
-          <label>行数:</label> { lineCount }
-        </span>
-        <span>
-          <label>字符数:</label> { value.length }
-        </span>
-        |
         <Button
           onClick={ () => { setLineCount(0); setValue('') } }
           style={ { backgroundColor: "#dc3545", color: "#fff" } } 
@@ -142,19 +124,26 @@ const ContentCount = () => {
           onChange={ fileChange }
           ref={ input => inputElement = input as HTMLInputElement }
           type="file" id="fileInput" style={ { display: 'none'}} />
+        |
+        <span>
+          <label>行数:</label> { lineCount }
+        </span>
+        <span>
+          <label>字符数:</label> { value.length }
+        </span>
       </Space>
 
       <TextArea
-        onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
-        onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files); } }
         style={ { margin: "12px 0 5px 0" }}
-        onChange={ (e) => { setValue(e.target.value); setLineCount(calcLineCount(e.target.value)); } }
+        onChange={ (e) => { changeContent(e.target.value); } }
         value= { value }
         placeholder="输入需要统计的内容 或 拖拽文件到框内"
-        autoSize={{ minRows: 26, maxRows: 26 }}
+        autoSize={{ minRows: 26,maxRows:26 }}
+        onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
+        onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, changeContent ); } }
       />
     </div>
   );
 }
 
-export default ContentCount;
+export default LineCount;
