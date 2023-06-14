@@ -15,6 +15,8 @@ const list = [
   'DESCrypto',
   'RabbitCrypto',
   'RC4Crypto',
+  'TripleDESCrypto',
+  'Base58Codec',
 ];
 
 // 加载 App 的定义 名称 / icon 
@@ -53,8 +55,8 @@ export const genMenuList = (appList :Array<AppItem>) => {
     ["codec", { key: 'codec',  label: '编解码',  icon: '', children: new Array<AppItem> }],
     ["crypto", { key: 'crypto',  label: '加解密',  icon: '', children: new Array<AppItem> }],
     ["convert", { key: 'convert',  label: '类型转换',  icon: '', children: new Array<AppItem> }],
-    ["formatter", { key: 'formatter',  label: '格式化',  icon: '', children: new Array<AppItem> }],
     ["value-calc", { key: 'value-calc',  label: '值计算',  icon: '', children: new Array<AppItem> }],
+    ["formatter", { key: 'formatter',  label: '格式化',  icon: '', children: new Array<AppItem> }],
     ["misc", { key: 'misc',  label: '其它',  icon: '', children:[] }],
   ]);
 
