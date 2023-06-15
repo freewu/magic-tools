@@ -1,18 +1,26 @@
 // 托盘程序
 import { app, Menu, Tray, ipcMain, BrowserWindow } from 'electron';
-import { getAssetPath } from './util';
+import { getAssetPath, openDefaultBrowser } from './util';
 
 
 // 隐藏主窗口，并创建托盘
 const setTray = (mainWindow: BrowserWindow) => {
   // 当托盘最小化时，右击有一个菜单显示，这里进设置一个退出的菜单
-  let trayMenuTemplate = [{ // 系统托盘图标目录
-    label: '退出',
-    click: function() {
-      console.log("tray quit");
-      app.exit(); // 点击之后退出应用
-    }
-  }];
+  let trayMenuTemplate = [
+    { // 系统托盘图标目录
+      label: '退出',
+      click: function() {
+        console.log("tray quit");
+        app.exit(); // 点击之后退出应用
+      }
+    },
+    {
+      label: 'MagicTools V1.1.0',
+      click: function() {
+        openDefaultBrowser("https://github.com/freewu/magic-tools");
+      }
+    },
+  ];
 
   // 创建托盘实例
   const appTray = new Tray(getAssetPath('icon.png'));
