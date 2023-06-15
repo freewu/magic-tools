@@ -13,6 +13,7 @@ import { default as DESCryptoSetting } from "../DESCrypto/setting";
 import { default as TripleDESCryptoSetting } from "../TripleDESCrypto/setting";
 import { default as RabbitCryptoSetting } from "../RabbitCrypto/setting";
 import { default as RC4CryptoSetting } from "../RC4Crypto/setting";
+import { default as PBKDF2CalcSetting } from "../PBKDF2Calc/setting";
 
 const Setting = () => {
   const genSettingFormHeight = () => {
@@ -50,6 +51,7 @@ const Setting = () => {
         <TripleDESCryptoSetting />
         <RabbitCryptoSetting />
         <RC4CryptoSetting />
+        <PBKDF2CalcSetting />
       </Form>
     </div>
   );

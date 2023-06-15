@@ -137,7 +137,7 @@ const HmacHash = () => {
           onClick={ () => { setValue(''); setHash(emptyResult); } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
         >清除</Button>
-        <Checkbox onChange={onChange} checked={ checked }>大写字符显示</Checkbox>
+        <Checkbox onChange={onChange} checked={ checked }>结果大写字符显示</Checkbox>
         <Input
           placeholder="密钥"
           allowClear

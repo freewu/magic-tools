@@ -17,6 +17,7 @@ const list = [
   'RC4Crypto',
   'TripleDESCrypto',
   'Base58Codec',
+  'PBKDF2Calc',
 ];
 
 // 加载 App 的定义 名称 / icon 
