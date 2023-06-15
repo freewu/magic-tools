@@ -4,7 +4,7 @@ import { Button, Layout, Menu, Space } from "antd";
 import React,{ useState,useContext } from "react";
 const { Sider, Content } = Layout;
 import { useNavigate } from "react-router-dom"
-import { appList } from "../App";
+import { appList, genMenuList } from "../App";
 import { getSiderFlag } from "../lib/setting";
 import "./layout.css";
 
@@ -60,10 +60,10 @@ const MainSider: React.FC = () => {
     <Menu
       theme="dark"
       mode="inline"
-      selectedKeys= { [app] }
+      selectedKeys= { [ app ] }
       // activeKey={ '' }
       onClick = { menuClick }
-      items={ appList }
+      items={ genMenuList(appList) }
     />
   </Sider>
   )

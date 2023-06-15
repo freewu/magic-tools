@@ -48,7 +48,7 @@ const Color = () => {
     setColorType(value);
     // 如果开启了批量取色,需要粘贴板需要生成新的格式
     if (batchPickFlag) {
-      updateClipboard(pickColorList);
+      updateClipboard(pickColorList, value);
     }
   };
 
@@ -78,11 +78,11 @@ const Color = () => {
   }
 
   // 更新粘贴板的数据const UICard = (color: string, label: string, colorType: string, opa: number) => {  // 创建一个 
-  const updateClipboard = (list: Array<PickColorEntity>) => {
+  const updateClipboard = (list: Array<PickColorEntity>,colorType :string) => {
     // 更新粘贴板
     const arr :Array<string> = [];
     list.forEach((item: PickColorEntity) => {
-      arr.push(getColorString(item.color, item.color, colorType, opacity));
+      arr.push(getColorString(item.color, item.label, colorType, opacity));
     });
     copyTextToClipboard(arr.toString());
   }
@@ -92,7 +92,7 @@ const Color = () => {
     // 更新列表
     setPickColorList(list);
     // 把批量选中的颜色写入到粘贴板中
-    updateClipboard(list);
+    updateClipboard(list,colorType);
   }
 
   // 生成颜色板

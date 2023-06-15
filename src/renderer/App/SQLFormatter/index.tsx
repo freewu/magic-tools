@@ -80,10 +80,17 @@ const URL = () => {
   // 打开本地 SQL 文件 
   const fileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files || [];
+    openFile(files);
+  };
+
+  const openFile = (files :any) => {
     if(0 === files.length) {
       // notice.error("请选择文件！！！");
       return;
     }
+    // 只打开 .sql结尾的文件
+    if(!/.*\.sql$/.test(files[0]['name'])) return ;
+
     const reader = new FileReader();
     // 加载失败
     reader.onerror = (err) => {
@@ -154,10 +161,12 @@ const URL = () => {
       </Space>
 
       <TextArea
+        onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
+        onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files); } }
         style={ { margin: "12px 0 5px 0" }}
         onChange={ onTextAreaChange }
         value= { value }
-        placeholder="输入需要格式化的 SQL 语句"
+        placeholder="输入需要格式化的 SQL 语句 或 拖拽 .sql 文件到框内"
         autoSize={{ minRows: 5,maxRows: 5}}
       />
 

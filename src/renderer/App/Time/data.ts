@@ -20,9 +20,9 @@ export const timeList = [
   { lable: "上月",value: formatDateTime(getLastMonth()) },
   { lable: "下月",value: formatDateTime(getNextMonth()) },
   { lable: "本月初",value: formatDateTime(getMonthBegin()) },
-  { lable: "本月未",value: formatDateTime(getMonthEnd()) },
+  { lable: "本月末",value: formatDateTime(getMonthEnd()) },
   { lable: "上月初",value: formatDateTime(getLastMonthBegin()) },
-  { lable: "上月未",value: formatDateTime(getLastMonthEnd()) },
+  { lable: "上月末",value: formatDateTime(getLastMonthEnd()) },
   { lable: "下月初",value: formatDateTime(getNextMonthBegin()) },
-  { lable: "下月未",value: formatDateTime(getNextMonthEnd()) },
+  { lable: "下月末",value: formatDateTime(getNextMonthEnd()) },
 ]

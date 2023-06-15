@@ -1,7 +1,9 @@
 const AppName = '进制转换';
-const Icon = ''
+const Icon = '';
+const Type = 'convert';
 
 export {
   AppName,
-  Icon
+  Icon,
+  Type,
 }

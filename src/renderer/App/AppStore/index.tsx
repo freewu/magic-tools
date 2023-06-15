@@ -1,47 +1,32 @@
-import { Space } from "antd";
-import React,{ useState,useContext } from "react";
-import { appList } from "../index";
-import { useNavigate } from "react-router-dom"
+
+import { appList, genMenuList } from "../index";
+import { useState } from "react";
 import "./appstore.css"
-import Icon from '@ant-design/icons';
-import { AppContext } from "../../hook/app-context";
+import { default as AppType } from "./app-type";
+import { debounce } from "../../lib";
 
 const AppStore = () => {
+  const genHeight = () => {
+    return (window.innerHeight - 70) + "px";
+  };
 
-  const navigate = useNavigate();
-  const { app, setApp } = useContext(AppContext)!
+  const [ height, setHeight ] = useState(genHeight()); // 窗口大小高度
 
-  const colClick = ( e:any ) => {
-    const uri = e.currentTarget.getAttribute('data-uri');
-    // 左边栏需要选中相关应用
-    setApp(uri);
-    navigate("/" + uri, { replace: true })
-  }
-
-  const handStyle = { cursor: "pointer",margin: "5px" };
+  // 窗体大小发生变化,改变窗口大小
+  window.addEventListener('resize', debounce(() => { setHeight(genHeight()) },100) );
 
   return (
-    <div className="appstore">
+    <div className="appstore" style={ { height: height, overflowY: "auto" } }>
     {
-      appList.map((item, index) => {
-        if ("" == item.icon) {
-          return (
-            <div className="app" key={ item.key } onClick={ colClick } style={ handStyle } data-uri={ item.key }>
-              <Space>
-                { item.label }
-              </Space>
-            </div>
-          );
-        } else {
-          return (
-            <div className="app" onClick={ colClick } style={ handStyle } data-uri={ item.key }>
-              <Space>
-                { item.icon }
-                { item.label }
-              </Space>
-            </div>
-          );
-        }
+      genMenuList(appList).map((parent, index) => {
+        return (
+          <AppType 
+            uri= { parent.key } 
+            key= { parent.key + index } 
+            label=  {parent.label } 
+            icon= { parent.label } 
+            children={ parent.children }/>
+        );
       })
     }
     </div>

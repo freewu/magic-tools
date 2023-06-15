@@ -4,7 +4,7 @@
 
 ## 功能模块
 ```
-Hash 值计算 ( MD5 / SHA1 / SHA3 / SHA256 / SHA512 )
+Hash 值计算 ( MD5 / SHA1 / SHA3 / SHA256 / SHA512 / SHA224 / SHA384 / RipeMD-160 )   
 Base64 编码 / 解码
 URL 编码 / 解码
 时间戳转换
@@ -12,15 +12,19 @@ CSS 配色
 颜色格式转换
 进制转换 ( BIN / OCT / DEC / HEX )
 二维码生成   
-HmacHash 值计算  
+HmacHash 值计算 ( HmacMD5 / HmacSHA1 / HmacSHA3 / HmacSHA256 / HmacSHA512 / HmacSHA224 / HmacSHA384 / HmacRipeMD-160 )     
 SQL 格式化
 行数统计
 Unicode 编码 / 解码
-
+DES 加密 / 解密   
+AES 加密 / 解密    
+Rabbit 加密 / 解密    
+RC4 加密 / 解密    
+3DES 加密 / 解密   
+Base58 编码 / 解码
+PBKDF2 值计算 
+   
 -- 待开发 ------------------
-AES 加密 / 解密 进行中(页面交互已完成,加解密结果有问题)
-DES 加密 / 解密
-3DES 加密 / 解密
 CRC 计算
 JSON 格式化
 正则表达式
@@ -60,6 +64,7 @@ WebSocket 调试
 <a target="_blank" href="https://github.com/Qix-/color-convert">color-convert</a>   
 <a target="_blank" href="https://github.com/sql-formatter-org/sql-formatter">SQL Formatter</a>   
 <a target="_blank" href="https://highlightjs.org/">highlight.js</a>   
+<a target="_blank" href="https://github.com/cryptocoinjs/base-x">base-x</a>
 
 
 ## 应用截图

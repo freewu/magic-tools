@@ -14,11 +14,23 @@ export function resolveHtmlPath(htmlFileName: string) {
 }
 
 // 获取 Asset路径
-const getAssetPath = (...paths: string[]): string => {
+export const getAssetPath = (...paths: string[]): string => {
   const RESOURCES_PATH = app.isPackaged? path.join(process.resourcesPath, 'assets') : path.join(__dirname, '../../assets');
   return path.join(RESOURCES_PATH, ...paths);
 };
 
-export {
-  getAssetPath
+// 调用系统默认浏览器打开链接
+export const openDefaultBrowser = function (url :string) {
+  var exec = require('child_process').exec;
+  console.log(process.platform)
+  switch (process.platform) {
+    case "darwin":
+      exec('open ' + url);
+      break;
+    case "win32":
+      exec('start ' + url);
+      break;
+    default:
+      exec('xdg-open', [url]);
+  }
 }
