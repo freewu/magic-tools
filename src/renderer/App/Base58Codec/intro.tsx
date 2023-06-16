@@ -20,7 +20,7 @@ let intro = `
 </pre>
 <p>&nbsp;</p>
 `;
-const Base64Intro = () => {
+const Base58Intro = () => {
 
   return (
     <div 
@@ -30,4 +30,4 @@ const Base64Intro = () => {
   );
 }
 
-export default Base64Intro;
+export default Base58Intro;

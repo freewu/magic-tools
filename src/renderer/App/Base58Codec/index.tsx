@@ -4,7 +4,7 @@ const { TextArea } = Input;
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "../../lib"
 import { openFile } from "../../lib/file"
-import { default as Base64Intro } from "./intro"
+import { default as Base58Intro } from "./intro"
 import { Base58Encode, Base58Decode } from "./lib"
 
 const Base58Codec = () => {
@@ -84,7 +84,7 @@ const Base58Codec = () => {
       
       <Divider> Base58 编码说明 </Divider>
 
-      <Base64Intro />
+      <Base58Intro />
     </div>
   );
 }
