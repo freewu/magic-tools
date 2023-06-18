@@ -5,6 +5,7 @@ import type { RadioChangeEvent } from 'antd';
 import { typeList } from "./data"
 import { openFile } from "../../lib/file"
 import { copyTextToClipboard } from "./../../lib"
+import "./base64-image.css"
 
 const Base64Image = () => {
 
@@ -154,7 +155,7 @@ const Base64Image = () => {
 
       { value.trim() !== ''?
        (
-        <div onClick = { resultClick } title="点击复制内容到粘贴板">
+        <div className="preview" onClick = { resultClick } title="点击复制内容到粘贴板">
           <img src={ value } width={ width } height={ height } alt={ alt } />
         </div>
       ): null}

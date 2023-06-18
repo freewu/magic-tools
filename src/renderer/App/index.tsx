@@ -20,6 +20,7 @@ const list = [
   'PBKDF2Calc',
   //'BaseXCodec',
   'Base64Image',
+  'ImageColor',
 ];
 
 // 加载 App 的定义 名称 / icon 
