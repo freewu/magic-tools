@@ -1,27 +1,44 @@
 // 内容统计页
-import { Button,Input, Space, message,Divider } from "antd";
+import { Button,Input, Space, Alert, Divider, Spin } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
-import { copyTextToClipboard } from "../../lib"
+import { copyTextToClipboard,debounce } from "../../lib"
 import { openFile } from "../../lib/file"
 import { InputStatus } from "antd/es/_util/statusUtils";
-import { calcLineCount, removeEmptyLine } from "./lib"
+import { genColorMap, getTopArray } from "./lib"
 import "./image-color.css";
+import { default as LevitationBox } from "./levitation-box"
 
 const ImageColor = () => {
 
+  // image-color-container 容器的宽度
+  const genWidth = () :number => {
+    return window.innerWidth - 300;
+  };
+
+  const [ loading, setLoading ] = useState(false); // 计算需要时间
+  const [ width, setWidth ] = useState(''); // 图片展示宽度
+  const [ height, setHeight ] = useState(''); // 图片展示高度
+  const [ imgWidth, setImgWidth ] = useState(''); // 图片实际宽度
+  const [ imgHeight, setImgHeight ] = useState(''); // 图片实际高度
   const [ value, setValue ] = useState(''); // base64编码的图片
+  const [ result, setResult ] = useState(new Array<String>()); // 提取的数组数据
+  const [ colorMap, setColorMap ] = useState(new Map<string,number>); // 提取的图片像素 map
   
   return (
-    <div >
+    <div id="image-color-container">
       <Space>
         <Button 
-          onClick={ () => { setValue(''); } }
+          onClick={ () => { 
+            setValue(''); setResult([]);
+            setWidth(genWidth() + '');setHeight('');
+            setImgWidth('');setImgHeight(''); 
+          } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
         >清除</Button>
       </Space>
       <Divider dashed />
-      { value === ''? 
+      { value === '' && loading == false? 
         <TextArea
           readOnly
           style={ { margin: "5px 0 5px 0" }}
@@ -30,7 +47,7 @@ const ImageColor = () => {
           placeholder="拖拽要提取主体色的图片文件到框内"
           autoSize={{ minRows: 8, maxRows: 8 }}
           onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
-          onDrop={ (e) => { 
+          onDrop={ (e) => {
             e.preventDefault(); 
             const files = e.dataTransfer.files;
             if(0 === files.length) {
@@ -52,88 +69,65 @@ const ImageColor = () => {
               let img = new Image();
               img.src = reader.result as string;
               img.onload = () => {
-                console.log(img.width,img.height);
+                setLoading(true);
+                
+                // 处理展示区域
+                setImgHeight(img.height + '');
+                setImgWidth(img.width + '');
+                let mw = genWidth(); 
+                // 如果图片宽度 大于 展示区域需要等比缩放
+                if (img.width > mw) {
+                  setWidth(mw + '');
+                  setHeight((img.height * mw / img.width) + '' );
+                } else {
+                  setWidth(img.width + '');
+                  setHeight('');
+                }
                 // 当画布的宽或高被重置时，当前画布内容就会被移除
                 myCanvas.width = img.width;
                 myCanvas.height = img.height;
                 ctx.drawImage(img, 0, 0,img.width,img.height);
                 let data = ctx.getImageData(0, 0, img.width, img.width).data;
-                //console.log(data);
-                
-                /**
-                  ImageData 对象中的每个像素，都存在着四方面的信息，即 RGBA 值：
-                    R - 红色 (0-255)
-                    G - 绿色 (0-255)
-                    B - 蓝色 (0-255)
-                    A - alpha 通道 (0-255; 0 是透明的，255 是完全可见的)
-                */ 
-                let start = 0;
-                let c = new Map<string,number>;
-                while(start < data.length) {
-                  let r = data[start];
-                  let g = data[start + 1];
-                  let b = data[start + 2];
-                  let a = data[start + 3];
-                  start = start + 4
-                  //console.log(`RGBA(${r},${g},${b})`);
-                  let key = `${r},${g},${b}`;
-                  let i = c.get(key);
-                  if(i) {
-                    c.set(key,i + 1);
-                  } else {
-                    c.set(key,1);
-                  }
-                }
+                // 统计出 colorMap
+                const c = genColorMap(data);
+                setColorMap(c);
                 // 取最多的 N 条数据
-                // 先取出所有值 values 
-                let arr :Array<number> = Array.from(c.values());
-                // 排序完成的数组
-                let sortedArr :Array<number> = arr.sort((a,b)=> {
-                  return b - a;
-                });
-                // 打印
-                //console.log(sortedArr);
-                // 取 Top N n = 10
-                let filter = 0;
-                let n = 10;
-                // 如果数量不够就取所有长度 返回所有 map 的 key 就行了
-                if(sortedArr.length < n) n = sortedArr.length;
-                filter = sortedArr[n - 1];
-                let cr :Array<String>= [];
-                c.forEach((value,key) => {
-                  if( value >= filter) cr.push(key);
-                })
-                console.log(cr);
-
+                const list = getTopArray(c,10);
+                console.log(list);
+                setResult(list);
+                // for(let a in list) {
+                //   console.log(list[a],":",c.get(list[a]));
+                // }
+                setTimeout(() => {
+                  setLoading(false);
+                },5000)
               }
-              // let img = new Image();
-              // img.src = reader.result as string;
-
-              // const myCanvas :HTMLCanvasElement = document.getElementById("canvas-img");
-              // const ctx: CanvasRenderingContext2D = myCanvas.getContext('2d')!;
-              
-              // // 当画布的宽或高被重置时，当前画布内容就会被移除
-              // myCanvas.width = myCanvas.width;
-              // myCanvas.height = myCanvas.height;
-
-              // img.onload = () => {
-              //   let h = img.height * myCanvas.offsetWidth / img.height;
-              //   myCanvas.height = h;
-              //   ctx.drawImage(img, 0, 0,myCanvas.offsetWidth,h);
-
-              //   // 获取需要统计的数据
-              //   let data = ctx.getImageData(0, 0, myCanvas.width, myCanvas.height).data;
-              //   console.log(data);
-              // };
             }
             reader.readAsDataURL(files[0]);
           } }
         />
        : null
       }
+      {loading?
+        <Spin tip="Loading...">
+          <Alert
+            message="主题色提取中"
+            description="提取计算需要时间"
+            type="info"
+          />
+        </Spin>
+        : null
+      }
       { value !== ''? 
-        <img src={value} width={ 860 }/> 
+        <div>
+          <img src={value} width={ width } height={ height } /> 
+        </div>
         :null
+      }
+      {
+        result.length > 0? 
+        <LevitationBox colorList={ result } colorMap={ colorMap } />
+        : null
       }
       <canvas id="canvas-img" style={ {} }/>
     </div>
