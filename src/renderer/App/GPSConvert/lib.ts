@@ -1,3 +1,18 @@
+const DEFAULT_TYPE = 'gps-convert:default-type';
+
+// 获取默认显示的 App
+export function getDefaultType() :string  {
+    const type = localStorage.getItem(DEFAULT_TYPE);
+    // 如果没有设置默认展示的应用，默认显示应用中心
+    return (type === null)? "GCJ02" : type;
+}
+
+// 设置默认显示的应用
+export function setDefaultType(type: string) : void  {
+    localStorage.setItem(DEFAULT_TYPE,type);
+}
+
+
 export type GPSPoint = {
   lng :number,
   lat :number

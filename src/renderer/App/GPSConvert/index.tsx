@@ -4,16 +4,18 @@ const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
 import { typeList, emptyResult, pickList } from "./data"
 import type { RadioChangeEvent } from 'antd';
-import { pointToString,GPSPoint,tencentMapPointToString} from "./lib"
+import { pointToString,GPSPoint,tencentMapPointToString, getDefaultType } from "./lib"
 import { gcj02Tobd09, bd09Togcj02 } from "./lib"
 import { wgs84Togcj02, gcj02Towgs84 } from "./lib"
 import "./gps-convert.css"
 
 const GPSConvert = () => {
+  const dt = getDefaultType();
+  const dp = typeList.find(item => item.value === dt)?.placeholder
 
   const [ value, setValue ] = useState(''); // 需要转换的 GPS坐标 
-  const [ type, setType ] = useState('GCJ02'); // 输入坐标类型,
-  const [ placeholder, setPlaceholder ] = useState(typeList[1]["placeholder"]); // 数字类型的输入提示
+  const [ type, setType ] = useState(dt); // 输入坐标类型,
+  const [ placeholder, setPlaceholder ] = useState(dp); // 数字类型的输入提示
   const [ result, setResult] = useState(emptyResult); // 转换的结果
   const [ notice, contextHolder] = message.useMessage();
 
