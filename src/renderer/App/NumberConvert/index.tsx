@@ -10,7 +10,7 @@ import { insertIntervalString } from "./../../lib"
 import { reverseString } from "./../../lib/string"
 
 
-const ColorConvert = () => {
+const NumberConvert = () => {
 
   const [ value, setValue ] = useState(''); // 需要转换的颜色值 
   const [ numberType, setNumberType ] = useState('DEC'); // 输入内容的数字类型,
@@ -154,4 +154,4 @@ const ColorConvert = () => {
   );
 }
 
-export default ColorConvert;
+export default NumberConvert;
