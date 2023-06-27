@@ -125,7 +125,7 @@ const ImageColor = () => {
         :null
       }
       {
-        result.length > 0? 
+        result.length > 0 && loading == false? 
         <LevitationBox colorList={ result } colorMap={ colorMap } />
         : null
       }

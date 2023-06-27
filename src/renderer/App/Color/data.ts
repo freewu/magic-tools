@@ -23,6 +23,8 @@ import {
   JapaneseColor,
   RalClassic,
   CSSColor, 
+  HKSColor, 
+  NormalRGBColor,
 } from "./data/index"
 
 // 颜色数据
@@ -51,6 +53,16 @@ const colorDataList = [
     key: 'css-color',
     label: `CSS颜色表`,
     data: CSSColor
+  },
+  {
+    key: 'hks-color',
+    label: `HKS Color`,
+    data: HKSColor
+  },
+  {
+    key: 'normal-rgb-color',
+    label: `Normal RGB Color`,
+    data: NormalRGBColor
   },
 ];
 
