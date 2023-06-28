@@ -22,6 +22,7 @@ const list = [
   'Base64Image',
   'ImageColor',
   'GPSConvert',
+  'RMBConvert',
 ];
 
 // 加载 App 的定义 名称 / icon 
