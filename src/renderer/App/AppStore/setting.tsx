@@ -13,7 +13,11 @@ const AppStoreSetting = () => {
 
   // 应用列表
   const getAppList = () => {
-    const result = [{ value: 'AppStore', label: '应用中心' }];
+    const result = [
+      { value: 'AppStore', label: '应用中心' },
+      { value: 'Help', label: '帮助' },
+      { value: 'Setting', label: '设置' },
+    ];
     appList.forEach((v) => {
       result.push({ value: v.key, label:  v.label });
     });

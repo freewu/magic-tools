@@ -15,7 +15,7 @@ const setTray = (mainWindow: BrowserWindow) => {
       }
     },
     {
-      label: 'MagicTools V1.1.0',
+      label: 'MagicTools V1.2.0',
       click: function() {
         openDefaultBrowser("https://github.com/freewu/magic-tools");
       }
