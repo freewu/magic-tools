@@ -2,10 +2,10 @@ import { Divider, Button,Input, message } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
-import { convertCurrency } from "./lib"
 import { InputStatus } from "antd/es/_util/statusUtils";
+import { pinyin } from 'pinyin-pro';
 
-const RMBConvert = () => {
+const PinyinConvert = () => {
 
   const [ status, setStatus ] = useState('');
   const [ value, setValue ] = useState('');
@@ -21,21 +21,10 @@ const RMBConvert = () => {
   };
 
   const encode = (value :string) => {
-    let v = value.trim()
-    setValue(v);
-    if ( v != "") {
-      // 去掉空格 去掉 `,` (有使用 ,做分隔展示的情况 )
-      v = v.replace(/,/g,'').replace(/\s/g,'');
-      // 判断是否是 全数字
-      if(/^[0-9\.]+$/.test(v)) {
-        setResult(convertCurrency(v));
-        setStatus('');
-      } else {
-        setStatus('error');
-        setResult('');
-      }
+    setValue(value);
+    if ( value.trim() != "") {
+      setResult(pinyin(value));
     } else {
-      setStatus('');
       setResult('');
     }
   }
@@ -54,28 +43,27 @@ const RMBConvert = () => {
         status= { status as InputStatus }
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
-        onChange={ (e) => { encode(e.target.value) ;} }
+        onChange={ (e) => { encode(e.target.value); } }
         title="双击复制内容到粘贴板"
         value= { value }
-        placeholder="请输入要转换的人民币金额"
-        autoSize={{ minRows: 5, maxRows: 5 }}
-        maxLength={ 30 }
+        placeholder="请输入中文"
+        autoSize={{ minRows: 5, maxRows: 10 }}
       />
 
       <Divider dashed plain>转换的结果</Divider>
       
       <TextArea
-        readOnly 
         style={ { margin: "5px 0 5px 0" }}
         title="点击复制内容到粘贴板"
         onClick={ textareaDoubleClick }
         value= { result }
+        onChange={ (e) => { setResult(e.target.value); } }
         placeholder="点击复制内容到粘贴板"
-        autoSize={{ minRows: 5, maxRows: 5 }}
+        autoSize={{ minRows: 10, maxRows: 10 }}
       />
 
     </div>
   );
 }
 
-export default RMBConvert;
+export default PinyinConvert;
