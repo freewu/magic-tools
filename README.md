@@ -121,3 +121,10 @@ WebSocket 调试
         4 重新执行打包命令 npn run package
 
 ```
+
+## 版本修改 (发布前需要修改)
+```
+./package.json  
+./release/app/package.json
+./src/version.ts
+```

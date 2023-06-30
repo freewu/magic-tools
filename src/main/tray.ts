@@ -1,7 +1,7 @@
 // 托盘程序
 import { app, Menu, Tray, ipcMain, BrowserWindow } from 'electron';
 import { getAssetPath, openDefaultBrowser } from './util';
-
+import { VERSION } from "../version"
 
 // 隐藏主窗口，并创建托盘
 const setTray = (mainWindow: BrowserWindow) => {
@@ -15,7 +15,7 @@ const setTray = (mainWindow: BrowserWindow) => {
       }
     },
     {
-      label: 'MagicTools V1.2.0',
+      label: 'MagicTools V' + VERSION,
       click: function() {
         openDefaultBrowser("https://github.com/freewu/magic-tools");
       }
