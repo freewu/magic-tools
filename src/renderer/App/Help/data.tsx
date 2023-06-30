@@ -10,6 +10,7 @@ export const compomentList = [
   { name: "SQL Formatter", url: "https://github.com/sql-formatter-org/sql-formatter" },
   { name: "highlight.js", url: "https://highlightjs.org/" },
   { name: "base-x", url: "https://github.com/cryptocoinjs/base-x" },
+  { name: "pinyin-pro", url: "https://pinyin-pro.cn/" },
 ];
 
 
@@ -24,9 +25,24 @@ export const eventList = [
     color: "green",
     children: (
       <>
+        <p>2023-06-30 V1.2.0 Release</p>
+        <ul style={ {listStyle: "none" }}>
+          <li>Base64 图片</li>
+          <li>中文拼音</li>
+          <li>GPS坐标转换</li>
+          <li>人民币大写</li>
+          <li>字节转换</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    color: "green",
+    children: (
+      <>
         <p>2023-06-15 V1.1.0 Release</p>
         <ul style={ {listStyle: "none" }}>
-          <li>DES 加密 / 解密 </li>
+          <li>DES 加密 / 解密</li>
           <li>AES 加密 / 解密</li>
           <li>Rabbit 加密 / 解密</li>
           <li>RC4 加密 / 解密</li>

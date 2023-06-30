@@ -14,6 +14,9 @@ import { default as TripleDESCryptoSetting } from "../TripleDESCrypto/setting";
 import { default as RabbitCryptoSetting } from "../RabbitCrypto/setting";
 import { default as RC4CryptoSetting } from "../RC4Crypto/setting";
 import { default as PBKDF2CalcSetting } from "../PBKDF2Calc/setting";
+import { default as BaseXCodecSetting } from "../BaseXCodec/setting";
+import { default as GPSConvertSetting } from "../GPSConvert/setting";
+import { default as ByteConvertSetting } from "../ByteConvert/setting";
 
 const Setting = () => {
   const genSettingFormHeight = () => {
@@ -52,6 +55,9 @@ const Setting = () => {
         <RabbitCryptoSetting />
         <RC4CryptoSetting />
         <PBKDF2CalcSetting />
+        {/* <BaseXCodecSetting /> */}
+        <GPSConvertSetting />
+        <ByteConvertSetting />
       </Form>
     </div>
   );

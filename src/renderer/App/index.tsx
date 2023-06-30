@@ -18,6 +18,13 @@ const list = [
   'TripleDESCrypto',
   'Base58Codec',
   'PBKDF2Calc',
+  //'BaseXCodec',
+  'Base64Image',
+  //'ImageColor',
+  'GPSConvert',
+  'RMBConvert',
+  'ByteConvert',
+  'PinyinConvert',
 ];
 
 // 加载 App 的定义 名称 / icon 

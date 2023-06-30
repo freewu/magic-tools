@@ -23,8 +23,20 @@ RC4 加密 / 解密
 3DES 加密 / 解密   
 Base58 编码 / 解码
 PBKDF2 值计算 
+Base64 图片  
+GPS坐标转换   
+人民币大写   
+字节转换
+中文拼音
    
 -- 待开发 ------------------
+图片主题色 ( 还需要做近似颜色合并处理 )
+繁简汉字转换   
+TEA 加密 / 解密    
+XTEA 加密 / 解密    
+XXTEA 加密 / 解密    
+RSA 加密 / 解密   
+BaseX 编码 / 解码(存在问题)
 CRC 计算
 JSON 格式化
 正则表达式
@@ -63,8 +75,9 @@ WebSocket 调试
 <a target="_blank" href="https://github.com/dankogai/js-base64">js-base64</a>   
 <a target="_blank" href="https://github.com/Qix-/color-convert">color-convert</a>   
 <a target="_blank" href="https://github.com/sql-formatter-org/sql-formatter">SQL Formatter</a>   
-<a target="_blank" href="https://highlightjs.org/">highlight.js</a>   
-<a target="_blank" href="https://github.com/cryptocoinjs/base-x">base-x</a>
+<a target="_blank" href="https://highlightjs.org/">highlight.js</a>    
+<a target="_blank" href="https://github.com/cryptocoinjs/base-x">base-x</a>   
+<a target="_blank" href="https://pinyin-pro.cn/">pinyin-pro</a>   
 
 
 ## 应用截图
@@ -107,4 +120,10 @@ WebSocket 调试
             nsis-resources-xx.7z 解压到 nsis/nsis-resources-xx
         4 重新执行打包命令 npn run package
 
+```
+
+## 版本修改 (发布前需要修改)
+```
+./package.json  
+./release/app/package.json
 ```
