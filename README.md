@@ -126,5 +126,4 @@ WebSocket 调试
 ```
 ./package.json  
 ./release/app/package.json
-./src/version.ts
 ```

@@ -1,2 +1,7 @@
+import config from '../package.json'
+console.log(config.version)
+
 // 当前版本
-export const VERSION = "1.2.0"
+export const getVersion = () :string => {
+    return config.version;
+} 

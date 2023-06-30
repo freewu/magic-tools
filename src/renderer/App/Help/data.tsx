@@ -24,9 +24,24 @@ export const eventList = [
     color: "green",
     children: (
       <>
+        <p>2023-07-01 V1.2.0 Release</p>
+        <ul style={ {listStyle: "none" }}>
+          <li>Base64 图片</li>
+          <li>图片主题色</li>
+          <li>GPS坐标转换</li>
+          <li>人民币大写</li>
+          <li>字节转换</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    color: "green",
+    children: (
+      <>
         <p>2023-06-15 V1.1.0 Release</p>
         <ul style={ {listStyle: "none" }}>
-          <li>DES 加密 / 解密 </li>
+          <li>DES 加密 / 解密</li>
           <li>AES 加密 / 解密</li>
           <li>Rabbit 加密 / 解密</li>
           <li>RC4 加密 / 解密</li>
