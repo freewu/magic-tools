@@ -4,10 +4,27 @@ const { TextArea } = Input;
 import type { RadioChangeEvent } from 'antd';
 import { typeList } from "./data"
 import { openFile } from "../../lib/file"
-import { copyTextToClipboard } from "./../../lib"
+import { copyTextToClipboard, debounce } from "./../../lib"
 import "./base64-image.css"
 
 const Base64Image = () => {
+
+  // 预览页面大小
+  const genPreviewHeight = () => {
+    return (window.innerHeight - 400) + "px";
+  };
+  const genPreviewWidth = () => {
+    return (window.innerWidth - 260) + "px";
+  };
+
+  const [ previewHeight, setPreviewHeight ] = useState(genPreviewHeight()); // 窗口大小高度
+  const [ previewWidth, setPreviewWidth] = useState(genPreviewWidth()); // 窗口大小宽度
+
+  // 窗体大小发生变化,改变窗口大小
+  window.addEventListener('resize', debounce(() => { 
+    setPreviewHeight(genPreviewHeight());
+    setPreviewWidth(genPreviewWidth());
+  },100) );
 
   const [ value, setValue ] = useState(''); // base64编码的图片
   const [ type, setType ] = useState('img'); // 使用场景 img / css / base64 (只显示 base64)
@@ -155,7 +172,9 @@ const Base64Image = () => {
 
       { value.trim() !== ''?
        (
-        <div className="preview" onClick = { resultClick } title="点击复制内容到粘贴板">
+        <div 
+          style={ {width: previewWidth , height: previewHeight } }
+          className="preview" onClick = { resultClick } title="点击复制内容到粘贴板">
           <img src={ value } width={ width } height={ height } alt={ alt } />
         </div>
       ): null}
