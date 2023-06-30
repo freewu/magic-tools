@@ -23,6 +23,7 @@ const list = [
   'ImageColor',
   'GPSConvert',
   'RMBConvert',
+  'ByteConvert',
 ];
 
 // 加载 App 的定义 名称 / icon 
