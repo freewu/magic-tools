@@ -25,6 +25,8 @@ const list = [
   'RMBConvert',
   'ByteConvert',
   'PinyinConvert',
+  //'TEACrypto',
+  'TemperatureConvert',
 ];
 
 // 加载 App 的定义 名称 / icon 
