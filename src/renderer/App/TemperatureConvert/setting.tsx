@@ -3,22 +3,18 @@ import { getDefaultType,setDefaultType } from "./lib";
 import { useState } from "react";
 import { typeList } from "./data";
 
-const ByteConvertSetting = () => {
-  const [ app, setApp ] = useState(getDefaultType()); // 默认展示的 app
+const TemperatureConvertSetting = () => {
 
-  const onChangeDefaultType = (value: string) => {
-    setApp(value);
-    setDefaultType(value);
-  };
+  const [ type, setType ] = useState(getDefaultType()); // 默认展示类型
 
   return (
     <>
-      <Divider orientation="left" plain>字节转换</Divider>
+      <Divider orientation="left" plain>温度转换</Divider>
       <Form.Item label="默认类型">
         <Select
-          value={ app }
+          value={ type }
           style={{ width: 240 }}
-          onChange={ onChangeDefaultType }
+          onChange={ (value: string) => { setType(value); setDefaultType(value); } }
           options={ typeList }
         />
       </Form.Item>
@@ -26,4 +22,4 @@ const ByteConvertSetting = () => {
   );
 }
 
-export default ByteConvertSetting;
+export default TemperatureConvertSetting;

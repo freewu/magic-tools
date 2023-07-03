@@ -17,6 +17,7 @@ import { default as PBKDF2CalcSetting } from "../PBKDF2Calc/setting";
 import { default as BaseXCodecSetting } from "../BaseXCodec/setting";
 import { default as GPSConvertSetting } from "../GPSConvert/setting";
 import { default as ByteConvertSetting } from "../ByteConvert/setting";
+import { default as TemperatureConvertSetting } from "../TemperatureConvert/setting";
 
 const Setting = () => {
   const genSettingFormHeight = () => {
@@ -58,6 +59,7 @@ const Setting = () => {
         {/* <BaseXCodecSetting /> */}
         <GPSConvertSetting />
         <ByteConvertSetting />
+        <TemperatureConvertSetting />
       </Form>
     </div>
   );
