@@ -18,6 +18,8 @@ import { default as BaseXCodecSetting } from "../BaseXCodec/setting";
 import { default as GPSConvertSetting } from "../GPSConvert/setting";
 import { default as ByteConvertSetting } from "../ByteConvert/setting";
 import { default as TemperatureConvertSetting } from "../TemperatureConvert/setting";
+import { default as DistanceConvertSetting } from "../DistanceConvert/setting";
+
 
 const Setting = () => {
   const genSettingFormHeight = () => {
@@ -60,6 +62,7 @@ const Setting = () => {
         <GPSConvertSetting />
         <ByteConvertSetting />
         <TemperatureConvertSetting />
+        <DistanceConvertSetting />
       </Form>
     </div>
   );
