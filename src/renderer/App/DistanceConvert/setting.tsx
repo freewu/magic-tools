@@ -6,7 +6,7 @@ import { getDefaultMSType,setDefaultMSType } from "./lib";
 import { getDefaultIUType,setDefaultIUType } from "./lib";
 import { getDefaultCNType,setDefaultCNType } from "./lib";
 
-const DistanceConvertSetting = () => {
+export const DistanceConvertSetting = () => {
   
   const [ type, setType ] = useState(getDefaultUnitType()); // 默认制式
   const [ msType, setMSType ] = useState(getDefaultMSType()); // 默认公制单位
@@ -51,5 +51,3 @@ const DistanceConvertSetting = () => {
     </>
   );
 }
-
-export default DistanceConvertSetting;

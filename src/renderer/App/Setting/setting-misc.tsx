@@ -1,7 +1,7 @@
 
 import { Form } from "antd";
-import { default as ColorSetting } from "../Color/setting";
-import { default as QRCodeGeneratorSetting } from "../QRCodeGenerator/setting";
+import { ColorSetting } from "../Color/setting";
+import { QRCodeGeneratorSetting } from "../QRCodeGenerator/setting";
 
 export const SettingMisc = () => {
 

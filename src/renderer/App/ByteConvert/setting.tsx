@@ -3,7 +3,7 @@ import { getDefaultType,setDefaultType } from "./lib";
 import { useState } from "react";
 import { typeList } from "./data";
 
-const ByteConvertSetting = () => {
+export const ByteConvertSetting = () => {
   
   const [ type, setType ] = useState(getDefaultType()); // 默认展示类型
 
@@ -21,5 +21,3 @@ const ByteConvertSetting = () => {
     </>
   );
 }
-
-export default ByteConvertSetting;

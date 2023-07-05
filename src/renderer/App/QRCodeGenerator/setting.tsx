@@ -3,7 +3,7 @@ import { getDefaultErrorLevel, setDefaultErrorLevel, getDefaultSize, setDefaultS
 import { useState } from "react";
 import { errorCorrectionLevelList } from "./data";
 
-const QRCodeGeneratorSetting = () => {
+export const QRCodeGeneratorSetting = () => {
   const [ level, setLevel ] = useState(getDefaultErrorLevel()); // 默认容错级别
   const [ size, setSize ] = useState(getDefaultSize()); // 默认尺寸
 
@@ -35,5 +35,3 @@ const QRCodeGeneratorSetting = () => {
     </>
   );
 }
-
-export default QRCodeGeneratorSetting;

@@ -1,10 +1,10 @@
 
 import { Form } from "antd";
-import { default as AESCryptoSetting } from "../AESCrypto/setting";
-import { default as DESCryptoSetting } from "../DESCrypto/setting";
-import { default as TripleDESCryptoSetting } from "../TripleDESCrypto/setting";
-import { default as RabbitCryptoSetting } from "../RabbitCrypto/setting";
-import { default as RC4CryptoSetting } from "../RC4Crypto/setting";
+import { AESCryptoSetting } from "../AESCrypto/setting";
+import { DESCryptoSetting } from "../DESCrypto/setting";
+import { TripleDESCryptoSetting } from "../TripleDESCrypto/setting";
+import { RabbitCryptoSetting } from "../RabbitCrypto/setting";
+import { RC4CryptoSetting } from "../RC4Crypto/setting";
 
 export const SettingCrypto = () => {
 

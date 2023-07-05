@@ -3,7 +3,7 @@ import { getDefaultApp,setDefaultApp } from "./lib";
 import { useState } from "react";
 import { appList } from "../index";
 
-const AppStoreSetting = () => {
+export const AppStoreSetting = () => {
   const [ app, setApp ] = useState(getDefaultApp()); // 默认展示的 app
 
   const onChangeDefaultApp = (value: string) => {
@@ -38,5 +38,3 @@ const AppStoreSetting = () => {
     </>
   );
 }
-
-export default AppStoreSetting;

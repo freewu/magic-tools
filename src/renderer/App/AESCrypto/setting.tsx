@@ -9,7 +9,7 @@ import { getDefaultIV, setDefaultIV } from "./lib";
 import { getDefaultPassphrase, setDefaultPassphrase, genPassphraseLimitLength } from "./lib";
 import type { InputStatus } from "antd/es/_util/statusUtils";
 
-const AESCryptoSetting = () => {
+export const AESCryptoSetting = () => {
 
   const [ mode, setMode ] = useState(getDefaultMode()); // 默认 mode
   const [ padding, setPadding ] = useState(getDefaultPadding()); // 默认填充

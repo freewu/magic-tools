@@ -17,6 +17,7 @@ import HmacSHA384 from 'crypto-js/hmac-sha384';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { getPasswordList } from "../Hash/lib";
 import "./hmac-hash.css";
+import { getDefaultPassphrase } from "./lib"
 
 const HmacHash = () => {
 
@@ -33,7 +34,7 @@ const HmacHash = () => {
   const [ checked, setChecked ] = useState(false);
   const [ hash, setHash ] = useState(emptyResult);
   const [ notice, contextHolder] = message.useMessage();
-  const [ passphrase, setPassphrase ] = useState(''); // 密钥
+  const [ passphrase, setPassphrase ] = useState(getDefaultPassphrase()); // 密钥
 
   const inputClick = (e :React.MouseEvent<HTMLElement>) => {
     const txt = (e.target as HTMLInputElement).value.trim();

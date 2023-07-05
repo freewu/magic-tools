@@ -3,7 +3,7 @@ import { getDefaultType,setDefaultType } from "./lib";
 import { useState } from "react";
 import { typeList } from "./data";
 
-const TemperatureConvertSetting = () => {
+export const TemperatureConvertSetting = () => {
 
   const [ type, setType ] = useState(getDefaultType()); // 默认展示类型
 
@@ -21,5 +21,3 @@ const TemperatureConvertSetting = () => {
     </>
   );
 }
-
-export default TemperatureConvertSetting;
