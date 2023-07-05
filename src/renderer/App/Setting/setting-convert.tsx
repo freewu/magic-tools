@@ -4,6 +4,8 @@ import { GPSConvertSetting } from "../GPSConvert/setting";
 import { ByteConvertSetting } from "../ByteConvert/setting";
 import { TemperatureConvertSetting } from "../TemperatureConvert/setting";
 import { DistanceConvertSetting } from "../DistanceConvert/setting";
+import { ConfigConvertSetting } from "../ConfigConvert/setting";
+
 
 export const SettingConvert = () => {
 
@@ -13,6 +15,7 @@ export const SettingConvert = () => {
       <ByteConvertSetting />
       <TemperatureConvertSetting />
       <DistanceConvertSetting />
+      <ConfigConvertSetting />
     </Form>
   )
 }

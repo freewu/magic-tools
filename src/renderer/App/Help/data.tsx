@@ -11,6 +11,11 @@ export const compomentList = [
   { name: "highlight.js", url: "https://highlightjs.org/" },
   { name: "base-x", url: "https://github.com/cryptocoinjs/base-x" },
   { name: "pinyin-pro", url: "https://pinyin-pro.cn/" },
+  { name: "js-ini", url: "https://github.com/Sdju/js-ini" },
+  { name: "yaml", url: "https://github.com/eemeli/yaml" },
+  { name: "toml-patch", url: "https://github.com/timhall/toml-patch" },
+  
+  
 ];
 
 
