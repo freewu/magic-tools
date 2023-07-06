@@ -28,7 +28,7 @@ const list = [
   //'TEACrypto',
   'TemperatureConvert',
   'DistanceConvert',
-  'SpeedConvert',
+  //'SpeedConvert',
   'ConfigConvert',
 ];
 
