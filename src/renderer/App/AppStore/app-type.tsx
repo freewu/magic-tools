@@ -13,7 +13,7 @@ export type AppTypeProps = {
 const AppType = ({ uri, label, icon, children } :AppTypeProps ) => {
   return (
     <>
-    <Divider dashed  orientation="left" plain>{ label }</Divider>
+    <Divider dashed  orientation="left" plain>{ label + ' ( ' + children?.length + ' )' }</Divider>
     {
       children?.map((item,i) => {
         return (
