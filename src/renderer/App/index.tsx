@@ -28,10 +28,11 @@ const list = [
   //'TEACrypto',
   'TemperatureConvert',
   'DistanceConvert',
-  //'SpeedConvert',
   'ConfigConvert',
-  'VolumeConvert',
-  'AreaConvert',
+  // 'SpeedConvert',
+  // 'VolumeConvert',
+  // 'AreaConvert',
+  // 'WeightConvert',
 ];
 
 // 加载 App 的定义 名称 / icon 
