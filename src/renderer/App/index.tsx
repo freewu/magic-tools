@@ -30,6 +30,7 @@ const list = [
   'DistanceConvert',
   //'SpeedConvert',
   'ConfigConvert',
+  'VolumeConvert',
 ];
 
 // 加载 App 的定义 名称 / icon 
