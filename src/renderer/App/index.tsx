@@ -31,6 +31,7 @@ const list = [
   //'SpeedConvert',
   'ConfigConvert',
   'VolumeConvert',
+  'AreaConvert',
 ];
 
 // 加载 App 的定义 名称 / icon 
