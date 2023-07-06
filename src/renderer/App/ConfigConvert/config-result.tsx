@@ -1,5 +1,6 @@
 import { Input } from "antd";
 const { TextArea } = Input;
+import { ConvertResult } from "./interface";
 
 export const ConfigResult = ({ data, click, type } :ConfigResultProps ) => {
 
@@ -19,7 +20,7 @@ export const ConfigResult = ({ data, click, type } :ConfigResultProps ) => {
     if(e.button !== 2) return ;
     const txt = (e.target as HTMLInputElement).value.trim();
     if(txt !== '') {
-      const blob = new Blob([data], {type: 'application/' + type})
+      const blob = new Blob([data.data], {type: 'application/' + type})
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.download = 'config.' + type; // 下载文件名
@@ -32,13 +33,14 @@ export const ConfigResult = ({ data, click, type } :ConfigResultProps ) => {
 
   return (
     <TextArea
+      status= { data.error? 'error' : '' }
       readOnly
       style={ { margin: "5px 0 5px 0" }}
       onClick={ click }
       //onDoubleClick={ saveConfigFile }
       onMouseDown={ saveConfigFile }
       title="单击复制内容到粘贴板,右击保存配置文件"
-      value={ data }
+      value={ data.data }
       autoSize={{ minRows: 10, maxRows: 10 }}
     />
   );
@@ -47,7 +49,7 @@ export const ConfigResult = ({ data, click, type } :ConfigResultProps ) => {
 
 // 接收参数
 export interface ConfigResultProps {
-  data: string,
+  data: ConvertResult,
   click: React.MouseEventHandler<HTMLTextAreaElement>,
   type: string,
 }

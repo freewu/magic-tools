@@ -12,6 +12,8 @@ import { json2ini, ini2json } from "./lib";
 import { json2yaml, yaml2json } from "./lib";
 import { json2toml, toml2json } from "./lib";
 import { json2xml, xml2json } from "./lib";
+import { json2properties, properties2json } from "./lib";
+import { ConvertResult } from "./interface";
 
 const ConfigConvert = () => {
 
@@ -31,6 +33,7 @@ const ConfigConvert = () => {
 
   const convert2object = (data :string) => {
     setValue(data);
+    if(data.trim() === '') return ; // 输入空没有进行下面的处理
     try {
       const json = convert2json(data,type);
       setStatus('');
@@ -58,30 +61,33 @@ const ConfigConvert = () => {
       case 'xml': return xml2json(data);
       case 'yaml': return yaml2json(data);
       case 'toml': return toml2json(data);;
-      case 'properties': return data;
+      case 'properties': return properties2json(data);
     }
     return '';
   }
 
-  const convert = (t :string ) :string => {
+  const convert = (t :string ) :ConvertResult => {
     const json = result;
-    if(JSON.stringify(json) === '{}' || JSON.stringify(json) === '""') return '';
+    if(value.trim() === '') return { data: '', error: false }; // 输入为空直接返回
+    if(JSON.stringify(json) === '{}' || JSON.stringify(json) === '""') return { data: '', error: false };
 
     // 有 json 转其它格式可能出问题错误,不影响全局
     try {
       switch(t) {
-        case 'json': return JSON.stringify(json,null,"\t");
-        case 'ini': return json2ini(json);
-        case 'xml': return json2xml(json);
-        case 'yaml': return json2yaml(json);
-        case 'toml': return json2toml(json);
-        case 'properties': return '';
+        case 'json': return { data: JSON.stringify(json,null,"\t"), error: false };
+        case 'ini': return { data: json2ini(json), error: false };
+        case 'xml': return { data: json2xml(json), error: false };
+        case 'yaml': return { data: json2yaml(json), error: false };
+        case 'toml': return { data: json2toml(json), error: false };
+        case 'properties': return { data: json2properties(json), error: false };
       }
     } catch (error) {
       console.log(error);
-      return '';
+      // 在 JS中，Error对象有两个默认的属性，分别是name和message
+      // 输出错原因
+      return { data: (error as Error).message, error: true };
     }
-    return '';
+    return { data: 'no such type', error: true };
   }
 
   // 结果 tabs

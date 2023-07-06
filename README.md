@@ -31,9 +31,9 @@ GPS坐标转换
 温度转换
 距离转换
 速度转换
+配置文件转换 (ini / json / yaml / toml / properties)
 
 -- 待开发 ------------------
-配置文件转换 (ini / json / xml / yaml / toml / properties)
 面积转换
 容积转换
 质量转换
@@ -88,6 +88,7 @@ WebSocket 调试
 <a target="_blank" href="https://github.com/Sdju/js-ini">js-ini</a>   
 <a target="_blank" href="https://github.com/eemeli/yaml">yaml</a>   
 <a target="_blank" href="https://github.com/timhall/toml-patch">toml-patch</a>   
+<a target="_blank" href="https://github.com/TehShrike/deepmerge">deepmerge</a>   
 
 ## 应用截图
 * Hash 值计算

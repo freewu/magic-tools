@@ -4,5 +4,5 @@ export const typeList = [
   //{ label: 'XML',   value: 'xml',   placeholder: '' },
   { label: 'Yaml',  value: 'yaml',  placeholder: '' },
   { label: 'Toml',  value: 'toml',  placeholder: '' },
-  //{ label: 'Properties', value: 'properties', placeholder: '' },
+  { label: 'Properties', value: 'properties', placeholder: '' },
 ];

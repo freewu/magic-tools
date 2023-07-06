@@ -14,10 +14,8 @@ export const compomentList = [
   { name: "js-ini", url: "https://github.com/Sdju/js-ini" },
   { name: "yaml", url: "https://github.com/eemeli/yaml" },
   { name: "toml-patch", url: "https://github.com/timhall/toml-patch" },
-  
-  
+  { name: "deepmerge", url: "https://github.com/TehShrike/deepmerge" },
 ];
-
 
 // 开发者列表
 export const developerList = [
