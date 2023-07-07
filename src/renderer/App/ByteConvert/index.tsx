@@ -87,10 +87,9 @@ const ByteConvert = () => {
         autoSize={{ minRows: 3, maxRows: 3 }}
       />
 
-      <Divider dashed />
-
       <Row wrap>
         <Col span={12}>
+          <Divider dashed plain>字节 ( Byte )</Divider>
           <Form name="basic1" labelCol={{ span: 8 }} autoComplete="off">
             <Form.Item label="B (Byte)">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b,'')) } />
@@ -122,6 +121,7 @@ const ByteConvert = () => {
           </Form>
         </Col>
         <Col span={12}>
+          <Divider dashed plain>位 ( bit )</Divider>
           <Form name="basic2" labelCol={{ span: 8 }} autoComplete="off">
           <Form.Item label="b (bit)">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b * 8,'')) } />
