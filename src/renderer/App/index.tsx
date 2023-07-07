@@ -72,7 +72,7 @@ export const genMenuList = (appList :Array<AppItem>) => {
     ["codec", { key: 'codec',  label: '编解码',  icon: '', children: new Array<AppItem> }],
     ["crypto", { key: 'crypto',  label: '加解密',  icon: '', children: new Array<AppItem> }],
     ["value-calc", { key: 'value-calc',  label: '值计算',  icon: '', children: new Array<AppItem> }],
-    ["formatter", { key: 'formatter',  label: '格式化',  icon: '', children: new Array<AppItem> }],
+    //["formatter", { key: 'formatter',  label: '格式化',  icon: '', children: new Array<AppItem> }],
     ["misc", { key: 'misc',  label: '其它',  icon: '', children:[] }],
   ]);
 
@@ -139,4 +139,4 @@ export const genMenuList = (appList :Array<AppItem>) => {
 
 export {
   appList
-} 
+}
