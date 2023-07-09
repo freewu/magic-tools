@@ -29,7 +29,7 @@ const list = [
   'TemperatureConvert',
   'DistanceConvert',
   'ConfigConvert',
-  // 'SpeedConvert',
+  'SpeedConvert',
   // 'VolumeConvert',
   // 'AreaConvert',
   // 'WeightConvert',

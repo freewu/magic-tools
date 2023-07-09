@@ -131,92 +131,50 @@ const DistanceConvert = () => {
       />
 
       <Row wrap>
-        <Col span={8}>
+        <Col span={12}>
           <Divider dashed plain>公制</Divider>
+
+
           <Form name="basic1" labelCol={{ span: 8 }} autoComplete="off">
-            <Form.Item label="千米">
+            <Form.Item label="米每秒(m/s)">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000) } />
             </Form.Item>
-            <Form.Item label="米">
+            <Form.Item label="千米每时(km/h)">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result) } />
             </Form.Item>
-            <Form.Item label="分米">
+            <Form.Item label="厘米每秒(m/s)">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 10) } />
             </Form.Item>
-            <Form.Item label="厘米">
+            <Form.Item label="千米每秒(km/s)">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 100) }/>
             </Form.Item>
-            <Form.Item label="毫米">
+            <Form.Item label="马赫">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000) } />
             </Form.Item>
-            <Form.Item label="微米">
+            <Form.Item label="节">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000 / 1000) } />
             </Form.Item>
-            <Form.Item label="纳米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000 / 1000 / 1000) } />
-            </Form.Item>
-            <Form.Item label="皮米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000 / 1000 / 1000 / 1000) } />
-            </Form.Item>
-            <Form.Item label="海里">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1852) } />
-            </Form.Item>
-            {/* <Form.Item label="光年">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= {  } />
-            </Form.Item>
-            <Form.Item label="天文单位">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { } />
-            </Form.Item> */}
           </Form>
         </Col>
 
-        <Col span={8}>
+        <Col span={12}>
           <Divider dashed plain>英制</Divider>
-          <Form name="basic2" labelCol={{ span: 10 }} autoComplete="off" >
-            <Form.Item label="英寸 (inch)">
+          <Form name="basic2" labelCol={{ span: 8 }} autoComplete="off" >
+            <Form.Item label="英里每时(m/h) 迈">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 2.54 * 1000) } />
             </Form.Item>
-            <Form.Item label="英尺 (foot)">
+            <Form.Item label="英尺每秒(ft/s)">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.3048) } />
             </Form.Item>
-            <Form.Item label="码 (yard)">
+            <Form.Item label="英尺每分钟(ft/min)">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.9144) } />
             </Form.Item>
-            <Form.Item label="英里 (mile)">
+            <Form.Item label="英寸每秒(in/s)">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1609.3)  }/>
             </Form.Item>
           </Form>
         </Col>
 
-        <Col span={8}>
-          <Divider dashed plain>市制</Divider>
-          <Form name="basic3" labelCol={{ span: 8 }} autoComplete="off">
-            <Form.Item label="里">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 500) } />
-            </Form.Item>
-            <Form.Item label="引">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 500 * 15) } />
-            </Form.Item>
-            <Form.Item label="丈">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 50 * 15) } />
-            </Form.Item>
-            <Form.Item label="尺">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 15) }/>
-            </Form.Item>
-            <Form.Item label="寸">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 150) } />
-            </Form.Item>
-            <Form.Item label="分">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 1500) } />
-            </Form.Item>
-            <Form.Item label="厘">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 15000) } />
-            </Form.Item>
-            <Form.Item label="毫">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 150000) } />
-            </Form.Item>
-          </Form>
-        </Col>
       </Row>
     </div>
   );
