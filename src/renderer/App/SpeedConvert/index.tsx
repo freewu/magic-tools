@@ -7,7 +7,7 @@ import type { RadioChangeEvent } from 'antd';
 import { getDefaultUnitType, getTypeList, getDefaultType, getTypePlaceholder } from "./lib"
 import { InputStatus } from "antd/es/_util/statusUtils";
 
-const DistanceConvert = () => {
+const SpeedConvert = () => {
 
   const ut = getDefaultUnitType();
   const [ unitType, setUnitType ] = useState(ut); // 制式 
@@ -44,34 +44,35 @@ const DistanceConvert = () => {
       setStatus('');
       return ; // 没有内容直接返回不做下面的处理
     }
+
+    /**
+  { label: '厘米每秒(m/s)', value: 'cms', type:'ms', placeholder: ''},
+  { label: '米每秒(m/s)',   value: 'ms',  type:'ms', placeholder: '' },
+  { label: '千米每秒(km/s)', value: 'kms', type:'ms', placeholder: '' },
+  { label: '千米每时(km/h)', value: 'kmh', type:'ms', placeholder: '' },
+  //{ label: '光速', value: 'ls', type:'ms', placeholder: '' },
+  { label: '马赫', value: 'mach', type:'ms', placeholder: '' },
+  { label: '节', value: 'knot', type:'ms', placeholder: '指 海里 / 小时，节是航海中代表速度的单位' },
+
+  { label: '英里每时(m/h)', value: 'mph', type:'iu', placeholder: ''},
+  { label: '英尺每秒(ft/s)', value: 'fts', type:'iu', placeholder: ''},
+  { label: '英尺每分钟(ft/min)', value: 'ftmin', type:'iu', placeholder: ''},
+  { label: '', value: 'ins', type:'iu', placeholder: ''},
+     */
+    // 统一转换成  千米每时 km/h
     if(/^[0-9\.\-]+$/.test(value)) {
       switch(type) {
-        case "km": setResult(parseFloat(value) / 1000); break;
-        case "m": setResult(parseFloat(value)); break;
-        case "dm": setResult(parseFloat(value) * 10); break;
-        case "cm": setResult(parseFloat(value) * 100); break;
-        case "mm": setResult(parseFloat(value) * 1000 ); break;
-        case "μm": setResult(parseFloat(value) * 1000 * 1000); break;
-        case "nm": setResult(parseFloat(value) * 1000 * 1000 * 1000); break;
-        case "pm": setResult(parseFloat(value) * 1000 * 1000 * 1000 * 1000); break;
-        case "nmile": setResult(parseFloat(value) * 1852); break;
-        //case "ly": setResult(parseFloat(value) * 9460730472580800); break;
-        //case "au": setResult(parseFloat(value) * 149597870); break;
+        case "cms": setResult(parseFloat(value) / 100000 * 3600); break; // 厘米每秒(m/s)
+        case "ms": setResult(parseFloat(value) / 1000 * 3600); break; // 米每秒(m/s)
+        case "kms": setResult(parseFloat(value) * 3600); break; // 千米每秒(km/s)
+        case "kmh": setResult(parseFloat(value)); break; // 千米每时(km/h)
+        case "mach": setResult(parseFloat(value) * 1224 ); break; // 马赫
+        case "knot": setResult(parseFloat(value) * 1.852); break; // 节
 
-        case "inch": setResult(parseFloat(value) * 2.54 / 1000 ); break;
-        case "foot": setResult(parseFloat(value) * 0.3048); break;
-        case "yard": setResult(parseFloat(value) * 0.9144); break;
-        case "mile": setResult(parseFloat(value) * 1.6093 / 1000); break;
-
-        // 1里 =	15引 =	150丈 =	1500尺 =	1,5000寸 =	15,0000分 =	150,0000釐 =	1500,0000毫 =	500米
-        case "li": setResult(parseFloat(value) * 500 ); break;
-        case "ying": setResult(parseFloat(value) * 500 / 15 ); break;
-        case "zhang": setResult(parseFloat(value) * 50  / 15); break;
-        case "chi": setResult(parseFloat(value) * 5 / 15 ); break;
-        case "cun": setResult(parseFloat(value) * 5 / 150 ); break;
-        case "fen": setResult(parseFloat(value) * 5 / 1500 ); break;
-        case "l": setResult(parseFloat(value) * 5 / 15000 ); break;
-        case "hao": setResult(parseFloat(value) * 5 / 150000 ); break;
+        case "mph": setResult(parseFloat(value) * 1.6093 ); break; // 英里每时(m/h)
+        case "fts": setResult(parseFloat(value) * 0.3048 * 3600 / 1000 ); break; // 英尺每秒(ft/s)
+        case "fts": setResult(parseFloat(value) * 0.3048 * 60 / 1000); break; //英尺每分钟(ft/min)
+        case "ins": setResult(parseFloat(value) * 2.54 * 3600  ); break; // 英寸每秒(in/s)
       }
       setStatus('')
     } else {
@@ -87,7 +88,7 @@ const DistanceConvert = () => {
   }
 
   const f = (v :number) :string => {
-    if(0 === v) return '';
+    if(value === '') return '';
     return v.toString();
   }
 
@@ -134,25 +135,24 @@ const DistanceConvert = () => {
         <Col span={12}>
           <Divider dashed plain>公制</Divider>
 
-
           <Form name="basic1" labelCol={{ span: 8 }} autoComplete="off">
             <Form.Item label="米每秒(m/s)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000) } />
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000 / 3600) } />
             </Form.Item>
             <Form.Item label="千米每时(km/h)">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result) } />
             </Form.Item>
             <Form.Item label="厘米每秒(m/s)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 10) } />
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 100000 / 3600) } />
             </Form.Item>
             <Form.Item label="千米每秒(km/s)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 100) }/>
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 3600) }/>
             </Form.Item>
             <Form.Item label="马赫">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000) } />
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1224) } />
             </Form.Item>
             <Form.Item label="节">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000 / 1000) } />
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1.852) } />
             </Form.Item>
           </Form>
         </Col>
@@ -161,16 +161,16 @@ const DistanceConvert = () => {
           <Divider dashed plain>英制</Divider>
           <Form name="basic2" labelCol={{ span: 8 }} autoComplete="off" >
             <Form.Item label="英里每时(m/h) 迈">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 2.54 * 1000) } />
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1.6093) } />
             </Form.Item>
             <Form.Item label="英尺每秒(ft/s)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.3048) } />
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.3048 / 3600 * 1000 ) } />
             </Form.Item>
             <Form.Item label="英尺每分钟(ft/min)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.9144) } />
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.3048 / 60 * 1000) } />
             </Form.Item>
             <Form.Item label="英寸每秒(in/s)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1609.3)  }/>
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 2.54 / 3600 * 100000)  }/>
             </Form.Item>
           </Form>
         </Col>
@@ -180,4 +180,4 @@ const DistanceConvert = () => {
   );
 }
 
-export default DistanceConvert;
+export default SpeedConvert;

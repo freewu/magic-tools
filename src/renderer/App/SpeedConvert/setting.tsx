@@ -4,14 +4,12 @@ import { useState } from "react";
 import { typeList, unitTypeList } from "./data";
 import { getDefaultMSType,setDefaultMSType } from "./lib";
 import { getDefaultIUType,setDefaultIUType } from "./lib";
-import { getDefaultCNType,setDefaultCNType } from "./lib";
 
-const DistanceConvertSetting = () => {
+export const SpeedConvertSetting = () => {
   
   const [ type, setType ] = useState(getDefaultUnitType()); // 默认制式
   const [ msType, setMSType ] = useState(getDefaultMSType()); // 默认公制单位
   const [ iuType, setIUType ] = useState(getDefaultIUType()); // 默认英制单位
-  const [ cnType, setCNType ] = useState(getDefaultCNType()); // 默认市制单位
 
   return (
     <>
@@ -40,16 +38,6 @@ const DistanceConvertSetting = () => {
           options={ getTypeList('iu') }
         />
       </Form.Item>
-      <Form.Item label="默认市制单位">
-        <Select
-          value={ cnType }
-          style={{ width: 240 }}
-          onChange={ (value: string) => { setCNType(value); setDefaultCNType(value); } }
-          options={ getTypeList('cn') }
-        />
-      </Form.Item>
     </>
   );
 }
-
-export default DistanceConvertSetting;

@@ -58,7 +58,7 @@ const DistanceConvert = () => {
         //case "ly": setResult(parseFloat(value) * 9460730472580800); break;
         //case "au": setResult(parseFloat(value) * 149597870); break;
 
-        case "inch": setResult(parseFloat(value) * 2.54 / 1000 ); break;
+        case "inch": setResult(parseFloat(value) * 2.54 / 100 ); break; // 1 英寸 = 2.54 cm
         case "foot": setResult(parseFloat(value) * 0.3048); break;
         case "yard": setResult(parseFloat(value) * 0.9144); break;
         case "mile": setResult(parseFloat(value) * 1.6093 / 1000); break;
@@ -174,7 +174,7 @@ const DistanceConvert = () => {
           <Divider dashed plain>英制</Divider>
           <Form name="basic2" labelCol={{ span: 10 }} autoComplete="off" >
             <Form.Item label="英寸 (inch)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 2.54 * 1000) } />
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 2.54 * 100) } />
             </Form.Item>
             <Form.Item label="英尺 (foot)">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.3048) } />

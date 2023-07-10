@@ -9,7 +9,7 @@ export const typeList = [
   { label: '千米每秒(km/s)', value: 'kms', type:'ms', placeholder: '' },
   { label: '千米每时(km/h)', value: 'kmh', type:'ms', placeholder: '' },
   //{ label: '光速', value: 'ls', type:'ms', placeholder: '' },
-  { label: '马赫', value: 'mach', type:'ms', placeholder: '' },
+  { label: '马赫', value: 'mach', type:'ms', placeholder: '马赫的大约速度换算一般认为相当于340.3 m/s，又大约等同于1225 km/h，761.2 mph，或者1116 ft/s。即视为等于声音在15摄氏度（59华氏度，288.15开氏度）的空气中传播的速度' },
   { label: '节', value: 'knot', type:'ms', placeholder: '指 海里 / 小时，节是航海中代表速度的单位' },
 
   { label: '英里每时(m/h)', value: 'mph', type:'iu', placeholder: ''},

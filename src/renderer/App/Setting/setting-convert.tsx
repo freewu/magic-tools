@@ -5,6 +5,7 @@ import { ByteConvertSetting } from "../ByteConvert/setting";
 import { TemperatureConvertSetting } from "../TemperatureConvert/setting";
 import { DistanceConvertSetting } from "../DistanceConvert/setting";
 import { ConfigConvertSetting } from "../ConfigConvert/setting";
+import { SpeedConvertSetting } from "../SpeedConvert/setting";
 
 
 export const SettingConvert = () => {
@@ -16,6 +17,7 @@ export const SettingConvert = () => {
       <TemperatureConvertSetting />
       <DistanceConvertSetting />
       <ConfigConvertSetting />
+      <SpeedConvertSetting />
     </Form>
   )
 }
