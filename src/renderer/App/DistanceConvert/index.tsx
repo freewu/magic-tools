@@ -62,6 +62,9 @@ const DistanceConvert = () => {
         case "foot": setResult(parseFloat(value) * 0.3048); break;
         case "yard": setResult(parseFloat(value) * 0.9144); break;
         case "mile": setResult(parseFloat(value) * 1.6093 / 1000); break;
+        case "fathom": setResult(parseFloat(value) * 1.829 ); break; // 1英寻 = 1.829米
+        case "chain": setResult(parseFloat(value) * 20.1168 ); break; // 1链 (chain) = 20.1168米 (m)
+        case "furlong": setResult(parseFloat(value) * 201.168); break; // 约等于公制的 201.168米
 
         // 1里 =	15引 =	150丈 =	1500尺 =	1,5000寸 =	15,0000分 =	150,0000釐 =	1500,0000毫 =	500米
         case "li": setResult(parseFloat(value) * 500 ); break;
@@ -72,6 +75,7 @@ const DistanceConvert = () => {
         case "fen": setResult(parseFloat(value) * 5 / 1500 ); break;
         case "l": setResult(parseFloat(value) * 5 / 15000 ); break;
         case "hao": setResult(parseFloat(value) * 5 / 150000 ); break;
+        case "si": setResult(parseFloat(value) * 5 / 15000000 ); break;
       }
       setStatus('')
     } else {
@@ -185,6 +189,15 @@ const DistanceConvert = () => {
             <Form.Item label="英里 (mile)">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1609.3)  }/>
             </Form.Item>
+            <Form.Item label="英寻 (fathom)">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1.829)  }/>
+            </Form.Item>
+            <Form.Item label="链 (chain)">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 20.1168)  }/>
+            </Form.Item>
+            <Form.Item label="化朗 (furlong)">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 201.168)  }/>
+            </Form.Item>
           </Form>
         </Col>
 
@@ -214,6 +227,9 @@ const DistanceConvert = () => {
             </Form.Item>
             <Form.Item label="毫">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 150000) } />
+            </Form.Item>
+            <Form.Item label="丝">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 15000000) } />
             </Form.Item>
           </Form>
         </Col>
