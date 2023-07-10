@@ -32,7 +32,7 @@ const list = [
   'SpeedConvert',
   // 'VolumeConvert',
   // 'AreaConvert',
-  // 'WeightConvert',
+  'WeightConvert',
 ];
 
 // 加载 App 的定义 名称 / icon 

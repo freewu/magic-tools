@@ -6,7 +6,7 @@ import { getDefaultMSType,setDefaultMSType } from "./lib";
 import { getDefaultIUType,setDefaultIUType } from "./lib";
 import { getDefaultCNType,setDefaultCNType } from "./lib";
 
-const DistanceConvertSetting = () => {
+export const WeightConvertSetting = () => {
   
   const [ type, setType ] = useState(getDefaultUnitType()); // 默认制式
   const [ msType, setMSType ] = useState(getDefaultMSType()); // 默认公制单位
@@ -15,7 +15,7 @@ const DistanceConvertSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>速度转换</Divider>
+      <Divider orientation="left" plain>重量转换</Divider>
       <Form.Item label="默认制式">
         <Select
           value={ type }
@@ -51,5 +51,3 @@ const DistanceConvertSetting = () => {
     </>
   );
 }
-
-export default DistanceConvertSetting;

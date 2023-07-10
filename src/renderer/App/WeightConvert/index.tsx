@@ -7,7 +7,7 @@ import type { RadioChangeEvent } from 'antd';
 import { getDefaultUnitType, getTypeList, getDefaultType, getTypePlaceholder } from "./lib"
 import { InputStatus } from "antd/es/_util/statusUtils";
 
-const DistanceConvert = () => {
+const WeightConvert = () => {
 
   const ut = getDefaultUnitType();
   const [ unitType, setUnitType ] = useState(ut); // 制式 
@@ -44,34 +44,39 @@ const DistanceConvert = () => {
       setStatus('');
       return ; // 没有内容直接返回不做下面的处理
     }
+    /*
+
+
+
+    */
     if(/^[0-9\.\-]+$/.test(value)) {
+      // 统一转成 克 g
       switch(type) {
-        case "km": setResult(parseFloat(value) / 1000); break;
-        case "m": setResult(parseFloat(value)); break;
-        case "dm": setResult(parseFloat(value) * 10); break;
-        case "cm": setResult(parseFloat(value) * 100); break;
-        case "mm": setResult(parseFloat(value) * 1000 ); break;
-        case "μm": setResult(parseFloat(value) * 1000 * 1000); break;
-        case "nm": setResult(parseFloat(value) * 1000 * 1000 * 1000); break;
-        case "pm": setResult(parseFloat(value) * 1000 * 1000 * 1000 * 1000); break;
-        case "nmile": setResult(parseFloat(value) * 1852); break;
-        //case "ly": setResult(parseFloat(value) * 9460730472580800); break;
-        //case "au": setResult(parseFloat(value) * 149597870); break;
+        case "kt": setResult(parseFloat(value) * 1000 * 1000 * 1000 ); break;
+        case "t": setResult(parseFloat(value) * 1000 * 1000); break;
+        case "kg": setResult(parseFloat(value) * 1000); break;
+        case "g": setResult(parseFloat(value) ); break;
+        case "mg": setResult(parseFloat(value) / 1000); break;
+        case "μg": setResult(parseFloat(value) / 1000 / 1000 ); break;
+        case "ng": setResult(parseFloat(value) / 1000 / 1000 / 1000); break;
+        case "pg": setResult(parseFloat(value) / 1000 / 1000 / 1000 / 1000); break;
+        case "ct": setResult(parseFloat(value) / 0.2 ); break;
 
-        case "inch": setResult(parseFloat(value) * 2.54 / 1000 ); break;
-        case "foot": setResult(parseFloat(value) * 0.3048); break;
-        case "yard": setResult(parseFloat(value) * 0.9144); break;
-        case "mile": setResult(parseFloat(value) * 1.6093 / 1000); break;
+        case "oz": setResult(parseFloat(value) * 28.349523125 ); break; // 1 盎司 = 1/16 磅（pound）= 28.349523125 克
+        case "lb": setResult(parseFloat(value) * 453.59237); break; // 1 磅 = 7000 格令 = 453.59237 克
+        case "st": setResult(parseFloat(value) * 6.35 * 1000); break; // 1 英石（stone）= 14 磅 = 6.35 千克
+        case "gr": setResult(parseFloat(value) * 64.79891 / 1000); break; // 1 格令（grain）= 64.79891 毫克
+        case "hw": setResult(parseFloat(value) * 50.8 * 1000); break; // 1 英担（hundredweight）= 4 夸特 = 112 磅 = 50.8 千克
+        case "md": setResult(parseFloat(value) * 45.359237 * 1000); break; // 1 美担 = 45.359237 千克
+        case "dr": setResult(parseFloat(value) * 1.77); break; // 1 打兰（drachm）= 1/16 盎司（ounce） = 1.77 克
+        case "qr": setResult(parseFloat(value) * 12.7 * 1000); break; // 1 夸特（quarter）= 2 英石 = 28 磅 = 12.7 千克
+        case "longton": setResult(parseFloat(value) * 1016 * 1000); break; // 1 英吨（ton）= 20 英担 = 2240 磅 = 1016 千克 英吨（长吨long ton）是2240磅
+        case "shortton": setResult(parseFloat(value) * 907 * 1000); break; // 1 美吨（短吨short ton）是 2000磅（907千克）'},
 
-        // 1里 =	15引 =	150丈 =	1500尺 =	1,5000寸 =	15,0000分 =	150,0000釐 =	1500,0000毫 =	500米
-        case "li": setResult(parseFloat(value) * 500 ); break;
-        case "ying": setResult(parseFloat(value) * 500 / 15 ); break;
-        case "zhang": setResult(parseFloat(value) * 50  / 15); break;
-        case "chi": setResult(parseFloat(value) * 5 / 15 ); break;
-        case "cun": setResult(parseFloat(value) * 5 / 150 ); break;
-        case "fen": setResult(parseFloat(value) * 5 / 1500 ); break;
-        case "l": setResult(parseFloat(value) * 5 / 15000 ); break;
-        case "hao": setResult(parseFloat(value) * 5 / 150000 ); break;
+        case "dan": setResult(parseFloat(value) * 50000 ); break;
+        case "jin": setResult(parseFloat(value) * 500 ); break;
+        case "liang": setResult(parseFloat(value) * 50 ); break;
+        case "qian": setResult(parseFloat(value) * 5 ); break;
       }
       setStatus('')
     } else {
@@ -134,56 +139,66 @@ const DistanceConvert = () => {
         <Col span={8}>
           <Divider dashed plain>公制</Divider>
           <Form name="basic1" labelCol={{ span: 8 }} autoComplete="off">
-            <Form.Item label="千米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000) } />
-            </Form.Item>
-            <Form.Item label="米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result) } />
-            </Form.Item>
-            <Form.Item label="分米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 10) } />
-            </Form.Item>
-            <Form.Item label="厘米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 100) }/>
-            </Form.Item>
-            <Form.Item label="毫米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000) } />
-            </Form.Item>
-            <Form.Item label="微米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000 / 1000) } />
-            </Form.Item>
-            <Form.Item label="纳米">
+            <Form.Item label="千吨(kt)">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000 / 1000 / 1000) } />
             </Form.Item>
-            <Form.Item label="皮米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000 / 1000 / 1000 / 1000) } />
+            <Form.Item label="吨(t)">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000 / 1000) } />
             </Form.Item>
-            <Form.Item label="海里">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1852) } />
+            <Form.Item label="千克(kg)">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000 ) } />
             </Form.Item>
-            {/* <Form.Item label="光年">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= {  } />
+            <Form.Item label="克(g)">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result) }/>
             </Form.Item>
-            <Form.Item label="天文单位">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { } />
-            </Form.Item> */}
+            <Form.Item label="毫克(mg)">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000) } />
+            </Form.Item>
+            <Form.Item label="微克(μg)">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000 * 1000) } />
+            </Form.Item>
+            <Form.Item label="纳克(ng)">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000 * 1000 * 1000) } />
+            </Form.Item>
+            <Form.Item label="克拉(ct)">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 0.2) } />
+            </Form.Item>
+
           </Form>
         </Col>
 
         <Col span={8}>
           <Divider dashed plain>英制</Divider>
           <Form name="basic2" labelCol={{ span: 10 }} autoComplete="off" >
-            <Form.Item label="英寸 (inch)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 2.54 * 1000) } />
+            <Form.Item label="盎司(ounce)">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 28.349523125) } />
             </Form.Item>
-            <Form.Item label="英尺 (foot)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.3048) } />
+            <Form.Item label="磅(pound)">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 453.59237) } />
             </Form.Item>
-            <Form.Item label="码 (yard)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.9144) } />
+            <Form.Item label="英石(stone)">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 6350) } />
             </Form.Item>
-            <Form.Item label="英里 (mile)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1609.3)  }/>
+            <Form.Item label="格令(grain)">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 64.79891 * 1000)  }/>
+            </Form.Item>
+            <Form.Item label="打兰(drachm)">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1.77)  }/>
+            </Form.Item>
+            <Form.Item label="夸特(quarter)">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 12.7 / 1000)  }/>
+            </Form.Item>
+            <Form.Item label="英担">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 50.8 / 1000)  }/>
+            </Form.Item>
+            <Form.Item label="美担">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 45.359237 / 1000)  }/>
+            </Form.Item>
+            <Form.Item label="英吨(long ton)">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1016 / 1000)  }/>
+            </Form.Item>
+            <Form.Item label="美吨(short ton)">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 907 / 1000)  }/>
             </Form.Item>
           </Form>
         </Col>
@@ -191,29 +206,17 @@ const DistanceConvert = () => {
         <Col span={8}>
           <Divider dashed plain>市制</Divider>
           <Form name="basic3" labelCol={{ span: 8 }} autoComplete="off">
-            <Form.Item label="里">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 500) } />
+            <Form.Item label="担">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 50000) } />
             </Form.Item>
-            <Form.Item label="引">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 500 * 15) } />
+            <Form.Item label="斤">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 500 ) } />
             </Form.Item>
-            <Form.Item label="丈">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 50 * 15) } />
+            <Form.Item label="两">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 50) } />
             </Form.Item>
-            <Form.Item label="尺">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 15) }/>
-            </Form.Item>
-            <Form.Item label="寸">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 150) } />
-            </Form.Item>
-            <Form.Item label="分">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 1500) } />
-            </Form.Item>
-            <Form.Item label="厘">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 15000) } />
-            </Form.Item>
-            <Form.Item label="毫">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 150000) } />
+            <Form.Item label="钱">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 ) }/>
             </Form.Item>
           </Form>
         </Col>
@@ -222,4 +225,4 @@ const DistanceConvert = () => {
   );
 }
 
-export default DistanceConvert;
+export default WeightConvert;
