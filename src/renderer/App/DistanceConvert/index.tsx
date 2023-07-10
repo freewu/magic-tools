@@ -46,14 +46,14 @@ const DistanceConvert = () => {
     }
     if(/^[0-9\.\-]+$/.test(value)) {
       switch(type) {
-        case "km": setResult(parseFloat(value) / 1000); break;
+        case "km": setResult(parseFloat(value) * 1000); break;
         case "m": setResult(parseFloat(value)); break;
-        case "dm": setResult(parseFloat(value) * 10); break;
-        case "cm": setResult(parseFloat(value) * 100); break;
-        case "mm": setResult(parseFloat(value) * 1000 ); break;
-        case "μm": setResult(parseFloat(value) * 1000 * 1000); break;
-        case "nm": setResult(parseFloat(value) * 1000 * 1000 * 1000); break;
-        case "pm": setResult(parseFloat(value) * 1000 * 1000 * 1000 * 1000); break;
+        case "dm": setResult(parseFloat(value) / 10); break;
+        case "cm": setResult(parseFloat(value) / 100); break;
+        case "mm": setResult(parseFloat(value) / 1000 ); break;
+        case "μm": setResult(parseFloat(value) / 1000 / 1000); break;
+        case "nm": setResult(parseFloat(value) / 1000 / 1000 / 1000); break;
+        case "pm": setResult(parseFloat(value) / 1000 / 1000 / 1000 / 1000); break;
         case "nmile": setResult(parseFloat(value) * 1852); break;
         //case "ly": setResult(parseFloat(value) * 9460730472580800); break;
         //case "au": setResult(parseFloat(value) * 149597870); break;
@@ -139,28 +139,28 @@ const DistanceConvert = () => {
           <Divider dashed plain>公制</Divider>
           <Form name="basic1" labelCol={{ span: 8 }} autoComplete="off">
             <Form.Item label="千米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000) } />
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000) } />
             </Form.Item>
             <Form.Item label="米">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result) } />
             </Form.Item>
             <Form.Item label="分米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 10) } />
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 10) } />
             </Form.Item>
             <Form.Item label="厘米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 100) }/>
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 100) }/>
             </Form.Item>
             <Form.Item label="毫米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000) } />
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000) } />
             </Form.Item>
             <Form.Item label="微米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000 / 1000) } />
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000 * 1000) } />
             </Form.Item>
             <Form.Item label="纳米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000 / 1000 / 1000) } />
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000 * 1000 * 1000) } />
             </Form.Item>
             <Form.Item label="皮米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000 / 1000 / 1000 / 1000) } />
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000 * 1000 * 1000 * 1000) } />
             </Form.Item>
             <Form.Item label="海里">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1852) } />
