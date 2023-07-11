@@ -15,7 +15,7 @@ import sha384 from 'crypto-js/sha384';
 import ripemd160 from 'crypto-js/ripemd160';
 
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
-import { getPasswordList } from "./lib"
+import { getPasswordList, getDefaultShowUppercase } from "./lib"
 import "./hash.css"
 
 const Hash = () => {
@@ -30,7 +30,7 @@ const Hash = () => {
   window.addEventListener('resize', debounce(() => { setHeight(genFormHeight()) },100) );
 
   const [ value, setValue ] = useState('');
-  const [ checked, setChecked ] = useState(false);
+  const [ checked, setChecked ] = useState(getDefaultShowUppercase());
   const [ hash, setHash ] = useState(emptyResult);
   const [ notice, contextHolder] = message.useMessage();
 

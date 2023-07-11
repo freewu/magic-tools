@@ -6,7 +6,7 @@ import { openFile } from "../../lib/file"
 import { arrayToOptions } from "../../lib/array"
 import { hashAlgoList } from "./data"
 import { getDefaultHashAlgo,getDefaultIteration,getDefaultKeyLength,getDefaultSalt} from "./lib"
-import { genValuePlaceholder, getHashAlgo } from "./lib"
+import { genValuePlaceholder, getHashAlgo, getDefaultShowUppercase } from "./lib"
 
 import * as CryptoJS from 'crypto-js';
 
@@ -22,7 +22,7 @@ const PBKDF2Calc = () => {
   const [ salt, setSalt ] = useState(getDefaultSalt()); // 盐值
   const [ iter, setIter ] = useState(getDefaultIteration()); // 迭代次数
   const [ keyLength, setKeyLength ] = useState(getDefaultKeyLength()); // 推导密钥长度(位)
-  const [ checked, setChecked ] = useState(false);
+  const [ checked, setChecked ] = useState(getDefaultShowUppercase());
   const [ result, setResult ] = useState('');
   const [ notice, contextHolder] = message.useMessage();
   const [ valuePlaceholder, setValuePlaceholder ] = useState(genValuePlaceholder(getDefaultHashAlgo())); // 计算内容提示

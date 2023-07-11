@@ -70,3 +70,16 @@ export function setDefaultKeyLength(len: number) :void {
 export const genValuePlaceholder = (algo :string) => {
   return "输入需要计算 PBKDF2-" + algo + " 值的内容 或 拖拽文件到框内打开";
 }
+
+const DEFAULT_SHOW_UPPERCASE = 'pbkdf2-calc:default-show-uppercase';
+
+// 获取默认是否大写展示
+export function getDefaultShowUppercase() :boolean  {
+  const show = localStorage.getItem(DEFAULT_SHOW_UPPERCASE);
+  return (show === null)? false : (show === 'false')? false : true;
+}
+
+// 设置默认是否大写展示
+export function setDefaultShowUppercase(show: boolean) : void  {
+  localStorage.setItem(DEFAULT_SHOW_UPPERCASE, show + '');
+}
