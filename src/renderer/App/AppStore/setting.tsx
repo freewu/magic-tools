@@ -11,17 +11,29 @@ export const AppStoreSetting = () => {
     setDefaultApp(value);
   };
 
+  const findAppList = (type :string) => {
+    return appList
+      .filter((item) => { return item.type === type })
+      .map((item) => { return { value: item.key, label: item.label } });
+  }
+
   // 应用列表
   const getAppList = () => {
-    const result = [
-      { value: 'AppStore', label: '应用中心' },
-      { value: 'Help', label: '帮助' },
-      { value: 'Setting', label: '设置' },
+    return [
+      {
+        label: '系统',
+        options: [
+          { value: 'AppStore', label: '应用中心' },
+          { value: 'Help', label: '帮助' },
+          { value: 'Setting', label: '设置' },
+        ],
+      },
+      { label: '类型转换', options: findAppList('convert') },
+      { label: '编解码', options: findAppList('codec') },
+      { label: '加解密', options: findAppList('crypto') },
+      { label: '值计算', options: findAppList('value-calc') },
+      { label: '其它', options: findAppList('misc') },
     ];
-    appList.forEach((v) => {
-      result.push({ value: v.key, label:  v.label });
-    });
-    return result;
   };
 
   return (
