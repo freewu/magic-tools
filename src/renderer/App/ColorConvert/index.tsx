@@ -140,7 +140,7 @@ const ColorConvert = () => {
         value= { value }
         onChange={ textAreaChange }
         placeholder={ placeholder }
-        autoSize={{ minRows: 2, maxRows: 2 }}
+        autoSize={{ minRows: 3, maxRows: 3 }}
       />
       <Divider dashed />
       <Row wrap>

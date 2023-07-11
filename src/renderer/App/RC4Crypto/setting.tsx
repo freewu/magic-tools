@@ -5,7 +5,7 @@ import { codeList } from "./data";
 import { getDefaultCode, setDefaultCode } from "./lib";
 import { getDefaultPassphrase, setDefaultPassphrase } from "./lib";
 
-const RabbitCryptoSetting = () => {
+export const RC4CryptoSetting = () => {
 
   const [ code, setCode ] = useState(getDefaultCode()); // 默认编码
   const [ passphrase, setPassphrase ] = useState(getDefaultPassphrase()); // 默认密钥
@@ -42,5 +42,3 @@ const RabbitCryptoSetting = () => {
     </>
   );
 }
-
-export default RabbitCryptoSetting;

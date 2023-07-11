@@ -28,13 +28,20 @@ GPS坐标转换
 人民币大写   
 字节转换
 中文拼音
-   
+温度转换
+距离转换
+速度转换
+配置文件转换 (ini / json / yaml / toml / properties)
+面积转换
+容积转换
+质量转换
+
 -- 待开发 ------------------
+TEA 加密 / 解密   
+XTEA 加密 / 解密    
+XXTEA 加密 / 解密   
 图片主题色 ( 还需要做近似颜色合并处理 )
 繁简汉字转换   
-TEA 加密 / 解密    
-XTEA 加密 / 解密    
-XXTEA 加密 / 解密    
 RSA 加密 / 解密   
 BaseX 编码 / 解码(存在问题)
 CRC 计算
@@ -78,7 +85,10 @@ WebSocket 调试
 <a target="_blank" href="https://highlightjs.org/">highlight.js</a>    
 <a target="_blank" href="https://github.com/cryptocoinjs/base-x">base-x</a>   
 <a target="_blank" href="https://pinyin-pro.cn/">pinyin-pro</a>   
-
+<a target="_blank" href="https://github.com/Sdju/js-ini">js-ini</a>   
+<a target="_blank" href="https://github.com/eemeli/yaml">yaml</a>   
+<a target="_blank" href="https://github.com/timhall/toml-patch">toml-patch</a>   
+<a target="_blank" href="https://github.com/TehShrike/deepmerge">deepmerge</a>   
 
 ## 应用截图
 * Hash 值计算

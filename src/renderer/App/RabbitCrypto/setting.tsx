@@ -7,7 +7,7 @@ import { getDefaultIV, setDefaultIV } from "./lib";
 import { getDefaultPassphrase, setDefaultPassphrase, genPassphraseLimitLength } from "./lib";
 import type { InputStatus } from "antd/es/_util/statusUtils";
 
-const RabbitCryptoSetting = () => {
+export const RabbitCryptoSetting = () => {
 
   const [ code, setCode ] = useState(getDefaultCode()); // 默认编码
   const [ iv, setIV ] = useState(getDefaultIV()); // 默认偏移量
@@ -81,5 +81,3 @@ const RabbitCryptoSetting = () => {
     </>
   );
 }
-
-export default RabbitCryptoSetting;

@@ -3,7 +3,7 @@ const { TextArea } = Input;
 import { useState } from "react";
 import { getPasswordList,setPasswordList } from "./lib"
 
-const HashSetting = () => {
+export const HashSetting = () => {
   const [ value, setValue ] = useState(getPasswordList().join("\n"));
 
   const onTextAreaChange = (e :React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -34,5 +34,3 @@ const HashSetting = () => {
     </>
   );
 }
-
-export default HashSetting;

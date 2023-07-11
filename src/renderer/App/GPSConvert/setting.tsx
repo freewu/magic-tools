@@ -3,7 +3,7 @@ import { getDefaultType, setDefaultType } from "./lib";
 import { useState } from "react";
 import { typeList } from "./data";
 
-const GPSConvertSetting = () => {
+export const GPSConvertSetting = () => {
   const [ type, setType ] = useState(getDefaultType()); // 默认坐标类型
 
   // // 应用列表
@@ -29,5 +29,3 @@ const GPSConvertSetting = () => {
     </>
   );
 }
-
-export default GPSConvertSetting;

@@ -6,7 +6,7 @@ import { getDefaultPickMax, setDefaultPickMax } from "./lib";
 import { colorDataList } from "./data";
 import { useState } from "react";
 
-const ColorSetting = () => {
+export const ColorSetting = () => {
   const [ colorPad, setColorPad ] = useState(getDefaultColorPad()); // 默认展示的 颜色板
   const [ batchSwitch, setBatchSwitch ] = useState(getDefaultBatchSwitch()); // 默认是否开启批量取色
   const [ opacity, setOpacity ] = useState(getDefaultOpacity()); // 默认 opacity
@@ -69,5 +69,3 @@ const ColorSetting = () => {
     </>
   );
 }
-
-export default ColorSetting;

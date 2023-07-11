@@ -8,7 +8,7 @@ import { getDefaultIteration, setDefaultIteration } from "./lib";
 import { getDefaultKeyLength, setDefaultKeyLength } from "./lib";
 import type { InputStatus } from "antd/es/_util/statusUtils";
 
-const PBKDF2CalcSetting = () => {
+export const PBKDF2CalcSetting = () => {
 
   const [ algo, setAlgo ] = useState(getDefaultHashAlgo()); //  Hash 算法
   const [ salt, setSalt ] = useState(getDefaultSalt()); // 盐值
@@ -71,5 +71,3 @@ const PBKDF2CalcSetting = () => {
     </>
   );
 }
-
-export default PBKDF2CalcSetting;
