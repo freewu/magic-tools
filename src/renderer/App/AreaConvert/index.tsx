@@ -7,7 +7,7 @@ import type { RadioChangeEvent } from 'antd';
 import { getDefaultUnitType, getTypeList, getDefaultType, getTypePlaceholder } from "./lib"
 import { InputStatus } from "antd/es/_util/statusUtils";
 
-const DistanceConvert = () => {
+const AreaConvert = () => {
 
   const ut = getDefaultUnitType();
   const [ unitType, setUnitType ] = useState(ut); // 制式 
@@ -18,7 +18,7 @@ const DistanceConvert = () => {
   const dt = getDefaultType(ut);
   const [ type, setType ] = useState(dt); // 转换类型
   const [ placeholder, setPlaceholder ] = useState(getTypePlaceholder(dt)); // 数字类型的输入提示
-  const [ result, setResult ] = useState(0); // 转换的结果 统一转换成 米
+  const [ result, setResult ] = useState(0); // 转换的结果 统一转换成 
   const [ notice, contextHolder] = message.useMessage();
 
   const inputStyle = { cursor: "pointer" };
@@ -46,32 +46,38 @@ const DistanceConvert = () => {
     }
     if(/^[0-9\.\-]+$/.test(value)) {
       switch(type) {
-        case "km": setResult(parseFloat(value) / 1000); break;
-        case "m": setResult(parseFloat(value)); break;
-        case "dm": setResult(parseFloat(value) * 10); break;
-        case "cm": setResult(parseFloat(value) * 100); break;
-        case "mm": setResult(parseFloat(value) * 1000 ); break;
-        case "μm": setResult(parseFloat(value) * 1000 * 1000); break;
-        case "nm": setResult(parseFloat(value) * 1000 * 1000 * 1000); break;
-        case "pm": setResult(parseFloat(value) * 1000 * 1000 * 1000 * 1000); break;
-        case "nmile": setResult(parseFloat(value) * 1852); break;
-        //case "ly": setResult(parseFloat(value) * 9460730472580800); break;
-        //case "au": setResult(parseFloat(value) * 149597870); break;
 
-        case "inch": setResult(parseFloat(value) * 2.54 / 1000 ); break;
-        case "foot": setResult(parseFloat(value) * 0.3048); break;
-        case "yard": setResult(parseFloat(value) * 0.9144); break;
-        case "mile": setResult(parseFloat(value) * 1.6093 / 1000); break;
+        case "km2": setResult(parseFloat(value) * 1000000); break; // 1 平方公里km² =  平方米 m²
+        case "m2": setResult(parseFloat(value)); break; // 1 平方米 m² = 0.0001 公顷 = 0.01 公亩
+        case "gq": setResult(parseFloat(value) * 10000); break; // 1 公顷 = 10000 平方米 m²
+        case "gm": setResult(parseFloat(value) * 100); break; // 1 公亩 = 100 平方米 m²
+        case "dm2": setResult(parseFloat(value) / 100 ); break; // 1 平方分米 dm² = 0.01 平方米 m²
+        case "cm2": setResult(parseFloat(value) / 10000 ); break; // 1 平方厘米 cm² = 0.0001 平方米 m²
+        case "mm2": setResult(parseFloat(value) / 1000000 ); break; // 1 平方毫米 mm² = 0.000001 平方米 m²
 
-        // 1里 =	15引 =	150丈 =	1500尺 =	1,5000寸 =	15,0000分 =	150,0000釐 =	1500,0000毫 =	500米
-        case "li": setResult(parseFloat(value) * 500 ); break;
-        case "ying": setResult(parseFloat(value) * 500 / 15 ); break;
-        case "zhang": setResult(parseFloat(value) * 50  / 15); break;
-        case "chi": setResult(parseFloat(value) * 5 / 15 ); break;
-        case "cun": setResult(parseFloat(value) * 5 / 150 ); break;
-        case "fen": setResult(parseFloat(value) * 5 / 1500 ); break;
-        case "l": setResult(parseFloat(value) * 5 / 15000 ); break;
-        case "hao": setResult(parseFloat(value) * 5 / 150000 ); break;
+        case "jp-ping": setResult(parseFloat(value) * 3.30578622 ); break; // 1 坪 = 3.30578622 平方米 m²
+        case "jp-die": setResult(parseFloat(value) * 1.62 ); break; // 1 叠 = 1.62 平方米 m²
+        case "jp-ding": setResult(parseFloat(value) * 0.00991736); break; // 1 町 = 0.00991736 平方米 m²
+        case "jp-duan": setResult(parseFloat(value) * 0.00099174); break; // 1 段 = 0.00099174 平方米 m²
+        case "jp-mu": setResult(parseFloat(value) * 0.00009917); break; // 1 亩 = 0.00009917 平方米 m²
+
+        case "mile2": setResult(parseFloat(value) * 2590000 ); break; // 1 平方英里 = 2590000 平方米 m²
+        case "ym": setResult(parseFloat(value) * 4046.85642 ); break; // 1 英亩 = 4046.85642 平方米 m²
+        case "ld": setResult(parseFloat(value) * 1011.7136203); break; // 1 路得 = 1011.7136203 平方米m²
+        case "g": setResult(parseFloat(value) * 25.2928469 ); break; // 1 平方杆 = 25.2928469 平方米m²
+        case "yard2": setResult(parseFloat(value) * 0.83612736 ); break; // 1 平方码 = 0.83612736 平方米 m²
+        case "foot2": setResult(parseFloat(value) * 0.09290304 ); break; // 1 平方英尺 = 0.09290304 平方米 m²'
+        case "inch2": setResult(parseFloat(value) * 0.00064516 ); break; // 1 平方英寸 = 0.00064516 平方米 m²
+
+        case "qin": setResult(parseFloat(value) * 66666 ); break; // 1顷 = 100亩 = 66666 平方米 m²
+        case "mu": setResult(parseFloat(value) * 666.66 ); break; // 1亩 = 666.66 平方米 m²
+        case "fen": setResult(parseFloat(value) * 66.666 ); break; // 1分 = 0.1亩 = 66.666 平方米 m²
+        case "li": setResult(parseFloat(value) * 6.6666 ); break; // 1厘 = 0.01亩 = 6.6666 平方米 m²
+        case "hao": setResult(parseFloat(value) * 0.66666 ); break; // 1毫 = 0.001亩 = 0.66666 平方米 m²
+
+        case "zhuang2": setResult(parseFloat(value) * 11.11 ); break; // 1平方丈 = 100平方尺 = 11.11平方米
+        case "chi2": setResult(parseFloat(value) * 0.1111 ); break; // 1平方尺 = 0.1111平方米
+        case "cun2": setResult(parseFloat(value) * 0.001111 ); break; // 1平方寸 = 0.01平方尺 = 0.001111平方米
       }
       setStatus('')
     } else {
@@ -87,7 +93,7 @@ const DistanceConvert = () => {
   }
 
   const f = (v :number) :string => {
-    if(0 === v) return '';
+    if('' === value || status !== '') return '';
     return v.toString();
   }
 
@@ -131,95 +137,114 @@ const DistanceConvert = () => {
       />
 
       <Row wrap>
-        <Col span={8}>
+        <Col span={6}>
           <Divider dashed plain>公制</Divider>
           <Form name="basic1" labelCol={{ span: 8 }} autoComplete="off">
-            <Form.Item label="千米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000) } />
+            <Form.Item label="平方公里">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000000) } />
             </Form.Item>
-            <Form.Item label="米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result) } />
+            <Form.Item label="公顷">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 10000) } />
             </Form.Item>
-            <Form.Item label="分米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 10) } />
+            <Form.Item label="公亩">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 100) } />
             </Form.Item>
-            <Form.Item label="厘米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 100) }/>
+            <Form.Item label="平方米">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result) }/>
             </Form.Item>
-            <Form.Item label="毫米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000) } />
+            <Form.Item label="平方分米">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 100) } />
             </Form.Item>
-            <Form.Item label="微米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000 / 1000) } />
+            <Form.Item label="平方厘米">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 10000 ) } />
             </Form.Item>
-            <Form.Item label="纳米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000 / 1000 / 1000) } />
+            <Form.Item label="平方毫米">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000000 ) } />
             </Form.Item>
-            <Form.Item label="皮米">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000 / 1000 / 1000 / 1000) } />
-            </Form.Item>
-            <Form.Item label="海里">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1852) } />
-            </Form.Item>
-            {/* <Form.Item label="光年">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= {  } />
-            </Form.Item>
-            <Form.Item label="天文单位">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { } />
-            </Form.Item> */}
           </Form>
         </Col>
 
-        <Col span={8}>
+        <Col span={6}>
           <Divider dashed plain>英制</Divider>
           <Form name="basic2" labelCol={{ span: 10 }} autoComplete="off" >
-            <Form.Item label="英寸 (inch)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 2.54 * 1000) } />
+            <Form.Item label="平方英里">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 2590000) } />
             </Form.Item>
-            <Form.Item label="英尺 (foot)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.3048) } />
+            <Form.Item label="英亩">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 4046.85642 ) } />
             </Form.Item>
-            <Form.Item label="码 (yard)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.9144) } />
+            <Form.Item label="路得">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1011.7136203 ) } />
             </Form.Item>
-            <Form.Item label="英里 (mile)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1609.3)  }/>
+            <Form.Item label="平方杆">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 25.2928469 )  }/>
+            </Form.Item>
+            <Form.Item label="平方码">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.83612736 )  }/>
+            </Form.Item>
+            <Form.Item label="平方英尺">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.09290304 )  }/>
+            </Form.Item>
+            <Form.Item label="平方英寸">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.00064516 )  }/>
             </Form.Item>
           </Form>
         </Col>
 
-        <Col span={8}>
+        <Col span={6}>
           <Divider dashed plain>市制</Divider>
           <Form name="basic3" labelCol={{ span: 8 }} autoComplete="off">
-            <Form.Item label="里">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 500) } />
+            <Form.Item label="顷">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 66666 ) } />
             </Form.Item>
-            <Form.Item label="引">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 500 * 15) } />
-            </Form.Item>
-            <Form.Item label="丈">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 50 * 15) } />
-            </Form.Item>
-            <Form.Item label="尺">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 15) }/>
-            </Form.Item>
-            <Form.Item label="寸">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 150) } />
+            <Form.Item label="亩">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 666.66 ) } />
             </Form.Item>
             <Form.Item label="分">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 1500) } />
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 66.666 ) } />
             </Form.Item>
             <Form.Item label="厘">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 15000) } />
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 6.6666 ) } />
             </Form.Item>
             <Form.Item label="毫">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 150000) } />
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.66666 ) } />
+            </Form.Item>
+            <Form.Item label="平方丈">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 11.11 ) } />
+            </Form.Item>
+            <Form.Item label="平方尺">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.1111 ) } />
+            </Form.Item>
+            <Form.Item label="平方寸">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.001111 ) } />
             </Form.Item>
           </Form>
+        </Col>
+
+        <Col span={6}>
+          <Divider dashed plain>日式</Divider>
+          <Form name="basic4" labelCol={{ span: 8 }} autoComplete="off" >
+            <Form.Item label="坪">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 3.30578622) } />
+            </Form.Item>
+            <Form.Item label="叠">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1.62) } />
+            </Form.Item>
+            <Form.Item label="町">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.00991736 ) } />
+            </Form.Item>
+            <Form.Item label="段">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.00099174 )  }/>
+            </Form.Item>
+            <Form.Item label="亩">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.00009917 )  }/>
+            </Form.Item>
+          </Form>
+
         </Col>
       </Row>
     </div>
   );
 }
 
-export default DistanceConvert;
+export default AreaConvert;

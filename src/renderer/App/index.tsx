@@ -31,7 +31,7 @@ const list = [
   'ConfigConvert',
   'SpeedConvert',
   'VolumeConvert',
-  // 'AreaConvert',
+  'AreaConvert',
   'WeightConvert',
 ];
 

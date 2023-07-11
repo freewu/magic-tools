@@ -8,6 +8,8 @@ import { ConfigConvertSetting } from "../ConfigConvert/setting";
 import { SpeedConvertSetting } from "../SpeedConvert/setting";
 import { WeightConvertSetting } from "../WeightConvert/setting";
 import { VolumeConvertSetting } from "../VolumeConvert/setting";
+import { AreaConvertSetting } from "../AreaConvert/setting";
+
 
 export const SettingConvert = () => {
 
@@ -20,7 +22,7 @@ export const SettingConvert = () => {
       <ConfigConvertSetting />
       <SpeedConvertSetting />
       <WeightConvertSetting />
-      <VolumeConvertSetting />
+      <AreaConvertSetting />
     </Form>
   )
 }
