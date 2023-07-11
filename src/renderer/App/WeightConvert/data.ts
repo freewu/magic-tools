@@ -30,9 +30,11 @@ export const typeList = [
   { label: '美吨', value: 'shortton', type:'iu', placeholder: '美吨（短吨short ton）是2000磅（907千克）'},
   
 
-  
   { label: '担', value: 'dan', type:'cn', placeholder: '' },
   { label: '斤', value: 'jin', type:'cn', placeholder: '' },
   { label: '两', value: 'liang', type:'cn', placeholder: '' },
   { label: '钱', value: 'qian', type:'cn', placeholder: '' },
+  { label: '分', value: 'fen', type:'cn', placeholder: '' },
+  { label: '厘', value: 'li', type:'cn', placeholder: '' },
+  
 ];

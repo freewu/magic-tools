@@ -77,6 +77,8 @@ const WeightConvert = () => {
         case "jin": setResult(parseFloat(value) * 500 ); break;
         case "liang": setResult(parseFloat(value) * 50 ); break;
         case "qian": setResult(parseFloat(value) * 5 ); break;
+        case "fen": setResult(parseFloat(value) * 0.5 ); break;
+        case "li": setResult(parseFloat(value) * 0.05 ); break;
       }
       setStatus('')
     } else {
@@ -217,6 +219,12 @@ const WeightConvert = () => {
             </Form.Item>
             <Form.Item label="钱">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 ) }/>
+            </Form.Item>
+            <Form.Item label="分">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 10 ) }/>
+            </Form.Item>
+            <Form.Item label="厘">
+              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 100 ) }/>
             </Form.Item>
           </Form>
         </Col>
