@@ -1,15 +1,18 @@
-import { Divider, Button,Input, message } from "antd";
+import { Divider, Button,Input, message, Checkbox,Space } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
 import { InputStatus } from "antd/es/_util/statusUtils";
 import { pinyin } from 'pinyin-pro';
+import type { CheckboxChangeEvent } from 'antd/es/checkbox';
+import { getDefaultShowTone } from './lib';
 
 const PinyinConvert = () => {
 
   const [ status, setStatus ] = useState('');
   const [ value, setValue ] = useState('');
   const [ result, setResult ] = useState('');
+  const [ showTone, setShowTone ] = useState(getDefaultShowTone()); // 是否显示声调
   const [ notice, contextHolder ] = message.useMessage(); // 消息提醒
 
   const textareaDoubleClick = (e :React.MouseEvent<HTMLTextAreaElement>) => {
@@ -20,24 +23,39 @@ const PinyinConvert = () => {
     }
   };
 
+  const convert = (data :string, show :boolean)  => {
+    setResult(pinyin(value,{ toneType: (show)? 'symbol' : 'none'}));
+  }
+
   const encode = (value :string) => {
     setValue(value);
     if ( value.trim() != "") {
-      setResult(pinyin(value));
+      convert(value,showTone);
     } else {
       setResult('');
     }
   }
+
+  const onShowToneChange = (e :CheckboxChangeEvent) => {
+    setShowTone(!showTone);
+    if(value.trim() !== '') {
+      convert(value,!showTone);
+    }
+  };
 
   return (
     <div>
 
       {contextHolder}
 
-      <Button 
-        onClick={ () => { setValue(''); setResult(''); setStatus(''); } }
-        style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-      >清除</Button>
+      <Space>
+        <Button 
+          onClick={ () => { setValue(''); setResult(''); setStatus(''); } }
+          style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
+        >清除</Button>
+        <Checkbox onChange={ onShowToneChange } checked={ showTone }>是否显示声调</Checkbox>
+      </Space>
+
 
       <TextArea
         status= { status as InputStatus }
