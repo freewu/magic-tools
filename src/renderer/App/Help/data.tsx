@@ -28,6 +28,23 @@ export const eventList = [
     color: "green",
     children: (
       <>
+        <p>2023-07-11 V1.3.0 Release</p>
+        <ul style={ {listStyle: "none" }}>
+          <li>温度转换</li>
+          <li>距离转换</li>
+          <li>速度转换</li>
+          <li>配置文件转换 (ini / json / yaml / toml / properties)</li>
+          <li>面积转换</li>
+          <li>容积转换</li>
+          <li>质量转换</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    color: "green",
+    children: (
+      <>
         <p>2023-06-30 V1.2.0 Release</p>
         <ul style={ {listStyle: "none" }}>
           <li>Base64 图片</li>
