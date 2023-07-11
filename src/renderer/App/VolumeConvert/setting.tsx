@@ -5,17 +5,19 @@ import { typeList, unitTypeList } from "./data";
 import { getDefaultMSType,setDefaultMSType } from "./lib";
 import { getDefaultIUType,setDefaultIUType } from "./lib";
 import { getDefaultCNType,setDefaultCNType } from "./lib";
+import { getDefaultUSType,setDefaultUSType } from "./lib";
 
-const DistanceConvertSetting = () => {
+export const VolumeConvertSetting = () => {
   
   const [ type, setType ] = useState(getDefaultUnitType()); // 默认制式
   const [ msType, setMSType ] = useState(getDefaultMSType()); // 默认公制单位
   const [ iuType, setIUType ] = useState(getDefaultIUType()); // 默认英制单位
+  const [ usType, setUSType ] = useState(getDefaultUSType()); // 默认美制单位
   const [ cnType, setCNType ] = useState(getDefaultCNType()); // 默认市制单位
 
   return (
     <>
-      <Divider orientation="left" plain>速度转换</Divider>
+      <Divider orientation="left" plain>容积转换</Divider>
       <Form.Item label="默认制式">
         <Select
           value={ type }
@@ -40,6 +42,14 @@ const DistanceConvertSetting = () => {
           options={ getTypeList('iu') }
         />
       </Form.Item>
+      <Form.Item label="默认美制单位">
+        <Select
+          value={ usType }
+          style={{ width: 240 }}
+          onChange={ (value: string) => { setUSType(value); setDefaultUSType(value); } }
+          options={ getTypeList('us') }
+        />
+      </Form.Item>
       <Form.Item label="默认市制单位">
         <Select
           value={ cnType }
@@ -51,5 +61,3 @@ const DistanceConvertSetting = () => {
     </>
   );
 }
-
-export default DistanceConvertSetting;

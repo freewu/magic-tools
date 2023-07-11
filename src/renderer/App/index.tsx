@@ -30,7 +30,7 @@ const list = [
   'DistanceConvert',
   'ConfigConvert',
   'SpeedConvert',
-  // 'VolumeConvert',
+  'VolumeConvert',
   // 'AreaConvert',
   'WeightConvert',
 ];
