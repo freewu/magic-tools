@@ -1,6 +1,6 @@
 const AppName = 'CSS 配色';
 const Icon = '';
-const Type = 'misc';
+const Type = 'img-color';
 
 export {
   AppName,

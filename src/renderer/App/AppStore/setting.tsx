@@ -32,6 +32,7 @@ export const AppStoreSetting = () => {
       { label: '编解码', options: findAppList('codec') },
       { label: '加解密', options: findAppList('crypto') },
       { label: '值计算', options: findAppList('value-calc') },
+      { label: '图片颜色', options: findAppList('img-color') },
       { label: '其它', options: findAppList('misc') },
     ];
   };
