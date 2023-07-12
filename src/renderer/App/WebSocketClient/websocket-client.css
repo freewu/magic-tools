@@ -9,11 +9,15 @@
   text-align: right;
   border-radius: 5px;
   /* border: 1px solid #eee; */
-  padding: 5px;
+  padding: 5px 12px 5px 12px;
   margin-top: 5px;
   cursor: pointer;
   float: right;
-  width: 60%;
+  max-width: 80%;
+}
+
+.msg-box p {
+  clear: both;
 }
 
 .msg-box .msg-from {
@@ -21,27 +25,29 @@
   text-align: left;
   border-radius: 5px;
   /* border: 1px solid #eee; */
-  padding: 5px;
+  padding: 5px 12px 5px 12px;
   margin-top: 5px;
   cursor: pointer;
   float: left;
-  width: 60%;
+  max-width: 80%;
 }
 
 .msg-to span {
   color:#eee;
   font-size: 12px;
+  margin-bottom: 12px;
 }
 
 .msg-from span {
   color:#81868c;
   font-size: 12px;
+  margin-bottom: 12px;
 }
 
 
 .msg-input {
-  margin-top: 5px;
-  border: 1px solid #eee;
+  margin-top: 12px;
+  /* border: 1px solid #eee; */
   border-radius: 5px;
   min-height: 200px;
 }

@@ -78,6 +78,4 @@ func TestWebSocketPong(t *testing.T) {
 	}
 	log.Printf("messageType: %v\n", messageType)
 	log.Printf("Received message: %v\n", string(p))
-
-	conn.
 }
