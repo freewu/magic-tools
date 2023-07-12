@@ -33,6 +33,7 @@ const list = [
   'VolumeConvert',
   'AreaConvert',
   'WeightConvert',
+  'WebSocketClient',
 ];
 
 // 加载 App 的定义 名称 / icon 

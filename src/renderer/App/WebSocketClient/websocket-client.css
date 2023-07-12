@@ -1,0 +1,47 @@
+.msg-box {
+  border: 1px solid #eee;
+  padding: 12px;
+  border-radius: 5px;
+}
+
+.msg-box .msg-to {
+  background-color: rgb(40, 167, 69);
+  text-align: right;
+  border-radius: 5px;
+  /* border: 1px solid #eee; */
+  padding: 5px;
+  margin-top: 5px;
+  cursor: pointer;
+  float: right;
+  width: 60%;
+}
+
+.msg-box .msg-from {
+  background-color: #eee;
+  text-align: left;
+  border-radius: 5px;
+  /* border: 1px solid #eee; */
+  padding: 5px;
+  margin-top: 5px;
+  cursor: pointer;
+  float: left;
+  width: 60%;
+}
+
+.msg-to span {
+  color:#eee;
+  font-size: 12px;
+}
+
+.msg-from span {
+  color:#81868c;
+  font-size: 12px;
+}
+
+
+.msg-input {
+  margin-top: 5px;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  min-height: 200px;
+}
