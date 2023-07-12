@@ -6,6 +6,8 @@ import { InputStatus } from "antd/es/_util/statusUtils";
 import { pinyin } from 'pinyin-pro';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { getDefaultShowTone } from './lib';
+import { openFile } from "../../lib/file"
+import "./pinyin-convert.css"
 
 const PinyinConvert = () => {
 
@@ -24,7 +26,7 @@ const PinyinConvert = () => {
   };
 
   const convert = (data :string, show :boolean)  => {
-    setResult(pinyin(value,{ toneType: (show)? 'symbol' : 'none'}));
+    setResult(pinyin(data,{ toneType: (show)? 'symbol' : 'none'}));
   }
 
   const encode = (value :string) => {
@@ -58,24 +60,27 @@ const PinyinConvert = () => {
 
 
       <TextArea
+        className="textarea"
         status= { status as InputStatus }
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { encode(e.target.value); } }
         title="双击复制内容到粘贴板"
         value= { value }
-        placeholder="请输入中文"
+        placeholder="请输入中文或拖拽要转换的文本文件到框内打开"
         autoSize={{ minRows: 5, maxRows: 10 }}
+        onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
+        onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, encode ); } }
       />
 
       <Divider dashed plain>转换的结果</Divider>
       
       <TextArea
+        className="textarea"
         style={ { margin: "5px 0 5px 0" }}
         title="点击复制内容到粘贴板"
         onClick={ textareaDoubleClick }
         value= { result }
-        onChange={ (e) => { setResult(e.target.value); } }
         placeholder="点击复制内容到粘贴板"
         autoSize={{ minRows: 10, maxRows: 10 }}
       />
