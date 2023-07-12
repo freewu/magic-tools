@@ -5,20 +5,22 @@ import { copyTextToClipboard } from "./../../lib"
 import { } from "./lib"
 import { numberTypeList, emptyResult, NumberConvertResult } from "./data"
 import type { RadioChangeEvent } from 'antd';
-import { translateDecimal } from "./lib"
+import { translateDecimal,getDefaultHumanRead,getDefaultShowUppercase,getDefaultType,getTypePlaceholder } from "./lib"
 import { insertIntervalString } from "./../../lib"
 import { reverseString } from "./../../lib/string"
 
 
 const NumberConvert = () => {
 
+  const dt = getDefaultType();
+
   const [ value, setValue ] = useState(''); // 需要转换的颜色值 
-  const [ numberType, setNumberType ] = useState('DEC'); // 输入内容的数字类型,
-  const [ placeholder, setPlaceholder ] = useState(numberTypeList[2]["placeholder"]); // 数字类型的输入提示
-  const [ checked, setChecked ] = useState(false); // 输出大小写
+  const [ numberType, setNumberType ] = useState(dt); // 输入内容的数字类型,
+  const [ placeholder, setPlaceholder ] = useState(getTypePlaceholder(dt)); // 数字类型的输入提示
+  const [ checked, setChecked ] = useState(getDefaultShowUppercase()); // 输出大小写
   const [ numberData, setNumberData ] = useState(emptyResult); // 转换的结果
   const [ notice, contextHolder] = message.useMessage();
-  const [ humanRead, setHumanRead ] = useState(false); // 显示是否加入空格
+  const [ humanRead, setHumanRead ] = useState(getDefaultHumanRead()); // 显示是否加入空格
 
   const inputStyle = { cursor: "pointer" };
 
@@ -28,8 +30,7 @@ const NumberConvert = () => {
     setValue(''); // 需要把内容清空,类型变了输入的内容也没意义了
     setNumberData(emptyResult);
     // 更新输入提示信息
-    const tips = numberTypeList.find(item => item.value === value)?.placeholder;
-    setPlaceholder(tips + "");
+    setPlaceholder(getTypePlaceholder(value));
   };
 
   // 点击结果框,把结果复制到粘贴板

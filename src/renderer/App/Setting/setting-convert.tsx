@@ -10,6 +10,7 @@ import { WeightConvertSetting } from "../WeightConvert/setting";
 import { VolumeConvertSetting } from "../VolumeConvert/setting";
 import { AreaConvertSetting } from "../AreaConvert/setting";
 import { PinyinConvertSetting } from "../PinyinConvert/setting";
+import { NumberConvertSetting } from "../NumberConvert/setting";
 
 export const SettingConvert = () => {
 
@@ -25,6 +26,7 @@ export const SettingConvert = () => {
       <VolumeConvertSetting />
       <AreaConvertSetting />
       <PinyinConvertSetting />
+      <NumberConvertSetting />
     </Form>
   )
 }
