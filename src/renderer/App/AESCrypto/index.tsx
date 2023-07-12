@@ -96,8 +96,11 @@ const AESCrypto = () => {
   };
 
   const textareaDoubleClick = (e :React.MouseEvent<HTMLElement>) => {
-    copyTextToClipboard((e.target as HTMLInputElement).value);
-    notice.success("复制到粘贴板成功！！！");
+    const txt = (e.target as HTMLInputElement).value;
+    if (txt.trim() !== '') {
+      copyTextToClipboard(txt);
+      notice.success("复制到粘贴板成功！！！");
+    }
   };
 
   // 偏移量 IV 输入处理
