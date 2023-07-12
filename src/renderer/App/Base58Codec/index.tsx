@@ -6,6 +6,7 @@ import { copyTextToClipboard } from "../../lib"
 import { openFile } from "../../lib/file"
 import { default as Base58Intro } from "./intro"
 import { Base58Encode, Base58Decode } from "./lib"
+import "./base58-codec.css"
 
 const Base58Codec = () => {
 
@@ -44,6 +45,7 @@ const Base58Codec = () => {
       {contextHolder}
 
       <TextArea
+        className="textarea"
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setEncodeValue(e.target.value) ;} }
@@ -71,6 +73,7 @@ const Base58Codec = () => {
       >清除</Button>
       
       <TextArea
+        className="textarea"
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setDecodeValue(e.target.value) ;} }

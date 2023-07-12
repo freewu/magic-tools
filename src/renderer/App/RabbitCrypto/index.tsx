@@ -9,6 +9,7 @@ import * as CryptoJS from 'crypto-js';
 import { codeList } from "./data";
 import { getDefaultIV, getDefaultCode, getDefaultPassphrase } from "./lib";
 import type { InputStatus } from "antd/es/_util/statusUtils";
+import "./rabbit-crypto.css"
 
 const RabbitCrypto = () => {
 
@@ -153,6 +154,7 @@ const RabbitCrypto = () => {
       </Row>
 
       <TextArea
+        className="textarea"
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setEncodeValue(e.target.value) } }
@@ -180,6 +182,7 @@ const RabbitCrypto = () => {
       >清除</Button>
 
       <TextArea
+        className="textarea"
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setDecodeValue(e.target.value) } }

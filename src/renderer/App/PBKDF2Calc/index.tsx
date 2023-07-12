@@ -16,7 +16,6 @@ import "./pbkdf2.css";
 
 const PBKDF2Calc = () => {
 
-
   const [ value, setValue ] = useState(''); // 需要计算 hash 值的内容
   const [ algo, setAlgo ] = useState(getDefaultHashAlgo()); // 使用的 Hash 算法
   const [ salt, setSalt ] = useState(getDefaultSalt()); // 盐值
@@ -109,11 +108,12 @@ const PBKDF2Calc = () => {
       </Space>
 
       <TextArea
+        className="textarea"
         style={ { margin: "5px 0 5px 0" }}
         value= { value }
         onChange={ (e) => { changeValue(e.target.value) } }
         placeholder= { valuePlaceholder }
-        autoSize={{ minRows: 5, maxRows: 5 }}
+        autoSize={{ minRows: 10, maxRows: 10 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, changeValue ); } }
       />
@@ -198,7 +198,7 @@ const PBKDF2Calc = () => {
         style={ { margin: "5px 0 5px 0" }}
         value= { result }
         placeholder="计算结果"
-        autoSize={{ minRows: 10, maxRows: 15 }}
+        autoSize={{ minRows: 3, maxRows: 3 }}
       />
       
     </div>

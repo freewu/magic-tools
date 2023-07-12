@@ -24,6 +24,7 @@ const Base58Intro = () => {
 
   return (
     <div 
+      className="textarea"
       dangerouslySetInnerHTML={{ __html: intro.replace("\n","<br/>") }}
       style={ { "overflowY": "scroll","height": "300px" }}>
     </div>

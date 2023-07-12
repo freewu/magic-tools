@@ -134,6 +134,7 @@ const LineCount = () => {
       </Space>
 
       <TextArea
+        className="textarea"
         style={ { margin: "12px 0 5px 0" }}
         onChange={ (e) => { changeContent(e.target.value); } }
         value= { value }

@@ -5,6 +5,7 @@ import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
 import { openFile } from "../../lib/file"
 import { default as URLIntro } from "./intro"
+import "./url.css"
 
 const URL = () => {
 
@@ -48,6 +49,7 @@ const URL = () => {
       {contextHolder}
 
       <TextArea
+        className="textarea"
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setEncodeValue(e.target.value) ;} }
@@ -85,6 +87,7 @@ const URL = () => {
       >清除</Button>
   
       <TextArea
+        className="textarea"
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setDecodeValue(e.target.value) ;} }

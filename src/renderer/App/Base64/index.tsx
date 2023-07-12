@@ -6,6 +6,7 @@ import { copyTextToClipboard } from "./../../lib"
 import { openFile } from "../../lib/file"
 import { Base64 as B64 } from 'js-base64';
 import { default as Base64Intro } from "./intro"
+import "./base64.css"
 
 const Base64 = () => {
 
@@ -55,6 +56,7 @@ Base64编码后的字符串中可能包含"+/="之类的字符，而"/"，"="等
       {contextHolder}
 
       <TextArea
+        className="textarea"
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setEncodeValue(e.target.value) ;} }
@@ -85,6 +87,7 @@ Base64编码后的字符串中可能包含"+/="之类的字符，而"/"，"="等
       >清除</Button>
       
       <TextArea
+        className="textarea"
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setDecodeValue(e.target.value) ;} }

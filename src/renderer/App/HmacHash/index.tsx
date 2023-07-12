@@ -124,6 +124,7 @@ const HmacHash = () => {
       </Space>
 
       <TextArea
+        className="textarea"
         style={ { margin: "5px 0 5px 0" }}
         value= { value }
         onChange={ (e) => { changeValue(e.target.value) } }
@@ -152,7 +153,7 @@ const HmacHash = () => {
 
       <Divider dashed />
       
-      <div className="hash-form" style={ { height: height, overflowY: "auto",paddingRight: 12 } } >
+      <div className="hash-form textarea" style={ { height: height, overflowY: "auto",paddingRight: 12 } } >
         <Form name="basic"labelCol={{ span: 4 }}autoComplete="off">
           <Form.Item label="Hmac-MD5">
             <Input readOnly showCount onClick={ inputClick } value= { hash.md5 } />
@@ -164,19 +165,19 @@ const HmacHash = () => {
             <Input readOnly showCount onClick={ inputClick } value= { hash.ripemd160 } />
           </Form.Item>
           <Form.Item label="Hmac-SHA256">
-            <Input readOnly showCount onClick={ inputClick } value= { hash.sha256 }/>
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sha256 } />
           </Form.Item>
           <Form.Item label="Hmac-SHA3">
-            <Input readOnly showCount onClick={ inputClick } value= { hash.sha3 } />
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sha3 } title={ hash.sha3 } />
           </Form.Item>
           <Form.Item label="Hmac-SHA224">
             <Input readOnly showCount onClick={ inputClick } value= { hash.sha224 } />
           </Form.Item>
           <Form.Item label="Hmac-SHA384">
-            <Input readOnly showCount onClick={ inputClick } value= { hash.sha384 } />
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sha384 } title={ hash.sha384 } />
           </Form.Item>
           <Form.Item label="Hmac-SHA512">
-            <Input readOnly showCount onClick={ inputClick } value= { hash.sha512 }/>
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sha512 } title={ hash.sha512 } />
           </Form.Item>
         </Form>
       </div>

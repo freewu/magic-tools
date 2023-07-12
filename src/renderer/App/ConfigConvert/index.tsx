@@ -14,6 +14,7 @@ import { json2toml, toml2json } from "./lib";
 import { json2xml, xml2json } from "./lib";
 import { json2properties, properties2json } from "./lib";
 import { ConvertResult } from "./interface";
+import "./config-convert.css"
 
 const ConfigConvert = () => {
 
@@ -121,6 +122,7 @@ const ConfigConvert = () => {
       </Space>
 
       <TextArea
+        className="textarea"
         status= { status as InputStatus }
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }

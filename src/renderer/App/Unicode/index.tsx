@@ -7,6 +7,7 @@ import { openFile } from "../../lib/file"
 import { default as UnicodeIntro } from "./intro"
 import { unicode2Ascii, ascii2Unicode } from "./lib"
 import { InputStatus } from "antd/es/_util/statusUtils";
+import "./unicode.css"
 
 const Unicode = () => {
 
@@ -52,6 +53,7 @@ const Unicode = () => {
       {contextHolder}
 
       <TextArea
+        className="textarea"
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setEncodeValue(e.target.value) ;} }
@@ -89,6 +91,7 @@ const Unicode = () => {
       >清除</Button>
       
       <TextArea
+        className="textarea"
         status={ decodeStatus as InputStatus }
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }

@@ -1,6 +1,6 @@
 const URLIntro = () => {
   return (
-    <div style={ { "overflowY": "scroll","height": "300px" }}>
+    <div style={ { "overflowY": "scroll","height": "300px" }} className="textarea">
 <h2>说明</h2>
 <ul>
 <li>中文编码就是将 中文转成 unicode 编码加上 %  如:  <code>中</code> =&gt; <code>E4 B8 AD</code> =&gt; <code>%E4%B8%AD</code></li>

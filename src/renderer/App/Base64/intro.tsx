@@ -68,6 +68,7 @@ const Base64Intro = () => {
 
   return (
     <div 
+      className="textarea"
       dangerouslySetInnerHTML={{ __html: intro }}
       style={ { "overflowY": "scroll","height": "300px" }}>
     </div>

@@ -10,6 +10,7 @@ import { modeList, paddingList, codeList } from "./data";
 import { getDefaultIV, getDefaultCode, getDefaultMode, getDefaultPadding, getDefaultPassphrase } from "./lib";
 import { getPadding, getMode } from "./lib";
 import type { InputStatus } from "antd/es/_util/statusUtils";
+import "./des-crypto.css"
 
 const DESCrypto = () => {
 
@@ -183,7 +184,9 @@ const DESCrypto = () => {
           { passphrase.length } / { 8 }
         </Space>
       </Row>
+
       <TextArea
+        className="textarea"
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setEncodeValue(e.target.value) } }
@@ -211,6 +214,7 @@ const DESCrypto = () => {
       >清除</Button>
 
       <TextArea
+        className="textarea"
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setDecodeValue(e.target.value) } }

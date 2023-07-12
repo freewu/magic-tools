@@ -33,6 +33,7 @@ export const ConfigResult = ({ data, click, type } :ConfigResultProps ) => {
 
   return (
     <TextArea
+      className="textarea"
       status= { data.error? 'error' : '' }
       readOnly
       style={ { margin: "5px 0 5px 0" }}

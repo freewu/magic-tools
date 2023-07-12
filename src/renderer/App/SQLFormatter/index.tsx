@@ -161,6 +161,7 @@ const URL = () => {
       </Space>
 
       <TextArea
+        className="textarea"
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files); } }
         style={ { margin: "12px 0 5px 0" }}
@@ -173,10 +174,11 @@ const URL = () => {
       <Divider dashed />
 
       <div
+
         style={ { height: resultHight }}
         title="点击复制内容到粘贴板"
         onClick={ textareaDoubleClick }
-        className="code-output">
+        className="code-output textarea">
         <pre dangerouslySetInnerHTML={ { __html : highLightResult } } />
       </div>
       

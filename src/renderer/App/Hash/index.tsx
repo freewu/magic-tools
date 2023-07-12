@@ -123,6 +123,7 @@ const Hash = () => {
         }
       </Space>
       <TextArea
+        className="textarea"
         style={ { margin: "5px 0 5px 0" }}
         value= { value }
         onChange={ (e) => { changeValue(e.target.value) } }
@@ -141,7 +142,7 @@ const Hash = () => {
 
       <Divider dashed />
 
-      <div className="hash-form" style={ { height: height, overflowY: "auto",paddingRight: 12 } } >
+      <div className="hash-form textarea" style={ { height: height, overflowY: "auto",paddingRight: 12 } } >
         <Form name="basic"labelCol={{ span: 3 }}autoComplete="off" >
           <Form.Item label="MD5 (16位)">
             <Input readOnly showCount onClick={ inputClick } value= { hash.md516 } />
@@ -159,16 +160,16 @@ const Hash = () => {
             <Input readOnly showCount onClick={ inputClick } value= { hash.sha256 }/>
           </Form.Item>
           <Form.Item label="SHA3">
-            <Input readOnly showCount onClick={ inputClick } value= { hash.sha3 } />
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sha3 } title={ hash.sha3 }  />
           </Form.Item>
           <Form.Item label="SHA224">
             <Input readOnly showCount onClick={ inputClick } value= { hash.sha224 } />
           </Form.Item>
           <Form.Item label="SHA384">
-            <Input readOnly showCount onClick={ inputClick } value= { hash.sha384 } />
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sha384 } title={ hash.sha384 } />
           </Form.Item>
           <Form.Item label="SHA512">
-            <Input readOnly showCount onClick={ inputClick } value= { hash.sha512 }/>
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sha512 } title={ hash.sha512 } />
           </Form.Item>
         </Form>
       </div>

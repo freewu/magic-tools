@@ -8,6 +8,7 @@ import { arrayToOptions } from "../../lib/array"
 import * as CryptoJS from 'crypto-js';
 import { codeList } from "./data";
 import { getDefaultCode, getDefaultPassphrase } from "./lib";
+import "./rc4-crypto.css"
 
 const RC4Crypto = () => {
 
@@ -107,6 +108,7 @@ const RC4Crypto = () => {
       </Row>
 
       <TextArea
+        className="textarea"
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setEncodeValue(e.target.value) } }
@@ -134,6 +136,7 @@ const RC4Crypto = () => {
       >清除</Button>
 
       <TextArea
+        className="textarea"
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setDecodeValue(e.target.value) } }

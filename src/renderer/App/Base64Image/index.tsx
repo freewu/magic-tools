@@ -63,9 +63,10 @@ const Base64Image = () => {
     <>
       { contextHolder }
       <TextArea
+        className="textarea"
         readOnly
         style={ { margin: "5px 0 5px 0" }}
-        showCount
+        //showCount
         onChange={ (e) => { setValue(e.target.value); } }
         value= { result }
         placeholder="拖拽要生成 Base64 编码的图片文件到框内"
