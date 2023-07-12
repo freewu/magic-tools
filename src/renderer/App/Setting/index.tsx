@@ -15,7 +15,7 @@ const Setting = () => {
   window.addEventListener('resize', debounce(() => { setHeight(genSettingFormHeight()) },100) );
 
   return (
-    <div style={ { height: height, overflowY: "auto" } }>
+    <div style={ { height: height, overflowY: "auto" } } className="container">
       <Tabs items={ itemList } />
     </div>
   );

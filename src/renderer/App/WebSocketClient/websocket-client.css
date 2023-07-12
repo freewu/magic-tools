@@ -13,7 +13,7 @@
 .msg-box::-webkit-scrollbar-thumb {
   /*滚动条里面小方块*/
   border-radius   : 5px;
-  background-color: #ccc;
+  background-color: #1677ff;
   background-image: -webkit-linear-gradient(
       45deg,
       rgba(255, 255, 255, 0.2) 25%,
