@@ -38,6 +38,7 @@ GPS坐标转换
 WebSocket 调试
 
 -- 待开发 ------------------
+图片EXIF( 提取Base64的图片有误 )
 色卡查询
 图片分割
 图片包浆
@@ -93,6 +94,7 @@ BCD码
 <a target="_blank" href="https://github.com/eemeli/yaml">yaml</a>   
 <a target="_blank" href="https://github.com/timhall/toml-patch">toml-patch</a>   
 <a target="_blank" href="https://github.com/TehShrike/deepmerge">deepmerge</a>   
+<a target="_blank" href="https://github.com/exif-js/exif-js">exif-js</a>   
 
 ## 应用截图
 * Hash 值计算

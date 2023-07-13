@@ -1,0 +1,21 @@
+.img-pick {
+  cursor: pointer;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  height: 150px;
+  text-align: center;
+  color: #565353;
+  opacity: 0.6;
+  padding-top: 60px;
+}
+
+.exif-preview {
+  opacity: 0.6;
+  overflow: hidden;
+  z-index: 9999;
+  position: fixed;
+  right: 20px;
+  top: 32px;
+  padding-top:12px;
+  padding-right:12px;
+}

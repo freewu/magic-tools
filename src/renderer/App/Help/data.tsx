@@ -15,6 +15,8 @@ export const compomentList = [
   { name: "yaml", url: "https://github.com/eemeli/yaml" },
   { name: "toml-patch", url: "https://github.com/timhall/toml-patch" },
   { name: "deepmerge", url: "https://github.com/TehShrike/deepmerge" },
+  { name: "exif-js", url: "https://github.com/exif-js/exif-js" },
+  
 ];
 
 // 开发者列表
