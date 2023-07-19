@@ -37,7 +37,9 @@ GPS坐标转换
 质量转换
 WebSocket 调试
 
+
 -- 待开发 ------------------
+文件 Hash值 (计算有问题)
 图片EXIF( 提取Base64的图片有误 )
 色卡查询
 图片分割
@@ -56,6 +58,7 @@ JSON 格式化
 CRON表达式
 密码管理
 BCD码
+莫斯编码
 
 ```
 
@@ -95,6 +98,8 @@ BCD码
 <a target="_blank" href="https://github.com/timhall/toml-patch">toml-patch</a>   
 <a target="_blank" href="https://github.com/TehShrike/deepmerge">deepmerge</a>   
 <a target="_blank" href="https://github.com/exif-js/exif-js">exif-js</a>   
+<a target="_blank" href="https://codemirror.net/">CodeMirror</a>   
+
 
 ## 应用截图
 * Hash 值计算

@@ -35,6 +35,9 @@ const list = [
   'WeightConvert',
   'WebSocketClient',
   //'ImageEXIF',
+  //'ImageCut',
+  //'JSONFormatter',
+  //'FileHash',
 ];
 
 // 加载 App 的定义 名称 / icon 

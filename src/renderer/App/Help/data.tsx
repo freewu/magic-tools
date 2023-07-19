@@ -16,6 +16,7 @@ export const compomentList = [
   { name: "toml-patch", url: "https://github.com/timhall/toml-patch" },
   { name: "deepmerge", url: "https://github.com/TehShrike/deepmerge" },
   { name: "exif-js", url: "https://github.com/exif-js/exif-js" },
+  { name: "CodeMirror 5", url: "https://codemirror.net/" },
   
 ];
 

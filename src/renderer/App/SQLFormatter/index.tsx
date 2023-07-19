@@ -12,7 +12,7 @@ import 'highlight.js/styles/monokai-sublime.css';
 import highlight from 'highlight.js';
 import './sql-formatter.css';
 
-const URL = () => {
+const SQLFormatter = () => {
   // highlight配置
   //highlight.configure({ useBR: true});
 
@@ -195,4 +195,4 @@ const URL = () => {
   );
 }
 
-export default URL;
+export default SQLFormatter;
