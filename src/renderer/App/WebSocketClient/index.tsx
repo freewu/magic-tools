@@ -5,6 +5,7 @@ import { debounce } from "../../lib";
 import "./websocket-client.css"
 import { arrayToOptions } from "../../lib/array"
 import { codeList } from "./data"
+import { getDefaultURL } from "./lib";
 
 const WebSocketClient = () => {
 
@@ -19,7 +20,7 @@ const WebSocketClient = () => {
 
   const [ outputFormat, setOutputFormat ] = useState("String"); // 输出格式
   const [ inputFormat, setInputFormat ] = useState("String"); // 输入格式
-  const [ url, setUrl ] = useState(""); // 连接
+  const [ url, setUrl ] = useState(getDefaultURL()); // 连接
 
   return (
     <>
@@ -77,7 +78,7 @@ const WebSocketClient = () => {
       <div  className="msg-input">
         <Divider plain dashed />
         <Space>
-          <label>输入编码:</label>
+          {/* <label>输入编码:</label>
           <Select
             value={ inputFormat }
             style={{ width: 80 }}
@@ -90,7 +91,7 @@ const WebSocketClient = () => {
             style={{ width: 80 }}
             onChange={ (v :string) => { setOutputFormat(v) } }
             options={ arrayToOptions(codeList) }
-          />
+          /> */}
           <Input
             allowClear
             placeholder="ws://localhost:8086/ws"
