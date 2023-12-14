@@ -159,7 +159,7 @@ const GPSConvert = () => {
                 key={ index + item.label }
                 color={ calcTagColor(index) }
                 onClick={ () => {
-                  if(null !== window.electron) {
+                  if(undefined !== window.electron) {
                     window.electron.ipcRenderer.sendMessage('open-url', [ item.url ]);
                   } else {
                     document.getElementById("map-url")?.setAttribute("herf",item.url);
