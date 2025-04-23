@@ -99,6 +99,7 @@ BCD码
 <a target="_blank" href="https://github.com/TehShrike/deepmerge">deepmerge</a>   
 <a target="_blank" href="https://github.com/exif-js/exif-js">exif-js</a>   
 <a target="_blank" href="https://codemirror.net/">CodeMirror</a>   
+<a target="_blank" href="https://github.com/JuneAndGreen/sm-crypto">sm-crypto</a>   
 
 
 ## 应用截图

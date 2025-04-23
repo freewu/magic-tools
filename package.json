@@ -101,6 +101,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.1",
+    "sm-crypto": "^0.3.13",
     "sql-formatter": "^12.2.1",
     "toml-patch": "^0.2.3",
     "yaml": "^2.3.1"

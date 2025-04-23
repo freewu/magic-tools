@@ -13,6 +13,7 @@ import sha3 from 'crypto-js/sha3';
 import sha224 from 'crypto-js/sha224';
 import sha384 from 'crypto-js/sha384';
 import ripemd160 from 'crypto-js/ripemd160';
+import { sm3 } from 'sm-crypto';
 
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
 import { getPasswordList, getDefaultShowUppercase } from "./lib"
@@ -61,6 +62,7 @@ const Hash = () => {
         "sha224": upperLowerFormat(hash["sha224"],!checked),
         "sha384": upperLowerFormat(hash["sha384"],!checked),
         "ripemd160": upperLowerFormat(hash["ripemd160"],!checked),
+        "sm3": upperLowerFormat(hash["sm3"],!checked),
       };
       setHash(result);
     }
@@ -88,6 +90,7 @@ const Hash = () => {
       "sha224": upperLowerFormat(sha224(value).toString(),checked),
       "sha384": upperLowerFormat(sha384(value).toString(),checked),
       "ripemd160": upperLowerFormat(ripemd160(value).toString(),checked),
+      "sm3": upperLowerFormat(sm3(value).toString(),checked),
     };
     // 处理 16 位 md5 
     result["md516"] = upperLowerFormat(result["md5"].substring(8,24),checked); // 取 9-24 位
@@ -170,6 +173,9 @@ const Hash = () => {
           </Form.Item>
           <Form.Item label="SHA512">
             <Input readOnly showCount onClick={ inputClick } value= { hash.sha512 } title={ hash.sha512 } />
+          </Form.Item>
+          <Form.Item label="SM3 国密">
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sm3 } title={ hash.sm3 } />
           </Form.Item>
         </Form>
       </div>
