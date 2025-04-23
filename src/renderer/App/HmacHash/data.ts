@@ -8,6 +8,7 @@ const emptyResult :HashResult = {
   "sha224": "",
   "sha384": "",
   "ripemd160": "",
+  //"sm3": "",
 };
 
 // hash 计算结果结构定义
@@ -17,9 +18,10 @@ type HashResult = {
   "sha3": string,
   "sha256": string,
   "sha512": string,
-  "sha224": string
-  "sha384": string
-  "ripemd160": string
+  "sha224": string,
+  "sha384": string,
+  "ripemd160": string,
+  //"sm3": string,
 }
 
 export {

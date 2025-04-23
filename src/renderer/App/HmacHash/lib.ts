@@ -23,3 +23,11 @@ export function getDefaultShowUppercase() :boolean  {
 export function setDefaultShowUppercase(show: boolean) : void  {
   localStorage.setItem(DEFAULT_SHOW_UPPERCASE, show + '');
 }
+
+// 将 字符串转换成 HexString
+export function stringToHex(str: string) {
+    // 使用TextEncoder将字符串编码为UTF-8格式的Uint8Array
+    const bytes = new TextEncoder().encode(str);
+    // 将Uint8Array转换为十六进制字符串
+    return Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+}

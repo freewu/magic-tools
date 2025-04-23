@@ -13,11 +13,12 @@ import HmacSHA3 from 'crypto-js/hmac-sha3';
 import HmacRipeMD160 from 'crypto-js/hmac-ripemd160';
 import HmacSHA224 from 'crypto-js/hmac-sha224';
 import HmacSHA384 from 'crypto-js/hmac-sha384';
+import { sm3 } from 'sm-crypto';
 
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { getPasswordList } from "../Hash/lib";
 import "./hmac-hash.css";
-import { getDefaultPassphrase, getDefaultShowUppercase } from "./lib"
+import { getDefaultPassphrase, getDefaultShowUppercase, stringToHex } from "./lib"
 
 const HmacHash = () => {
 
@@ -62,6 +63,7 @@ const HmacHash = () => {
         "sha224": upperLowerFormat(hash["sha224"],!checked),
         "sha384": upperLowerFormat(hash["sha384"],!checked),
         "ripemd160": upperLowerFormat(hash["ripemd160"],!checked),
+        //"sm3": upperLowerFormat(hash["sm3"],!checked),
       };
       setHash(result);
     }
@@ -89,7 +91,9 @@ const HmacHash = () => {
       "sha224": upperLowerFormat(HmacSHA224(value,passphrase).toString(),checked),
       "sha384": upperLowerFormat(HmacSHA384(value,passphrase).toString(),checked),
       "ripemd160": upperLowerFormat(HmacRipeMD160(value,passphrase).toString(),checked),
+      //"sm3": upperLowerFormat(sm3(value, { key: stringToHex(passphrase), mode: "hmac" }).toString(),checked),
     };
+    console.log(stringToHex(passphrase));
     setHash(result);
   }
 
@@ -179,6 +183,9 @@ const HmacHash = () => {
           <Form.Item label="Hmac-SHA512">
             <Input readOnly showCount onClick={ inputClick } value= { hash.sha512 } title={ hash.sha512 } />
           </Form.Item>
+          {/* <Form.Item label="Hmac-SM3 国密">
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sm3 } title={ hash.sm3 } />
+          </Form.Item> */}
         </Form>
       </div>
 
