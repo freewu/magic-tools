@@ -26,39 +26,38 @@ PBKDF2 值计算
 Base64 图片  
 GPS坐标转换   
 人民币大写   
-字节转换
-中文拼音
-温度转换
-距离转换
-速度转换
-配置文件转换 (ini / json / yaml / toml / properties)
-面积转换
-容积转换
-质量转换
-WebSocket 调试
-BMI计算
+字节转换   
+中文拼音   
+温度转换   
+距离转换   
+速度转换   
+配置文件转换 (ini / json / yaml / toml / properties)   
+面积转换   
+容积转换   
+质量转换   
+RSA 加密 / 解密   
 
 -- 待开发 ------------------
-文件 Hash值 (计算有问题)
-图片EXIF( 提取Base64的图片有误 )
-色卡查询
-图片分割
-图片包浆
-数据生成
+文件 Hash值 (计算有问题)   
+图片EXIF( 提取Base64的图片有误 )   
+色卡查询   
+图片分割   
+图片包浆   
+数据生成   
 TEA 加密 / 解密   
 XTEA 加密 / 解密    
 XXTEA 加密 / 解密   
 图片主题色 ( 还需要做近似颜色合并处理 )
 繁简汉字转换   
-RSA 加密 / 解密   
-BaseX 编码 / 解码(存在问题)
-CRC 计算
-JSON 格式化
-正则表达式
-CRON表达式
-密码管理
-BCD码
-莫斯编码
+BaseX 编码 / 解码(存在问题)   
+CRC 计算   
+JSON 格式化   
+正则表达式   
+CRON表达式   
+密码管理   
+BCD码   
+莫斯编码   
+WebSocket 调试   
 
 ```
 
@@ -100,6 +99,7 @@ BCD码
 <a target="_blank" href="https://github.com/exif-js/exif-js">exif-js</a>   
 <a target="_blank" href="https://codemirror.net/">CodeMirror</a>   
 <a target="_blank" href="https://github.com/JuneAndGreen/sm-crypto">sm-crypto</a>   
+<a target="_blank" href="https://github.com/travist/jsencrypt">jsencrypt</a>   
 
 
 ## 应用截图
