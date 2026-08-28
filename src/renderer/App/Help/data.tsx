@@ -27,6 +27,19 @@ export const eventList = [
     color: "green",
     children: (
       <>
+        <p>2026-02-28 V2.0.0 Release</p>
+        <ul style={ {listStyle: "none" }}>
+          <li>核心重构: 从 Electron 迁移到 Tauri 2 (体积更小、内存占用更低)</li>
+          <li>构建发布: just 命令 + GitHub Actions 三平台自动打包 (win / macos / linux)</li>
+          <li>Windows 提供单体免安装 exe, Linux 提供免安装 AppImage</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    color: "green",
+    children: (
+      <>
         <p>2023-07-11 V1.3.0 Release</p>
         <ul style={ {listStyle: "none" }}>
           <li>温度转换</li>

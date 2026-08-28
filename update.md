@@ -1,20 +1,23 @@
-# MagicTools v1.3.0
-
-> 本文件内容将作为 GitHub Release 的发布说明，请在每次发布前更新为本次版本的更新内容。
+# MagicTools v2.0.0
 
 ## 更新内容
 
-### ✨ 新功能
+### ✨ 核心重构
 
-- 示例：新增 XX 工具
+- 从 Electron 迁移到 Tauri 2：应用体积更小（exe 约 11MB）、内存占用更低、启动更快
+- 界面与功能保持不变（温度/距离/速度/面积/容积/质量转换、配置文件转换、GPS 转换等）
 
-### 🚀 改进
+### 🚀 构建与发布
 
-- 示例：优化 XX 性能
+- 引入 `just` 命令统一管理开发/构建/发布流程（`just dev` / `just build` / `just release` / `just help`）
+- 新增 GitHub Actions 自动打包：推送 `v*` 版本 tag 自动构建 Windows / macOS / Linux 三平台免安装包并发布到 GitHub Releases
+- Windows 提供**单体免安装 exe**（双击即运行，依赖系统自带 WebView2）
+- Linux 提供免安装 **AppImage**
 
 ### 🐛 修复
 
-- 示例：修复 XX 问题
+- 修复生产构建产物残留 source maps 的问题
+- 移除页面四周白边，禁用右键菜单
 
 ## 安装包说明
 
