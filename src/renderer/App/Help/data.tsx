@@ -1,8 +1,7 @@
 // 使用组件
 export const compomentList = [
-  { name: "Electron React Boilerplate", url: "https://github.com/electron-react-boilerplate/electron-react-boilerplate" },
+  { name: "Tauri 2", url: "https://tauri.app/" },
   { name: "React 18", url: "https://react.dev/" },
-  { name: "Electron 23", url: "https://www.electronjs.org/" },
   { name: "Ant Design 5", url: "https://ant.design/" },
   { name: "CryptoJS", url: "https://github.com/brix/crypto-js" },
   { name: "js-base64", url: "https://github.com/dankogai/js-base64" },

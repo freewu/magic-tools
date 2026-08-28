@@ -35,3 +35,5 @@ export function debounce(operate:Function, delay:number) {
 export function insertIntervalString(str :string, disNum :number = 4, insertStr:string  = " ") {
   return str.replace(new RegExp("(.{" + disNum + "})", "g"), "$1" + insertStr);
 }
+
+export { openUrl } from "./tauri";

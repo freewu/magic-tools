@@ -1,7 +1,10 @@
 import { createRoot } from 'react-dom/client';
 import {default as App} from './Main';
-import { BrowserRouter, HashRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import React from 'react';
+
+// 禁用右键菜单 (Tauri WebView 默认上下文菜单)
+window.addEventListener('contextmenu', (e) => e.preventDefault());
 
 const container = document.getElementById('root') as HTMLElement;
 const root = createRoot(container);
@@ -14,13 +17,3 @@ root.render(
     // </BrowserRouter>
   //</React.StrictMode>
 );
-
-// 测试一下 ipc 调用
-if(null !== window.electron) {
-  // calling IPC exposed from preload script
-  window.electron.ipcRenderer.once('ipc-example', (arg) => {
-    // eslint-disable-next-line no-console
-    console.log(arg);
-  });
-  window.electron.ipcRenderer.sendMessage('ipc-example', ['ping']);
-}

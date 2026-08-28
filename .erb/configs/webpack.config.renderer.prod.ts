@@ -1,5 +1,5 @@
 /**
- * Build config for electron renderer process
+ * Build config for Tauri renderer process (React)
  */
 
 import path from 'path';
@@ -13,17 +13,15 @@ import TerserPlugin from 'terser-webpack-plugin';
 import baseConfig from './webpack.config.base';
 import webpackPaths from './webpack.paths';
 import checkNodeEnv from '../scripts/check-node-env';
-import deleteSourceMaps from '../scripts/delete-source-maps';
 
 checkNodeEnv('production');
-deleteSourceMaps();
 
 const configuration: webpack.Configuration = {
   devtool: 'source-map',
 
   mode: 'production',
 
-  target: ['web', 'electron-renderer'],
+  target: 'web',
 
   entry: [path.join(webpackPaths.srcRendererPath, 'index.tsx')],
 
@@ -31,9 +29,6 @@ const configuration: webpack.Configuration = {
     path: webpackPaths.distRendererPath,
     publicPath: './',
     filename: 'renderer.js',
-    library: {
-      type: 'umd',
-    },
   },
 
   module: {
@@ -140,6 +135,29 @@ const configuration: webpack.Configuration = {
     new webpack.DefinePlugin({
       'process.type': '"renderer"',
     }),
+
+    // 在资源写盘前剔除源码映射 (.js.map / .css.map), 避免源码泄露到生产安装包
+    {
+      apply(compiler) {
+        compiler.hooks.thisCompilation.tap('DeleteSourceMaps', (compilation) => {
+          compilation.hooks.processAssets.tap(
+            {
+              name: 'DeleteSourceMaps',
+              // 在最后一个资源阶段 (REPORT) 之后执行, 确保 TerserPlugin/CssMinimizer 生成的
+              // .js.map / .css.map 都已就绪, 统一剔除
+              stage: webpack.Compilation.PROCESS_ASSETS_STAGE_REPORT + 10000,
+            },
+            (assets) => {
+              for (const name of Object.keys(assets)) {
+                if (name.endsWith('.js.map') || name.endsWith('.css.map')) {
+                  delete assets[name];
+                }
+              }
+            }
+          );
+        });
+      },
+    },
   ],
 };
 

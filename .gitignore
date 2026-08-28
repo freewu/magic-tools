@@ -15,11 +15,17 @@ coverage
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules
 
+# 打包产物
+release
+src-tauri/target
+
 # OSX
 .DS_Store
 
-release/app/dist
-release/build
+# Tauri
+frontendDist
+dist
+
 .erb/dll
 
 .idea

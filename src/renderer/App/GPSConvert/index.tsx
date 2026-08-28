@@ -1,7 +1,7 @@
 import { Form, Input, Divider, message, Space, Radio, Button,Tag } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
-import { copyTextToClipboard } from "./../../lib"
+import { copyTextToClipboard, openUrl } from "./../../lib"
 import { typeList, emptyResult, pickList } from "./data"
 import type { RadioChangeEvent } from 'antd';
 import { pointToString,GPSPoint,tencentMapPointToString, getDefaultType } from "./lib"
@@ -159,14 +159,7 @@ const GPSConvert = () => {
                 key={ index + item.label }
                 color={ calcTagColor(index) }
                 onClick={ () => {
-                  if(null !== window.electron) {
-                    window.electron.ipcRenderer.sendMessage('open-url', [ item.url ]);
-                  } else {
-                    document.getElementById("map-url")?.setAttribute("herf",item.url);
-                    document.getElementById("map-url")?.click();
-                    // window.open(item.url); 
-                  }
-                  
+                  openUrl(item.url);
                 } } >{ item.label }</Tag>
             )
           }
