@@ -56,7 +56,7 @@ jobs:
         run: npm ci || npm install
 
       - name: Build with Tauri (${{ matrix.platform }})
-        run: npm run tauri build ${{ matrix.args }}
+        run: npm run tauri build -- ${{ matrix.args }}
 
       - name: Package macOS app as zip
         if: matrix.platform == 'macos-latest'
