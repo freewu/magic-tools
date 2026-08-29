@@ -26,3 +26,41 @@ export async function openUrl(url: string) {
   a.rel = 'noopener noreferrer';
   a.click();
 }
+
+/** 判断是否运行在 Tauri WebView 中 */
+export function isTauri(): boolean {
+  return typeof window !== 'undefined' && '__TAURI__' in window;
+}
+
+/**
+ * 通知 Tauri 主进程显示模式已变化 (同步托盘菜单勾选)
+ * @param mode 'light' | 'dark' | 'system'
+ */
+export async function emitThemeMode(mode: string) {
+  if (!isTauri()) return;
+  try {
+    const { emit } = await import('@tauri-apps/api/event');
+    await emit('theme-mode-changed', mode);
+  } catch (err) {
+    console.error('tauri emitThemeMode failed:', err);
+  }
+}
+
+/**
+ * 监听托盘菜单切换显示模式的事件
+ * @param handler 收到模式 'light' | 'dark' | 'system' 时回调
+ * @returns 取消监听的函数
+ */
+export async function listenThemeMode(handler: (mode: string) => void): Promise<() => void> {
+  if (!isTauri()) return () => {};
+  try {
+    const { listen } = await import('@tauri-apps/api/event');
+    const unlisten = await listen<string>('theme-mode-set', (event) => {
+      handler(event.payload);
+    });
+    return unlisten;
+  } catch (err) {
+    console.error('tauri listenThemeMode failed:', err);
+    return () => {};
+  }
+}

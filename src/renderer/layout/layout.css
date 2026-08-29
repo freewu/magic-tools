@@ -14,7 +14,7 @@ html {
 .ant-layout {
   display: flex;
   width: 100%;
-  min-height: 98%;
+  min-height: 100%;
 }
 
 .ant-layout-sider-dark {

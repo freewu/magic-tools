@@ -1,6 +1,7 @@
 import { Layout } from "antd";
 import React from "react";
 import { useNavigate } from "react-router-dom"
+import { ThemeProvider } from "./hook/theme-context"
 import { AppContextProvider } from "./hook/app-context"
 import { default as MainSider } from './layout/main-sider';
 import { default as MainContent } from './layout/main-content';
@@ -22,13 +23,15 @@ const Main :React.FC = () => {
   });
 
   return (
-    <AppContextProvider>
-      <></>
-      <Layout>
-        <MainSider />
-        <MainContent />
-      </Layout>
-    </AppContextProvider>
+    <ThemeProvider>
+      <AppContextProvider>
+        <></>
+        <Layout>
+          <MainSider />
+          <MainContent />
+        </Layout>
+      </AppContextProvider>
+    </ThemeProvider>
   );
 };
 
