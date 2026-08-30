@@ -2,7 +2,7 @@
 // - 持久化到 localStorage('theme-mode')
 // - 与托盘菜单「显示模式」双向同步 (Tauri 事件)
 // - 非 Tauri 环境(浏览器调试)自动降级, 仅本地生效
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useLayoutEffect, useState } from 'react';
 import { ConfigProvider, theme as antdTheme } from 'antd';
 import { emitThemeMode, listenThemeMode } from '../lib/tauri';
 
@@ -63,9 +63,12 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const isDark = mode === 'dark' || (mode === 'system' && systemDark);
 
-  // 页面背景跟随主题, 避免窗口边缘露白 (对应 antd Layout 背景色)
-  useEffect(() => {
-    document.body.style.backgroundColor = isDark ? '#000000' : '#f0f2f5';
+  // 页面背景/文字/原生输入框颜色跟随主题, 避免深色模式文字不可见或窗口边缘露白
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty('--app-bg', isDark ? '#000000' : '#f0f2f5');
+    root.style.setProperty('--app-text', isDark ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)');
+    root.style.setProperty('--app-input-bg', isDark ? '#1f1f1f' : '#ffffff');
   }, [isDark]);
 
   return (

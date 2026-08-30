@@ -12,7 +12,7 @@
   border: 1px solid #424c50;
   cursor: pointer;
   margin: 5px;
-  color: #000;
+  color: inherit;
   text-align: center;
   padding-top:20px;
   opacity: 0.9;

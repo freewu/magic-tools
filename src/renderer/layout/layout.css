@@ -11,6 +11,21 @@ html {
   overflow-y: hidden;
 }
 
+/* 全局文字色跟随主题 (深色模式防黑字看不见) */
+html,
+body {
+  background-color: var(--app-bg, #f0f2f5);
+  color: var(--app-text, rgba(0, 0, 0, 0.88));
+}
+
+/* 原生表单控件 (非 antd) 跟随主题 */
+input,
+textarea,
+select {
+  color: var(--app-text, rgba(0, 0, 0, 0.88));
+  background-color: var(--app-input-bg, #ffffff);
+}
+
 .ant-layout {
   display: flex;
   width: 100%;
