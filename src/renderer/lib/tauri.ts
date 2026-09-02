@@ -47,6 +47,25 @@ export async function emitThemeMode(mode: string) {
 }
 
 /**
+ * 监听托盘菜单「设置 / 帮助 / 应用列表」的页面跳转事件
+ * @param handler 收到目标页面 key ('Setting' | 'Help' | 'AppStore') 时回调
+ * @returns 取消监听的函数
+ */
+export async function listenOpenPage(handler: (page: string) => void): Promise<() => void> {
+  if (!isTauri()) return () => {};
+  try {
+    const { listen } = await import('@tauri-apps/api/event');
+    const unlisten = await listen<string>('open-page', (event) => {
+      handler(event.payload);
+    });
+    return unlisten;
+  } catch (err) {
+    console.error('tauri listenOpenPage failed:', err);
+    return () => {};
+  }
+}
+
+/**
  * 监听托盘菜单切换显示模式的事件
  * @param handler 收到模式 'light' | 'dark' | 'system' 时回调
  * @returns 取消监听的函数

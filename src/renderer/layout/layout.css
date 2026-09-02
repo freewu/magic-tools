@@ -35,3 +35,18 @@ select {
 .ant-layout-sider-dark {
   min-width: 90px !important;
 }
+
+/* 内容区顶部: 最近打开应用标签 + 面包屑 */
+.page-head {
+  margin: 12px 12px 0 12px;
+  min-width: 0;
+}
+
+/* 去掉卡片标签默认的下边距, 与面包屑紧凑排列 */
+.page-head .page-tabs .ant-tabs-nav {
+  margin: 0;
+}
+
+.page-head .page-breadcrumb {
+  margin: 8px 4px 12px 4px;
+}

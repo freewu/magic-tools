@@ -47,12 +47,37 @@ pub fn run() {
     tauri::Builder::default()
         // 打开外部链接插件 (对应原 ipcMain 'open-url')
         .plugin(tauri_plugin_opener::init())
+        // 单实例运行: 重复启动时不再创建新窗口, 只唤起并聚焦已存在的实例
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            show_main_window(app);
+        }))
         .setup(|app| {
             let version = app.package_info().version.to_string();
 
-            // 托盘菜单: [展示窗口, 显示模式▸, MagicTools V{version}, 退出]
+            // 托盘菜单: [展示窗口, 设置, 帮助, 应用列表, 显示模式▸, MagicTools V{version}, 退出]
             let show_item =
                 MenuItem::with_id(app, "show", "展示窗口", true, None::<&str>)?;
+            let open_setting_item = MenuItem::with_id(
+                app,
+                "open-setting",
+                "设置",
+                true,
+                None::<&str>,
+            )?;
+            let open_help_item = MenuItem::with_id(
+                app,
+                "open-help",
+                "帮助",
+                true,
+                None::<&str>,
+            )?;
+            let open_appstore_item = MenuItem::with_id(
+                app,
+                "open-appstore",
+                "应用列表",
+                true,
+                None::<&str>,
+            )?;
             let about_item = MenuItem::with_id(
                 app,
                 "about",
@@ -97,7 +122,15 @@ pub fn run() {
 
             let menu = Menu::with_items(
                 app,
-                &[&show_item, &theme_submenu, &about_item, &quit_item],
+                &[
+                    &show_item,
+                    &open_setting_item,
+                    &open_help_item,
+                    &open_appstore_item,
+                    &theme_submenu,
+                    &about_item,
+                    &quit_item,
+                ],
             )?;
 
             let _tray = TrayIconBuilder::with_id("main-tray")
@@ -110,6 +143,16 @@ pub fn run() {
                     "quit" => app.exit(0),
                     "about" => open_github(),
                     "show" => show_main_window(app),
+                    // 托盘页面跳转: 设置 / 帮助 / 应用列表 -> 唤起窗口并广播给前端路由
+                    "open-setting" | "open-help" | "open-appstore" => {
+                        show_main_window(app);
+                        let page = match event.id.as_ref() {
+                            "open-setting" => "Setting",
+                            "open-help" => "Help",
+                            _ => "AppStore",
+                        };
+                        let _ = app.emit("open-page", page);
+                    }
                     // 托盘切换显示模式: 广播给前端应用主题
                     "theme-light" | "theme-dark" | "theme-system" => {
                         let mode = match event.id.as_ref() {
