@@ -6,38 +6,29 @@ import { copyTextToClipboard } from "../../lib"
 import { openFile } from "../../lib/file"
 import { arrayToOptions } from "../../lib/array"
 import { codeList } from "./data";
-import { getDefaultCode, getDefaultPassphrase, getDefaultRound, teaEncrypt, teaDecrypt } from "./lib";
+import { getDefaultCode, getDefaultPassphrase, xxteaEncrypt, xxteaDecrypt } from "./lib";
 import { utf8ToBytes, bytesToUtf8, bytesToHex, hexToBytes, bytesToBase64, base64ToBytes } from "../../lib/codec";
 import type { InputStatus } from "antd/es/_util/statusUtils";
 
-const TEACrypto = () => {
+const XXTEACrypto = () => {
 
   const genDefaultPassphraseStatus = () :InputStatus => {
     const p = getDefaultPassphrase();
     return (16 === p.length)? '' : 'error';
   }
 
-  const genDefaultRoundStatus = () :InputStatus => {
-    const r = getDefaultRound();
-    return (/^[1-9]\d{0,2}$/.test(r))? '' : 'error';
-  }
-
   const [ notice, contextHolder ] = message.useMessage();
   const [ encodeValue, setEncodeValue ] = useState(''); // 要加密的内容
   const [ decodeValue, setDecodeValue ] = useState(''); // 要解密的内容
   const [ code, setCode ] = useState(getDefaultCode()); // 编码
-  const [ round, setRound ] = useState(getDefaultRound()); // 循环次数
   const [ passphrase, setPassphrase] = useState(getDefaultPassphrase()); // 密钥 (16 字节 = 128 位)
   const [ passphraseStatus, setPassphraseStatus ] = useState(genDefaultPassphraseStatus()); // 密钥提醒
-  const [ roundStatus, setRoundStatus ] = useState(genDefaultRoundStatus()); // 循环次数提醒
 
   const isCanDo = (value :string) :boolean => {
     // 需要处理的内容为空
     if(value.trim() === "") return false;
     // 密钥长度不符合 (必须 16 位)
     if('' !== passphraseStatus) return false;
-    // 循环次数不符合 (必须 1 ~ 999)
-    if('' !== roundStatus) return false;
     return true;
   }
 
@@ -45,7 +36,7 @@ const TEACrypto = () => {
   const encode = () => {
     if(!isCanDo(encodeValue)) return ;
     try {
-      const cipher = teaEncrypt(utf8ToBytes(encodeValue), utf8ToBytes(passphrase), parseInt(round));
+      const cipher = xxteaEncrypt(utf8ToBytes(encodeValue), utf8ToBytes(passphrase));
       switch(code) {
         case "Base64": return setDecodeValue(bytesToBase64(cipher));
         case "HEX": return setDecodeValue(bytesToHex(cipher));
@@ -64,7 +55,7 @@ const TEACrypto = () => {
       // 根据编码解析密文
       const cipher = (code === "HEX")? hexToBytes(decodeValue) : base64ToBytes(decodeValue);
       // 解密处理
-      const result = bytesToUtf8(teaDecrypt(cipher, utf8ToBytes(passphrase), parseInt(round)));
+      const result = bytesToUtf8(xxteaDecrypt(cipher, utf8ToBytes(passphrase)));
       return setEncodeValue(result);
     } catch (error) {
       console.log(error);
@@ -97,17 +88,6 @@ const TEACrypto = () => {
     }
   }
 
-  // 循环次数输入处理 (1 ~ 999)
-  const onRoundChange = (e :React.ChangeEvent<HTMLInputElement>) => {
-    const v = e.target.value.replace(/[^\d]/g, '');
-    setRound(v);
-    if(/^[1-9]\d{0,2}$/.test(v)) {
-      setRoundStatus("");
-    } else {
-      setRoundStatus("error");
-    }
-  }
-
   return (
     <div>
       { contextHolder }
@@ -121,14 +101,6 @@ const TEACrypto = () => {
             onChange={ (v :string) => { setCode(v) } }
             options={ arrayToOptions(codeList) }
           />
-          <label>循环次数:</label>
-          <Input
-            allowClear
-            status={ roundStatus }
-            maxLength = { 3 }
-            style={ { width: 100 } }
-            onChange={ onRoundChange }
-            value= { round } />
           <label>密钥:</label>
           <Input
             showCount
@@ -148,7 +120,7 @@ const TEACrypto = () => {
         onChange={ (e) => { setEncodeValue(e.target.value) } }
         title="双击复制内容到粘贴板"
         value= { encodeValue }
-        placeholder="输入需要进行 TEA 加密的内容 或 拖拽文件到框内打开"
+        placeholder="输入需要进行 XXTEA 加密的内容 或 拖拽文件到框内打开"
         autoSize={{ minRows: 8, maxRows: 8 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setEncodeValue ); } }
@@ -176,7 +148,7 @@ const TEACrypto = () => {
         onChange={ (e) => { setDecodeValue(e.target.value) } }
         title="双击复制内容到粘贴板"
         value= { decodeValue }
-        placeholder="输入需要进行 TEA 解密的内容 或 拖拽文件到框内打开"
+        placeholder="输入需要进行 XXTEA 解密的内容 或 拖拽文件到框内打开"
         autoSize={{ minRows: 8, maxRows: 8 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setDecodeValue ); } }
@@ -184,4 +156,4 @@ const TEACrypto = () => {
     </div>
   )
 }
-export default TEACrypto;
+export default XXTEACrypto;

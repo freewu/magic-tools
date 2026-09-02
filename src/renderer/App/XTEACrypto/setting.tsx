@@ -6,7 +6,7 @@ import { getDefaultCode, getDefaultRound, setDefaultCode, setDefaultRound } from
 import { getDefaultPassphrase, setDefaultPassphrase } from "./lib";
 import type { InputStatus } from "antd/es/_util/statusUtils";
 
-export const TEACryptoSetting = () => {
+export const XTEACryptoSetting = () => {
 
   const [ code, setCode ] = useState(getDefaultCode()); // 默认编码
   const [ round, setRound ] = useState(getDefaultRound()); // 默认循环次数
@@ -40,7 +40,7 @@ export const TEACryptoSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>TEA 加解密</Divider>
+      <Divider orientation="left" plain>XTEA 加解密</Divider>
       <Form.Item label="默认编码">
         <Select
           value={ code }
