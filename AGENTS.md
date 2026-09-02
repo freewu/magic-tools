@@ -11,17 +11,21 @@
 
 发布新版本时按顺序执行：
 
+> **重要：版本修改 → 打 tag → 触发 GitHub Action 发布 是自动流程。**
+> 只要修改了版本号（含仅升版本号、无新功能的维护性升级），提交后**必须立即**打 tag 并推送，**无需再次询问用户**；
+> 仅当用户明确说「暂不发布 / 不要打 tag」时才跳过，并在回复中说明跳过了 tag。
+
 1. 按下表「版本号修改位置清单」**逐一同步所有版本号**为同一新版本号
 2. 在 `update.md` **顶部**写入本次版本的发布说明（参考现有格式），它将作为 GitHub Release 的发布说明
 3. 提交并推送代码（`git commit` + `git push origin master`）
-4. 打 tag 并推送，自动触发 GitHub Actions 构建发布：
+4. **自动打 tag 并推送**（无需询问，紧跟第 3 步执行）：
 
-       git tag v2.1.0
+       git tag v2.1.1
        git push origin master
-       git push origin v2.1.0
+       git push origin v2.1.1
 
-   （项目 justfile 中**没有** `just tag` 命令，手动执行上述 git 命令即可；tag 若推错可 `git tag -d vX.Y.Z && git push origin :refs/tags/vX.Y.Z` 删除后重推）
-5. 推送 `v*` tag 触发 `.github/workflows/build-release.yml`：Windows 单体免安装 exe / macOS zip / Linux AppImage 三平台自动构建，并以 `update.md` 全文作为 GitHub Release 说明，产物自动上传
+   （项目 justfile 中**没有** `just tag` 命令，手动执行上述 git 命令即可；tag 若推错可 `git tag -d vX.Y.Z && git push origin :refs/tags/vX.Y.Z` 删除后重推，不影响已触发失败的 Action）
+5. 推送 `v*` tag 触发 `.github/workflows/build-release.yml`：Windows 单体免安装 exe / macOS zip / Linux AppImage 三平台自动构建，并以 `update.md` 全文作为 GitHub Release 说明，产物自动上传。**确认 tag 已推送成功**（`git ls-remote --tags origin vX.Y.Z`）后，在回复中告知用户 CI 已触发，可在 GitHub Actions 页查看进度
 
 ### 版本号修改位置清单（升版本时逐一检查，勿遗漏）
 
