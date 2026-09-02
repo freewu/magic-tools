@@ -4,7 +4,7 @@
 
 ## 功能模块
 ```
-Hash 值计算 ( MD5 / SHA1 / SHA3 / SHA256 / SHA512 / SHA224 / SHA384 / RipeMD-160 )   
+Hash 值计算 ( MD5 / SHA1 / SHA3 / SHA256 / SHA512 / SHA224 / SHA384 / RipeMD-160 / SM3 / BCrypt )   
 Base64 编码 / 解码
 URL 编码 / 解码
 时间戳转换

@@ -1,4 +1,4 @@
-import { Checkbox, Form, Input, Divider, message, Space, Tag, Button } from "antd";
+import { Checkbox, Form, Input, Divider, message, Space, Tag, Button, InputNumber } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard, debounce } from "./../../lib"
@@ -13,6 +13,8 @@ import sha3 from 'crypto-js/sha3';
 import sha224 from 'crypto-js/sha224';
 import sha384 from 'crypto-js/sha384';
 import ripemd160 from 'crypto-js/ripemd160';
+import bcrypt from 'bcryptjs';
+import { sm3 } from "./sm3"
 
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
 import { getPasswordList } from "./lib"
@@ -31,6 +33,7 @@ const Hash = () => {
 
   const [ value, setValue ] = useState('');
   const [ checked, setChecked ] = useState(false);
+  const [ bcryptCost, setBcryptCost ] = useState(10); // BCrypt 成本因子 (4~31)
   const [ hash, setHash ] = useState(emptyResult);
   const [ notice, contextHolder] = message.useMessage();
 
@@ -49,7 +52,7 @@ const Hash = () => {
 
   const onChange = (e :CheckboxChangeEvent) => {
     setChecked(!checked);
-    // 如果加密内容不为空，处理 hash 值的大小问题
+    // 如果加密内容不为空，处理 hash 值的大小问题 (bcrypt 包含随机盐, 不处理大小写)
     if ( value.trim() != "") {
       const result = {
         "md5": upperLowerFormat(hash["md5"],!checked),
@@ -61,8 +64,9 @@ const Hash = () => {
         "sha224": upperLowerFormat(hash["sha224"],!checked),
         "sha384": upperLowerFormat(hash["sha384"],!checked),
         "ripemd160": upperLowerFormat(hash["ripemd160"],!checked),
+        "sm3": upperLowerFormat(hash["sm3"],!checked),
       };
-      setHash(result);
+      setHash({ ...result, "bcrypt": hash["bcrypt"] });
     }
   };
 
@@ -88,6 +92,9 @@ const Hash = () => {
       "sha224": upperLowerFormat(sha224(value).toString(),checked),
       "sha384": upperLowerFormat(sha384(value).toString(),checked),
       "ripemd160": upperLowerFormat(ripemd160(value).toString(),checked),
+      "sm3": upperLowerFormat(sm3(value),checked),
+      // bcrypt 使用随机盐值 + 成本因子, 内容变化时重新生成
+      "bcrypt": bcrypt.hashSync(value, bcryptCost),
     };
     // 处理 16 位 md5 
     result["md516"] = upperLowerFormat(result["md5"].substring(8,24),checked); // 取 9-24 位
@@ -169,6 +176,27 @@ const Hash = () => {
           </Form.Item>
           <Form.Item label="SHA512">
             <Input readOnly showCount onClick={ inputClick } value= { hash.sha512 }/>
+          </Form.Item>
+          <Form.Item label="SM3">
+            <Input readOnly showCount onClick={ inputClick } value= { hash.sm3 } />
+          </Form.Item>
+          <Form.Item label="BCrypt 成本">
+            <InputNumber
+              min={ 4 }
+              max={ 15 }
+              title="成本因子 (4~15), 数值越大计算越慢; 超过 72 字节的内容将被截断"
+              value={ bcryptCost }
+              onChange={ (v :number | null) => {
+                if(v != null && v >= 4 && v <= 15) {
+                  setBcryptCost(v);
+                  // 内容不为空时, 用新的成本因子重新计算
+                  if(value.trim() !== '') calcHash(value);
+                }
+              } }
+            />
+          </Form.Item>
+          <Form.Item label="BCrypt">
+            <Input readOnly showCount onClick={ inputClick } value= { hash.bcrypt } />
           </Form.Item>
         </Form>
       </div>
