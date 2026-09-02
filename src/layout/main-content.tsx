@@ -2,7 +2,7 @@ import { AppContext } from "../hook/app-context";
 import React,{ useState,useContext } from "react";
 import { Breadcrumb, Dropdown, Layout, Tabs, theme } from "antd";
 const { Content } = Layout;
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom"
+import { Navigate, useNavigate } from "react-router-dom"
 import { appList, genMenuList } from "../App";
 // lazy 需要配合 Suspense 使用
 import { lazy, Suspense } from "react";
@@ -15,6 +15,20 @@ const PAGE_NAMES: Record<string,string> = {
   "Setting": "设置",
   "Help": "帮助页面",
 };
+
+// 页面组件映射 (懒加载): 固定页面 + appList 中的工具应用
+// 组件实例按 key 固定, 保证切换 Tab 时页面保持挂载 (填写的数据不丢失)
+const pageComps = new Map<string, React.LazyExoticComponent<React.ComponentType<any>>>();
+for (const key of [...Object.keys(PAGE_NAMES), ...appList.map((i) => i.key)]) {
+    pageComps.set(key, lazy(() => import(`../App/${key}`)));
+}
+// 该 key 是否是真实页面 (固定页面或已注册应用)
+const validPage = (key :string) => pageComps.has(key);
+
+// 单个页面容器: memo 后仅在首次挂载时渲染, 切走/切回不会重建组件 (保活核心)
+const KeepAlivePage = React.memo(({ Page } :{ Page :React.ComponentType }) => {
+    return <Page />;
+});
 
 const MainContent :React.FC = () => {
 
@@ -45,17 +59,11 @@ const MainContent :React.FC = () => {
     return PAGE_NAMES[key] ? [{ title: PAGE_NAMES[key] }] : [{ title: key }];
   };
 
-  // 快速导入工具函数
-  const lazyLoad = (moduleName: string) => {
-    const Module = lazy(() => import(`../App/${moduleName}`));
-    return (
-      <>
-      <Suspense fallback={<div>应用正在加载中...</div>}>
-        <Module />
-      </Suspense>
-      </>
-    );
-  };
+  // 保活容器: 所有已打开标签的页面保持挂载, 仅显示当前页
+  // (切换 Tab / 面包屑切换都不再销毁页面, 原页面填写的数据保留)
+  const pages = tabs.filter((k) => validPage(k));
+  const showKey = validPage(app) ? app : (pages.length > 0 ? pages[pages.length - 1] : '');
+  if (validPage(app) && !pages.includes(app)) pages.push(app);
 
   // 标签右键菜单: 关闭左侧 / 关闭右侧 / 关闭其他
   const tabMenuItems = (key :string) => {
@@ -107,21 +115,22 @@ const MainContent :React.FC = () => {
           background: colorBgContainer,
         }}
       >
-        <Routes>
-          // 应用中心
-          <Route path={ "/AppStore" } element={ lazyLoad("AppStore") }></Route>
-          // 设置
-          <Route path={ "/Setting" } element={ lazyLoad("Setting") }></Route>
-          // 帮助页面
-          <Route path={ "/Help" } element={ lazyLoad("Help") }></Route>
-          {
-            appList.map((item, index) => {
-              return <Route path={ "/" + item.key } key={item.key} element={ lazyLoad(item.key) }></Route>
-            })
-          }
-          // 默认显示应用
-          <Route path="*" element={<Navigate to={"/" + defaultApp } replace />} />
-        </Routes>
+        { showKey === '' ? (
+          // 非法地址 -> 回到默认应用
+          <Navigate to={ "/" + defaultApp } replace />
+        ) : (
+          <div className="keep-alive">
+            {
+              pages.map((key) => (
+                <div key={ key } className="keep-alive-item" style={ { display: key === showKey ? undefined : 'none' } }>
+                  <Suspense fallback={ <div>应用正在加载中...</div> }>
+                    <KeepAlivePage Page={ pageComps.get(key)! } />
+                  </Suspense>
+                </div>
+              ))
+            }
+          </div>
+        ) }
       </Content>
     </Layout>
   )

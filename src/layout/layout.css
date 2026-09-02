@@ -84,6 +84,15 @@ select {
   margin: 8px 4px 12px 4px;
 }
 
+/* 多标签保活: 所有已打开标签的页面保持挂载, 仅当前页显示
+   (切换 Tab 不销毁页面组件, 填写的数据不丢失) */
+.keep-alive {
+  height: 100%;
+}
+.keep-alive .keep-alive-item {
+  height: 100%;
+}
+
 /* ---- 滚动条美化 (Chromium/WebView2, Firefox scrollbar-width) ---- */
 ::-webkit-scrollbar {
   width: 8px;
