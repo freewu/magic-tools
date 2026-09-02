@@ -11,7 +11,7 @@ license = "MIT"
 #   src-tauri/src/main.rs    -> 入口
 #   src-tauri/src/lib.rs     -> 应用逻辑
 #   src-tauri/tauri.conf.json -> 配置
-#   src/renderer             -> React 前端 (保持不变)
+#   src/                    -> React 前端 (保持不变)
 #   dist/                    -> React 打包产物 (tauri frontendDist)
 
 [lib]

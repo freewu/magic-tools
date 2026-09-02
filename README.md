@@ -58,7 +58,7 @@ WebSocket 调试
 ## 技术栈
 ```
 Tauri 2            -> 桌面应用框架 (替代原 Electron)
-React 18           -> 前端 UI (代码结构保持不变, 位于 src/renderer)
+React 18           -> 前端 UI (代码结构保持不变, 位于 src)
 Ant Design 5       -> UI 组件库
 webpack 5          -> 渲染进程构建
 just               -> 显示使用帮助 (默认命令)
@@ -74,7 +74,12 @@ magic-tools
 │   ├── tauri.conf.json         # Tauri 配置 (窗口大小、打包、图标)
 │   ├── capabilities/           # 权限配置
 │   └── icons/                  # 应用图标
-├── src/renderer/               # React 前端 (保持不变)
+├── src/                        # React 前端 (保持不变)
+│   ├── index.tsx               # 入口
+│   ├── App/                    # 各工具应用
+│   ├── hook/                   # 全局状态 (主题/应用上下文)
+│   ├── layout/                 # 主框架 (侧边栏/内容区)
+│   └── lib/                    # 通用工具库
 ├── .erb/configs/               # webpack 渲染进程构建配置
 ├── dist/                       # React 打包产物 (Tauri frontendDist)
 └── justfile                    # 构建/打包/发布脚本
