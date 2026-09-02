@@ -1,20 +1,11 @@
 // 帮助页面
 import { Layout,Card, Avatar, Space,Row, Col,Timeline } from 'antd';
 import { compomentList, developerList, eventList } from "./data"
-import { debounce } from "../../lib";
-import { useState } from "react";
 import "./help.css";
 
 const Help = () => {
-
-  const genHeight = () => {
-    return (window.innerHeight - 70) + "px";
-  };
-
-  const [ height, setHeight ] = useState(genHeight()); // 窗口大小高度
-
   return (
-    <Layout style={ { height: height, overflowY: "auto" } } >
+    <Layout style={ { height: '100%', overflowY: "auto" } } >
       <Card title="开发者" className='help-card'>
         <Space>
         {

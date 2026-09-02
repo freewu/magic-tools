@@ -1,7 +1,7 @@
 import { Checkbox, Form, Input, Divider, message, Space, Tag, Button, InputNumber } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
-import { copyTextToClipboard, debounce } from "./../../lib"
+import { copyTextToClipboard } from "./../../lib"
 import { openFile } from "../../lib/file"
 import { emptyResult } from "./data"
 
@@ -21,15 +21,6 @@ import { getPasswordList } from "./lib"
 import "./hash.css"
 
 const Hash = () => {
-
-  const genFormHeight = () => {
-    return (window.innerHeight - 300) + "px";
-  };
-
-  const [ height, setHeight ] = useState(genFormHeight()); // 窗口大小高度
-
-  // 窗体大小发生变化,改变窗口大小
-  window.addEventListener('resize', debounce(() => { setHeight(genFormHeight()) },100) );
 
   const [ value, setValue ] = useState('');
   const [ checked, setChecked ] = useState(false);
@@ -111,7 +102,7 @@ const Hash = () => {
   }
 
   return (
-    <div>
+    <div style={ { display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 } }>
       {contextHolder}
       <Space size={[0, 8]} wrap>
         {
@@ -148,7 +139,7 @@ const Hash = () => {
 
       <Divider dashed />
 
-      <div className="hash-form" style={ { height: height, overflowY: "auto",paddingRight: 12 } } >
+      <div className="hash-form" style={ { flex: 1, minHeight: 0, overflowY: "auto", paddingRight: 12 } } >
         <Form name="basic"labelCol={{ span: 3 }}autoComplete="off" >
           <Form.Item label="MD5 (16位)">
             <Input readOnly showCount onClick={ inputClick } value= { hash.md516 } />
