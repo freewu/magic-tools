@@ -60,6 +60,7 @@ const MainSider: React.FC = () => {
     <Menu
       theme="dark"
       mode="inline"
+      inlineCollapsed={ collapsed }
       selectedKeys= { [ app ] }
       // activeKey={ '' }
       onClick = { menuClick }
