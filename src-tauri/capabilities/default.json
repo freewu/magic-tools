@@ -3,5 +3,20 @@
   "identifier": "default",
   "description": "默认能力: 主窗口可以使用 core + opener 插件权限",
   "windows": ["main"],
-  "permissions": ["core:default", "opener:default"]
+  "permissions": [
+    "core:default",
+    "opener:default",
+    "dialog:allow-save",
+    {
+      "identifier": "fs:allow-write-file",
+      "allow": [
+        { "path": "**" },
+        { "path": "$HOME/**" },
+        { "path": "$DOWNLOAD/**" },
+        { "path": "$DESKTOP/**" },
+        { "path": "$DOCUMENT/**" },
+        { "path": "$PICTURE/**" }
+      ]
+    }
+  ]
 }

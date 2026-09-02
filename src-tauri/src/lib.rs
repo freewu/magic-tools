@@ -51,6 +51,9 @@ pub fn run() {
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             show_main_window(app);
         }))
+        // 系统保存对话框 + 文件读写 (条形码/二维码保存图片)
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_fs::init())
         .setup(|app| {
             let version = app.package_info().version.to_string();
 

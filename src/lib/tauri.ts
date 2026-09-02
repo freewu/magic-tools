@@ -33,6 +33,48 @@ export function isTauri(): boolean {
 }
 
 /**
+ * 保存 PNG 图片 (条形码 / 二维码等 canvas 生成图)
+ * - Tauri 环境: 弹出系统保存对话框, 选好路径后写入文件 (WebView2 下 <a download> 不弹保存框, 体验更好)
+ * - 普通浏览器(纯前端调试): 回退为 <a download> 触发浏览器下载
+ * @param defaultName 默认文件名 (如 'barcode-code128.png')
+ * @param dataUrl canvas.toDataURL('image/png') 得到的 data URL
+ * @returns true = 已保存/已触发下载; false = 用户在保存对话框取消
+ */
+export async function savePngFile(defaultName: string, dataUrl: string): Promise<boolean> {
+  if (isTauri()) {
+    try {
+      const { save } = await import('@tauri-apps/plugin-dialog');
+      const { writeFile } = await import('@tauri-apps/plugin-fs');
+      const path = await save({
+        title: '保存图片',
+        defaultPath: defaultName,
+        filters: [{ name: 'PNG 图片', extensions: ['png'] }],
+      });
+      // 用户点击了「取消」
+      if (path === null) return false;
+      // data URL -> Uint8Array (atob 处理 base64)
+      const base64 = dataUrl.slice(dataUrl.indexOf(',') + 1);
+      const bin = atob(base64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      await writeFile(path, bytes);
+      return true;
+    } catch (err) {
+      // 插件/权限异常时回退到浏览器下载方式
+      console.error('tauri savePngFile failed:', err);
+    }
+  }
+  // 浏览器回退
+  const a = document.createElement('a');
+  a.download = defaultName;
+  a.href = dataUrl;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  return true;
+}
+
+/**
  * 通知 Tauri 主进程显示模式已变化 (同步托盘菜单勾选)
  * @param mode 'light' | 'dark' | 'system'
  */

@@ -6,6 +6,7 @@ import type { RadioChangeEvent, QRCodeProps } from 'antd';
 import type { Color } from 'antd/es/color-picker';
 import { ArrowUpOutlined } from '@ant-design/icons';
 import { getDefaultErrorLevel, getErrorLevelTip, getDefaultSize } from './lib';
+import { savePngFile } from '../../lib/tauri';
 
 const QRCodeGenerator = () => {
 
@@ -23,25 +24,27 @@ const QRCodeGenerator = () => {
     setErrorLevelTips(getErrorLevelTip(value));
   };
 
-  const downloadQRCode = () => {
-    const canvas = document.getElementById('myqrcode')?.querySelector('canvas');
-    const img = document.getElementById('myqrcode')?.querySelector('img');
+  const [ notice, contextHolder ] = message.useMessage();
 
-    if (canvas) {
-      // 处理中间 icon 图片跨域问题
-      if(img) {
-        // 缓存的图像数据仍然会被画布视为有污染的跨源内容
-        img.src =img.src+'?v='+Math.random()
-        img.crossOrigin= 'anonymous';
-      }
-      const url = canvas.toDataURL();
-      const a = document.createElement('a');
-      a.download = 'QRCode.png';
-      a.href = url;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+  // 保存二维码为 PNG (Tauri 弹系统保存对话框选位置; 浏览器环境直接触发下载)
+  const downloadQRCode = async () => {
+    const box = document.getElementById('myqrcode');
+    const canvas = box?.querySelector('canvas');
+    const img = box?.querySelector('img');
+
+    if (!canvas) {
+      if (value.trim() === '') notice.warning('请先输入内容生成二维码');
+      return;
     }
+
+    // 处理中间 icon 图片跨域问题
+    if (img) {
+      // 缓存的图像数据仍然会被画布视为有污染的跨源内容
+      img.src = img.src + '?v=' + Math.random();
+      img.crossOrigin = 'anonymous';
+    }
+    const ok = await savePngFile('QRCode.png', canvas.toDataURL('image/png'));
+    if (ok) notice.success('二维码图片已保存');
   };
 
   // color 取色器选择颜色事件
@@ -56,6 +59,7 @@ const QRCodeGenerator = () => {
 
   return (
     <>
+      { contextHolder }
       <TextArea
         style={ { margin: "5px 0 5px 0" }}
         showCount
@@ -88,6 +92,11 @@ const QRCodeGenerator = () => {
             value={ backgroudColor }
             onChange={ onBackgroudColorChange }
           />
+          <Button
+            type="primary"
+            disabled={ value.trim() === '' }
+            onClick={ downloadQRCode }
+          >保存图片</Button>
           <Button 
             onClick={ () => { setValue(''); } }
             style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 

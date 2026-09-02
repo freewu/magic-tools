@@ -1,8 +1,9 @@
-import { Button, ColorPicker, Divider, Input, Select, Slider, Space, Switch, Tooltip } from "antd";
+import { Button, ColorPicker, Divider, Input, Select, Slider, Space, Switch, Tooltip, message } from "antd";
 import { useEffect, useRef, useState } from "react";
 import type { Color } from 'antd/es/color-picker';
 import JsBarcode from 'jsbarcode';
 import { barcodeFormatList } from './data';
+import { savePngFile } from '../../lib/tauri';
 import {
   getDefaultFormat,
   getDefaultBarWidth,
@@ -23,6 +24,7 @@ const BarcodeGenerator = () => {
   const [ backgroudColor, setBackgroudColor ] = useState('#ffffff'); // 条码背景色
   const [ runtimeError, setRuntimeError ] = useState(''); // 生成时异常提示 (jsbarcode 内部校验)
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [ notice, contextHolder ] = message.useMessage();
 
   // 渲染期同步校验 (避免先展示旧图/旧错误一帧)
   const vmsg = value === '' ? '' : validateBarcode(format, value);
@@ -61,17 +63,15 @@ const BarcodeGenerator = () => {
     render();
   });
 
-  // 下载 PNG
-  const download = () => {
+  // 下载/保存 PNG (Tauri 弹系统保存对话框选位置; 浏览器环境直接触发下载)
+  const download = async () => {
     const canvas = canvasRef.current;
-    if (!canvas || canvas.width === 0) return;
-    const url = canvas.toDataURL('image/png');
-    const a = document.createElement('a');
-    a.download = 'barcode-' + format.toLowerCase() + '.png';
-    a.href = url;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    if (!canvas || canvas.width === 0) {
+      notice.warning('请先输入内容生成条形码');
+      return;
+    }
+    const ok = await savePngFile('barcode-' + format.toLowerCase() + '.png', canvas.toDataURL('image/png'));
+    if (ok) notice.success('条形码图片已保存');
   };
 
   // 取色器回调
@@ -80,6 +80,7 @@ const BarcodeGenerator = () => {
 
   return (
     <>
+      { contextHolder }
       <Space style={ { margin: "5px 0 5px 0", flexWrap: "wrap" } }>
         <Tooltip placement="topLeft" title={ getFormatHint(format) }>
           <label>格式:</label>
