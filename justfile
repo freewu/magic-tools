@@ -18,7 +18,9 @@ set quiet := false
 
 # Release version; defaults to package.json, override with the VERSION env var
 # Example: VERSION=1.3.1 just publish
-# Note: keep version in sync across package.json / src-tauri/Cargo.toml / src-tauri/tauri.conf.json
+# Note: 修改版本号时需同步以下位置 (完整清单见 README「版本修改」):
+#   package.json / src-tauri/Cargo.toml / src-tauri/tauri.conf.json / 本文件默认值
+#   / src/App/Help/data.tsx 更新日志 / update.md
 version := env_var_or_default("VERSION", "2.1.0")
 
 # Default command: show usage help

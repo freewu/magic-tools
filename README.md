@@ -216,9 +216,17 @@ magic-tools
 
 ## 版本修改 (发布前需要修改)
 ```
-./package.json          # 主版本号
-./src-tauri/Cargo.toml  # Rust 包版本号 (需与 package.json 一致)
-./src-tauri/tauri.conf.json  # bundle 版本号
+每次发布新版本时, 将下列位置统一改为相同版本号 (当前 2.1.0):
+
+1. ./package.json              # "version": "x.y.z"  (npm 包版本号; src/version.ts 通过 import '../package.json' 自动读取, 无需单独改)
+2. ./src-tauri/Cargo.toml      # version = "x.y.z"    (Rust 包版本号, 托盘菜单「MagicTools Vx.y.z」显示它)
+3. ./src-tauri/tauri.conf.json # "version": "x.y.z"  (打包版本号, 安装包/About 使用)
+4. ./justfile                  # version := env_var_or_default("VERSION", "x.y.z") 的默认值 (可用 VERSION= 环境变量覆盖)
+5. ./src/App/Help/data.tsx     # eventList 数组顶部新增一条: <p>YYYY-MM-DD Vx.y.z Release</p> + 本次更新内容列表 (帮助页更新日志)
+6. ./update.md                 # 重写为本次版本的更新内容 (将用作 GitHub Release 发布说明)
+
+改完后建议验证: npm test && npm run build:renderer && cargo check (在 src-tauri 下)
+发布流程见下方「开发规范 - 规则 2」
 ```
 ## 开发规范
 
@@ -233,7 +241,7 @@ magic-tools
 
 修改版本号发布新版本时：
 
-1. 同步版本号: `package.json` / `src-tauri/Cargo.toml` / `src-tauri/tauri.conf.json`
+1. 按上方「版本修改」清单同步所有版本号位置 (package.json / Cargo.toml / tauri.conf.json / justfile / Help 更新日志)
 2. 在 `update.md` 中总结本次版本的更新内容 (将作为 GitHub Release 的发布说明)
 3. 打 tag 并推送，自动触发 GitHub Actions 打包三平台免安装包:
 
