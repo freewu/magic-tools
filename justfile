@@ -19,7 +19,7 @@ set quiet := false
 # Release version; defaults to package.json, override with the VERSION env var
 # Example: VERSION=1.3.1 just publish
 # Note: keep version in sync across package.json / src-tauri/Cargo.toml / src-tauri/tauri.conf.json
-version := env_var_or_default("VERSION", "2.0.0")
+version := env_var_or_default("VERSION", "2.1.0")
 
 # Default command: show usage help
 default: help

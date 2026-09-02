@@ -27,6 +27,20 @@ export const eventList = [
     color: "green",
     children: (
       <>
+        <p>2026-09-03 V2.1.0 Release</p>
+        <ul style={ {listStyle: "none" }}>
+          <li>新增 TEA / XTEA / XXTEA 加解密工具</li>
+          <li>Hash 值计算新增 SM3 / BCrypt</li>
+          <li>新增条形码生成 (CODE128 / EAN-13 / UPC-A / CODE39 / ITF / MSI / Pharmacode 等 16 种格式)</li>
+          <li>应用只运行单实例; 托盘菜单支持直达设置/帮助/应用中心; 内容区顶部应用标签页与面包屑、标签右键菜单</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    color: "green",
+    children: (
+      <>
         <p>2026-02-28 V2.0.0 Release</p>
         <ul style={ {listStyle: "none" }}>
           <li>核心重构: 从 Electron 迁移到 Tauri 2 (体积更小、内存占用更低)</li>
