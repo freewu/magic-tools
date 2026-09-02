@@ -7,6 +7,21 @@
 - **commit 完成后自动 `git push origin master`**（默认分支为 `master`）；WSL 侧 git 通常可直接推送，若出现凭据卡认证，改用 Windows 侧执行：`cmd.exe /c "cd /d E:\work\github\magic-tools && git push origin master"`
 - 构建产物（`release/*.exe`、`src-tauri/target`、`dist/`）已被 `.gitignore` 忽略，无需特殊处理
 
+## Cloudflare Pages 构建 (npm ci 同步规则)
+
+Cloudflare Pages 使用 **Node 18 / npm 9.6.7** 构建（本地 Node 24 / npm 11）。本地 npm 11 生成的 `package-lock.json` 会让 CF 的 `npm ci` 报错（`npm ERR! Missing: @emnapi/core@... from lock file`）。因此：
+
+- **每次用 npm 安装/删除依赖后**，必须用 npm 9 重新生成并提交 lockfile：
+
+      npx --yes npm@9.6.7 install --package-lock-only --ignore-scripts
+
+- 提交前本地验证（退出码 0 才提交）：
+
+      npx --yes npm@9.6.7 ci --dry-run --ignore-scripts
+
+- 只改 `package.json` 版本号（不改依赖）时，lockfile 顶部 `version` 字段也需同步（可同上命令刷新）；
+  可选：在 Cloudflare Pages 项目设置的环境变量里加 `NODE_VERSION=22` 使两侧 npm 版本接近，但**不能代替**上述 npm9 同步步骤
+
 ## 版本发布流程
 
 发布新版本时按顺序执行：
