@@ -1,3 +1,28 @@
+# MagicTools v2.1.1
+
+## 更新内容
+
+### ✨ 重构与体验
+
+- 代码目录重构：`src/renderer` 上移到 `src` 根目录（`App/hook/layout/lib` 直接位于 `src/` 下）
+- Tab 切换保活：切换标签页不再销毁原页面，**已填写的数据不丢失**（关闭标签才卸载）
+- 帮助页更新日志新增 V2.1.0 / V2.1.1 发布记录
+
+### 📷 图片保存
+
+- 条形码生成：下载 PNG 弹出**系统保存对话框**选择保存位置（WebView2 下 `<a download>` 不再可靠）
+- 二维码生成：新增「保存图片」按钮，点击二维码预览同样可保存 PNG
+
+## 安装包说明
+
+| 平台 | 文件 | 说明 |
+| --- | --- | --- |
+| Windows | `magic-tools.exe` | 单体免安装，双击即运行（依赖系统自带 WebView2） |
+| macOS | `MagicTools-macOS-aarch64.zip` | 免安装，解压后拖入"应用程序"或直接运行 |
+| Linux | `*.AppImage` | 免安装，`chmod +x` 后运行 |
+
+---
+
 # MagicTools v2.0.0
 
 ## 更新内容

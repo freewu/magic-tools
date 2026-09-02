@@ -27,6 +27,20 @@ export const eventList = [
     color: "green",
     children: (
       <>
+        <p>2026-09-03 V2.1.1 Release</p>
+        <ul style={ {listStyle: "none" }}>
+          <li>目录重构: src/renderer 代码上移到 src 根目录</li>
+          <li>Tab 切换保活: 切换标签页不丢失已填写数据</li>
+          <li>条形码生成: 下载 PNG 弹出系统保存对话框选位置</li>
+          <li>二维码生成: 新增「保存图片」按钮, 点击二维码预览也可保存 PNG</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    color: "green",
+    children: (
+      <>
         <p>2026-09-03 V2.1.0 Release</p>
         <ul style={ {listStyle: "none" }}>
           <li>新增 TEA / XTEA / XXTEA 加解密工具</li>
