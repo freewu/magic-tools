@@ -12,6 +12,7 @@ CSS 配色
 颜色格式转换
 进制转换 ( BIN / OCT / DEC / HEX )
 二维码生成   
+条形码生成 ( CODE128 / CODE128 A / CODE128 B / CODE128 C / EAN-13 / EAN-8 / UPC-A / CODE39 / ITF-14 / ITF / MSI 系列 / Pharmacode )
 HmacHash 值计算 ( HmacMD5 / HmacSHA1 / HmacSHA3 / HmacSHA256 / HmacSHA512 / HmacSHA224 / HmacSHA384 / HmacRipeMD-160 )     
 SQL 格式化
 行数统计

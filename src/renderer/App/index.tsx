@@ -11,6 +11,7 @@ const list = [
   'ColorConvert',
   'NumberConvert',
   'QRCodeGenerator',
+  'BarcodeGenerator',
   'AESCrypto',
   'SQLFormatter',
   'LineCount',
