@@ -1,6 +1,6 @@
 import { AppContext } from "../hook/app-context";
 import React,{ useState,useContext } from "react";
-import { Breadcrumb, Layout, Tabs, theme } from "antd";
+import { Breadcrumb, Dropdown, Layout, Tabs, theme } from "antd";
 const { Content } = Layout;
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom"
 import { appList, genMenuList } from "../App";
@@ -18,7 +18,7 @@ const PAGE_NAMES: Record<string,string> = {
 
 const MainContent :React.FC = () => {
 
-  const { app, tabs, closeTab } = useContext(AppContext)!
+  const { app, tabs, closeTab, closeLeft, closeRight, closeOthers } = useContext(AppContext)!
   const defaultApp = getDefaultApp();
   const navigate = useNavigate();
   const { token: { colorBgContainer } } = theme.useToken();
@@ -57,6 +57,28 @@ const MainContent :React.FC = () => {
     );
   };
 
+  // 标签右键菜单: 关闭左侧 / 关闭右侧 / 关闭其他
+  const tabMenuItems = (key :string) => {
+    const idx = tabs.indexOf(key);
+    return [
+      { key: 'left',  label: '关闭左侧', disabled: idx <= 0 },
+      { key: 'right', label: '关闭右侧', disabled: idx < 0 || idx === tabs.length - 1 },
+      { key: 'others', label: '关闭其他', disabled: tabs.length <= 1 },
+    ];
+  };
+  const tabActions: Record<string, (key :string) => void> = { left: closeLeft, right: closeRight, others: closeOthers };
+  const tabLabel = (key :string) => (
+    <Dropdown
+      menu={{
+        items: tabMenuItems(key),
+        onClick: ({ key: action }) => { tabActions[String(action)]?.(key); },
+      }}
+      trigger={['contextMenu']}
+    >
+      <span>{ pageName(key) }</span>
+    </Dropdown>
+  );
+
   return (
     <Layout style={ { height: '100%' } }>
       {/* 顶部: 最近打开应用标签 + 面包屑 */}
@@ -67,7 +89,7 @@ const MainContent :React.FC = () => {
           size="small"
           hideAdd
           activeKey={ tabs.includes(app) ? app : (tabs.length > 0 ? tabs[tabs.length - 1] : undefined) }
-          items={ tabs.map((key) => ({ key, label: pageName(key), closable: true })) }
+          items={ tabs.map((key) => ({ key, label: tabLabel(key), closable: true })) }
           onChange={ (key) => { if(key !== app) navigate('/' + key, { replace: true }); } }
           onEdit={ (targetKey, action) => {
             if(action === 'remove' && typeof targetKey === 'string') closeTab(targetKey);

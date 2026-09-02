@@ -69,6 +69,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     root.style.setProperty('--app-bg', isDark ? '#000000' : '#f0f2f5');
     root.style.setProperty('--app-text', isDark ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)');
     root.style.setProperty('--app-input-bg', isDark ? '#1f1f1f' : '#ffffff');
+    root.style.setProperty('--app-raised', isDark ? '#1f1f1f' : '#ffffff');
+    root.style.setProperty('--app-border', isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(5, 5, 5, 0.12)');
   }, [isDark]);
 
   return (

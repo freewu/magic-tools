@@ -47,6 +47,39 @@ select {
   margin: 0;
 }
 
+/* Tab 可见度: 默认做透明的“胶囊”边框, 悬停显示边框, 激活时浅色/深色均以高亮面板+描边突出 */
+.page-head .page-tabs.ant-tabs-card .ant-tabs-nav .ant-tabs-tab {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.page-head .page-tabs.ant-tabs-card .ant-tabs-nav .ant-tabs-tab:hover {
+  border-color: var(--app-border, rgba(5, 5, 5, 0.12));
+  background: var(--app-raised, #ffffff);
+}
+.page-head .page-tabs.ant-tabs-card .ant-tabs-nav .ant-tabs-tab.ant-tabs-tab-active {
+  background: var(--app-raised, #ffffff);
+  border-color: var(--app-border, rgba(5, 5, 5, 0.12));
+  box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.05);
+}
+.page-head .page-tabs.ant-tabs-card .ant-tabs-nav .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  font-weight: 600;
+}
+.page-head .page-tabs.ant-tabs-card .ant-tabs-nav .ant-tabs-tab-btn {
+  font-weight: 400;
+  color: var(--app-text, rgba(0, 0, 0, 0.88));
+}
+.page-head .page-tabs.ant-tabs-nav::before {
+  border-bottom: none;
+}
+.page-head .page-tabs.ant-tabs-card .ant-tabs-nav .ant-tabs-tab .ant-tabs-tab-remove {
+  color: var(--app-text, rgba(0, 0, 0, 0.88));
+}
+.page-head .page-tabs.ant-tabs-card .ant-tabs-nav .ant-tabs-tab .ant-tabs-tab-remove:hover {
+  color: #ff4d4f;
+}
+
 .page-head .page-breadcrumb {
   margin: 8px 4px 12px 4px;
 }

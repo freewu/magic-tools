@@ -19,6 +19,10 @@ export const AppContext = createContext<{
     tabs: string[],
     // 关闭指定标签; 若关闭的是当前应用, 自动切换到最近打开的其他标签
     closeTab: (key :string)=>void,
+    // 关闭左侧 / 右侧 / 其他标签 (key 本身保留打开)
+    closeLeft: (key :string)=>void,
+    closeRight: (key :string)=>void,
+    closeOthers: (key :string)=>void,
 } | null>(null)
 
 // 从 localStorage 恢复标签列表
@@ -79,8 +83,31 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode[] }> = (pr
         }
     }, [app, tabs, navigate])
 
+    // 关闭左侧: 保留 key 及其右侧标签
+    const closeLeft = useCallback((key :string) => {
+        const idx = tabs.indexOf(key);
+        if(idx <= 0) return;
+        if(tabs.slice(0, idx).includes(app)) navigate('/' + key, { replace: true });
+        setTabs(tabs.slice(idx));
+    }, [tabs, app, navigate])
+
+    // 关闭右侧: 保留 key 及其左侧标签
+    const closeRight = useCallback((key :string) => {
+        const idx = tabs.indexOf(key);
+        if(idx < 0 || idx === tabs.length - 1) return;
+        if(app !== key && tabs.indexOf(app) > idx) navigate('/' + key, { replace: true });
+        setTabs(tabs.slice(0, idx + 1));
+    }, [tabs, app, navigate])
+
+    // 关闭其他: 仅保留 key 标签
+    const closeOthers = useCallback((key :string) => {
+        if(tabs.length <= 1) return;
+        if(app !== key) navigate('/' + key, { replace: true });
+        setTabs([key]);
+    }, [tabs, app, navigate])
+
     return (
-        <AppContext.Provider value={{ app, setApp, tabs, closeTab }}>
+        <AppContext.Provider value={{ app, setApp, tabs, closeTab, closeLeft, closeRight, closeOthers }}>
             {props.children}
         </AppContext.Provider>
     );
