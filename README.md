@@ -18,6 +18,9 @@ SQL 格式化
 行数统计
 Unicode 编码 / 解码  
 Punycode 编码 / 解码  
+UUencode 编码 / 解码  
+XXencode 编码 / 解码  
+JWT 解码器 (header.payload.signature 解析)
 DES 加密 / 解密   
 AES 加密 / 解密    
 Rabbit 加密 / 解密    
