@@ -26,6 +26,7 @@ const list = [
   'XXTEACrypto',
   'Base58Codec',
   'PBKDF2Calc',
+  'BCCCheck',
   //'BaseXCodec',
   'Base64Image',
   //'ImageColor',
