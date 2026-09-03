@@ -27,6 +27,21 @@ export const eventList = [
     color: "green",
     children: (
       <>
+        <p>2026-09-03 V2.2.0 Release</p>
+        <ul style={ {listStyle: "none" }}>
+          <li>编解码新增 Punycode 编解码</li>
+          <li>值计算新增 BCC 校验 (XOR) / LRC 校验 (累加和·Modbus 补码) / CRC 校验 (44 种标准 CRC-3~64 参数化计算, 含多项式公式展示)</li>
+          <li>校验结果输出行点击即复制, 展示样式与 Hash 计算对齐</li>
+          <li>设置新增 BCC/LRC/CRC 默认输入格式 (默认 ASCII/文本) 与 CRC 默认校验算法 (默认 CRC-16/MODBUS)</li>
+          <li>CRC 算法下拉可搜索并展示多项式公式, 深色模式适配</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    color: "green",
+    children: (
+      <>
         <p>2026-09-03 V2.1.1 Release</p>
         <ul style={ {listStyle: "none" }}>
           <li>目录重构: src/renderer 代码上移到 src 根目录</li>
