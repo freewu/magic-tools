@@ -29,6 +29,7 @@ XXTEA 加密 / 解密
 Base58 编码 / 解码
 PBKDF2 值计算 
 BCC 校验 ( XOR 异或累加校验值计算 )   
+LRC 校验 ( 累加和 / Modbus 补码校验值计算 )   
 Base64 图片  
 GPS坐标转换   
 人民币大写   
