@@ -3,7 +3,33 @@
 
 const SEP_RE = /[\s,;:|_-]+/;
 
-// 解析十六进制文本 -> 字节数组
+// ASCII/文本 -> UTF-8 字节数组 (纯实现, 不依赖 TextEncoder)
+export const strToUtf8Bytes = (text :string) :number[] => {
+  const bytes :number[] = [];
+  for (const ch of text) {
+    const cp = ch.codePointAt(0) as number;
+    if (cp < 0x80) {
+      bytes.push(cp);
+    } else if (cp < 0x800) {
+      bytes.push(0xc0 | (cp >> 6), 0x80 | (cp & 0x3f));
+    } else if (cp < 0x10000) {
+      bytes.push(0xe0 | (cp >> 12), 0x80 | ((cp >> 6) & 0x3f), 0x80 | (cp & 0x3f));
+    } else {
+      bytes.push(
+        0xf0 | (cp >> 18),
+        0x80 | ((cp >> 12) & 0x3f),
+        0x80 | ((cp >> 6) & 0x3f),
+        0x80 | (cp & 0x3f),
+      );
+    }
+  }
+  return bytes;
+}
+
+// 按输入模式解析为字节数组: 'hex' 解析十六进制, 'ascii' 按 UTF-8 编码文本
+export const parseInput = (input :string, mode :'hex' | 'ascii') :number[] => {
+  return mode === 'hex' ? parseHexBytes(input) : strToUtf8Bytes(input);
+}
 // 支持分隔: 空格 / 逗号 / 分号 / 冒号 / 竖线 / 下划线 / 短横线 / 换行
 // 每段可带 0x 前缀 (如 0x01 0x02), 单个字节 1-2 位十六进制 (如 1 F 表示 0x01 0x0F)
 export const parseHexBytes = (input :string) :number[] => {
@@ -31,6 +57,12 @@ export const bccXor = (bytes :number[]) :number => {
 export const bccHex = (bytes :number[]) :string => {
   return bccXor(bytes).toString(16).padStart(2, '0').toUpperCase();
 }
+
+// 单字节 -> 各进制字符串 (结果 BCC 为 0-255 单字节)
+export const byteToHex = (b :number) :string => b.toString(16).toUpperCase().padStart(2, '0');
+export const byteToDec = (b :number) :string => String(b);
+export const byteToOct = (b :number) :string => b.toString(8).padStart(3, '0');
+export const byteToBin = (b :number) :string => b.toString(2).padStart(8, '0');
 
 // 期望值文本 -> 字节 (仅允许 1-2 位十六进制), 非法返回 -1
 export const parseExpected = (input :string) :number => {
