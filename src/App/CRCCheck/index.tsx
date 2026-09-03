@@ -1,4 +1,4 @@
-import { Form, Input, Divider, message, Space, Button, Segmented, Select, Typography, Checkbox } from "antd";
+import { Form, Input, Divider, message, Space, Button, Segmented, Select, Typography, Checkbox, theme } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -14,6 +14,7 @@ type InputMode = 'hex' | 'ascii';
 
 const CRCCheck = () => {
 
+  const { token } = theme.useToken();
   const [ mode, setMode ] = useState<InputMode>('hex');
   const [ algoName, setAlgoName ] = useState('CRC-16/MODBUS');
   const [ hexInput, setHexInput ] = useState('');
@@ -93,7 +94,7 @@ const CRCCheck = () => {
                     title={ formula }
                     style={ {
                       fontSize: 12,
-                      color: 'rgba(0,0,0,0.45)',
+                      color: token.colorTextSecondary,
                       textAlign: 'right',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
