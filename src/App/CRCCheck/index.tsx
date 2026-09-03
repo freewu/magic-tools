@@ -6,7 +6,7 @@ import { ClearOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
 import { default as CRCIntro } from "./intro"
 import { parseInput } from "../../lib/byte"
-import { CRC_ALGOS, findAlgo, computeCrc, formatCrc, algoLabel } from "./lib"
+import { CRC_ALGOS, findAlgo, computeCrc, formatCrc, polyFormula } from "./lib"
 import { InputStatus } from "antd/es/_util/statusUtils";
 import "./../../lib/check.css"
 
@@ -78,11 +78,35 @@ const CRCCheck = () => {
         <span style={ { marginLeft: 16 } }>校验算法:</span>
         <Select
           showSearch
-          style={ { width: 380 } }
+          style={ { width: 520 } }
           value={ algoName }
           onChange={ (v) => { setAlgoName(v); } }
-          options={ CRC_ALGOS.map((a) => ({ label: algoLabel(a), value: a.name })) }
-          optionFilterProp="label"
+          options={ CRC_ALGOS.map((a) => {
+            const formula = polyFormula(a);
+            return {
+              value: a.name,
+              searchText: `${a.name} ${formula}`,
+              label: (
+                <span style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' } }>
+                  <span style={ { whiteSpace: 'nowrap', flexShrink: 0, paddingRight: 12 } }>{ a.name }</span>
+                  <span
+                    title={ formula }
+                    style={ {
+                      fontSize: 12,
+                      color: 'rgba(0,0,0,0.45)',
+                      textAlign: 'right',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      minWidth: 0,
+                    } }
+                  >{ formula }</span>
+                </span>
+              ),
+            };
+          }) }
+          filterOption={ (input, option) =>
+            ((option as { searchText?: string } | undefined)?.searchText ?? '').toLowerCase().includes(input.toLowerCase()) }
           placeholder="选择 CRC 算法"
         />
       </Space>

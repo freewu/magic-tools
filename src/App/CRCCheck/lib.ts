@@ -100,8 +100,3 @@ export const algoSummary = (p :CRCParam) :string => {
   const ref = p.refin ? '是' : '否';
   return `${polyFormula(p)} (poly 0x${p.poly.toUpperCase()}) · init 0x${p.init.toUpperCase()} · refin/refout ${ref} · xorout 0x${p.xorout.toUpperCase()} · check(123456789) = 0x${p.check}`;
 }
-
-// 下拉选项文案: "CRC-8    x8 + x2 + x + 1"
-export const algoLabel = (p :CRCParam) :string => {
-  return `${p.name}    ${polyFormula(p)}`;
-}
