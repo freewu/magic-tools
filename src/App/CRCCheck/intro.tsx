@@ -8,7 +8,7 @@ const introHtml = `
   <h4>使用说明</h4>
   <ol>
     <li>选择输入格式: <b>HEX</b> (十六进制字节, 支持 空格/逗号/分号/冒号/竖线/短横线/下划线/换行及 0x 前缀分隔) 或 <b>ASCII / 文本</b> (文本按 UTF-8 编码为字节);</li>
-    <li>选择校验算法 (下拉可搜索, 每个选项带多项式公式), 下方同步显示 Width / Poly / Init / RefIn / RefOut / XorOut / Check 参数行 (点击参数值即可复制);</li>
+    <li>选择校验算法 (下拉可搜索, 每个选项带多项式公式), 下方两行参数: Width / Poly / Init 与 XorOut 为输入框 (点击即复制), 输入数据反转 (RefIn) / 输出数据反转 (RefOut) 以勾选框展示;</li>
     <li>输入数据后实时计算, 结果以四个输出行给出 HEX / DEC / OCT / BIN 四种进制, 点击任一行即可复制 (参考 Hash 值计算的展示方式)。</li>
   </ol>
 

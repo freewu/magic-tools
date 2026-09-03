@@ -1,4 +1,4 @@
-import { Form, Input, Divider, message, Space, Button, Segmented, Select, Typography } from "antd";
+import { Form, Input, Divider, message, Space, Button, Segmented, Select, Typography, Checkbox } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -78,7 +78,7 @@ const CRCCheck = () => {
         <span style={ { marginLeft: 16 } }>校验算法:</span>
         <Select
           showSearch
-          style={ { width: 260 } }
+          style={ { width: 380 } }
           value={ algoName }
           onChange={ (v) => { setAlgoName(v); } }
           options={ CRC_ALGOS.map((a) => ({ label: algoLabel(a), value: a.name })) }
@@ -87,12 +87,12 @@ const CRCCheck = () => {
         />
       </Space>
 
-      <div style={ { margin: '2px 0 4px 0' } }>
+      <div style={ { display: 'flex', flexDirection: 'column', gap: 6, margin: '2px 0 4px 0' } }>
         <Space size={ [8, 8] } wrap>
           <Input
             addonBefore="Width"
             readOnly
-            style={ { width: 64 } }
+            style={ { width: 92 } }
             title="CRC 位数"
             value={ String(param.width) }
             onClick={ fieldClick }
@@ -100,7 +100,7 @@ const CRCCheck = () => {
           <Input
             addonBefore="Poly"
             readOnly
-            style={ { width: 160 } }
+            style={ { width: 230 } }
             title="生成多项式 (已省略隐含最高位)"
             value={ '0x' + param.poly.toUpperCase() }
             onClick={ fieldClick }
@@ -108,43 +108,31 @@ const CRCCheck = () => {
           <Input
             addonBefore="Init"
             readOnly
-            style={ { width: 150 } }
+            style={ { width: 220 } }
             title="寄存器初始值"
             value={ '0x' + param.init.toUpperCase() }
             onClick={ fieldClick }
           />
-          <Input
-            addonBefore="RefIn"
-            readOnly
-            style={ { width: 74 } }
-            title="输入比特反转 (LSB first)"
-            value={ param.refin ? '是' : '否' }
-            onClick={ fieldClick }
-          />
-          <Input
-            addonBefore="RefOut"
-            readOnly
-            style={ { width: 84 } }
-            title="输出比特反转"
-            value={ param.refout ? '是' : '否' }
-            onClick={ fieldClick }
-          />
+        </Space>
+        <Space size={ [8, 16] } wrap align="center">
           <Input
             addonBefore="XorOut"
             readOnly
-            style={ { width: 150 } }
+            style={ { width: 220 } }
             title="最终结果异或值"
             value={ '0x' + param.xorout.toUpperCase() }
             onClick={ fieldClick }
           />
-          <Input
-            addonBefore="Check"
-            readOnly
-            style={ { width: 200 } }
-            title="标准测试串 123456789 的校验值"
-            value={ '0x' + param.check }
-            onClick={ fieldClick }
-          />
+          <Checkbox
+            disabled
+            checked={ param.refin }
+            title="输入比特反转 (LSB first)"
+          >输入数据反转 (RefIn)</Checkbox>
+          <Checkbox
+            disabled
+            checked={ param.refout }
+            title="输出比特反转"
+          >输出数据反转 (RefOut)</Checkbox>
         </Space>
       </div>
 
