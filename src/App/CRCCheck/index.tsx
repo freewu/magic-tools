@@ -113,8 +113,6 @@ const CRCCheck = () => {
             value={ '0x' + param.init.toUpperCase() }
             onClick={ fieldClick }
           />
-        </Space>
-        <Space size={ [8, 16] } wrap align="center">
           <Input
             addonBefore="XorOut"
             readOnly
@@ -123,6 +121,8 @@ const CRCCheck = () => {
             value={ '0x' + param.xorout.toUpperCase() }
             onClick={ fieldClick }
           />
+        </Space>
+        <Space size={ [8, 16] } wrap align="center">
           <Checkbox
             disabled
             checked={ param.refin }
