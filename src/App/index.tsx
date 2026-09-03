@@ -16,6 +16,7 @@ const list = [
   'SQLFormatter',
   'LineCount',
   'Unicode',
+  'Punycode',
   'DESCrypto',
   'RabbitCrypto',
   'RC4Crypto',

@@ -16,7 +16,8 @@ CSS 配色
 HmacHash 值计算 ( HmacMD5 / HmacSHA1 / HmacSHA3 / HmacSHA256 / HmacSHA512 / HmacSHA224 / HmacSHA384 / HmacRipeMD-160 )     
 SQL 格式化
 行数统计
-Unicode 编码 / 解码
+Unicode 编码 / 解码  
+Punycode 编码 / 解码  
 DES 加密 / 解密   
 AES 加密 / 解密    
 Rabbit 加密 / 解密    
@@ -49,9 +50,7 @@ CRC 计算
 JSON 格式化
 正则表达式
 CRON表达式
-密码管理
 BCD码
-WebSocket 调试
 
 ```
 
