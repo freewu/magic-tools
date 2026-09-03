@@ -75,6 +75,45 @@ export async function savePngFile(defaultName: string, dataUrl: string): Promise
 }
 
 /**
+ * 保存文本文件 (RSA/SM2 密钥导出等)
+ * - Tauri 环境: 弹出系统保存对话框, 选好路径后写入文件
+ * - 普通浏览器(纯前端调试): 回退为 <a download> 触发浏览器下载
+ * @param defaultName 默认文件名
+ * @param content 文本内容 (UTF-8)
+ * @param title 保存对话框标题
+ * @returns true = 已保存/已触发下载; false = 用户在保存对话框取消
+ */
+export async function saveTextFile(defaultName: string, content: string, title = '保存文件'): Promise<boolean> {
+  if (isTauri()) {
+    try {
+      const { save } = await import('@tauri-apps/plugin-dialog');
+      const { writeTextFile } = await import('@tauri-apps/plugin-fs');
+      const path = await save({
+        title,
+        defaultPath: defaultName,
+        filters: [{ name: '文本文件', extensions: ['txt', 'pem', 'key'] }],
+      });
+      if (path === null) return false;
+      await writeTextFile(path, content);
+      return true;
+    } catch (err) {
+      console.error('tauri saveTextFile failed:', err);
+    }
+  }
+  // 浏览器回退
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = defaultName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  return true;
+}
+
+/**
  * 通知 Tauri 主进程显示模式已变化 (同步托盘菜单勾选)
  * @param mode 'light' | 'dark' | 'system'
  */

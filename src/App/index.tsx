@@ -13,6 +13,8 @@ const list = [
   'QRCodeGenerator',
   'BarcodeGenerator',
   'AESCrypto',
+  'RSACrypto',
+  'SM2Crypto',
   'SQLFormatter',
   'LineCount',
   'Unicode',
