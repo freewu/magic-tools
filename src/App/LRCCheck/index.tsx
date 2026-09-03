@@ -2,7 +2,7 @@ import { Form, Input, Divider, message, Space, Button, Segmented, Typography } f
 import { useState } from "react";
 const { TextArea } = Input;
 const { Text } = Typography;
-import { CopyOutlined, ClearOutlined } from '@ant-design/icons';
+import { ClearOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
 import { default as LRCIntro } from "./intro"
 import { parseInput, computeLrc, parseExpected, byteToHex, byteToDec, byteToOct, byteToBin } from "./lib"
@@ -109,12 +109,6 @@ const LRCCheck = () => {
       />
 
       <Space size={ [8, 8] } wrap style={ { margin: '4px 0' } }>
-        <Button
-          type="primary"
-          icon={ <CopyOutlined /> }
-          disabled={ result.hex === '' }
-          onClick={ () => { if (result.hex !== '') { copyTextToClipboard(result.hex); notice.success('已复制 ' + (algo === 'twos' ? 'LRC' : 'SUM') + ' 校验值: ' + result.hex); } } }
-        >复制 { algo === 'twos' ? 'LRC' : 'SUM' } 结果</Button>
         <Button
           danger
           icon={ <ClearOutlined /> }
