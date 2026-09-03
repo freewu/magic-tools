@@ -92,7 +92,7 @@ const CRCCheck = () => {
           <Input
             addonBefore="Width"
             readOnly
-            style={ { width: 92 } }
+            style={ { width: 180 } }
             title="CRC 位数"
             value={ String(param.width) }
             onClick={ fieldClick }
