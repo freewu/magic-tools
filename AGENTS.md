@@ -31,7 +31,8 @@ Cloudflare Pages 使用 **Node 18 / npm 9.6.7** 构建（本地 Node 24 / npm 11
 > 仅当用户明确说「暂不发布 / 不要打 tag」时才跳过，并在回复中说明跳过了 tag。
 
 1. 按下表「版本号修改位置清单」**逐一同步所有版本号**为同一新版本号
-2. 在 `update.md` **顶部**写入本次版本的发布说明（参考现有格式），它将作为 GitHub Release 的发布说明
+2. 在 `update.md` **顶部**新增本版本的发布说明节（格式：`# MagicTools vX.Y.Z` + 更新内容），历史版本节**保留在其下方**；
+   **GitHub Release 说明只取本版本的更新内容**（顶部第一个版本节），不会包含历史版本内容
 3. 提交并推送代码（`git commit` + `git push origin master`）
 4. **自动打 tag 并推送**（无需询问，紧跟第 3 步执行）：
 
@@ -40,7 +41,7 @@ Cloudflare Pages 使用 **Node 18 / npm 9.6.7** 构建（本地 Node 24 / npm 11
        git push origin v2.1.1
 
    （项目 justfile 中**没有** `just tag` 命令，手动执行上述 git 命令即可；tag 若推错可 `git tag -d vX.Y.Z && git push origin :refs/tags/vX.Y.Z` 删除后重推，不影响已触发失败的 Action）
-5. 推送 `v*` tag 触发 `.github/workflows/build-release.yml`：Windows 单体免安装 exe / macOS zip / Linux AppImage 三平台自动构建，并以 `update.md` 全文作为 GitHub Release 说明，产物自动上传。**确认 tag 已推送成功**（`git ls-remote --tags origin vX.Y.Z`）后，在回复中告知用户 CI 已触发，可在 GitHub Actions 页查看进度
+5. 推送 `v*` tag 触发 `.github/workflows/build-release.yml`：Windows 单体免安装 exe / macOS zip / Linux AppImage 三平台自动构建；workflow 会**自动截取 `update.md` 顶部第一个版本节**（第二个 `# MagicTools v` 标题之前）作为 GitHub Release 说明，产物自动上传。**确认 tag 已推送成功**（`git ls-remote --tags origin vX.Y.Z`）后，在回复中告知用户 CI 已触发，可在 GitHub Actions 页查看进度
 
 ### 版本号修改位置清单（升版本时逐一检查，勿遗漏）
 
@@ -51,7 +52,7 @@ Cloudflare Pages 使用 **Node 18 / npm 9.6.7** 构建（本地 Node 24 / npm 11
 | 3 | `src-tauri/tauri.conf.json` | `"version": "x.y.z"`（打包/安装包版本号） |
 | 4 | `justfile` | `version := env_var_or_default("VERSION", "x.y.z")` 的默认值（可用 `VERSION=` 环境变量覆盖，不强制同步） |
 | 5 | `src/App/Help/data.tsx` | `eventList` 数组**顶部**新增一条更新日志：`<p>YYYY-MM-DD Vx.y.z Release</p>` + 本次更新内容 `<li>`（帮助页时间线） |
-| 6 | `update.md` | 顶部写入本次版本发布说明（GitHub Release 使用） |
+| 6 | `update.md` | **顶部新增**一个版本节（`# MagicTools vX.Y.Z` + 本次更新内容），历史版本节保留在下文；GitHub Action 只取顶部第一个版本节作为 Release 说明（勿把历史内容混入本版本节内） |
 
 提示：
 

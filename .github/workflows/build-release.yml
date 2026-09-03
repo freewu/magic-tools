@@ -66,11 +66,18 @@ jobs:
           ditto -c -k --keepParent "$APP" "MagicTools-macOS-aarch64.zip"
           ls -la MagicTools-macOS-aarch64.zip
 
+      # 发布说明: 只取 update.md 顶部第一个版本节 (从文件头到第二个 "# MagicTools v" 标题之前),
+      # 不要把历史版本内容带进本次 Release 说明
+      - name: Extract top version section from update.md as release notes
+        run: |
+          awk 'BEGIN { n = 0 } /^# MagicTools v/ { n++; if (n > 1) exit } { print }' update.md > release-notes.md
+          echo "==== release-notes.md (前 8 行) ===="
+          head -8 release-notes.md
+
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
-          # 发布说明: 取项目根目录 update.md 的内容
-          body_path: update.md
+          body_path: release-notes.md
           files: |
             src-tauri/target/release/*.exe
             MagicTools-macOS-aarch64.zip

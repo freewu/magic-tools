@@ -223,7 +223,7 @@ magic-tools
 3. ./src-tauri/tauri.conf.json # "version": "x.y.z"  (打包版本号, 安装包/About 使用)
 4. ./justfile                  # version := env_var_or_default("VERSION", "x.y.z") 的默认值 (可用 VERSION= 环境变量覆盖)
 5. ./src/App/Help/data.tsx     # eventList 数组顶部新增一条: <p>YYYY-MM-DD Vx.y.z Release</p> + 本次更新内容列表 (帮助页更新日志)
-6. ./update.md                 # 重写为本次版本的更新内容 (将用作 GitHub Release 发布说明)
+6. ./update.md                 # 顶部新增本版本发布说明节 (# MagicTools vX.Y.Z), 历史版本节保留在下方; GitHub Action 只取顶部第一个版本节作为 Release 说明
 
 改完后建议验证: npm test && npm run build:renderer && cargo check (在 src-tauri 下)
 发布流程见下方「开发规范 - 规则 2」
@@ -242,7 +242,7 @@ magic-tools
 修改版本号发布新版本时：
 
 1. 按上方「版本修改」清单同步所有版本号位置 (package.json / Cargo.toml / tauri.conf.json / justfile / Help 更新日志)
-2. 在 `update.md` 中总结本次版本的更新内容 (将作为 GitHub Release 的发布说明)
+2. 在 `update.md` 顶部新增本版本发布说明节（历史版本节保留在下方；GitHub Actions 只取顶部第一个版本节作为 Release 说明）
 3. 打 tag 并推送，自动触发 GitHub Actions 打包三平台免安装包:
 
     just tag 1.3.1
