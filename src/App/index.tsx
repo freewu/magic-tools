@@ -28,6 +28,7 @@ const list = [
   'PBKDF2Calc',
   'BCCCheck',
   'LRCCheck',
+  'CRCCheck',
   //'BaseXCodec',
   'Base64Image',
   //'ImageColor',
