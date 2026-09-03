@@ -5,7 +5,7 @@ const { Text } = Typography;
 import { ClearOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
 import { default as LRCIntro } from "./intro"
-import { parseInput, computeLrc, parseExpected, byteToHex, byteToDec, byteToOct, byteToBin } from "./lib"
+import { parseInput, computeLrc, parseExpected, byteToHex, byteToDec, byteToOct, byteToBin, getDefaultInputMode } from "./lib"
 import { InputStatus } from "antd/es/_util/statusUtils";
 import "./../../lib/check.css"
 
@@ -14,7 +14,7 @@ type Algo = 'twos' | 'sum';
 
 const LRCCheck = () => {
 
-  const [ mode, setMode ] = useState<InputMode>('hex');
+  const [ mode, setMode ] = useState<InputMode>(getDefaultInputMode());
   const [ algo, setAlgo ] = useState<Algo>('twos');
   const [ hexInput, setHexInput ] = useState('');
   const [ expectedInput, setExpectedInput ] = useState('');

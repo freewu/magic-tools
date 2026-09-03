@@ -5,7 +5,7 @@ const { Text } = Typography;
 import { ClearOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
 import { default as BCCIntro } from "./intro"
-import { parseInput, bccXor, parseExpected, byteToHex, byteToDec, byteToOct, byteToBin } from "./lib"
+import { parseInput, bccXor, parseExpected, byteToHex, byteToDec, byteToOct, byteToBin, getDefaultInputMode } from "./lib"
 import { InputStatus } from "antd/es/_util/statusUtils";
 import "./../../lib/check.css"
 
@@ -13,7 +13,7 @@ type InputMode = 'hex' | 'ascii';
 
 const BCCCheck = () => {
 
-  const [ mode, setMode ] = useState<InputMode>('hex');
+  const [ mode, setMode ] = useState<InputMode>(getDefaultInputMode());
   const [ hexInput, setHexInput ] = useState('');
   const [ expectedInput, setExpectedInput ] = useState('');
   const [ notice, contextHolder ] = message.useMessage();

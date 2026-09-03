@@ -100,3 +100,26 @@ export const algoSummary = (p :CRCParam) :string => {
   const ref = p.refin ? '是' : '否';
   return `${polyFormula(p)} (poly 0x${p.poly.toUpperCase()}) · init 0x${p.init.toUpperCase()} · refin/refout ${ref} · xorout 0x${p.xorout.toUpperCase()} · check(123456789) = 0x${p.check}`;
 }
+
+// ---- 默认输入格式 / 默认校验算法 (localStorage, 供设置页/页面初始化使用) ----
+const DEFAULT_MODE_KEY = 'crc-check:default-input-mode';
+const DEFAULT_ALGO_KEY = 'crc-check:default-algo';
+
+// 默认输入格式: 未设置时默认 ASCII
+export const getDefaultInputMode = () :'hex' | 'ascii' => {
+  return localStorage.getItem(DEFAULT_MODE_KEY) === 'hex' ? 'hex' : 'ascii';
+}
+
+export const setDefaultInputMode = (mode :'hex' | 'ascii') :void => {
+  localStorage.setItem(DEFAULT_MODE_KEY, mode);
+}
+
+// 默认校验算法: 未设置时默认 CRC-16/MODBUS
+export const getDefaultAlgo = () :string => {
+  const v = localStorage.getItem(DEFAULT_ALGO_KEY);
+  return CRC_ALGOS.some((a) => a.name === v) ? (v as string) : 'CRC-16/MODBUS';
+}
+
+export const setDefaultAlgo = (name :string) :void => {
+  localStorage.setItem(DEFAULT_ALGO_KEY, CRC_ALGOS.some((a) => a.name === name) ? name : 'CRC-16/MODBUS');
+}

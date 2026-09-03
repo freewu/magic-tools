@@ -32,3 +32,15 @@ export const lrcTwos = (bytes :number[]) :number => {
 export const computeLrc = (bytes :number[], algo :'twos' | 'sum') :number => {
   return algo === 'twos' ? lrcTwos(bytes) : lrcSum(bytes);
 }
+
+// ---- 默认输入格式 (localStorage, 供设置页/页面初始化使用) ----
+const DEFAULT_MODE_KEY = 'lrc-check:default-input-mode';
+
+// 默认输入格式: 未设置时默认 ASCII
+export const getDefaultInputMode = () :'hex' | 'ascii' => {
+  return localStorage.getItem(DEFAULT_MODE_KEY) === 'hex' ? 'hex' : 'ascii';
+}
+
+export const setDefaultInputMode = (mode :'hex' | 'ascii') :void => {
+  localStorage.setItem(DEFAULT_MODE_KEY, mode);
+}

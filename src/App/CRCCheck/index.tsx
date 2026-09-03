@@ -6,7 +6,7 @@ import { ClearOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
 import { default as CRCIntro } from "./intro"
 import { parseInput } from "../../lib/byte"
-import { CRC_ALGOS, findAlgo, computeCrc, formatCrc, polyFormula } from "./lib"
+import { CRC_ALGOS, findAlgo, computeCrc, formatCrc, polyFormula, getDefaultInputMode, getDefaultAlgo } from "./lib"
 import { InputStatus } from "antd/es/_util/statusUtils";
 import "./../../lib/check.css"
 
@@ -15,8 +15,8 @@ type InputMode = 'hex' | 'ascii';
 const CRCCheck = () => {
 
   const { token } = theme.useToken();
-  const [ mode, setMode ] = useState<InputMode>('hex');
-  const [ algoName, setAlgoName ] = useState('CRC-16/MODBUS');
+  const [ mode, setMode ] = useState<InputMode>(getDefaultInputMode());
+  const [ algoName, setAlgoName ] = useState<string>(getDefaultAlgo());
   const [ hexInput, setHexInput ] = useState('');
   const [ notice, contextHolder ] = message.useMessage();
 
