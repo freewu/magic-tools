@@ -1,12 +1,13 @@
-import { Divider, Button, Input, Segmented, message, Typography } from "antd";
+import { Form, Input, Divider, message, Space, Button, Segmented, Typography } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 const { Text } = Typography;
 import { CopyOutlined, ClearOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
 import { default as BCCIntro } from "./intro"
-import { parseInput, bccHex, bccXor, parseExpected, byteToHex, byteToDec, byteToOct, byteToBin } from "./lib"
+import { parseInput, bccXor, parseExpected, byteToHex, byteToDec, byteToOct, byteToBin } from "./lib"
 import { InputStatus } from "antd/es/_util/statusUtils";
+import "./../../lib/check.css"
 
 type InputMode = 'hex' | 'ascii';
 
@@ -15,7 +16,7 @@ const BCCCheck = () => {
   const [ mode, setMode ] = useState<InputMode>('hex');
   const [ hexInput, setHexInput ] = useState('');
   const [ expectedInput, setExpectedInput ] = useState('');
-  const [ notice, contextHolder ] = message.useMessage(); // 消息提醒
+  const [ notice, contextHolder ] = message.useMessage();
 
   // 实时解析并计算
   let error = '';
@@ -25,14 +26,8 @@ const BCCCheck = () => {
   } catch (err) {
     error = (err as Error).message;
   }
-  const hasData = hexInput.trim() !== '';
   const result = {
-    hex: '',
-    dec: '',
-    oct: '',
-    bin: '',
-    raw: 0,
-    byteCount: 0,
+    hex: '', dec: '', oct: '', bin: '', raw: 0, byteCount: 0,
   };
   if (error === '' && bytes.length > 0) {
     result.raw = bccXor(bytes);
@@ -52,32 +47,34 @@ const BCCCheck = () => {
     else compare = exp === result.raw;
   }
 
-  const copyField = (value :string, label :string) => {
-    if (value === '') return;
-    copyTextToClipboard(value);
-    notice.success(`已复制 ${label}: ${value}`);
-  }
-
-  const copyResult = () => copyField(result.hex, 'BCC 校验值');
+  // 点击复制输入框内容 (参考 Hash 值计算交互)
+  const inputClick = (e :React.MouseEvent<HTMLElement>) => {
+    const txt = (e.target as HTMLInputElement).value.trim();
+    if (txt !== '') {
+      copyTextToClipboard(txt);
+      notice.success("已复制: " + txt);
+    }
+  };
 
   const clear = () => {
     setHexInput('');
     setExpectedInput('');
   }
 
-  // 四种进制显示字段
-  const radixFields = [
+  // 输出行: 四种进制 + 数据长度 (展示参考 Hash 值计算)
+  const resultRows = [
     { label: 'HEX', value: result.hex, title: '十六进制' },
     { label: 'DEC', value: result.dec, title: '十进制' },
     { label: 'OCT', value: result.oct, title: '八进制' },
     { label: 'BIN', value: result.bin, title: '二进制' },
+    { label: '数据长度', value: result.hex !== '' ? result.byteCount + ' 字节' : '', title: '参与计算的字节数' },
   ];
 
   return (
-    <div>
+    <div style={ { display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 } }>
       {contextHolder}
 
-      <div style={ { display: "flex", alignItems: "center", gap: 10, margin: "5px 0" } }>
+      <Space size={ [0, 8] } wrap style={ { margin: '5px 0' } }>
         <span>输入格式:</span>
         <Segmented
           value={ mode }
@@ -87,7 +84,7 @@ const BCCCheck = () => {
             { label: 'ASCII / 文本', value: 'ascii', title: '文本按 UTF-8 编码为字节' },
           ] }
         />
-      </div>
+      </Space>
 
       <TextArea
         style={ { margin: "5px 0 5px 0" }}
@@ -95,17 +92,17 @@ const BCCCheck = () => {
         onChange={ (e) => { setHexInput(e.target.value); } }
         value= { hexInput }
         placeholder={ mode === 'hex'
-          ? '输入十六进制数据 (字节), 支持空格 / 逗号 / 0x 前缀等分隔, 例如: 01 03 00 00 00 02  或  0x01,0x02,0x03'
-          : '输入文本, 按 UTF-8 编码为字节参与异或计算, 例如: ABC   (0x41 ^ 0x42 ^ 0x43 = 0x40)' }
-        autoSize={{ minRows: 4, maxRows: 4 }}
+          ? '输入需要计算 BCC 校验值的十六进制数据 (如: 01 03 00 00 00 02) 或 拖拽文件到框内打开'
+          : '输入文本 (按 UTF-8 编码为字节参与计算, 如: ABC -> XOR = 0x40) 或 拖拽文件到框内打开' }
+        autoSize={{ minRows: 5, maxRows: 5 }}
       />
 
-      <div style={ { display: "flex", gap: 8, margin: "4px 0" } }>
+      <Space size={ [8, 8] } wrap style={ { margin: '4px 0' } }>
         <Button
           type="primary"
           icon={ <CopyOutlined /> }
           disabled={ result.hex === '' }
-          onClick={ copyResult }
+          onClick={ () => { if (result.hex !== '') { copyTextToClipboard(result.hex); notice.success('已复制 BCC 校验值: ' + result.hex); } } }
         >复制 BCC 结果</Button>
         <Button
           danger
@@ -113,44 +110,10 @@ const BCCCheck = () => {
           disabled={ hexInput === '' && expectedInput === '' }
           onClick={ clear }
         >清除</Button>
-      </div>
+      </Space>
 
-      { (error !== '' || result.hex !== '') && (
-        <div
-          style={ {
-            margin: "8px 0",
-            padding: "12px 16px",
-            border: "1px solid " + (error !== '' ? "#ff4d4f" : "#d9d9d9"),
-            borderRadius: 6,
-            background: error !== '' ? "#fff2f0" : "#f6ffed",
-          } }>
-          { error !== '' && (
-            <Text type="danger" strong> { error } </Text>
-          ) }
-          { error === '' && result.hex !== '' && (
-            <>
-              <div style={ { marginBottom: 8, color: "#888" } }>
-                数据长度: { result.byteCount } 字节
-              </div>
-              <div style={ { display: "flex", flexWrap: "wrap", gap: "4px 28px", alignItems: "center" } }>
-                { radixFields.map((f) => (
-                  <span
-                    key={ f.label }
-                    title={ `双击复制 ${f.label} (${f.title}) 值` }
-                    onDoubleClick={ () => { copyField(f.value, f.label + ' 值'); } }
-                    style={ { cursor: "copy" } }>
-                    { f.label }:&nbsp;
-                    <Text code strong style={ { fontSize: f.label === 'HEX' ? 22 : 16 } }>{ f.value }</Text>
-                  </span>
-                )) }
-              </div>
-            </>
-          ) }
-        </div>
-      ) }
-
-      { result.hex !== '' && (
-        <div style={ { display: "flex", alignItems: "center", gap: 12, margin: "8px 0" } }>
+      { result.hex !== '' && error === '' && (
+        <Space size={ [8, 8] } wrap style={ { margin: '4px 0' } }>
           <span>期望 BCC:</span>
           <Input
             style={ { width: 130 } }
@@ -162,12 +125,35 @@ const BCCCheck = () => {
           { compare === false && <Text type="danger" strong> ✗ 校验不通过 (期望 { expectedInput.trim().replace(/^0x/i, '').padStart(2, '0').toUpperCase() }) </Text> }
           { compare === '格式错误' && <Text type="warning"> 期望值格式错误 (需 1-2 位十六进制) </Text> }
           { compare === '' && expectedInput.trim() === '' && <Text type="secondary"> 填入期望值 (十六进制) 后自动比对 </Text> }
-        </div>
+        </Space>
       ) }
 
-      <Divider> BCC 校验说明 </Divider>
+      <Divider dashed style={ { margin: '8px 0' } } />
 
-      <BCCIntro />
+      <div style={ { flex: 1, minHeight: 0, overflowY: 'auto', paddingRight: 12 } }>
+        { error !== '' && (
+          <div style={ { margin: '0 0 8px 0', color: '#ff4d4f' } }>
+            <Text type="danger" strong>{ error }</Text>
+          </div>
+        ) }
+        <Form name="bcc" labelCol={ { span: 3 } } autoComplete="off" >
+          {
+            resultRows.map((row) => (
+              <Form.Item key={ row.label } label={ row.label }>
+                <Input
+                  readOnly
+                  title={ row.value !== '' ? `点击复制 ${row.label} 值` : '' }
+                  onClick={ inputClick }
+                  value= { row.value }
+                  placeholder={ row.value === '' ? '—' : '' }
+                />
+              </Form.Item>
+            ))
+          }
+        </Form>
+        <Divider dashed style={ { margin: '8px 0' } } />
+        <BCCIntro />
+      </div>
     </div>
   );
 }
