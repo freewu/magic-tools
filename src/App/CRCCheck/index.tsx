@@ -6,7 +6,7 @@ import { ClearOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
 import { default as CRCIntro } from "./intro"
 import { parseInput } from "../../lib/byte"
-import { CRC_ALGOS, findAlgo, computeCrc, formatCrc, algoSummary } from "./lib"
+import { CRC_ALGOS, findAlgo, computeCrc, formatCrc, algoLabel } from "./lib"
 import { InputStatus } from "antd/es/_util/statusUtils";
 import "./../../lib/check.css"
 
@@ -46,12 +46,16 @@ const CRCCheck = () => {
 
   // 点击复制输入框内容 (参考 Hash 值计算交互)
   const inputClick = (e :React.MouseEvent<HTMLElement>) => {
-    const txt = (e.target as HTMLInputElement).value.trim();
+    if (!(e.target instanceof HTMLInputElement)) return;
+    const txt = e.target.value.trim();
     if (txt !== '') {
       copyTextToClipboard(txt);
       notice.success("已复制: " + txt);
     }
   };
+
+  // 参数行点击复制 (与 inputClick 同逻辑)
+  const fieldClick = inputClick;
 
   const clear = () => {
     setHexInput('');
@@ -77,14 +81,71 @@ const CRCCheck = () => {
           style={ { width: 260 } }
           value={ algoName }
           onChange={ (v) => { setAlgoName(v); } }
-          options={ CRC_ALGOS.map((a) => ({ label: a.name, value: a.name })) }
+          options={ CRC_ALGOS.map((a) => ({ label: algoLabel(a), value: a.name })) }
           optionFilterProp="label"
           placeholder="选择 CRC 算法"
         />
       </Space>
 
-      <div style={ { margin: '2px 0 4px 0', color: 'rgba(0,0,0,0.55)' } }>
-        <Text type="secondary" style={ { fontSize: 12 } }>{ algoSummary(param) }</Text>
+      <div style={ { margin: '2px 0 4px 0' } }>
+        <Space size={ [8, 8] } wrap>
+          <Input
+            addonBefore="Width"
+            readOnly
+            style={ { width: 64 } }
+            title="CRC 位数"
+            value={ String(param.width) }
+            onClick={ fieldClick }
+          />
+          <Input
+            addonBefore="Poly"
+            readOnly
+            style={ { width: 160 } }
+            title="生成多项式 (已省略隐含最高位)"
+            value={ '0x' + param.poly.toUpperCase() }
+            onClick={ fieldClick }
+          />
+          <Input
+            addonBefore="Init"
+            readOnly
+            style={ { width: 150 } }
+            title="寄存器初始值"
+            value={ '0x' + param.init.toUpperCase() }
+            onClick={ fieldClick }
+          />
+          <Input
+            addonBefore="RefIn"
+            readOnly
+            style={ { width: 74 } }
+            title="输入比特反转 (LSB first)"
+            value={ param.refin ? '是' : '否' }
+            onClick={ fieldClick }
+          />
+          <Input
+            addonBefore="RefOut"
+            readOnly
+            style={ { width: 84 } }
+            title="输出比特反转"
+            value={ param.refout ? '是' : '否' }
+            onClick={ fieldClick }
+          />
+          <Input
+            addonBefore="XorOut"
+            readOnly
+            style={ { width: 150 } }
+            title="最终结果异或值"
+            value={ '0x' + param.xorout.toUpperCase() }
+            onClick={ fieldClick }
+          />
+          <Input
+            addonBefore="Check"
+            readOnly
+            style={ { width: 200 } }
+            title="标准测试串 123456789 的校验值"
+            value={ '0x' + param.check }
+            onClick={ fieldClick }
+          />
+        </Space>
       </div>
 
       <TextArea

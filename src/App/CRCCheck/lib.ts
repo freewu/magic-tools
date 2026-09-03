@@ -1,5 +1,5 @@
 // CRC 校验 (Cyclic Redundancy Check) — 参考 ip33.com/crc.html 的参数化模型
-// 基于 CRCParam (poly/init/refin/refout/xorout) 的通用逐位引擎, 使用 BigInt 支持 64 位宽
+// 基于 CRCParam (poly/init/refin/refout/xorout) 的通用逐位引擎, 使用 BigInt 支持 3~64 位宽
 // 解析/格式化等通用能力统一来自 src/lib/byte.ts
 
 import { parseInput } from '../../lib/byte';
@@ -20,31 +20,46 @@ const reflectBig = (x :bigint, width :number) :bigint => {
   return r;
 }
 
-// 通用 CRC 引擎 (按参数计算字节数组的校验值)
+// 由 poly(不含隐含最高位) 推导多项式公式, 如 poly=0x07 w=8 -> "x8 + x2 + x + 1"
+export const polyFormula = (p :CRCParam) :string => {
+  const terms :string[] = [ 'x' + p.width ];
+  const poly = BigInt('0x' + p.poly);
+  for (let k = p.width - 1; k >= 1; k--) {
+    if ((poly & (1n << BigInt(k))) !== 0n) terms.push(k === 1 ? 'x' : 'x' + k);
+  }
+  if ((poly & 1n) !== 0n) terms.push('1');
+  return terms.join(' + ');
+}
+
+// 通用 CRC 引擎 (逐位法, 支持位宽 3~64; 与移位法在 >=8 位宽下结果一致)
 export const computeCrc = (bytes :number[], p :CRCParam) :bigint => {
   const w = BigInt(p.width);
   const mask = (1n << w) - 1n;
-  const topBit = 1n << (w - 1n);
   const poly = BigInt('0x' + p.poly);
   const xorout = BigInt('0x' + p.xorout);
   const init = BigInt('0x' + p.init);
-  // reflected 模式使用位反转后的多项式; init 不预反转、结果不二次反转 (查表法语义, 目录参数 refin/refout 恒成对出现)
+  // reflected 模式使用位反转后的多项式 (查表法语义, 目录参数 refin/refout 恒成对出现)
   const polyUsed = p.refin ? reflectBig(poly, p.width) : poly;
   let crc = init;
   for (const b of bytes) {
     if (p.refin) {
-      crc ^= BigInt(b);
+      // LSB 优先: 逐位右移
       for (let i = 0; i < 8; i++) {
-        crc = (crc & 1n) !== 0n ? ((crc >> 1n) ^ polyUsed) : (crc >> 1n);
+        const bit = (b >> i) & 1;
+        const t = crc & 1n;
+        crc >>= 1n;
+        if ((t ^ BigInt(bit)) !== 0n) crc ^= polyUsed;
       }
     } else {
-      crc ^= BigInt(b) << (w - 8n);
-      for (let i = 0; i < 8; i++) {
-        crc = (crc & topBit) !== 0n ? ((crc << 1n) ^ polyUsed) : (crc << 1n);
+      // MSB 优先: 逐位左移
+      for (let i = 7; i >= 0; i--) {
+        const bit = (b >> i) & 1;
+        const t = (crc >> (w - 1n)) & 1n;
+        crc = (crc << 1n) & mask;
+        if ((t ^ BigInt(bit)) !== 0n) crc ^= poly;
       }
     }
   }
-  // 目录参数 refin/refout 恒成对; 反转已通过 polyUsed 体现, 结果无需二次反转
   crc ^= xorout;
   return crc & mask;
 }
@@ -80,7 +95,13 @@ export const crcOfAscii = (text :string, algoName :string) :CRCResult => {
   return crcOf(text, 'ascii', algoName);
 }
 
-// 参数摘要文案 (供 UI 展示)
+// 参数摘要文案 (供 UI 展示): 多项式公式 + poly 十六进制 + 其余参数 + check
 export const algoSummary = (p :CRCParam) :string => {
-  return `宽度 ${p.width} bit · poly 0x${p.poly.toUpperCase()} · init 0x${p.init.toUpperCase()} · refin/refout ${p.refin ? '是' : '否'} · xorout 0x${p.xorout.toUpperCase()} · check(123456789) = 0x${p.check}`;
+  const ref = p.refin ? '是' : '否';
+  return `${polyFormula(p)} (poly 0x${p.poly.toUpperCase()}) · init 0x${p.init.toUpperCase()} · refin/refout ${ref} · xorout 0x${p.xorout.toUpperCase()} · check(123456789) = 0x${p.check}`;
+}
+
+// 下拉选项文案: "CRC-8    x8 + x2 + x + 1"
+export const algoLabel = (p :CRCParam) :string => {
+  return `${p.name}    ${polyFormula(p)}`;
 }
