@@ -3,10 +3,11 @@ import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
 import { openFile } from "../../lib/file"
-import { emptyResult, FIXED_ITEMS, SAMPLE_LIST } from "./data"
+import { emptyResult, FIXED_ITEMS } from "./data"
 import { computeKeccakHash, getDefaultUpper } from "./lib"
 import type { KeccakHashResult } from "./data"
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
+import { getPasswordList } from "../Hash/lib"
 import "../Hash/hash.css"
 
 const KeccakHash = () => {
@@ -77,14 +78,17 @@ const KeccakHash = () => {
       {contextHolder}
       <Space size={[0, 8]} wrap>
         {
-          SAMPLE_LIST.map((sample, index) => {
-            return (
-              <Tag
-                className="hash-tag"
-                key={ sample + index }
-                color={ calcTagColor(index) }
-                onClick={ () => { setValue(sample); compute(sample, checked); } } >{ sample }</Tag>
-            )
+          getPasswordList()?.map((password, index) => {
+            // 与 Hash 值计算保持一致, 只展示 10 个
+            if(index < 10) {
+              return (
+                <Tag
+                  className="hash-tag"
+                  key={ password }
+                  color={ calcTagColor(index) }
+                  onClick={ () => { setValue(password); compute(password, checked); } } >{ password }</Tag>
+              )
+            }
           })
         }
       </Space>

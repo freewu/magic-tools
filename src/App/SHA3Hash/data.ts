@@ -28,16 +28,8 @@ const FIXED_ITEMS :Array<{ key :keyof Sha3HashResult; label :string }> = [
   { key: "sha3_512", label: "SHA3-512" },
 ];
 
-// 点击即计算的样例内容
-const SAMPLE_LIST :Array<string> = [
-  "admin",
-  "123456",
-  "The quick brown fox jumps over the lazy dog",
-];
-
 export {
   emptyResult,
   Sha3HashResult,
   FIXED_ITEMS,
-  SAMPLE_LIST,
 }

@@ -24,16 +24,8 @@ const FIXED_ITEMS :Array<{ key :keyof KeccakHashResult; label :string }> = [
   { key: "keccak_512", label: "Keccak-512" },
 ];
 
-// 点击即计算的样例内容
-const SAMPLE_LIST :Array<string> = [
-  "admin",
-  "123456",
-  "The quick brown fox jumps over the lazy dog",
-];
-
 export {
   emptyResult,
   KeccakHashResult,
   FIXED_ITEMS,
-  SAMPLE_LIST,
 }
