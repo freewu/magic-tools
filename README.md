@@ -5,6 +5,8 @@
 ## 功能模块
 ```
 Hash 值计算 ( MD5 / SHA1 / SHA3 / SHA256 / SHA512 / SHA224 / SHA384 / RipeMD-160 / SM3 / BCrypt )   
+SHA3 Hash 值计算 ( SHA3-224 / SHA3-256 / SHA3-384 / SHA3-512 / SHAKE128 / SHAKE256 )
+Keccak Hash 值计算 ( Keccak-224 / Keccak-256 / Keccak-384 / Keccak-512 )
 Base64 编码 / 解码
 URL 编码 / 解码
 时间戳转换

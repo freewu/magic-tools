@@ -4,6 +4,8 @@ import { SwapOutlined, CodeOutlined, LockOutlined, CalculatorOutlined, EllipsisO
 const list = [
   'Hash',
   'HmacHash',
+  'SHA3Hash',
+  'KeccakHash',
   'Base64',
   'URL',
   'Time',
