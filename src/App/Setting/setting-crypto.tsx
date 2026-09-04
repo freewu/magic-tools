@@ -4,6 +4,10 @@ import { AESCryptoSetting } from "../AESCrypto/setting";
 import { RSACryptoSetting } from "../RSACrypto/setting";
 import { SM2CryptoSetting } from "../SM2Crypto/setting";
 import { SM4CryptoSetting } from "../SM4Crypto/setting";
+import { CaesarCryptoSetting } from "../CaesarCrypto/setting";
+import { RailFenceCryptoSetting } from "../RailFenceCrypto/setting";
+import { VigenereCryptoSetting } from "../VigenereCrypto/setting";
+import { HillCryptoSetting } from "../HillCrypto/setting";
 import { DESCryptoSetting } from "../DESCrypto/setting";
 import { TripleDESCryptoSetting } from "../TripleDESCrypto/setting";
 import { RabbitCryptoSetting } from "../RabbitCrypto/setting";
@@ -20,6 +24,10 @@ export const SettingCrypto = () => {
       <RSACryptoSetting />
       <SM2CryptoSetting />
       <SM4CryptoSetting />
+      <CaesarCryptoSetting />
+      <RailFenceCryptoSetting />
+      <VigenereCryptoSetting />
+      <HillCryptoSetting />
       <DESCryptoSetting />
       <TripleDESCryptoSetting />
       <RabbitCryptoSetting />
