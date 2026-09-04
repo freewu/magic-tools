@@ -61,10 +61,15 @@ const list = [
 ];
 
 // 加载 App 的定义 名称 / icon 
-const loadApp = (app :string,callback :Function) => {
-  return import(`./${app}/define`)
-    .then( ({ AppName, Icon, Type }) => { callback({ AppName, Icon, Type }) })
-    .catch( (err:any) => console.log(err) );
+type DefineModule = { AppName :string; Icon :string; Type :string };
+const loadAppDefine = async (app :string) :Promise<DefineModule | null> => {
+  try {
+    const m = await import(`./${app}/define`);
+    return { AppName: m.AppName, Icon: m.Icon, Type: m.Type };
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
 }
 
 export type AppItem = {
@@ -74,17 +79,17 @@ export type AppItem = {
   type: string, // app 类型 
 }
 
-// 获取 App 列表
-const getAppList = async () => {
-  let result:Array<AppItem> = [];
-  let p;
-  list.forEach( item => {
-    p = loadApp(item,({ AppName, Icon, Type } : any) => {
-      //const img = (Icon === "")? '' : <Icon component={ Icon } />;
-      result.push({ key: item, icon: Icon, label: AppName, type: Type });
-    });
-  })
-  await p;
+// 获取 App 列表: 并行加载所有 define, 全部就绪后按 list 顺序返回。
+// (原实现只 await 最后一项的加载, 存在竞态: 靠后位置的 App 可能因加载完成晚于最后一项而丢失, 表现为菜单/页面打不开)
+const getAppList = async () :Promise<Array<AppItem>> => {
+  const mods = await Promise.all(list.map((item) => loadAppDefine(item)));
+  const result:Array<AppItem> = [];
+  mods.forEach((m, i) => {
+    if(m) {
+      //const img = (m.Icon === "")? '' : <Icon component={ m.Icon } />;
+      result.push({ key: list[i], icon: m.Icon, label: m.AppName, type: m.Type });
+    }
+  });
   return result;
 }
 

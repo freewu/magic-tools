@@ -5,6 +5,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getDefaultApp } from "../lib/setting";
+import { appList } from "../App";
 
 // 标签持久化 key (重启后恢复最近打开的应用)
 const TABS_STORAGE_KEY = "recent-tabs";
@@ -25,13 +26,18 @@ export const AppContext = createContext<{
     closeOthers: (key :string)=>void,
 } | null>(null)
 
+// 固定页面 (不在 appList 中, 同样允许出现在标签里)
+const FIXED_PAGE_KEYS = ['Setting', 'AppStore', 'Help'];
+// 当前有效的页面 key 集合 (防止恢复到旧版本/加载遗漏产生的无效标签 -> 点开无响应)
+const validPageKeys = new Set([...appList.map((i) => i.key), ...FIXED_PAGE_KEYS]);
+
 // 从 localStorage 恢复标签列表
 const readTabs = () :string[] => {
     try {
         const raw = localStorage.getItem(TABS_STORAGE_KEY);
         if(!raw) return [];
         const arr = JSON.parse(raw);
-        return Array.isArray(arr) ? arr.filter((k :unknown) => typeof k === 'string') : [];
+        return Array.isArray(arr) ? arr.filter((k :unknown) => typeof k === 'string' && validPageKeys.has(k)) : [];
     } catch (e) {
         console.error('read recent tabs failed:', e);
         return [];
