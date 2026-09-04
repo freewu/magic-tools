@@ -151,3 +151,40 @@ export const rsaEncryptBytes = (publicPem :string, data :Uint8Array) :Promise<Ui
 /** 私钥解密原始密文字节 -> 明文字节 */
 export const rsaDecryptBytes = (privatePem :string, cipher :Uint8Array) :Promise<Uint8Array> =>
   rsaDecryptRaw(privatePem, cipher);
+
+// -------- 默认密钥 (设置页共用同一 localStorage 槽位) --------
+const DEFAULT_PUBLIC_KEY_ITEM = 'rsa-crypto:default-public-key';
+
+/** 获取默认公钥 (SPKI PEM) */
+export function getDefaultPublicKey() :string {
+  return localStorage.getItem(DEFAULT_PUBLIC_KEY_ITEM) ?? '';
+}
+
+/** 保存默认公钥 (SPKI PEM) */
+export function setDefaultPublicKey(pem :string) :void {
+  localStorage.setItem(DEFAULT_PUBLIC_KEY_ITEM, pem);
+}
+
+const DEFAULT_PRIVATE_KEY_ITEM = 'rsa-crypto:default-private-key';
+
+/** 获取默认私钥 (PKCS#8 PEM) */
+export function getDefaultPrivateKey() :string {
+  return localStorage.getItem(DEFAULT_PRIVATE_KEY_ITEM) ?? '';
+}
+
+/** 保存默认私钥 (PKCS#8 PEM) */
+export function setDefaultPrivateKey(pem :string) :void {
+  localStorage.setItem(DEFAULT_PRIVATE_KEY_ITEM, pem);
+}
+
+/** 是否已配置完整的默认密钥对 (公钥 + 私钥) */
+export function hasDefaultKeyPair() :boolean {
+  return getDefaultPublicKey().trim() !== '' && getDefaultPrivateKey().trim() !== '';
+}
+
+/** 判断字符串是否为合法的 PEM (宽松: 含 BEGIN/END 行) */
+export const isPublicPem = (text :string) :boolean =>
+  /-----BEGIN PUBLIC KEY-----/.test(text) && /-----END PUBLIC KEY-----/.test(text);
+
+export const isPrivatePem = (text :string) :boolean =>
+  /-----BEGIN PRIVATE KEY-----/.test(text) && /-----END PRIVATE KEY-----/.test(text);

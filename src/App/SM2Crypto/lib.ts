@@ -247,3 +247,33 @@ export const sm2DecryptText = (cipherHex :string, privateHex :string) :string =>
   dec.decode(sm2DecryptBytes(cipherHex, privateHex));
 
 export { hexToBytes, bytesToHex };
+
+// -------- 默认密钥 (设置页共用同一 localStorage 槽位) --------
+const DEFAULT_PUBLIC_KEY_ITEM = 'sm2-crypto:default-public-key';
+
+/** 获取默认公钥 (04||X||Y HEX) */
+export function getDefaultPublicKey() :string {
+  return localStorage.getItem(DEFAULT_PUBLIC_KEY_ITEM) ?? '';
+}
+
+/** 保存默认公钥 */
+export function setDefaultPublicKey(pub :string) :void {
+  localStorage.setItem(DEFAULT_PUBLIC_KEY_ITEM, pub);
+}
+
+const DEFAULT_PRIVATE_KEY_ITEM = 'sm2-crypto:default-private-key';
+
+/** 获取默认私钥 (64 位 HEX) */
+export function getDefaultPrivateKey() :string {
+  return localStorage.getItem(DEFAULT_PRIVATE_KEY_ITEM) ?? '';
+}
+
+/** 保存默认私钥 */
+export function setDefaultPrivateKey(pri :string) :void {
+  localStorage.setItem(DEFAULT_PRIVATE_KEY_ITEM, pri);
+}
+
+/** 是否已配置完整的默认密钥对 */
+export function hasDefaultKeyPair() :boolean {
+  return getDefaultPublicKey().trim() !== '' && getDefaultPrivateKey().trim() !== '';
+}

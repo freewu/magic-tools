@@ -15,6 +15,7 @@ const list = [
   'AESCrypto',
   'RSACrypto',
   'SM2Crypto',
+  'SM4Crypto',
   'SQLFormatter',
   'LineCount',
   'Unicode',
