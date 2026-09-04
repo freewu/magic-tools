@@ -1,4 +1,4 @@
-import { Button, Divider, Input, message, Progress, Space, Tag } from 'antd';
+import { Button, Divider, Input, message, Progress, Space, Tag, theme } from 'antd';
 import { useState } from 'react';
 import {
   CopyOutlined,
@@ -11,6 +11,8 @@ import { fetchPageHtml } from './fetch';
 import WebTDKIntro from './intro';
 
 const WebTDKCheck = () => {
+
+  const { token } = theme.useToken();
 
   const [ url, setUrl ] = useState(''); // 网址
   const [ loading, setLoading ] = useState(false); // 检测中
@@ -65,13 +67,13 @@ const WebTDKCheck = () => {
         >检测</Button>
       </Space.Compact>
       { !isTauri() && (
-        <div style={ { marginTop: 6, color: '#999', fontSize: 12 } }>
+        <div style={ { marginTop: 6, color: token.colorTextTertiary, fontSize: 12 } }>
           浏览器演示版受 CORS 限制, 多数外部站点无法抓取; 桌面版 (Tauri) 无此限制
         </div>
       ) }
 
       { finalUrl !== '' && (
-        <div style={ { marginTop: 12, color: '#666' } }>
+        <div style={ { marginTop: 12, color: token.colorTextSecondary } }>
           检测完成: { finalUrl }
         </div>
       ) }
@@ -90,18 +92,19 @@ const WebTDKCheck = () => {
           <div
             key={ field }
             style={ {
-              border: '1px solid #e5e5e5',
+              border: `1px solid ${token.colorBorderSecondary}`,
               borderRadius: 6,
               padding: '12px 16px',
               margin: '12px 0',
               maxWidth: 720,
-              backgroundColor: '#fafafa',
+              backgroundColor: token.colorFillQuaternary,
+              color: token.colorText,
             } }
           >
             <div style={ { display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 8 } }>
               <b>{ label }</b>
               <Tag color={ tag.color }>{ tag.text }</Tag>
-              <span style={ { color: '#666', fontSize: 12 } }>
+              <span style={ { color: token.colorTextSecondary, fontSize: 12 } }>
                 当前 { check.length } / 建议不超过 { check.limit } 字符
               </span>
               <Button
@@ -116,11 +119,11 @@ const WebTDKCheck = () => {
               showInfo={ false }
               size="small"
               status={ check.status === 'over' ? 'exception' : 'normal' }
-              strokeColor={ check.status === 'over' ? '#ff4d4f' : (check.status === 'empty' ? '#d9d9d9' : '#52c41a') }
+              strokeColor={ check.status === 'over' ? '#ff4d4f' : (check.status === 'empty' ? token.colorBorderSecondary : '#52c41a') }
               style={ { margin: '6px 0 2px 0' } }
             />
             { check.status === 'empty' ? (
-              <div style={ { color: '#999' } }>{ emptyTip }</div>
+              <div style={ { color: token.colorTextTertiary } }>{ emptyTip }</div>
             ) : (
               <div
                 title="双击复制内容"
@@ -131,8 +134,9 @@ const WebTDKCheck = () => {
                   whiteSpace: 'pre-wrap',
                   wordBreak: 'break-all',
                   padding: '6px 8px',
-                  backgroundColor: '#fff',
-                  border: '1px solid #eee',
+                  backgroundColor: token.colorBgContainer,
+                  color: token.colorText,
+                  border: `1px solid ${token.colorBorderSecondary}`,
                   borderRadius: 4,
                   cursor: 'text',
                 } }
@@ -146,7 +150,7 @@ const WebTDKCheck = () => {
 
       {/* 未检测时的占位提示 */}
       { tdk === null && !loading && (
-        <div style={ { color: '#999', margin: '16px 0' } }>
+        <div style={ { color: token.colorTextTertiary, margin: '16px 0' } }>
           输入网址后点击「检测」, 将解析网页 &lt;title&gt; 与
           keywords / description 两个 meta 标签并给出长度建议
         </div>
