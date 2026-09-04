@@ -44,6 +44,8 @@ BCC 校验 ( XOR 异或累加校验值计算 )
 LRC 校验 ( 累加和 / Modbus 补码校验值计算 )   
 CRC 校验 ( 30+ 种标准 CRC-8/10/12/16/24/32/64 参数化计算 )   
 htpasswd 生成 ( Apache/Nginx 基础认证文件: bcrypt ($2y$) / Apache MD5 ($apr1$) / SHA1 ({SHA}) / 明文, 可保存为 .htpasswd 文件 )   
+网页TDK信息检测 ( 输入网址自动抓取页面, 解析 Title / Keywords / Description 并按建议长度校验 )   
+robots.txt 生成 ( User-agent + Allow / Disallow / Crawl-delay / Sitemap 规则组装, 可保存文件 )   
 Base64 图片  
 GPS坐标转换   
 人民币大写   

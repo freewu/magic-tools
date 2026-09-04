@@ -30,3 +30,6 @@ tauri-plugin-fs = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 log = "0.4"
+# 网页抓取 (TDK 检测), rustls 避免引入 OpenSSL
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "gzip"] }
+base64 = "0.22"

@@ -1,5 +1,5 @@
 // 分类图标: 侧边栏(尤其折叠时)展示用
-import { SwapOutlined, CodeOutlined, LockOutlined, CalculatorOutlined, EllipsisOutlined } from '@ant-design/icons';
+import { SwapOutlined, CodeOutlined, LockOutlined, CalculatorOutlined, GlobalOutlined, EllipsisOutlined } from '@ant-design/icons';
 
 const list = [
   'Hash',
@@ -56,6 +56,8 @@ const list = [
   'AreaConvert',
   'WeightConvert',
   'HtpasswdGenerator',
+  'WebTDKCheck',
+  'RobotsTxtGenerator',
 ];
 
 // 加载 App 的定义 名称 / icon 
@@ -97,6 +99,7 @@ export const genMenuList = (appList :Array<AppItem>) => {
     ["crypto", { key: 'crypto',  label: '加解密',  icon: <LockOutlined />, children: new Array<AppItem> }],
     ["value-calc", { key: 'value-calc',  label: '值计算',  icon: <CalculatorOutlined />, children: new Array<AppItem> }],
     //["formatter", { key: 'formatter',  label: '格式化',  icon: '', children: new Array<AppItem> }],
+    ["webmaster", { key: 'webmaster',  label: '站长工具',  icon: <GlobalOutlined />, children:[] }],
     ["misc", { key: 'misc',  label: '其它',  icon: <EllipsisOutlined />, children:[] }],
   ]);
 
