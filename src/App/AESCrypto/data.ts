@@ -1,6 +1,8 @@
 // 加密模式列表
+// GCM: 认证加密 (密文+16 字节认证标签, IV 建议 12 字节, 无填充)
 export const modeList = [
   "CBC",
+  "GCM",
   "CFB",
   "CTR",
   "OFB",

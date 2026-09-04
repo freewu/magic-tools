@@ -24,7 +24,7 @@ UUencode 编码 / 解码
 XXencode 编码 / 解码  
 JWT 解码器 (header.payload.signature 解析)
 DES 加密 / 解密   
-AES 加密 / 解密    
+AES 加密 / 解密 ( ECB / CBC / CFB / CTR / OFB + GCM 认证加密, GCM 输出为 密文+16 字节认证标签 )   
 RSA 加解密 ( 公钥加密/私钥解密, 密钥对生成与 PEM 导出 )   
 SM2 加解密 ( 国密椭圆曲线, 公钥加密/私钥解密, 密钥对生成与导出 )   
 SM4 加解密 ( 国密分组密码, 128 位密钥, ECB / CBC + Pkcs7 / ZeroPadding )   

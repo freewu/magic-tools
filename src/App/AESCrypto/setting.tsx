@@ -9,6 +9,9 @@ import { getDefaultIV, setDefaultIV } from "./lib";
 import { getDefaultPassphrase, setDefaultPassphrase, genPassphraseLimitLength } from "./lib";
 import type { InputStatus } from "antd/es/_util/statusUtils";
 
+// 偏移量长度要求: GCM 建议 12 字节 (96-bit), 其它块模式 16 字节
+const ivRequiredLen = (m :string) => (m === 'GCM' ? 12 : 16);
+
 export const AESCryptoSetting = () => {
 
   const [ mode, setMode ] = useState(getDefaultMode()); // 默认 mode
@@ -24,12 +27,19 @@ export const AESCryptoSetting = () => {
   const onIVChange = (e :React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
     setIV(v); 
-    if(v.length === 0 || v.length == 16) { // IV长度必须为 0 
+    if(v.length === 0 || v.length === ivRequiredLen(mode)) { // IV 长度必须为 0 或与模式匹配
       setDefaultIV(v);
       setIVStatus("");
     } else {
       setIVStatus("error");
     }
+  }
+
+  // 默认模式切换
+  const onModeChange = (v :string) => {
+    setMode(v);
+    setDefaultMode(v);
+    setIVStatus((iv.length === 0 || iv.length === ivRequiredLen(v))? "" : "error");
   }
 
   // 密钥 Passphrase 输入处理
@@ -54,7 +64,7 @@ export const AESCryptoSetting = () => {
         <Select
           value={ mode }
           style={{ width: 240 }}
-          onChange={ (v :string) => { setMode(v); setDefaultMode(v); } }
+          onChange={ onModeChange }
           options={ arrayToOptions(modeList) }
         />
       </Form.Item>
@@ -78,12 +88,13 @@ export const AESCryptoSetting = () => {
         <Space>
           <Input 
             status= { ivStatus }
-            maxLength = { 16 }
+            maxLength = { ivRequiredLen(mode) }
             allowClear
             style={ { width: "520px" } }
             onChange={ onIVChange }
             value= { iv } />
-          { iv.length? iv.length + " / 16" : null }
+          { iv.length? iv.length + " / " + ivRequiredLen(mode) : null }
+          { (mode === 'GCM') && <span style={ { color: "#999", fontSize: 12 }}>GCM 建议 12 字节 (96-bit) IV</span> }
         </Space>
       </Form.Item>
       <Form.Item label="默认密钥">

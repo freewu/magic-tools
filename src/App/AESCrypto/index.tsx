@@ -1,4 +1,4 @@
-import { Select, Divider, Button,Input, Space, message,Row } from "antd";
+import { Select, Divider, Button,Input, Space, message,Row, Tooltip } from "antd";
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { useState } from "react";
 const { TextArea } = Input;
@@ -9,7 +9,14 @@ import * as CryptoJS from 'crypto-js';
 import { modeList, paddingList, codeList, capacityList } from "./data";
 import { getDefaultIV, getDefaultCode, getDefaultMode, getDefaultPadding, getDefaultPassphrase,genCapacity } from "./lib";
 import { getPadding, getMode } from "./lib";
+import { aesGcmEncrypt, aesGcmDecrypt, bytesToHex, hexToBytes, bytesToBase64, base64ToBytes } from "./gcm";
 import type { InputStatus } from "antd/es/_util/statusUtils";
+
+// 偏移量长度要求: GCM 建议 12 字节 (96-bit), 其它块模式 16 字节
+const ivRequiredLen = (m :string) => (m === 'GCM' ? 12 : 16);
+
+// 字符串 -> UTF-8 字节
+const utf8Bytes = (s :string) :Uint8Array => new TextEncoder().encode(s);
 
 const AESCrypto = () => {
 
@@ -28,7 +35,11 @@ const AESCrypto = () => {
   const [ passphrase, setPassphrase] = useState(getDefaultPassphrase()); // 秘钥
   const [ capacity, setCapacity ] = useState(genCapacity(getDefaultPassphrase().length)); // 位数
   const [ ivDisabled, setIVDisabled ] = useState(getDefaultMode() == 'ECB'); // iv 是否可用 ECB 模式下不需要 iv
-  const [ ivStatus, setIVStatus ] = useState( ((getDefaultIV().length !== 16)? 'error' : '') as InputStatus); // 偏移量提醒
+  const [ ivStatus, setIVStatus ] = useState( (() => {
+    const m = getDefaultMode();
+    if(m === 'ECB') return '' as InputStatus;
+    return (getDefaultIV().length === ivRequiredLen(m))? '' as InputStatus : 'error' as InputStatus;
+  })() ); // 偏移量提醒
   const [ passphraseStatus, setPassphraseStatus ] = useState(genDefaultPassphraseStatus()); // 密钥提醒
 
   const isCanDo = (value :string) :boolean => {
@@ -46,6 +57,11 @@ const AESCrypto = () => {
   const encode = () => {
     if(!isCanDo(encodeValue)) return ;
     try {
+      if(mode === 'GCM') {
+        // GCM: 纯 TS 引擎, 输出 = 密文 || 16 字节认证标签
+        const out = aesGcmEncrypt(utf8Bytes(passphrase), utf8Bytes(iv), utf8Bytes(encodeValue));
+        return setDecodeValue((code === "Base64")? bytesToBase64(out) : bytesToHex(out));
+      }
       const value = CryptoJS.AES.encrypt(
         encodeValue,
         CryptoJS.enc.Utf8.parse(passphrase), // passphrase, 不能直接传string 要不然会 CryptoJS 会加 salt
@@ -69,6 +85,12 @@ const AESCrypto = () => {
   const decode = () => {
     if(!isCanDo(decodeValue)) return ;
     try {
+      if(mode === 'GCM') {
+        // GCM: 输入 = 密文 || 16 字节认证标签 (Base64/HEX)
+        const data = (code === "Base64")? base64ToBytes(decodeValue) : hexToBytes(decodeValue);
+        const plain = aesGcmDecrypt(utf8Bytes(passphrase), utf8Bytes(iv), data);
+        return setEncodeValue(new TextDecoder().decode(plain));
+      }
       const value = CryptoJS.AES.decrypt(
         (code === "Base64")? decodeValue : CryptoJS.enc.Base64.stringify(CryptoJS.enc.Hex.parse(decodeValue)), // 需传入 base64的值 
         CryptoJS.enc.Utf8.parse(passphrase), // passphrase, 不能直接传string 要不然会 CryptoJS 会加 salt
@@ -84,8 +106,12 @@ const AESCrypto = () => {
       }
       return setEncodeValue(result);
     } catch (error) {
-      console.log(error);
-      //notice.error(e);
+      // GCM 的认证失败等异常需要给出明确提示
+      if(mode === 'GCM' && error instanceof Error) {
+        notice.error(error.message);
+      } else {
+        console.log(error);
+      }
     }
   };
 
@@ -104,11 +130,7 @@ const AESCrypto = () => {
   const onIVChange = (e :React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
     setIV(v); 
-    if(v.length == 16) { // IV长度必须为 0 
-      setIVStatus("");
-    } else {
-      setIVStatus("error");
-    }
+    setIVStatus(v.length === ivRequiredLen(mode)? "" : "error");
   }
 
   // 位数切换
@@ -125,6 +147,8 @@ const AESCrypto = () => {
   const onModeChange = (v :string) => { 
     setMode(v);
     setIVDisabled( v == 'ECB'); 
+    // 切换后按新模式的 IV 长度要求重新校验
+    setIVStatus((v == 'ECB')? '' : ((iv.length === ivRequiredLen(v))? '' : 'error'));
   } 
 
   // 密钥 Passphrase 输入处理
@@ -149,22 +173,38 @@ const AESCrypto = () => {
             options={ arrayToOptions(modeList) }
           />
           <label>填充:</label>
-          <Select
-            value={ padding }
-            style={{ width: 120 }}
-            onChange={ (v :string) => { setPadding(v) } }
-            options={ arrayToOptions(paddingList) }
-          />
+          {
+            (mode === 'GCM')
+              ? (
+                <Tooltip title="GCM 为认证加密模式, 无需填充; 输出 / 输入格式为 密文 + 16 字节认证标签">
+                  <Select
+                    value={ padding }
+                    style={{ width: 120 }}
+                    disabled
+                    options={ arrayToOptions(paddingList) }
+                  />
+                </Tooltip>
+              )
+              : (
+                <Select
+                  value={ padding }
+                  style={{ width: 120 }}
+                  onChange={ (v :string) => { setPadding(v) } }
+                  options={ arrayToOptions(paddingList) }
+                />
+              )
+          }
           <label>偏移量(IV):</label>
           <Input 
             allowClear
             status={ ivStatus }
-            maxLength={ 16 }
+            maxLength={ ivRequiredLen(mode) }
             style={ { width: 320 } }
             disabled={ ivDisabled }
             onChange={ onIVChange }
             value= { iv } />
-          { iv.length } / { 16 }
+          { iv.length } / { ivRequiredLen(mode) }
+          { (mode === 'GCM') && <span style={ { color: "#999", fontSize: 12 }}>输出为 密文+16字节认证标签, IV 建议 12 字节</span> }
         </Space>
       </Row>
       <Row style = { { marginTop: "5px" }}>
