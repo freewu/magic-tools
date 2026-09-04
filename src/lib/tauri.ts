@@ -91,7 +91,7 @@ export async function saveTextFile(defaultName: string, content: string, title =
       const path = await save({
         title,
         defaultPath: defaultName,
-        filters: [{ name: '文本文件', extensions: ['txt', 'pem', 'key'] }],
+        filters: [{ name: '文本文件', extensions: ['txt', 'pem', 'key', 'htpasswd'] }],
       });
       if (path === null) return false;
       await writeTextFile(path, content);

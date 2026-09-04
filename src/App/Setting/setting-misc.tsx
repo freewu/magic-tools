@@ -3,6 +3,7 @@ import { Form } from "antd";
 import { ColorSetting } from "../Color/setting";
 import { QRCodeGeneratorSetting } from "../QRCodeGenerator/setting";
 import { BarcodeGeneratorSetting } from "../BarcodeGenerator/setting";
+import { HtpasswdGeneratorSetting } from "../HtpasswdGenerator/setting";
 
 export const SettingMisc = () => {
 
@@ -11,6 +12,7 @@ export const SettingMisc = () => {
       <ColorSetting />
       <QRCodeGeneratorSetting />
       <BarcodeGeneratorSetting />
+      <HtpasswdGeneratorSetting />
     </Form>
   )
 }

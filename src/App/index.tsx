@@ -55,6 +55,7 @@ const list = [
   'VolumeConvert',
   'AreaConvert',
   'WeightConvert',
+  'HtpasswdGenerator',
 ];
 
 // 加载 App 的定义 名称 / icon 
