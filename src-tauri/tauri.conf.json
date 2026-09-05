@@ -23,7 +23,7 @@
       }
     ],
     "security": {
-      "csp": "script-src 'self' 'unsafe-inline'"
+      "csp": null
     }
   },
   "bundle": {

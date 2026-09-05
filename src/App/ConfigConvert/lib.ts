@@ -46,7 +46,7 @@ export const yaml2json = (data :string) :Object => {
 }
 
 // toml <==> json
-const TOML = require('toml-patch');
+import * as TOML from 'toml-patch';
 export const json2toml = (data :Object) :string => {
   return TOML.stringify(data);
 }
@@ -149,7 +149,7 @@ function propertiesToJSON(data :string) :Object {
   return result;
 }
 
-const merge = require('deepmerge')
+import merge from 'deepmerge'
 // 生成 对象
 function pp(key :string , value :string, result :any ) :Object {
   const k = key.split("."); // 使用 . 分隔

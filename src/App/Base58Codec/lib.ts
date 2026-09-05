@@ -1,5 +1,6 @@
+import baseX from 'base-x';
 const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-const bs58 = require('base-x')(BASE58);
+const bs58 = baseX(BASE58);
 
 import { Uint8ArrayToString, stringToUint8Array } from "../../lib/string"
 
