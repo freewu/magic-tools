@@ -5,6 +5,7 @@ import { QRCodeGeneratorSetting } from "../QRCodeGenerator/setting";
 import { BarcodeGeneratorSetting } from "../BarcodeGenerator/setting";
 import { HtpasswdGeneratorSetting } from "../HtpasswdGenerator/setting";
 import { RegexTesterSetting } from "../RegexTester/setting";
+import { MorseCodecSetting } from "../MorseCodec/setting";
 
 export const SettingMisc = () => {
 
@@ -14,6 +15,7 @@ export const SettingMisc = () => {
       <QRCodeGeneratorSetting />
       <BarcodeGeneratorSetting />
       <HtpasswdGeneratorSetting />
+      <MorseCodecSetting />
       <RegexTesterSetting />
     </Form>
   )

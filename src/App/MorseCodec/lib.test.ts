@@ -122,3 +122,51 @@ describe('摩斯码播放调度 (buildMorsePlaySchedule)', () => {
     expect(s.startMs).toEqual([]);
   });
 });
+
+import {
+  MORSE_PHRASE_GROUPS,
+  listCustomMorsePhrases,
+  saveCustomMorsePhrases,
+} from './lib';
+
+describe('摩斯码常用编码速查', () => {
+  it('内置分组与条目齐全', () => {
+    expect(MORSE_PHRASE_GROUPS.map((g) => g.key)).toEqual(['call', 'q', 'num', 'word']);
+    const total = MORSE_PHRASE_GROUPS.reduce((a, g) => a + g.items.length, 0);
+    expect(total).toBe(26);
+    const allTexts = MORSE_PHRASE_GROUPS.flatMap((g) => g.items.map((i) => i.text));
+    expect(allTexts).toContain('CQ');
+    expect(allTexts).toContain('SOS');
+    expect(allTexts).toContain('QRZ');
+    expect(allTexts).toContain('QSO');
+    expect(allTexts).toContain('73');
+    expect(allTexts).toContain('88');
+    expect(allTexts).toContain('TU');
+    expect(new Set(allTexts).size).toBe(allTexts.length); // 无重复
+  });
+
+  it('内置编码均可被摩斯表编码且码值正确', () => {
+    expect(encodeMorse('CQ')).toBe('-.-. --.-');
+    expect(encodeMorse('SOS')).toBe('... --- ...');
+    expect(encodeMorse('QRZ')).toBe('--.- .-. --..');
+    expect(encodeMorse('73')).toBe('--... ...--');
+    expect(encodeMorse('TU')).toBe('- ..-');
+    // 所有内置条目都能编码 (全为字母/数字/标点)
+    for (const g of MORSE_PHRASE_GROUPS) {
+      for (const it of g.items) {
+        expect(() => encodeMorse(it.text)).not.toThrow();
+      }
+    }
+  });
+
+  it('自定义常用编码存取与容错', () => {
+    localStorage.removeItem('morse-phrases');
+    expect(listCustomMorsePhrases()).toEqual([]);
+    localStorage.setItem('morse-phrases', 'not-json');
+    expect(listCustomMorsePhrases()).toEqual([]);
+    saveCustomMorsePhrases([{ id: 1, text: 'CQ', desc: '呼叫' }, { id: 2, text: 'BYE', desc: '再见' }]);
+    expect(listCustomMorsePhrases().length).toBe(2);
+    expect(listCustomMorsePhrases()[0]).toEqual({ id: 1, text: 'CQ', desc: '呼叫' });
+    localStorage.removeItem('morse-phrases');
+  });
+});

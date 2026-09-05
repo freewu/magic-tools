@@ -136,3 +136,92 @@ export const buildMorsePlaySchedule = (morse :string, dotMs :number) :MorsePlayS
 
   return { tokens: out, startMs, totalMs: cur, events };
 };
+
+// ---------- 常用编码 (呼叫 / Q简语 / 数字祝词 / 单词简写 + 自定义) ----------
+export interface MorsePhraseItem {
+  text: string; // 填入文本 (如 CQ / 73 / TU), 可为字母数字标点组成的词句
+  desc: string; // 含义说明
+}
+
+export interface MorsePhraseGroup {
+  key: string;
+  name: string;
+  items: MorsePhraseItem[];
+}
+
+// 内置常用编码分组 (莫斯码由表实时编码, 保证与播放一致)
+export const MORSE_PHRASE_GROUPS :MorsePhraseGroup[] = [
+  {
+    key: 'call', name: '呼叫 / 通用',
+    items: [
+      { text: 'CQ', desc: '呼叫所有电台（常发 CQ CQ CQ 广泛呼叫）' },
+      { text: 'SOS', desc: '求救信号' },
+      { text: 'K', desc: '请讲 / 轮到你（Over）' },
+      { text: 'KN', desc: '只允许指定电台回复' },
+      { text: 'AS', desc: '稍等、待命' },
+      { text: 'AR', desc: '报文结束' },
+      { text: 'SK', desc: '通信结束，下线' },
+      { text: 'BT', desc: '分段分隔符' },
+    ],
+  },
+  {
+    key: 'q', name: '高频 Q 简语',
+    items: [
+      { text: 'QRZ', desc: '谁在呼叫我？' },
+      { text: 'QTH', desc: '你的位置？/ 我位置是…' },
+      { text: 'QSL', desc: '收到确认，知悉' },
+      { text: 'QRL', desc: '频率占用、我很忙' },
+      { text: 'QRM', desc: '有人为干扰' },
+      { text: 'QRN', desc: '天电 / 静电噪声' },
+      { text: 'QRX', desc: '请等一下，稍后呼叫' },
+      { text: 'QRT', desc: '停止发报、关机' },
+      { text: 'QRV', desc: '我准备好了' },
+      { text: 'QSY', desc: '换频率' },
+      { text: 'QSO', desc: '电台联络、通联会话' },
+    ],
+  },
+  {
+    key: 'num', name: '数字祝词',
+    items: [
+      { text: '73', desc: '致敬、祝顺利（最常用结束语）' },
+      { text: '88', desc: '爱与祝福' },
+    ],
+  },
+  {
+    key: 'word', name: '单词简写',
+    items: [
+      { text: 'TU', desc: 'Thank you 谢谢' },
+      { text: 'OK', desc: '好的' },
+      { text: 'R', desc: 'Received = 收到' },
+      { text: 'GN', desc: 'Good night 晚安' },
+      { text: 'GM', desc: 'Good morning 早安' },
+    ],
+  },
+];
+
+// 自定义常用编码 (存储在 设置 → 其它 → 摩斯码常用编码)
+export interface CustomMorsePhrase {
+  id: number;
+  text: string;
+  desc: string;
+}
+
+const CUSTOM_KEY = 'morse-phrases';
+
+export const listCustomMorsePhrases = () :CustomMorsePhrase[] => {
+  try {
+    const raw = localStorage.getItem(CUSTOM_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) return [];
+    return arr.filter((x) => x && typeof x.text === 'string' && typeof x.desc === 'string' && typeof x.id === 'number');
+  } catch {
+    return [];
+  }
+};
+
+export const saveCustomMorsePhrases = (list :CustomMorsePhrase[]) => {
+  try { localStorage.setItem(CUSTOM_KEY, JSON.stringify(list)); } catch { /* ignore */ }
+};
+
+export const newMorsePhraseId = () :number => Date.now();

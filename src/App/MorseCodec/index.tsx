@@ -4,7 +4,7 @@ const { TextArea } = Input;
 import { ArrowDownOutlined, ArrowUpOutlined, CaretRightOutlined, StopOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
 import { openFile } from "../../lib/file"
-import { encodeMorse, decodeMorse, isMorseText, buildMorsePlaySchedule, type MorsePlayToken } from "./lib"
+import { encodeMorse, decodeMorse, isMorseText, buildMorsePlaySchedule, MORSE_PHRASE_GROUPS, listCustomMorsePhrases, type MorsePlayToken } from "./lib"
 import MorseIntro from "./intro"
 
 // 播放速度: 点的时长 (ms)
@@ -35,7 +35,9 @@ const MorseCodec = () => {
   const [ tone, setTone ] = useState('telegraph'); // 播放音效
   const [ playTokens, setPlayTokens ] = useState<MorsePlayToken[] | null>(null); // 播放的码值序列
   const [ activeIdx, setActiveIdx ] = useState(-1); // 当前发声码值 (红色高亮)
+  const [ phrases, setPhrases ] = useState(() => listCustomMorsePhrases()); // 自定义常用编码
   const [ notice, contextHolder ] = message.useMessage();
+  const phraseMap = useRef(new Map<string, { text: string; desc: string }>()); // value -> 编码条目
 
   const ctxRef = useRef<AudioContext | null>(null);
   const runRef = useRef(0);          // 播放批次号, 停止时递增使旧定时器失效
@@ -66,6 +68,52 @@ const MorseCodec = () => {
     } catch(err) {
       notice.error("解码失败: " + (err as Error).message);
     }
+  }
+
+  // 取某段文本对应的摩斯码 (供下拉显示; 无法编码时返回 '?')
+  const codeOf = (t :string) :string => {
+    try { return encodeMorse(t); } catch { return '?'; }
+  }
+
+  // 选择常用编码后快速填充: 填入明文并同步编码到下方摩斯区
+  const fillPhrase = (item :{ text: string; desc: string }) => {
+    const t = item.text.trim();
+    if (t === '') return;
+    setText(t);
+    try {
+      setMorse(encodeMorse(t));
+      notice.success(`已快速填充: ${t} (${item.desc})`);
+    } catch {
+      setMorse('');
+      notice.warning(`已填入文本「${t}」, 但含无法编码的字符`);
+    }
+  }
+
+  // 常用编码下拉分组选项 (内置分组 + 设置中的自定义), label 内联码值与含义
+  const phraseOptions = () => {
+    phraseMap.current.clear();
+    const groups :Array<{ label: string; options: Array<{ value: string; label: string }> }> = [];
+    for (const g of MORSE_PHRASE_GROUPS) {
+      groups.push({
+        label: g.name,
+        options: g.items.map((it) => {
+          const value = `${g.key}:${it.text}`;
+          phraseMap.current.set(value, { text: it.text, desc: it.desc });
+          return { value, label: `${it.text}  ${codeOf(it.text)}  ·  ${it.desc}` };
+        }),
+      });
+    }
+    if (phrases.length > 0) {
+      groups.push({
+        label: '自定义',
+        options: phrases.map((it) => {
+          const value = `custom:${it.id}`;
+          phraseMap.current.set(value, { text: it.text, desc: it.desc });
+          return { value, label: `${it.text}  ${codeOf(it.text)}  ·  ${it.desc}` };
+        }),
+      });
+    }
+    return groups;
   }
 
   // 取当前可播放的摩斯码: 优先下方的摩斯框, 其次上方若为摩斯码, 最后尝试把上方明文编码后播放
@@ -156,6 +204,24 @@ const MorseCodec = () => {
   return (
     <div>
       {contextHolder}
+
+      <div style={ { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', margin: '4px 0' } }>
+        <span>常用编码</span>
+        <Select
+          style={ { minWidth: 260 } }
+          placeholder="选择常用编码快速填充 (CQ / SOS / Q简语 / 73 等, 自定义见设置)"
+          showSearch
+          value={ undefined }
+          options={ phraseOptions() }
+          onSelect={ (v :unknown) => {
+            const it = phraseMap.current.get(String(v));
+            if (it) fillPhrase(it);
+          } }
+          onDropdownVisibleChange={ (open) => { if (open) setPhrases(listCustomMorsePhrases()); } }
+          dropdownStyle={ { minWidth: 520 } }
+          allowClear
+        />
+      </div>
 
       <TextArea
         style={ { margin: "5px 0 5px 0" }}
