@@ -7,9 +7,49 @@
       content="script-src 'self' 'unsafe-inline'"
     />
     <title>Magic Tools</title>
+    <style>
+      /* file:// 直接打开产物时的引导提示样式 (http/dev/Tauri 下不显示) */
+      .file-hint {
+        font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+        max-width: 520px;
+        margin: 12vh auto 0;
+        padding: 28px 32px;
+        border: 1px solid #d9d9d9;
+        border-radius: 8px;
+        background: #fff;
+        color: #333;
+      }
+      .file-hint h2 { margin: 0 0 12px; font-size: 18px; }
+      .file-hint p { margin: 8px 0; font-size: 13px; line-height: 1.7; }
+      .file-hint code {
+        background: #f5f5f5;
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-family: Consolas, monospace;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Vite 产物使用 ES Module 加载 (含按需懒加载分包), 浏览器出于安全限制
+      // 不允许 file:// 页面加载 module 子资源, 直接双击 dist/index.html 会黑屏。
+      // 这里给 file:// 场景一个可操作的引导提示 (替代无声黑屏)。
+      if (window.location.protocol === 'file:') {
+        var el = document.getElementById('root');
+        if (el) {
+          el.innerHTML =
+            '<div class="file-hint">' +
+            '<h2>无法以 file:// 方式打开构建产物</h2>' +
+            '<p>当前页面通过双击 index.html 打开，浏览器安全策略禁止加载 ES Module 分包资源，因此页面无法启动。</p>' +
+            '<p>请选择以下任一方式运行：</p>' +
+            '<p>1. 本地预览构建产物：<code>just preview</code>（或 <code>npm run preview:renderer</code>），然后访问 <code>http://localhost:4173</code></p>' +
+            '<p>2. 开发模式：<code>just dev</code>（Tauri 窗口）或 <code>npm run dev:renderer</code> 后访问 <code>http://localhost:1212</code></p>' +
+            '<p>3. 使用打包后的桌面应用：<code>just build</code></p>' +
+            '</div>';
+        }
+      }
+    </script>
     <script type="module" src="/index.tsx"></script>
   </body>
 </html>

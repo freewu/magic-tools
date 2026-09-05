@@ -7,9 +7,11 @@ import { format } from 'sql-formatter';
 import type { FormatOptionsWithLanguage,IndentStyle, KeywordCase, CommaPosition, LogicalOperatorNewline } from 'sql-formatter';
 import { languageList, keywordCaseList,indentStyleList,commaPositionList,logicalOperatorNewlineList } from "./data";
 
-// 代码高亮
+// 代码高亮 (按需: 仅注册 SQL 语言, 避免整库 190+ 语言全部打包)
 import 'highlight.js/styles/monokai-sublime.css';
-import highlight from 'highlight.js';
+import sqlLang from 'highlight.js/lib/languages/sql'; // 根包 types 提供通配子路径声明
+import highlight from 'highlight.js/lib/core';
+highlight.registerLanguage('sql', sqlLang);
 import './sql-formatter.css';
 
 const URL = () => {

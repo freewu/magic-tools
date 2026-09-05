@@ -31,7 +31,8 @@
     "lint": "cross-env NODE_ENV=development eslint . --ext .js,.jsx,.ts,.tsx",
     "test": "jest",
     "clean:renderer": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\"",
-    "clean": "just clean"
+    "clean": "just clean",
+    "preview:renderer": "vite preview --port 4173 --strictPort"
   },
   "browserslist": [],
   "prettier": {

@@ -22,5 +22,42 @@ export default defineConfig({
     sourcemap: false,
     // 入口 bundle 含 antd 等依赖体积较大, 提高告警阈值避免 CI 噪音
     chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        // 手动分包: 主入口 (layout/App 注册表) 只留业务骨架,
+        // 框架/UI/工具依赖拆成独立 vendor chunk, 供懒加载页面按需复用
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return undefined;
+          if (/node_modules\/(?:react|react-dom|react-router|react-router-dom|scheduler|use-sync-external-store|@remix-run|object-assign|loose-envify|prop-types)\//.test(id)) {
+            return 'vendor-react';
+          }
+          if (/node_modules\/@ant-design\//.test(id)) {
+            return 'vendor-antd-icons';
+          }
+          if (/node_modules\/(?:antd|rc-[^/]+|@rc-component|dayjs|classnames)\//.test(id)) {
+            return 'vendor-antd';
+          }
+          if (/node_modules\/(?:sql-formatter|nearley|moo|discontinuous-range|ret|railroad-diagrams)\//.test(id)) {
+            return 'vendor-sql';
+          }
+          if (/node_modules\/highlight\.js\//.test(id)) {
+            return 'vendor-highlight';
+          }
+          if (/node_modules\/yaml\//.test(id)) {
+            return 'vendor-yaml';
+          }
+          if (/node_modules\/(?:crypto-js|bcryptjs)\//.test(id)) {
+            return 'vendor-crypto';
+          }
+          if (/node_modules\/jsbarcode\//.test(id)) {
+            return 'vendor-barcode';
+          }
+          if (/node_modules\/pinyin-pro\//.test(id)) {
+            return 'vendor-pinyin';
+          }
+          return 'vendor-misc';
+        },
+      },
+    },
   },
 });

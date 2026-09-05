@@ -128,6 +128,14 @@ magic-tools
 # 只启动 React 开发服务器 (浏览器调试)
 
     just dev-renderer
+    # 浏览器打开 http://localhost:1212
+
+# 本地预览构建产物 (dist/, 相当于生产效果)
+
+    just preview
+    # 浏览器打开 http://localhost:4173
+    # 注意: Vite 产物为 ES Module 分包, 浏览器禁止 file:// 加载 module,
+    # 不要直接双击 dist/index.html (页面会给出引导提示, 不会无声黑屏)
 
 # 打包应用 (输出到 src-tauri/target/release/bundle/)
 

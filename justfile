@@ -44,6 +44,11 @@ dev-renderer:
 build-renderer:
     npm run build:renderer
 
+# Preview the built renderer locally (serve dist/ at http://localhost:4173)
+# 注意: 不要直接双击 dist/index.html (file:// 下浏览器禁 ES Module 分包, 会黑屏)
+preview:
+    npm run preview:renderer
+
 # Build the production app: renderer + Rust + installers (bundle)
 build:
     npm run tauri build
