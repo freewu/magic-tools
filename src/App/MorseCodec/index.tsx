@@ -1,10 +1,10 @@
-import { Button, Divider, Input, message, Select, Slider, Space } from "antd";
+import { Button, Divider, Input, message, Select, Slider, Space, theme } from "antd";
 import { useEffect, useRef, useState } from "react";
 const { TextArea } = Input;
 import { ArrowDownOutlined, ArrowUpOutlined, CaretRightOutlined, StopOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
 import { openFile } from "../../lib/file"
-import { encodeMorse, decodeMorse } from "./lib"
+import { encodeMorse, decodeMorse, isMorseText, buildMorsePlaySchedule, type MorsePlayToken } from "./lib"
 import MorseIntro from "./intro"
 
 // 播放速度: 点的时长 (ms)
@@ -15,43 +15,22 @@ const MORSE_SPEEDS = [
   { value: 80,  label: '快 (80ms)' },
 ];
 
-// 判断是否为摩斯码文本 (字母间空格 / 单词间 / 分隔)
-const isMorseText = (s :string) :boolean =>
-  /[.\-]/.test(s) && /^[\s.\-/]+$/.test(s);
-
-// 将摩斯码转换为按顺序播放的事件序列 (单位已换算为毫秒)
-const buildPlayEvents = (morse :string, dotMs :number) :Array<{ on: boolean; ms: number }> => {
-  const tokens = morse.trim().split(/\s+/).filter(Boolean);
-  const events :Array<{ on: boolean; ms: number }> = [];
-  let pendingGap = 0; // 下一个声音前需要静音的长度
-  for (const token of tokens) {
-    if (token === '/') { // 单词间隔 7 个单位
-      pendingGap = Math.max(pendingGap, dotMs * 7);
-      continue;
-    }
-    if (!/^[.\-]+$/.test(token)) continue; // 忽略无法识别的杂字符
-    const syms = token.split('');
-    syms.forEach((sym, j) => {
-      if (pendingGap > 0) { events.push({ on: false, ms: pendingGap }); pendingGap = 0; }
-      events.push({ on: true, ms: sym === '.' ? dotMs : dotMs * 3 }); // 点 1 / 划 3
-      if (j < syms.length - 1) events.push({ on: false, ms: dotMs });  // 符号内间隔 1
-    });
-    pendingGap = dotMs * 3; // 字母间隔 3
-  }
-  return events;
-};
-
 const MorseCodec = () => {
+
+  const { token } = theme.useToken();
 
   const [ text, setText ] = useState('');   // 明文
   const [ morse, setMorse ] = useState(''); // 摩斯码
   const [ dotMs, setDotMs ] = useState(120);   // 播放速度
   const [ freq, setFreq ] = useState(700);     // 播放频率 Hz
   const [ playing, setPlaying ] = useState(false);
+  const [ playTokens, setPlayTokens ] = useState<MorsePlayToken[] | null>(null); // 播放的码值序列
+  const [ activeIdx, setActiveIdx ] = useState(-1); // 当前发声码值 (红色高亮)
   const [ notice, contextHolder ] = message.useMessage();
 
   const ctxRef = useRef<AudioContext | null>(null);
-  const timerRef = useRef<number | undefined>(undefined);
+  const runRef = useRef(0);          // 播放批次号, 停止时递增使旧定时器失效
+  const timersRef = useRef<number[]>([]); // 所有待触发的定时器
 
   // 组件卸载时停止播放
   useEffect(() => () => { stop(); }, []);
@@ -93,8 +72,12 @@ const MorseCodec = () => {
   }
 
   const stop = () => {
+    runRef.current++; // 使尚未触发的批次定时器失效
     setPlaying(false);
-    if (timerRef.current !== undefined) { window.clearTimeout(timerRef.current); timerRef.current = undefined; }
+    setPlayTokens(null);
+    setActiveIdx(-1);
+    timersRef.current.forEach((t) => window.clearTimeout(t));
+    timersRef.current = [];
     if (ctxRef.current) { ctxRef.current.close().catch(() => {}); ctxRef.current = null; }
   };
 
@@ -104,8 +87,8 @@ const MorseCodec = () => {
       notice.warning('请先输入要播放的摩斯码 (或明文后先编码)');
       return;
     }
-    const events = buildPlayEvents(morseStr, dotMs);
-    if (events.length === 0) {
+    const sched = buildMorsePlaySchedule(morseStr, dotMs);
+    if (sched.events.length === 0) {
       notice.warning('没有可播放的摩斯符号');
       return;
     }
@@ -114,10 +97,15 @@ const MorseCodec = () => {
       const ctx = new AudioCtor();
       if (ctx.state === 'suspended') await ctx.resume();
       ctxRef.current = ctx;
+      const runId = ++runRef.current;
       setPlaying(true);
+      setPlayTokens(sched.tokens);
+      setActiveIdx(-1);
 
-      let cursor = ctx.currentTime + 0.06;
-      for (const ev of events) {
+      // 音频与高亮共用同一时间线 (声音从约 60ms 后开始)
+      const baseMs = 60;
+      let cursor = ctx.currentTime + baseMs / 1000;
+      for (const ev of sched.events) {
         if (ev.on) {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
@@ -125,19 +113,32 @@ const MorseCodec = () => {
           osc.frequency.value = freq;
           gain.gain.setValueAtTime(0.0001, cursor);
           gain.gain.linearRampToValueAtTime(0.5, cursor + 0.01);
-          gain.gain.setValueAtTime(0.5, cursor + Math.max(ev.ms - 0.02, 0.005));
-          gain.gain.linearRampToValueAtTime(0.0001, cursor + ev.ms);
+          gain.gain.setValueAtTime(0.5, cursor + Math.max(ev.ms / 1000 - 0.02, 0.005));
+          gain.gain.linearRampToValueAtTime(0.0001, cursor + ev.ms / 1000);
           osc.connect(gain).connect(ctx.destination);
           osc.start(cursor);
-          osc.stop(cursor + ev.ms + 0.03);
+          osc.stop(cursor + ev.ms / 1000 + 0.03);
         }
         cursor += ev.ms / 1000;
       }
-      const total = (cursor - ctx.currentTime) * 1000 + 150;
-      timerRef.current = window.setTimeout(() => { stop(); }, total);
+
+      // 每个码值开始发声时, 红色高亮它 (延迟 = 该码值在时间线上的起点 + 音频起始偏移)
+      const timers: number[] = [];
+      timersRef.current = timers;
+      sched.startMs.forEach((st, i) => {
+        timers.push(window.setTimeout(() => {
+          if (runRef.current === runId) setActiveIdx(i);
+        }, st + baseMs));
+      });
+      // 播放结束时自动停止 (最后一个声音 + 尾音)
+      timers.push(window.setTimeout(() => {
+        if (runRef.current === runId) stop();
+      }, sched.totalMs + baseMs + 150));
     } catch (err) {
       notice.error('播放失败: ' + (err as Error).message);
       setPlaying(false);
+      setPlayTokens(null);
+      setActiveIdx(-1);
     }
   };
 
@@ -197,6 +198,39 @@ const MorseCodec = () => {
         onDragOver={ (e) => { e.preventDefault(); } }
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setMorse ); } }
       />
+
+      { playing && playTokens && playTokens.length > 0 && (
+        <div
+          style={ {
+            marginTop: 10,
+            padding: '8px 12px',
+            border: `1px solid ${token.colorBorderSecondary}`,
+            borderRadius: 6,
+            background: token.colorBgContainer,
+            display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
+          } }
+        >
+          <span style={ { color: token.colorError, fontWeight: 600, fontSize: 13, flex: 'none' } }>● 正在播放</span>
+          <span style={ { fontFamily: 'Consolas, Monaco, monospace', fontSize: 17, letterSpacing: 2, lineHeight: '28px' } }>
+            { playTokens.map((t, i) => t.word ? (
+              <span key={ i } style={ { color: token.colorTextTertiary, margin: '0 8px' } }>/</span>
+            ) : (
+              <span
+                key={ i }
+                style={ {
+                  color: t.sym === activeIdx ? token.colorError : token.colorText,
+                  background: t.sym === activeIdx ? token.colorErrorBg : 'transparent',
+                  fontWeight: t.sym === activeIdx ? 700 : 400,
+                  borderRadius: 4,
+                  padding: '0 5px',
+                  marginRight: 8,
+                  transition: 'color 0.1s, background 0.1s',
+                } }
+              >{ t.text }</span>
+            )) }
+          </span>
+        </div>
+      ) }
 
       <Space style={ { marginTop: 4 } } wrap>
         <span>播放速度</span>

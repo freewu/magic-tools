@@ -70,3 +70,69 @@ export const decodeMorse = (text :string) :string => {
   words.push(current);
   return words.map((w) => w.join('')).filter(Boolean).join(' ');
 };
+
+// 判断是否为可播放的摩斯码文本 (仅 . - 空格 / )
+export const isMorseText = (s :string) :boolean =>
+  /[.\-]/.test(s) && /^[\s.\-/]+$/.test(s);
+
+export interface MorsePlayToken {
+  text: string;   // 展示文本: 某字母的码值 (如 ...) 或单词分隔 /
+  word: boolean;  // 是否为单词分隔 /
+  sym: number;    // 该码值在播放序列中的序号 (非码值项为 -1)
+}
+
+export interface MorsePlaySchedule {
+  tokens: MorsePlayToken[];          // 按顺序展示的码值列表
+  startMs: number[];                 // 每个码值开始发声的时间 (距首个声音, 毫秒)
+  totalMs: number;                   // 总时长 (毫秒)
+  events: Array<{ on: boolean; ms: number }>; // 音频事件序列 (与 startMs 同源)
+}
+
+/**
+ * 构建播放调度: 时间线完全基于摩斯节奏 (点=1, 划=3, 符号内间隔 1,
+ * 字母间隔 3, 单词间隔 7, 单位 = dotMs 毫秒), 供音频与高亮共用, 保证同步。
+ */
+export const buildMorsePlaySchedule = (morse :string, dotMs :number) :MorsePlaySchedule => {
+  const tokens = morse.trim().split(/\s+/).filter(Boolean);
+  const events :Array<{ on: boolean; ms: number }> = [];
+  const out :MorsePlayToken[] = [];
+  const startMs :number[] = [];
+  let cur = 0;        // 当前时间线位置 (距首个声音, ms)
+  let pendingGap = 0; // 下一个声音前需要静默的长度
+  let symIdx = 0;
+
+  const flushGap = () => {
+    if (pendingGap > 0) {
+      events.push({ on: false, ms: pendingGap });
+      cur += pendingGap;
+      pendingGap = 0;
+    }
+  };
+
+  for (const token of tokens) {
+    if (token === '/') { // 单词间隔 7 个单位
+      pendingGap = Math.max(pendingGap, dotMs * 7);
+      out.push({ text: '/', word: true, sym: -1 });
+      continue;
+    }
+    if (!isMorseSymbol(token)) { // 无法识别的杂串: 按字母间隔跳过 (常规入口已被 isMorseText 拦截)
+      pendingGap = Math.max(pendingGap, dotMs * 3);
+      out.push({ text: token, word: false, sym: -1 });
+      continue;
+    }
+    flushGap();
+    const syms = token.split('');
+    startMs.push(cur); // 该码值第一个符号开始发声的时间
+    syms.forEach((sym, j) => {
+      events.push({ on: true, ms: sym === '.' ? dotMs : dotMs * 3 }); // 点 1 / 划 3
+      if (j < syms.length - 1) events.push({ on: false, ms: dotMs });  // 符号内间隔 1
+    });
+    const charMs = syms.reduce((a, s) => a + (s === '.' ? dotMs : dotMs * 3) + dotMs, 0) - dotMs;
+    cur += charMs;
+    out.push({ text: token, word: false, sym: symIdx });
+    symIdx++;
+    pendingGap = dotMs * 3; // 字母间隔 3
+  }
+
+  return { tokens: out, startMs, totalMs: cur, events };
+};
