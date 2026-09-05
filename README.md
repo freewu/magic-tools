@@ -79,7 +79,7 @@ BCD码
 Tauri 2            -> 桌面应用框架 (替代原 Electron)
 React 18           -> 前端 UI (代码结构保持不变, 位于 src)
 Ant Design 5       -> UI 组件库
-webpack 5          -> 渲染进程构建
+Vite 5            -> 渲染进程构建 (替代原 webpack)
 just               -> 显示使用帮助 (默认命令)
 Rust               -> Tauri 主进程 (位于 src-tauri)
 ```
@@ -99,8 +99,9 @@ magic-tools
 │   ├── hook/                   # 全局状态 (主题/应用上下文)
 │   ├── layout/                 # 主框架 (侧边栏/内容区)
 │   └── lib/                    # 通用工具库
-├── .erb/configs/               # webpack 渲染进程构建配置
-├── dist/                       # React 打包产物 (Tauri frontendDist)
+├── .erb/                     # 构建辅助脚本 (jest 环境补丁 / release 复制等)
+├── vite.config.ts            # Vite 渲染进程构建配置 (入口 src/index.html)
+├── dist/                     # React 打包产物 (Tauri frontendDist)
 └── justfile                    # 构建/打包/发布脚本
 ```
 
@@ -119,7 +120,7 @@ magic-tools
     cd magic-tools
     npm install
 
-# 开发模式 (webpack dev server + Tauri 窗口)
+# 开发模式 (Vite dev server + Tauri 窗口)
 
     just dev
     # 或: npm run dev

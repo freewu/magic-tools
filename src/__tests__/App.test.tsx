@@ -9,6 +9,13 @@ jest.mock('../App', () => ({
   genMenuList: () => [],
 }));
 
+// app-modules 使用 import.meta.glob (Vite 专用), ts-jest 下需 mock
+jest.mock('../App/app-modules', () => ({
+  // 返回可渲染的空组件 (避免 React "Element type is invalid")
+  lazyPage: () => (function Dummy() { return null; }) as never,
+  defineLoader: () => undefined,
+}));
+
 import Main from '../Main';
 
 describe('App', () => {

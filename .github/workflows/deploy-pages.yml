@@ -1,6 +1,6 @@
 # 版本发布后部署纯前端版到 GitHub Pages
 # 触发时机: 推送 v* 版本 tag (与 build-release.yml 同源) 或手动 workflow_dispatch
-# 产物: 纯前端 Web 版 (webpack renderer 构建, dist/), publicPath './' 适配仓库子路径
+# 产物: 纯前端 Web 版 (Vite renderer 构建, dist/), base './' 适配仓库子路径
 name: deploy-pages
 
 on:

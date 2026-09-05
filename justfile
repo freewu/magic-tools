@@ -8,7 +8,7 @@
 #
 # Quick start:
 #   just              -> show usage help (default)
-#   just dev          -> development mode (webpack dev server + Tauri window)
+#   just dev          -> development mode (Vite dev server + Tauri window)
 #   just release      -> build and copy installers into release/
 #   just publish      -> build and publish to GitHub Releases
 #
@@ -32,7 +32,7 @@ help:
     @echo Usage: just COMMAND ARGS - full docs in README.md or run just --dump
     @just --list
 
-# Development mode: start webpack dev server (beforeDevCommand) + Tauri window
+# Development mode: start Vite dev server (beforeDevCommand) + Tauri window
 dev:
     npm run tauri dev
 

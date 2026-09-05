@@ -5,7 +5,7 @@ const { Content } = Layout;
 import { Navigate, useNavigate } from "react-router-dom"
 import { appList, genMenuList } from "../App";
 // lazy 需要配合 Suspense 使用
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
 import { getDefaultApp } from "../lib/setting";
 import "./layout.css"
 
@@ -18,12 +18,13 @@ const PAGE_NAMES: Record<string,string> = {
 
 // 页面组件映射 (懒加载): 固定页面 + appList 中的工具应用
 // 组件实例按 key 固定, 保证切换 Tab 时页面保持挂载 (填写的数据不丢失)
+import { lazyPage } from "../App/app-modules";
 const pageComps = new Map<string, React.LazyExoticComponent<React.ComponentType<any>>>();
 for (const key of [...Object.keys(PAGE_NAMES), ...appList.map((i) => i.key)]) {
-    pageComps.set(key, lazy(() => import(`../App/${key}`)));
+    pageComps.set(key, lazyPage(key));
 }
 // 该 key 是否是真实页面 (固定页面或已注册应用)
-const validPage = (key :string) => pageComps.has(key);
+const validPage = (key :string) => PAGE_NAMES[key] !== undefined || appList.some((i) => i.key === key);
 
 // 单个页面容器: memo 后仅在首次挂载时渲染, 切走/切回不会重建组件 (保活核心)
 const KeepAlivePage = React.memo(({ Page } :{ Page :React.ComponentType }) => {

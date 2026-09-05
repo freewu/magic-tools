@@ -63,12 +63,15 @@ const list = [
   'RobotsTxtGenerator',
 ];
 
+import { defineLoader } from './app-modules';
+
 // 加载 App 的定义 名称 / icon 
 type DefineModule = { AppName :string; Icon :string; Type :string };
 const loadAppDefine = async (app :string) :Promise<DefineModule | null> => {
   try {
-    const m = await import(`./${app}/define`);
-    return { AppName: m.AppName, Icon: m.Icon, Type: m.Type };
+    const m = await defineLoader(app)?.();
+    if (!m) return null;
+    return { AppName: String(m.AppName ?? ''), Icon: String(m.Icon ?? ''), Type: String(m.Type ?? '') };
   } catch (err) {
     console.log(err);
     return null;
