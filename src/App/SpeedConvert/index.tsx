@@ -72,7 +72,7 @@ const SpeedConvert = () => {
         case "mph": setResult(parseFloat(value) * 1.6093 ); break; // 英里每时(m/h)
         case "fts": setResult(parseFloat(value) * 0.3048 * 3600 / 1000 ); break; // 英尺每秒(ft/s)
         case "ftmin": setResult(parseFloat(value) * 0.3048 * 60 / 1000); break; //英尺每分钟(ft/min)
-        case "ins": setResult(parseFloat(value) * 2.54 * 3600  ); break; // 英寸每秒(in/s)
+        case "ins": setResult(parseFloat(value) * 2.54 * 3600 / 100000 ); break; // 英寸每秒(in/s)
       }
       setStatus('')
     } else {
