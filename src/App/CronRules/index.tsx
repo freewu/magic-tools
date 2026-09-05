@@ -1,4 +1,4 @@
-import { Button, Divider, InputNumber, Select, Space, Tag, theme, message } from 'antd';
+import { Button, Divider, InputNumber, Select, Space, Tag, Tabs, theme, message } from 'antd';
 import { useState } from 'react';
 import { CopyOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from './../../lib'
@@ -16,6 +16,7 @@ import {
   type CronPreset,
 } from './lib'
 import CronIntro from './intro'
+import CronParsePanel from './parse'
 
 const MODE_OPTIONS = [
   { value: 'any',   label: '任意 (*)' },
@@ -64,6 +65,14 @@ const CronRules = () => {
     <div>
       {contextHolder}
 
+      <Tabs
+        defaultActiveKey="gen"
+        items={ [
+          {
+            key: 'gen',
+            label: '生成',
+            children: (
+              <div>
       <Space wrap style={ { marginBottom: 10 } }>
         <span>表达式格式</span>
         <Select
@@ -187,6 +196,17 @@ const CronRules = () => {
       <div style={ { color: token.colorTextTertiary, fontSize: 12, marginTop: 4 } }>
         标准格式 = 秒 分 时 日 月 周 年; Linux 格式 = 分 时 日 月 周 (crontab 不支持秒/年)
       </div>
+
+              </div>
+            ),
+          },
+          {
+            key: 'parse',
+            label: '解析',
+            children: <CronParsePanel />,
+          },
+        ] }
+      />
 
       <Divider> Cron 规则说明 </Divider>
 
