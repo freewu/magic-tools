@@ -4,6 +4,7 @@ const { TextArea } = Input;
 import { ArrowDownOutlined, ArrowUpOutlined, CaretRightOutlined, StopOutlined, DownloadOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
 import { openFile } from "../../lib/file"
+import { saveBytesFile } from "../../lib/tauri"
 import { encodeMorse, decodeMorse, isMorseText, buildMorsePlaySchedule, renderMorseWav, MORSE_PHRASE_GROUPS, listCustomMorsePhrases, type MorsePlayToken } from "./lib"
 import MorseIntro from "./intro"
 
@@ -202,7 +203,7 @@ const MorseCodec = () => {
     }
   };
 
-  const saveWav = () => {
+  const saveWav = async () => {
     const morseStr = pickMorse();
     if (morseStr === null) {
       notice.warning('请先输入要导出的摩斯码 (或明文后先编码)');
@@ -216,17 +217,16 @@ const MorseCodec = () => {
     try {
       const toneDef = TONE_OPTIONS.find((t) => t.value === tone) ?? TONE_OPTIONS[0];
       const bytes = renderMorseWav(sched, { freq, wave: toneDef.type, amp: toneDef.amp });
-      const blob = new Blob([ bytes ], { type: 'audio/wav' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
       const base = morseStr.replace(/[^\w.-]/g, '_').replace(/_+/g, '_').slice(0, 20) || 'morse';
-      a.href = url;
-      a.download = `morse_${base}_${dotMs}ms.wav`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      notice.success(`已保存 WAV 音频 (时长约 ${(sched.totalMs / 1000).toFixed(1)}s, ${toneDef.label})`);
+      const defaultName = `morse_${base}_${dotMs}ms.wav`;
+      const saved = await saveBytesFile(defaultName, bytes, {
+        title: '保存摩斯音频',
+        filterName: 'WAV 音频',
+        extensions: ['wav'],
+      });
+      if (saved) {
+        notice.success(`已保存 WAV 音频 (时长约 ${(sched.totalMs / 1000).toFixed(1)}s, ${toneDef.label})`);
+      }
     } catch (err) {
       notice.error('保存失败: ' + (err as Error).message);
     }

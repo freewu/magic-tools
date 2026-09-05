@@ -114,6 +114,53 @@ export async function saveTextFile(defaultName: string, content: string, title =
 }
 
 /**
+ * 保存二进制文件 (摩斯 WAV 导出等)
+ * - Tauri 环境: 弹出系统保存对话框, 选好路径后写入文件
+ * - 普通浏览器(纯前端调试): 回退为 <a download> 触发浏览器下载
+ * @param defaultName 默认文件名 (含扩展名, 如 'morse_sos_120ms.wav')
+ * @param bytes 文件内容 (字节数组)
+ * @param opts.title 保存对话框标题
+ * @param opts.filterName 文件类型显示名
+ * @param opts.extensions 可选的扩展名过滤 (不带点)
+ * @returns true = 已保存/已触发下载; false = 用户在保存对话框取消
+ */
+export async function saveBytesFile(
+  defaultName: string,
+  bytes: Uint8Array,
+  opts: { title?: string; filterName?: string; extensions?: string[] } = {},
+): Promise<boolean> {
+  if (isTauri()) {
+    try {
+      const { save } = await import('@tauri-apps/plugin-dialog');
+      const { writeFile } = await import('@tauri-apps/plugin-fs');
+      const path = await save({
+        title: opts.title ?? '保存文件',
+        defaultPath: defaultName,
+        filters: [{ name: opts.filterName ?? '文件', extensions: opts.extensions ?? [] }],
+      });
+      // 用户点击了「取消」
+      if (path === null) return false;
+      await writeFile(path, bytes);
+      return true;
+    } catch (err) {
+      // 插件/权限异常时回退到浏览器下载方式
+      console.error('tauri saveBytesFile failed:', err);
+    }
+  }
+  // 浏览器回退
+  const blob = new Blob([ bytes ], { type: 'application/octet-stream' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = defaultName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  return true;
+}
+
+/**
  * 通知 Tauri 主进程显示模式已变化 (同步托盘菜单勾选)
  * @param mode 'light' | 'dark' | 'system'
  */
