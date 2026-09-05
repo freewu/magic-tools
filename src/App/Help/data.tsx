@@ -27,6 +27,25 @@ export const eventList = [
     color: "green",
     children: (
       <>
+        <p>2026-09-05 V2.4.0 Release</p>
+        <ul style={ {listStyle: "none" }}>
+          <li>新增站长工具分类: 网页 TDK 信息检测与 robots.txt 生成</li>
+          <li>编解码新增摩斯码编解码 (播放高亮/多音效/常用编码/一键保存 WAV 弹窗选择位置)、UUencode/XXencode、JWT 解码器</li>
+          <li>加解密新增 RSA / SM2 国密、SM4、AES GCM 认证加密、Caesar/Rail Fence/Vigenere/Hill 古典密码</li>
+          <li>值计算新增 SHA3 Hash / Keccak Hash; 其它分类新增 htpasswd 生成、正则表达式工具、Cron 规则生成</li>
+          <li>正则表达式: 预设增至 17 条 (常用 5 条新增) + 一键复制规则</li>
+          <li>Cron 规则生成新增「解析」页签 (逐字段中文解读 + 未来 10 次触发时间)</li>
+          <li>设置页改为 VSCode 式布局 (分类导航移至左侧栏, 记住上次分类)</li>
+          <li>修复 App 列表加载竞态与网页 TDK 深色模式显示问题</li>
+          <li>渲染进程构建由 webpack 迁移至 Vite</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    color: "green",
+    children: (
+      <>
         <p>2026-09-03 V2.2.0 Release</p>
         <ul style={ {listStyle: "none" }}>
           <li>编解码新增 Punycode 编解码</li>

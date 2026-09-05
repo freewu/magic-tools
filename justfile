@@ -21,7 +21,7 @@ set quiet := false
 # Note: 修改版本号时需同步以下位置 (完整清单见 README「版本修改」):
 #   package.json / src-tauri/Cargo.toml / src-tauri/tauri.conf.json / 本文件默认值
 #   / src/App/Help/data.tsx 更新日志 / update.md
-version := env_var_or_default("VERSION", "2.2.0")
+version := env_var_or_default("VERSION", "2.4.0")
 
 # Default command: show usage help
 default: help

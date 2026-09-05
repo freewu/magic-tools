@@ -42,7 +42,9 @@ Cloudflare Pages 使用 **Node 18 / npm 9.6.7** 构建（本地 Node 24 / npm 11
 
    （项目 justfile 中**没有** `just tag` 命令，手动执行上述 git 命令即可；tag 若推错可 `git tag -d vX.Y.Z && git push origin :refs/tags/vX.Y.Z` 删除后重推，不影响已触发失败的 Action）
 5. 推送 `v*` tag 触发 `.github/workflows/build-release.yml`：Windows 单体免安装 exe / macOS zip / Linux AppImage 三平台自动构建；workflow 会**自动截取 `update.md` 顶部第一个版本节**（第二个 `# MagicTools v` 标题之前）作为 GitHub Release 说明，产物自动上传。**确认 tag 已推送成功**（`git ls-remote --tags origin vX.Y.Z`）后，在回复中告知用户 CI 已触发，可在 GitHub Actions 页查看进度
-6. **同一个 `v*` tag 同时触发 `.github/workflows/deploy-pages.yml`**：构建纯前端 Web 版（`npm run build:renderer`，`publicPath: './'` 适配仓库子路径）并部署到 **GitHub Pages**（线上演示版，无 Tauri 能力，保存类操作走浏览器下载回退）。前提：仓库 Settings → Pages → Source 选择 **GitHub Actions**（Build and deployment），并确认 Pages 已启用；回复中一并告知用户 Pages 部署状态
+6. **同一个 `v*` tag 同时触发 `.github/workflows/deploy-pages.yml`**：构建纯前端 Web 版（`npm run build:renderer`，`base: './'` 适配仓库子路径）并部署到 **GitHub Pages**（线上演示版，无 Tauri 能力，保存类操作走浏览器下载回退）。前提：仓库 Settings → Pages → Source 选择 **GitHub Actions**（Build and deployment），并确认 Pages 已启用；回复中一并告知用户 Pages 部署状态
+
+> **防漏检查（教训：v2.3.0 曾只升版本号未打 tag/未发 release）**：升版本前先 `git tag -l` 确认上一版本 tag 存在；commit 后立刻 `git tag vX.Y.Z` + push（用 `git ls-remote --tags origin vX.Y.Z` 复核）。若发现历史某版本号漏发（仅改了部分版本文件、无 tag），**不要**为历史版本补 tag，应把其变更并入下一实际发布的版本节，并在 update.md 该版本节开头注明“含此前未发布的 vX.Y.Z 变更”。
 
 > 记牢：**每次版本发布 = 打 tag → 自动三平台 Release (build-release.yml) + GitHub Pages 部署 (deploy-pages.yml) 双触发**，两步均无需询问用户
 

@@ -1,6 +1,6 @@
 [package]
 name = "magic-tools"
-version = "2.3.0"
+version = "2.4.0"
 description = "Developer Tools Application"
 authors = ["bluefrog <bluefrog.wu@gmail.com>"]
 edition = "2021"
