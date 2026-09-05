@@ -22,6 +22,11 @@ export const DEFAULT_REGEX_PRESETS :RegexPreset[] = [
   { id: 10, name: '数字',          pattern: '^\\d+$', flags: '' },
   { id: 11, name: '金额(≤2位小数)', pattern: '^\\d+(\\.\\d{1,2})?$', flags: '' },
   { id: 12, name: '空白行',        pattern: '^\\s*$', flags: '' },
+  { id: 13, name: '中文字符',       pattern: '[\\u4e00-\\u9fa5]', flags: '' },
+  { id: 14, name: '双字节字符',     pattern: '[^\\x00-\\xff]', flags: '' },
+  { id: 15, name: '网址',           pattern: '^((https|http|ftp|rtsp|mms)?://)[^\\s]+', flags: '' },
+  { id: 16, name: '邮编',           pattern: '\\d{6}', flags: '' },
+  { id: 17, name: 'QQ号码',         pattern: '[1-9]([0-9]{5,11})', flags: '' },
 ];
 
 const cloneDefaults = () :RegexPreset[] => DEFAULT_REGEX_PRESETS.map((p) => ({ ...p }));
