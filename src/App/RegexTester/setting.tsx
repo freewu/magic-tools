@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button, Divider, Input, Space, message } from 'antd';
-import { DeleteOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusOutlined, ReloadOutlined, CopyOutlined } from '@ant-design/icons';
+import { copyTextToClipboard } from './../../lib'
 import {
   listRegexPresets,
   saveRegexPresets,
@@ -89,6 +90,13 @@ export const RegexTesterSetting = () => {
             type="text"
             icon={ <DeleteOutlined /> }
             onClick={ () => removeRow(p.id) }
+          />
+          <Button
+            size="small"
+            type="text"
+            icon={ <CopyOutlined /> }
+            title="一键复制该正则规则"
+            onClick={ () => { copyTextToClipboard(p.pattern); notice.success('复制到粘贴板成功！！！'); } }
           />
         </div>
       )) }

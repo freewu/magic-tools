@@ -76,6 +76,19 @@ const RegexTester = () => {
     setFlags(p.flags === '' ? [] : p.flags.split(''));
   };
 
+  // 一键复制某条预设的正则规则 (点击图标只复制不套用)
+  const copyPresetRule = (p :RegexPreset) => {
+    copyTextToClipboard(p.pattern);
+    notice.success('复制到粘贴板成功！！！');
+  };
+
+  // 一键复制当前正在使用的正则规则
+  const copyCurrentRule = () => {
+    if (pattern === '') { notice.warning('请先输入正则表达式'); return; }
+    copyTextToClipboard(pattern);
+    notice.success('复制到粘贴板成功！！！');
+  };
+
   const copyMatchedLines = () => {
     const matched = lines.filter((_, i) => results[i] === true).join('\n');
     if (matched === '') { notice.warning('没有匹配的行'); return; }
@@ -122,8 +135,34 @@ const RegexTester = () => {
           options={ presets.map((p) => ({ value: p.id, label: `${p.name}  (${p.pattern})` })) }
           onSelect={ applyPreset }
           onDropdownVisibleChange={ (open) => { if (open) setPresets(listRegexPresets()); } }
+          dropdownStyle={ { minWidth: 440 } }
+          optionRender={ (ori) => {
+            const v = (ori as { value?: number }).value;
+            const p = presets.find((x) => x.id === v);
+            return (
+              <div style={ { display: 'flex', alignItems: 'center', gap: 6 } }>
+                <span style={ { flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }>{ ori.label }</span>
+                { p && (
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={ <CopyOutlined /> }
+                    title={ `一键复制规则: ${p.pattern}` }
+                    onMouseDown={ (e) => e.stopPropagation() }
+                    onClick={ (e) => { e.stopPropagation(); copyPresetRule(p); } }
+                  />
+                ) }
+              </div>
+            );
+          } }
           allowClear
         />
+        <Button
+          size="small"
+          icon={ <CopyOutlined /> }
+          title="一键复制当前正则规则"
+          onClick={ copyCurrentRule }
+        >复制规则</Button>
         <Button
           size="small"
           icon={ <ReloadOutlined /> }
