@@ -57,6 +57,7 @@ const list = [
   'AreaConvert',
   'WeightConvert',
   'HtpasswdGenerator',
+  'RegexTester',
   'WebTDKCheck',
   'RobotsTxtGenerator',
 ];

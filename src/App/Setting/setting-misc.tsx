@@ -4,6 +4,7 @@ import { ColorSetting } from "../Color/setting";
 import { QRCodeGeneratorSetting } from "../QRCodeGenerator/setting";
 import { BarcodeGeneratorSetting } from "../BarcodeGenerator/setting";
 import { HtpasswdGeneratorSetting } from "../HtpasswdGenerator/setting";
+import { RegexTesterSetting } from "../RegexTester/setting";
 
 export const SettingMisc = () => {
 
@@ -13,6 +14,7 @@ export const SettingMisc = () => {
       <QRCodeGeneratorSetting />
       <BarcodeGeneratorSetting />
       <HtpasswdGeneratorSetting />
+      <RegexTesterSetting />
     </Form>
   )
 }
