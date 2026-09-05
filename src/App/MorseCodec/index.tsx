@@ -15,6 +15,14 @@ const MORSE_SPEEDS = [
   { value: 80,  label: '快 (80ms)' },
 ];
 
+// 播放音效: 波形 + 响度 (默认电报音 = 经典等幅报纯正弦 CW 音)
+const TONE_OPTIONS = [
+  { value: 'telegraph', label: '电报音 (默认)', type: 'sine' as OscillatorType, amp: 0.5 },
+  { value: 'buzzer',    label: '蜂鸣音',       type: 'square' as OscillatorType, amp: 0.2 },
+  { value: 'soft',      label: '柔和音',       type: 'triangle' as OscillatorType, amp: 0.45 },
+  { value: 'digital',   label: '电子音',       type: 'sawtooth' as OscillatorType, amp: 0.14 },
+];
+
 const MorseCodec = () => {
 
   const { token } = theme.useToken();
@@ -24,6 +32,7 @@ const MorseCodec = () => {
   const [ dotMs, setDotMs ] = useState(120);   // 播放速度
   const [ freq, setFreq ] = useState(700);     // 播放频率 Hz
   const [ playing, setPlaying ] = useState(false);
+  const [ tone, setTone ] = useState('telegraph'); // 播放音效
   const [ playTokens, setPlayTokens ] = useState<MorsePlayToken[] | null>(null); // 播放的码值序列
   const [ activeIdx, setActiveIdx ] = useState(-1); // 当前发声码值 (红色高亮)
   const [ notice, contextHolder ] = message.useMessage();
@@ -104,16 +113,18 @@ const MorseCodec = () => {
 
       // 音频与高亮共用同一时间线 (声音从约 60ms 后开始)
       const baseMs = 60;
+      const toneDef = TONE_OPTIONS.find((t) => t.value === tone) ?? TONE_OPTIONS[0];
+      const peak = toneDef.amp;
       let cursor = ctx.currentTime + baseMs / 1000;
       for (const ev of sched.events) {
         if (ev.on) {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
-          osc.type = 'sine';
+          osc.type = toneDef.type;
           osc.frequency.value = freq;
           gain.gain.setValueAtTime(0.0001, cursor);
-          gain.gain.linearRampToValueAtTime(0.5, cursor + 0.01);
-          gain.gain.setValueAtTime(0.5, cursor + Math.max(ev.ms / 1000 - 0.02, 0.005));
+          gain.gain.linearRampToValueAtTime(peak, cursor + 0.01);
+          gain.gain.setValueAtTime(peak, cursor + Math.max(ev.ms / 1000 - 0.02, 0.005));
           gain.gain.linearRampToValueAtTime(0.0001, cursor + ev.ms / 1000);
           osc.connect(gain).connect(ctx.destination);
           osc.start(cursor);
@@ -251,6 +262,13 @@ const MorseCodec = () => {
           />
         </div>
         <span>{ freq } Hz</span>
+        <span>音效</span>
+        <Select
+          value={ tone }
+          style={ { width: 150 } }
+          onChange={ setTone }
+          options={ TONE_OPTIONS }
+        />
         { playing && <span style={ { color: '#28a745' } }>正在播放…</span> }
       </Space>
 

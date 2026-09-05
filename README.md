@@ -22,7 +22,7 @@ Unicode 编码 / 解码
 Punycode 编码 / 解码  
 UUencode 编码 / 解码  
 XXencode 编码 / 解码  
-摩斯码编解码 ( ITU 摩斯电码, 文本⇄摩斯, 支持 Web Audio 播放/调速/调频, 播放时红色高亮当前码值 )  
+摩斯码编解码 ( ITU 摩斯电码, 文本⇄摩斯, 支持 Web Audio 播放/调速/调频/多音效(默认电报音), 播放时红色高亮当前码值 )  
 JWT 解码器 (header.payload.signature 解析)
 DES 加密 / 解密   
 AES 加密 / 解密 ( ECB / CBC / CFB / CTR / OFB + GCM 认证加密, GCM 输出为 密文+16 字节认证标签 )   
