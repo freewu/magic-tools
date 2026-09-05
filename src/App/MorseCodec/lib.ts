@@ -225,3 +225,70 @@ export const saveCustomMorsePhrases = (list :CustomMorsePhrase[]) => {
 };
 
 export const newMorsePhraseId = () :number => Date.now();
+
+// ---------- 导出为 WAV 音频 (离线合成, 与播放共用同一调度时间线) ----------
+export interface MorseWavOptions {
+  freq: number;          // 载波频率 Hz
+  wave: OscillatorType;  // 波形 (sine / square / triangle / sawtooth)
+  amp: number;           // 峰值幅度 0-1 (按音效预设)
+  sampleRate?: number;   // 采样率, 默认 44100
+}
+
+const clampSample = (v :number) :number => Math.max(-32767, Math.min(32767, Math.round(v * 32767)));
+
+// 按调度事件合成单声道 16bit PCM 并打包为 WAV (含 44 字节头 + 尾部静音)
+export const renderMorseWav = (sched :MorsePlaySchedule, opts :MorseWavOptions) :Uint8Array => {
+  const sr = opts.sampleRate ?? 44100;
+  const tailMs = 120; // 结尾静音, 避免音频戛然而止
+  const totalMs = Math.max(sched.totalMs, 1) + tailMs;
+  const totalSamples = Math.round(totalMs * sr / 1000);
+  const pcm = new Int16Array(totalSamples);
+
+  let cursorMs = 0; // 按事件推进 (事件为 on/off 段序列)
+  for (const ev of sched.events) {
+    const startIdx = Math.round(cursorMs * sr / 1000);
+    const endIdx = Math.round((cursorMs + ev.ms) * sr / 1000);
+    if (ev.on && opts.amp > 0) {
+      const dur = ev.ms / 1000;
+      const attack = 0.002; // 起音 2ms 防爆音
+      const release = 0.006; // 释音 6ms
+      const wave = opts.wave;
+      for (let i = startIdx; i < endIdx && i < totalSamples; i++) {
+        const t = (i - startIdx) / sr;
+        // 起音/释音包络
+        const envA = Math.min(1, t / attack);
+        const envR = Math.min(1, Math.max(0, (dur - t) / release));
+        const env = Math.min(envA, envR) * opts.amp;
+        const ph = t * opts.freq;
+        let s = 0;
+        if (wave === 'sine') s = Math.sin(2 * Math.PI * ph);
+        else if (wave === 'square') s = (ph - Math.floor(ph)) < 0.5 ? 1 : -1;
+        else if (wave === 'triangle') s = 1 - 4 * Math.abs((ph - Math.floor(ph)) - 0.5);
+        else s = 2 * (ph - Math.floor(ph)) - 1; // sawtooth
+        pcm[i] = clampSample(s * env);
+      }
+    }
+    cursorMs += ev.ms;
+  }
+
+  // WAV 头 (RIFF / fmt / data)
+  const dataLen = pcm.length * 2;
+  const bytes = new Uint8Array(44 + dataLen);
+  const view = new DataView(bytes.buffer);
+  const writeStr = (off :number, s :string) => { for (let i = 0; i < s.length; i++) bytes[off + i] = s.charCodeAt(i); };
+  writeStr(0, 'RIFF');
+  view.setUint32(4, 36 + dataLen, true);
+  writeStr(8, 'WAVE');
+  writeStr(12, 'fmt ');
+  view.setUint32(16, 16, true);          // fmt 块长度
+  view.setUint16(20, 1, true);           // PCM
+  view.setUint16(22, 1, true);           // 单声道
+  view.setUint32(24, sr, true);          // 采样率
+  view.setUint32(28, sr * 2, true);      // 字节率
+  view.setUint16(32, 2, true);           // 块对齐
+  view.setUint16(34, 16, true);          // 位深
+  writeStr(36, 'data');
+  view.setUint32(40, dataLen, true);
+  for (let i = 0; i < pcm.length; i++) view.setInt16(44 + i * 2, pcm[i], true);
+  return bytes;
+};

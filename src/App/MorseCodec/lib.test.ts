@@ -170,3 +170,59 @@ describe('摩斯码常用编码速查', () => {
     localStorage.removeItem('morse-phrases');
   });
 });
+
+import { renderMorseWav } from './lib';
+
+describe('摩斯码导出 WAV 音频', () => {
+  const sched = buildMorsePlaySchedule('... --- ...', 120); // SOS: totalMs = 3240
+
+  it('生成合法 RIFF/WAVE 单声道 16bit 头', () => {
+    const wav = renderMorseWav(sched, { freq: 700, wave: 'sine', amp: 0.5, sampleRate: 8000 });
+    const text = (b: Uint8Array, off: number, len: number) =>
+      String.fromCharCode(...Array.from(b.slice(off, off + len)));
+    expect(text(wav, 0, 4)).toBe('RIFF');
+    expect(text(wav, 8, 4)).toBe('WAVE');
+    expect(text(wav, 36, 4)).toBe('data');
+    const view = new DataView(wav.buffer);
+    expect(view.getUint16(20, true)).toBe(1);  // PCM
+    expect(view.getUint16(22, true)).toBe(1);  // 单声道
+    expect(view.getUint32(24, true)).toBe(8000);
+    expect(view.getUint16(34, true)).toBe(16); // 位深
+    // 总时长 = (3240 + 120 尾音)ms @ 8k
+    const dataLen = view.getUint32(40, true);
+    expect(dataLen).toBe((3240 + 120) * 8000 / 1000 * 2);
+    expect(wav.length).toBe(44 + dataLen);
+    expect(view.getUint32(4, true)).toBe(36 + dataLen);
+  });
+
+  it('实际有波形输出且幅度不削波', () => {
+    const wav = renderMorseWav(sched, { freq: 700, wave: 'sine', amp: 0.5, sampleRate: 8000 });
+    const view = new DataView(wav.buffer);
+    let nonZero = 0;
+    let peak = 0;
+    for (let i = 44; i < wav.length; i += 2) {
+      const s = view.getInt16(i, true);
+      peak = Math.max(peak, Math.abs(s));
+      if (s !== 0) nonZero++;
+    }
+    expect(nonZero).toBeGreaterThan(1000); // SOS 有声段足够长
+    expect(peak).toBeLessThanOrEqual(32767);
+    expect(peak).toBeGreaterThan(1000);    // 并非静音
+  });
+
+  it('不同波形与幅度参与渲染', () => {
+    const a = renderMorseWav(sched, { freq: 700, wave: 'square', amp: 0.2, sampleRate: 8000 });
+    const b = renderMorseWav(sched, { freq: 700, wave: 'triangle', amp: 0.45, sampleRate: 8000 });
+    const c = renderMorseWav(sched, { freq: 700, wave: 'sawtooth', amp: 0.14, sampleRate: 8000 });
+    expect(a.length).toBe(b.length);
+    expect(b.length).toBe(c.length);
+    const viewA = new DataView(a.buffer);
+    const viewB = new DataView(b.buffer);
+    let diff = 0;
+    for (let i = 44; i < a.length; i += 2) {
+      if (viewA.getInt16(i, true) !== viewB.getInt16(i, true)) diff++;
+    }
+    expect(diff).toBeGreaterThan(100); // 波形不同 -> 采样不同
+    expect(a.length).toBe(44 + (3240 + 120) * 8 * 2);
+  });
+});

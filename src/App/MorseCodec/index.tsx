@@ -1,10 +1,10 @@
 import { Button, Divider, Input, message, Select, Slider, Space, theme } from "antd";
 import { useEffect, useRef, useState } from "react";
 const { TextArea } = Input;
-import { ArrowDownOutlined, ArrowUpOutlined, CaretRightOutlined, StopOutlined } from '@ant-design/icons';
+import { ArrowDownOutlined, ArrowUpOutlined, CaretRightOutlined, StopOutlined, DownloadOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
 import { openFile } from "../../lib/file"
-import { encodeMorse, decodeMorse, isMorseText, buildMorsePlaySchedule, MORSE_PHRASE_GROUPS, listCustomMorsePhrases, type MorsePlayToken } from "./lib"
+import { encodeMorse, decodeMorse, isMorseText, buildMorsePlaySchedule, renderMorseWav, MORSE_PHRASE_GROUPS, listCustomMorsePhrases, type MorsePlayToken } from "./lib"
 import MorseIntro from "./intro"
 
 // 播放速度: 点的时长 (ms)
@@ -149,6 +149,7 @@ const MorseCodec = () => {
       notice.warning('没有可播放的摩斯符号');
       return;
     }
+
     try {
       const AudioCtor = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       const ctx = new AudioCtor();
@@ -198,6 +199,36 @@ const MorseCodec = () => {
       setPlaying(false);
       setPlayTokens(null);
       setActiveIdx(-1);
+    }
+  };
+
+  const saveWav = () => {
+    const morseStr = pickMorse();
+    if (morseStr === null) {
+      notice.warning('请先输入要导出的摩斯码 (或明文后先编码)');
+      return;
+    }
+    const sched = buildMorsePlaySchedule(morseStr, dotMs);
+    if (sched.events.length === 0) {
+      notice.warning('没有可导出的摩斯符号');
+      return;
+    }
+    try {
+      const toneDef = TONE_OPTIONS.find((t) => t.value === tone) ?? TONE_OPTIONS[0];
+      const bytes = renderMorseWav(sched, { freq, wave: toneDef.type, amp: toneDef.amp });
+      const blob = new Blob([ bytes ], { type: 'audio/wav' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const base = morseStr.replace(/[^\w.-]/g, '_').replace(/_+/g, '_').slice(0, 20) || 'morse';
+      a.href = url;
+      a.download = `morse_${base}_${dotMs}ms.wav`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      notice.success(`已保存 WAV 音频 (时长约 ${(sched.totalMs / 1000).toFixed(1)}s, ${toneDef.label})`);
+    } catch (err) {
+      notice.error('保存失败: ' + (err as Error).message);
     }
   };
 
@@ -252,6 +283,12 @@ const MorseCodec = () => {
           style={ { backgroundColor: "#17a2b8", color: "#fff" } }
           icon={<CaretRightOutlined />}
         >播放摩斯码</Button>
+        <Button
+          onClick={ saveWav }
+          disabled={ playing }
+          style={ { backgroundColor: "#6f42c1", color: "#fff" } }
+          icon={<DownloadOutlined />}
+        >保存音频 (WAV)</Button>
         <Button
           onClick={ stop }
           disabled={ !playing }
