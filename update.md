@@ -1,6 +1,13 @@
-# MagicTools v2.4.0
+# MagicTools v2.4.1
 
-> 说明：上一版 v2.3.0 仅升级了版本号但未发布（缺 git tag / GitHub Release），其间的功能变更一并收录在本次 v2.4.0 发布中
+> ⚠️ **本版发布原因（重要）**：上一版 **v2.4.0** 发布后，用户反馈**打开应用为黑屏、无任何内容**。经排查定位为渲染进程 webpack → Vite 迁移引入的产物兼容问题，本版已修复并作为正式版重新发布（v2.4.0 发布包已撤回）：
+>
+> 1. **残留 CommonJS `require()`**：源码中 3 处 `require('base-x' / 'toml-patch' / 'deepmerge')` 在 Vite/Rollup 下不再被转换、原样进入浏览器产物，执行即抛 `require is not defined`，导致 React 无法挂载（整页空白）→ 已全部改写为 **ESM import** 并补充类型声明；
+> 2. **Tauri CSP 拦截 antd 运行时样式**：Tauri 会把配置的 CSP 收紧为 nonce 白名单（`style-src 'self' 'nonce-…'`），而 antd v5 样式是**运行时注入的 `<style>`**，会被全部拦截 → 已调整 CSP 不再注入 nonce 强化（页面保留 `script-src` 约束）。
+>
+> 修复效果经打包产物 + WebView2 远程调试实测：首页与 ConfigConvert / Base58Codec / BaseXCodec / SQLFormatter / Setting 等懒加载页面均可正常渲染（React 挂载、47 个样式表注入、零报错）。**请 v2.4.0 用户重新下载本版**。
+>
+> 另：上一版 v2.3.0 仅升级了版本号但未发布（缺 git tag / GitHub Release），其间的功能变更一并收录在本版发布中。
 
 ## 更新内容
 
@@ -21,6 +28,7 @@
 
 ### 🐛 修复
 
+- **修复 v2.4.0 安装包启动黑屏（本版发布原因）**：残留 CommonJS `require` 改写 ESM import、CSP 调整兼容 antd 运行时样式（详见顶部说明）
 - 修复 App 列表加载竞态导致个别应用（如网页 TDK 检测）打不开的问题
 - 修复网页 TDK 信息检测结果区域深色模式下内容不可见（改用主题 token 配色）
 
