@@ -38,8 +38,8 @@ const MainContent :React.FC = () => {
   const navigate = useNavigate();
   const { token: { colorBgContainer } } = theme.useToken();
 
-  // 类型分组 -> 分组名称 (面包屑的类型)
-  const groupLabels = new Map(genMenuList(appList).map((g) => [g.key, g.label]));
+  // 类型分组 -> 分组名称 (面包屑的类型; 取纯文本 name, 避免带上菜单里的应用数徽标)
+  const groupLabels = new Map(genMenuList(appList).map((g) => [g.key, g.name ?? String(g.label)]));
 
   // 页面 key -> 应用名称
   const pageName = (key :string) => {

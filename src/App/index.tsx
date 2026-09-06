@@ -118,16 +118,17 @@ const appList = await getAppList();
 
 // 生成 menu
 export const genMenuList = (appList :Array<AppItem>) => {
-  type MenuGroup = { key: string; label: ReactNode; icon: ReactNode; children: AppItem[] };
+  type MenuGroup = { key: string; label: ReactNode; icon: ReactNode; children: AppItem[]; name: string };
   // 菜单分组 key/icon 与 App define 中的 Type 对应
+  // name: 分类纯文本名称 (供面包屑等非菜单场景使用, label 会在下方升级为含数量徽标的 ReactNode)
   let menuList = new Map<string, MenuGroup>([
-    ["convert", { key: 'convert',  label: '类型转换',  icon: <SwapOutlined />, children: new Array<AppItem>() }],
-    ["codec", { key: 'codec',  label: '编解码',  icon: <CodeOutlined />, children: new Array<AppItem>() }],
-    ["crypto", { key: 'crypto',  label: '加解密',  icon: <LockOutlined />, children: new Array<AppItem>() }],
-    ["value-calc", { key: 'value-calc',  label: '值计算',  icon: <CalculatorOutlined />, children: new Array<AppItem>() }],
-    //["formatter", { key: 'formatter',  label: '格式化',  icon: '', children: new Array<AppItem>() }],
-    ["webmaster", { key: 'webmaster',  label: '站长工具',  icon: <GlobalOutlined />, children: [] as AppItem[] }],
-    ["misc", { key: 'misc',  label: '其它',  icon: <EllipsisOutlined />, children: [] as AppItem[] }],
+    ["convert", { key: 'convert',  label: '类型转换',  name: '类型转换',  icon: <SwapOutlined />, children: new Array<AppItem>() }],
+    ["codec", { key: 'codec',  label: '编解码',  name: '编解码',  icon: <CodeOutlined />, children: new Array<AppItem>() }],
+    ["crypto", { key: 'crypto',  label: '加解密',  name: '加解密',  icon: <LockOutlined />, children: new Array<AppItem>() }],
+    ["value-calc", { key: 'value-calc',  label: '值计算',  name: '值计算',  icon: <CalculatorOutlined />, children: new Array<AppItem>() }],
+    //["formatter", { key: 'formatter',  label: '格式化',  name: '格式化',  icon: '', children: new Array<AppItem>() }],
+    ["webmaster", { key: 'webmaster',  label: '站长工具',  name: '站长工具',  icon: <GlobalOutlined />, children: [] as AppItem[] }],
+    ["misc", { key: 'misc',  label: '其它',  name: '其它',  icon: <EllipsisOutlined />, children: [] as AppItem[] }],
   ]);
 
   // todo 收藏
