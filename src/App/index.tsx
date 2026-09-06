@@ -28,6 +28,7 @@ const list = [
   'Punycode',
   'UUencode',
   'XXencode',
+  'BCDCodec',
   'MorseCodec',
   'JWTDecoder',
   'DESCrypto',

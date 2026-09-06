@@ -1,4 +1,5 @@
 import { Form } from "antd";
+import { BCDCodecSetting } from "../BCDCodec/setting";
 import { BaseXCodecSetting } from "../BaseXCodec/setting";
 import { MorseCodecSetting } from "../MorseCodec/setting";
 
@@ -7,6 +8,7 @@ export const SettingCodec = () => {
 
   return (
     <Form labelCol={{ span: 5 }} wrapperCol={{ span: 18 }} layout="horizontal" style={{ maxWidth: 800 }}>
+      <BCDCodecSetting />
       <BaseXCodecSetting />
       <MorseCodecSetting />
     </Form>
