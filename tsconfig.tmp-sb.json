@@ -1,6 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": { "noEmit": true, "skipLibCheck": true, "incremental": false, "module": "esnext" },
-  "include": ["src/App/ShieldBadgeGenerator/**/*", "src/App/index.tsx", "src/lib/index.ts", "src/types/vendor-shims.d.ts", "src/Main.tsx", "src/index.tsx"],
-  "exclude": []
-}
