@@ -21,7 +21,9 @@ export default defineConfig({
     target: 'chrome105',
     sourcemap: false,
     // 入口 bundle 含 antd 等依赖体积较大, 提高告警阈值避免 CI 噪音
-    chunkSizeWarningLimit: 800,
+    // antd 主包 (antd+rc-*) 约 800k 且随页面引用组件小幅增长; 拆成 antd/rc 两包
+    // 只会增加请求数与缓存碎片 (依赖必然同载), 故阈值提到 900 留余量
+    chunkSizeWarningLimit: 900,
     rollupOptions: {
       output: {
         // 手动分包: 主入口 (layout/App 注册表) 只留业务骨架,
