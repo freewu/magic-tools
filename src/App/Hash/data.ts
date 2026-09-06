@@ -10,7 +10,6 @@ const emptyResult :HashResult = {
   "sha384": "",
   "ripemd160": "",
   "sm3": "",
-  "bcrypt": "",
 };
 
 // hash 计算结果结构定义
@@ -25,7 +24,6 @@ type HashResult = {
   "sha384": string,
   "ripemd160": string,
   "sm3": string,
-  "bcrypt": string,
 }
 
 export {
