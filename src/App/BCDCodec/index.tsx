@@ -60,7 +60,7 @@ const BCDCodec = () => {
         <Select
           value={ type }
           style={{ width: 150 }}
-          onChange={ (v: string) => { setType(v as BCDType); setEncodeValue(''); setDecodeValue(''); } }
+          onChange={ (v: string) => { setType(v as BCDType); setDecodeValue(''); } }
           options={ codeList }
         />
         <Button 

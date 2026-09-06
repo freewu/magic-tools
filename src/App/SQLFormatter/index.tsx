@@ -4,6 +4,7 @@ const { TextArea } = Input;
 import { copyTextToClipboard, debounce } from "./../../lib";
 import { arrayToOptions } from "./../../lib/array";
 import { format } from 'sql-formatter';
+import { saveTextFile } from "../../lib/tauri";
 import type { FormatOptionsWithLanguage,IndentStyle, KeywordCase, CommaPosition, LogicalOperatorNewline } from 'sql-formatter';
 import { languageList, keywordCaseList,indentStyleList,commaPositionList,logicalOperatorNewlineList } from "./data";
 
@@ -44,6 +45,20 @@ const URL = () => {
     if(result.trim() === "") return ;
     copyTextToClipboard(result);
     notice.success( "复制到粘贴板成功！！！");
+  };
+
+  // 保存格式化结果为 .sql 文件
+  const saveSql = async () => {
+    if (result.trim() === '') {
+      notice.warning('请先输入 SQL 语句进行格式化');
+      return;
+    }
+    try {
+      const saved = await saveTextFile('formatted.sql', result, '保存 SQL 文件', { filterName: 'SQL 文件', extensions: ['sql'] });
+      if (saved) notice.success('已保存 SQL 文件');
+    } catch (err) {
+      notice.error('保存失败: ' + (err as Error).message);
+    }
   };
 
   const onTextAreaChange = (e :React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -152,6 +167,10 @@ const URL = () => {
           onChange={ (v :string) => { setIndentStyle(v); doFormatter(value,genConfig('indentStyle',v)) } }
           options={ arrayToOptions(indentStyleList) }
         />
+        <Button 
+          onClick={ saveSql }
+          style={ { backgroundColor: "#17a2b8", color: "#fff" } } 
+        >保存为 .sql</Button>
         <Button 
           onClick={ ()=> { inputElement?.click() } }
           style={ { backgroundColor: "#007bff", color: "#fff" } } 

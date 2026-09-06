@@ -83,7 +83,7 @@ export async function savePngFile(defaultName: string, dataUrl: string): Promise
  * @param title 保存对话框标题
  * @returns true = 已保存/已触发下载; false = 用户在保存对话框取消
  */
-export async function saveTextFile(defaultName: string, content: string, title = '保存文件'): Promise<boolean> {
+export async function saveTextFile(defaultName: string, content: string, title = '保存文件', opts: { filterName?: string; extensions?: string[] } = {}): Promise<boolean> {
   if (isTauri()) {
     try {
       const { save } = await import('@tauri-apps/plugin-dialog');
@@ -91,7 +91,11 @@ export async function saveTextFile(defaultName: string, content: string, title =
       const path = await save({
         title,
         defaultPath: defaultName,
-        filters: [{ name: '文本文件', extensions: ['txt', 'pem', 'key', 'htpasswd'] }],
+        // 未指定时回退到旧文本类型集合, 保证既有调用行为不变
+        filters: [{
+          name: opts.filterName ?? '文本文件',
+          extensions: opts.extensions ?? ['txt', 'pem', 'key', 'htpasswd'],
+        }],
       });
       if (path === null) return false;
       await writeTextFile(path, content);

@@ -59,6 +59,7 @@ const list = [
   'WeightConvert',
   'HtpasswdGenerator',
   'RegexTester',
+  'JsonFormatter',
   'CronRules',
   'WebTDKCheck',
   'RobotsTxtGenerator',
