@@ -17,3 +17,23 @@ declare module 'toml-patch' {
   export function parse(text: string, options?: unknown): any;
   export function patch(source: string, ...rest: unknown[]): unknown;
 }
+
+// CompressionStream / DecompressionStream (TS 4.9 的 DOM lib 未收录; 运行时为 Chromium/WebView2/Node 18+ 全局 API)
+// 本文件为 script (无 import/export), 顶层声明即全局; 使用方以 /// <reference> 引入
+interface CompressionStream {
+  readonly readable: ReadableStream<Uint8Array>;
+  readonly writable: WritableStream<Uint8Array>;
+}
+declare var CompressionStream: {
+  prototype: CompressionStream;
+  new (format: 'gzip' | 'deflate' | 'deflate-raw'): CompressionStream;
+};
+interface DecompressionStream {
+  readonly readable: ReadableStream<Uint8Array>;
+  readonly writable: WritableStream<Uint8Array>;
+}
+declare var DecompressionStream: {
+  prototype: DecompressionStream;
+  new (format: 'gzip' | 'deflate' | 'deflate-raw'): DecompressionStream;
+};
+

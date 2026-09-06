@@ -40,6 +40,7 @@ const list = [
   'XXTEACrypto',
   'BaseXCodec',
   'Base58Codec',
+  'GzipCodec',
   'PBKDF2Calc',
   'BCCCheck',
   'LRCCheck',
