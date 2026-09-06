@@ -64,6 +64,7 @@ const list = [
   'CronRules',
   'IcoGenerator',
   'AppIconGenerator',
+  'PlaceholderImage',
   'WebTDKCheck',
   'RobotsTxtGenerator',
 ];
