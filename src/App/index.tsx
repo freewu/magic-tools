@@ -62,6 +62,7 @@ const list = [
   'RegexTester',
   'JsonFormatter',
   'AsciiImageGenerator',
+  'AsciiTextArt',
   'CronRules',
   'IcoGenerator',
   'AppIconGenerator',
