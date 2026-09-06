@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Button, Card, Checkbox, Collapse, message } from "antd";
+import { Button, Card, Checkbox, Collapse, message, theme } from "antd";
 import { saveBytesFile } from "../../lib/tauri";
 import { zipStore } from "./lib";
 import { ALL_PLATFORMS, TOTAL_ICONS } from "./data";
@@ -14,6 +14,7 @@ const checkerBg = {
 interface Rendered { dataUrl: string; bytes: Uint8Array }
 
 const AppIconGenerator: React.FC = () => {
+  const { token } = theme.useToken();
   const [ srcName, setSrcName ] = useState('');
   const [ master, setMaster ] = useState('');   // 1024 主图标 dataURL (预览)
   const [ busy, setBusy ] = useState(false);
@@ -172,22 +173,22 @@ const AppIconGenerator: React.FC = () => {
                   style={ {
                     width: 208,
                     cursor: 'pointer',
-                    borderColor: on ? '#1677ff' : undefined,
-                    boxShadow: on ? '0 0 0 1px #1677ff' : undefined,
-                    background: on ? '#f0f7ff' : undefined,
+                    borderColor: on ? token.colorPrimary : undefined,
+                    boxShadow: on ? `0 0 0 1px ${token.colorPrimary}` : undefined,
+                    background: on ? token.colorPrimaryBg : undefined,
                     transition: 'all 0.2s',
                   } }
                   onClick={ () => togglePlatform(p.key) }
                   title={ <Checkbox checked={ on } onClick={ (e) => { e.stopPropagation(); togglePlatform(p.key); } }>{ p.title }</Checkbox> }
                 >
                   <div style={ { fontWeight: 600, marginBottom: 2 } }>{ p.files.length } 张</div>
-                  <div style={ { color: '#999', fontSize: 12, margin: '0 0 6px' } }>{ p.desc }</div>
-                  <div style={ { color: '#666', fontSize: 12 } }>像素: { pxs.join(' / ') }</div>
+                  <div style={ { color: token.colorTextTertiary, fontSize: 12, margin: '0 0 6px' } }>{ p.desc }</div>
+                  <div style={ { color: token.colorTextSecondary, fontSize: 12 } }>像素: { pxs.join(' / ') }</div>
                 </Card>
               );
             }) }
           </div>
-          <div style={ { color: '#999', fontSize: 12, marginTop: 6 } }>
+          <div style={ { color: token.colorTextTertiary, fontSize: 12, marginTop: 6 } }>
             点击卡片可勾选 / 取消平台, 选中的平台才会被打包下载 (当前选中 { selCount } 张)
           </div>
 
