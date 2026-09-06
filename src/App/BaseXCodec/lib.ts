@@ -16,10 +16,10 @@ export const BaseXDecode = (str :string,code :string) :string => {
 
 const DEFAULT_CODE = 'base-x:default-code';
 
-// 获取默认编码
+// 获取默认编码 (未设置时默认 Base91)
 export function getDefaultCode() :string  {
     const code = localStorage.getItem(DEFAULT_CODE);
-    return (code === null)? "Base32" : code;
+    return (code === null)? "Base91" : code;
 }
 
 // 设置默认编码

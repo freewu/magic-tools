@@ -1,14 +1,14 @@
-import { Checkbox, Divider, Button,Input, Space, message, Select } from "antd";
+import { Divider, Button, Input, Space, message, Select } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
-import { copyTextToClipboard } from "../../lib"
-import { openFile } from "../../lib/file"
+import { copyTextToClipboard } from "./../../lib"
+import { openFile } from "./../../lib/file"
 import { BaseXEncode, BaseXDecode, getDefaultCode } from "./lib"
 import { codeList } from "./data";
-import { arrayToOptions } from "../../lib/array"
+import { default as BaseXIntro } from "./intro"
 
-const Base58Codec = () => {
+const BaseXCodec = () => {
 
   const [ code, setCode ] = useState(getDefaultCode());
   const [ encodeValue, setEncodeValue ] = useState('');
@@ -35,7 +35,8 @@ const Base58Codec = () => {
       try {
         r = BaseXDecode(decodeValue,code)
       } catch(err) {
-        notice.error("解码失败！！！");
+        notice.error("解码失败: " + (err as Error).message);
+        return;
       }
       setEncodeValue(r);
     }
@@ -51,19 +52,19 @@ const Base58Codec = () => {
         onChange={ (e) => { setEncodeValue(e.target.value) ;} }
         title="双击复制内容到粘贴板"
         value= { encodeValue }
-        placeholder="输入需要进行 Base58 编码的内容  或 拖拽文件到框内打开"
-        autoSize={{ minRows: 10, maxRows: 10 }}
+        placeholder={ `输入需要进行 ${code} 编码的内容  或 拖拽文件到框内打开` }
+        autoSize={{ minRows: 5, maxRows: 5 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setEncodeValue ); } }
       />
 
-      <Space>
-        <label>格式:</label>
+      <Space wrap>
+        <label>码型:</label>
         <Select
           value={ code }
-          style={{ width: 160 }}
+          style={{ width: 220 }}
           onChange={ (v: string) => { setCode(v); setEncodeValue(''); setDecodeValue(''); } }
-          options={ arrayToOptions(codeList) }
+          options={ codeList.map((c) => ({ label: c, value: c })) }
         />
         <Button 
           onClick={ encode }
@@ -81,20 +82,23 @@ const Base58Codec = () => {
         >清除</Button>
       </Space>
 
-      
       <TextArea
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setDecodeValue(e.target.value) ;} }
         title="双击复制内容到粘贴板"
         value= { decodeValue }
-        placeholder="输入需要进行 Base58 解码的内容  或 拖拽文件到框内打开"
-        autoSize={{ minRows: 10, maxRows: 10 }}
+        placeholder={ `输入需要进行 ${code} 解码的内容  或 拖拽文件到框内打开` }
+        autoSize={{ minRows: 5, maxRows: 5 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setDecodeValue ); } }
       />
+
+      <Divider> BaseX 编码说明 </Divider>
+
+      <BaseXIntro />
     </div>
   );
 }
 
-export default Base58Codec;
+export default BaseXCodec;
