@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { saveBytesFile } from "../../lib/tauri";
 import {
   buildFileName, checkSize, getDefaultBg, getDefaultFg, getDefaultSize,
-  PH_FORMATS, PH_MAX, PH_MIN, type PhFormat,
+  getCustomPresets, PH_FORMATS, PH_MAX, PH_MIN, dimKey, parseDimKey,
+  BUILTIN_GROUPS, PRESETS_CHANGED_EVENT, type PhFormat,
 } from "./lib";
 
 const MIME: Record<PhFormat, string> = { png: 'image/png', jpg: 'image/jpeg', webp: 'image/webp' };
@@ -63,7 +64,38 @@ const PlaceholderImage: React.FC = () => {
   const [ result, setResult ] = useState<Result | null>(null);
   const [ modalOpen, setModalOpen ] = useState(false);
   const [ saving, setSaving ] = useState(false);
+  const [ presetKey, setPresetKey ] = useState<string | null>(null);
+  // 自定义预设 (设置页改动时通过事件同步)
+  const [ customs, setCustoms ] = useState(getCustomPresets);
   const genIdRef = useRef(0);
+
+  useEffect(() => {
+    const sync = () => setCustoms(getCustomPresets());
+    window.addEventListener(PRESETS_CHANGED_EVENT, sync);
+    return () => window.removeEventListener(PRESETS_CHANGED_EVENT, sync);
+  }, []);
+
+  // 预设下拉: 内置分组 + 我的自定义 (设置页改动经事件同步)
+  const presetOptions = [
+    ...BUILTIN_GROUPS.map((g) => ({
+      label: g.label,
+      options: g.items.map((it) => ({
+        value: dimKey(it.w, it.h),
+        label: `${it.w} × ${it.h}${it.name ? ' (' + it.name + ')' : ''}`,
+      })),
+    })),
+    ...(customs.length > 0
+      ? [ { label: '我的预设', options: customs.map((d) => ({ value: dimKey(d.w, d.h), label: `${d.w} × ${d.h}` })) } ]
+      : []),
+  ];
+
+  const fillPreset = (key: string) => {
+    const d = parseDimKey(key);
+    if (!d) return;
+    setPresetKey(key);
+    setW(d.w);
+    setH(d.h);
+  };
 
   // 参数变化 -> 重新生成 (首次点「生成图片」后才自动跟随)
   useEffect(() => {
@@ -109,12 +141,22 @@ const PlaceholderImage: React.FC = () => {
   return (
     <div>
       <div style={ { maxWidth: 720 } }>
-        {/* 参数行: 宽高 */}
+        {/* 参数行: 预设 + 宽高 */}
         <div style={ row }>
+          <span style={ label }>预设</span>
+          <Select
+            value={ presetKey }
+            placeholder="选常用尺寸填充"
+            style={ { width: 200, maxWidth: '100%' } }
+            popupMatchSelectWidth={ false }
+            allowClear
+            options={ presetOptions }
+            onChange={ (v) => (v ? fillPreset(v) : setPresetKey(null)) }
+          />
           <span style={ label }>尺寸</span>
-          <InputNumber min={ PH_MIN } max={ PH_MAX } value={ w } onChange={ (v) => { if (v != null) setW(v); } } addonBefore="宽" style={ { width: 130 } } />
+          <InputNumber min={ PH_MIN } max={ PH_MAX } value={ w } onChange={ (v) => { if (v != null) { setPresetKey(null); setW(v); } } } addonBefore="宽" style={ { width: 130 } } />
           <span style={ { color: '#bbb' } }>×</span>
-          <InputNumber min={ PH_MIN } max={ PH_MAX } value={ h } onChange={ (v) => { if (v != null) setH(v); } } addonBefore="高" style={ { width: 130 } } />
+          <InputNumber min={ PH_MIN } max={ PH_MAX } value={ h } onChange={ (v) => { if (v != null) { setPresetKey(null); setH(v); } } } addonBefore="高" style={ { width: 130 } } />
           <span style={ label }>格式</span>
           <Select value={ fmt } onChange={ setFmt } style={ { width: 90 } }
             options={ PH_FORMATS.map((f) => ({ value: f, label: f.toUpperCase() })) } />
@@ -137,7 +179,7 @@ const PlaceholderImage: React.FC = () => {
           <Button type="primary" onClick={ generate }>生成图片</Button>
         </div>
         <div style={ { color: '#bbb', fontSize: 12, marginBottom: 10 } }>
-          宽高范围 { PH_MIN }–{ PH_MAX }px; 文字过长会自动缩小字号或截断; 已生成后修改参数会自动刷新图片
+          宽高范围 { PH_MIN }–{ PH_MAX }px; 文字过长会自动缩小字号或截断; 已生成后修改参数会自动刷新图片; 常用尺寸见预设下拉, 设置页可自定预设
         </div>
       </div>
 

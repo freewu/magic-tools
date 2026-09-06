@@ -2,8 +2,6 @@
 import { Form } from "antd";
 import { ColorSetting } from "../Color/setting";
 import { QRCodeGeneratorSetting } from "../QRCodeGenerator/setting";
-import { IcoGeneratorSetting } from "../IcoGenerator/setting";
-import { PlaceholderImageSetting } from "../PlaceholderImage/setting";
 import { BarcodeGeneratorSetting } from "../BarcodeGenerator/setting";
 import { HtpasswdGeneratorSetting } from "../HtpasswdGenerator/setting";
 import { RegexTesterSetting } from "../RegexTester/setting";
@@ -14,8 +12,6 @@ export const SettingMisc = () => {
     <Form labelCol={{ span: 5 }} wrapperCol={{ span: 18  }} layout="horizontal"  style={{ maxWidth: 800 }}>
       <ColorSetting />
       <QRCodeGeneratorSetting />
-      <IcoGeneratorSetting />
-      <PlaceholderImageSetting />
       <BarcodeGeneratorSetting />
       <HtpasswdGeneratorSetting />
       <RegexTesterSetting />

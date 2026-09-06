@@ -5,6 +5,7 @@ import { SettingValueCalc } from "./setting-value-calc"
 import { SettingConvert } from "./setting-convert"
 import { SettingCodec } from "./setting-codec"
 import { SettingMisc } from "./setting-misc"
+import { SettingWebmaster } from "./setting-webmaster"
 
 export const itemList = [
   {
@@ -31,6 +32,11 @@ export const itemList = [
     key : 'value-calc',
     label : '值计算',
     children: <SettingValueCalc />
+  },
+  {
+    key : 'webmaster',
+    label : '站长工具',
+    children: <SettingWebmaster />
   },
   {
     key : 'misc',
