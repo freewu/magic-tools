@@ -62,7 +62,7 @@ bundle target:
 # Build and copy installers into release/ - default: single portable executable (--no-bundle, needs system WebView2)
 release target="":
     {{ if target == "" { "npm run tauri build -- --no-bundle" } else { "npm run tauri build -- --bundles " + target } }}
-    node scripts/copy-to-release.js
+    node scripts/copy-to-release.js {{target}}
 
 # 1. Build all installers
 # 2. gh release create creates/overwrites the release (creates it if missing)
