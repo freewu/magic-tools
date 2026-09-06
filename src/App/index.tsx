@@ -47,6 +47,7 @@ const list = [
   'Base64Image',
   //'ImageColor',
   'GPSConvert',
+  'DownloadLinkConvert',
   'RMBConvert',
   'ByteConvert',
   'PinyinConvert',
