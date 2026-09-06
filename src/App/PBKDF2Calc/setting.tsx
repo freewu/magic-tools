@@ -30,7 +30,7 @@ export const PBKDF2CalcSetting = () => {
         <Input 
           showCount
           allowClear
-          style={ { width: 520 } }
+          style={ { width: "100%", maxWidth: 520 } }
           onChange={ (e) => { setSalt(e.target.value); setDefaultSalt(e.target.value); } }
           value= { salt } />
       </Form.Item>

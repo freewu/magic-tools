@@ -19,8 +19,8 @@ export const QRCodeGeneratorSetting = () => {
         />
       </Form.Item>
       <Form.Item label="默认尺寸">
-        <Space>
-          <div style={ {width: "520px"} }>
+        <Space style={{ width: "100%" }}>
+          <div style={ {width: "100%", maxWidth: 520} }>
             <Slider
               value={ size }
               min = { 160 }

@@ -59,13 +59,13 @@ export const XTEACryptoSetting = () => {
         />
       </Form.Item>
       <Form.Item label="默认密钥">
-        <Space>
+        <Space style={{ width: "100%" }}>
           <Input
             status={ passphraseStatus }
             showCount
             maxLength= { 16 }
             allowClear
-            style={ { width: "520px" } }
+            style={ { width: "100%", maxWidth: 520 } }
             onChange={ onPassphraseChange }
             value= { passphrase } />
         </Space>

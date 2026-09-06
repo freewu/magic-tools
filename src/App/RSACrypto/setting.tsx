@@ -48,7 +48,7 @@ export const RSACryptoSetting = () => {
         <Input.TextArea
           status={ pubStatus }
           rows={ 5 }
-          style={ { fontFamily: "monospace", fontSize: 12, width: "520px" } }
+          style={ { fontFamily: "monospace", fontSize: 12, width: "100%", maxWidth: 520 } }
           onChange={ onPublicChange }
           placeholder="-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----\n留空表示不配置; 用于「RSA 加解密」页加密"
           value={ publicPem }
@@ -58,14 +58,14 @@ export const RSACryptoSetting = () => {
         <Input.TextArea
           status={ priStatus }
           rows={ 7 }
-          style={ { fontFamily: "monospace", fontSize: 12, width: "520px" } }
+          style={ { fontFamily: "monospace", fontSize: 12, width: "100%", maxWidth: 520 } }
           onChange={ onPrivateChange }
           placeholder="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n留空表示不配置; 用于解密, 请妥善保管"
           value={ privatePem }
         />
       </Form.Item>
       <Form.Item label=" ">
-        <Space>
+        <Space style={{ width: "100%" }}>
           <Button size="small" danger onClick={ clear }>清空默认密钥</Button>
           <span style={ { color: "#999" } }>公钥 + 私钥均配置后, 打开 RSA 页将自动进入「加解密」</span>
         </Space>

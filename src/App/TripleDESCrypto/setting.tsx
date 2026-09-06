@@ -76,24 +76,24 @@ export const TripleDESCryptoSetting = () => {
         />
       </Form.Item>
       <Form.Item label="默认偏移量(IV)">
-        <Space>
+        <Space style={{ width: "100%" }}>
           <Input 
             status= { ivStatus }
             maxLength = { 8 }
             allowClear
-            style={ { width: "520px" } }
+            style={ { width: "100%", maxWidth: 520 } }
             onChange={ onIVChange }
             value= { iv } />
           { iv.length? iv.length + " / 8" : null }
         </Space>
       </Form.Item>
       <Form.Item label="默认密钥">
-        <Space>
+        <Space style={{ width: "100%" }}>
           <Input 
             status= { passphraseStatus }
             maxLength= { 24 }
             allowClear
-            style={ { width: "520px" } }
+            style={ { width: "100%", maxWidth: 520 } }
             onChange={ onPassphraseChange }
             value= { passphrase } />
           { passphrase.length? passphrase.length + " / " + 24  : null }

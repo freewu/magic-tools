@@ -71,24 +71,24 @@ export const SM4CryptoSetting = () => {
         />
       </Form.Item>
       <Form.Item label="默认偏移量(IV)">
-        <Space>
+        <Space style={{ width: "100%" }}>
           <Input
             status= { ivStatus }
             maxLength = { 32 }
             allowClear
-            style={ { width: "520px" } }
+            style={ { width: "100%", maxWidth: 520 } }
             onChange={ onIVChange }
             value= { iv } />
           { iv.length? iv.length + " / 16" : null }
         </Space>
       </Form.Item>
       <Form.Item label="默认密钥 (16 字符或 32 位 HEX)">
-        <Space>
+        <Space style={{ width: "100%" }}>
           <Input
             status= { passphraseStatus }
             maxLength= { 32 }
             allowClear
-            style={ { width: "520px" } }
+            style={ { width: "100%", maxWidth: 520 } }
             onChange={ onPassphraseChange }
             value= { passphrase } />
           { passphrase.length? passphrase.length + " / 16" : null }

@@ -123,7 +123,7 @@ const Setting = () => {
       <div
         ref={ scrollRef }
         onScroll={ onScroll }
-        style={ { flex: 1, minWidth: 0, overflowY: 'auto', background: token.colorBgLayout, padding: '4px 16px 0', position: 'relative' } }
+        style={ { flex: 1, minWidth: 0, overflowY: 'auto', overflowX: 'hidden', background: token.colorBgLayout, padding: '4px 16px 0', position: 'relative' } }
       >
         { itemList.map((item) => (
           <div

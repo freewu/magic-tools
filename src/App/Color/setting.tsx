@@ -33,8 +33,8 @@ export const ColorSetting = () => {
         />
       </Form.Item>
       <Form.Item label="默认 Opacity">
-        <Space>
-          <div style={ {width: "520px"} }>
+        <Space style={{ width: "100%" }}>
+          <div style={ {width: "100%", maxWidth: 520} }>
             <Slider
               tooltip={{ formatter: (value? :number) => { return (value)? (value / 10) : null; } }} 
               value={ opacity }
@@ -53,8 +53,8 @@ export const ColorSetting = () => {
           checked={ batchSwitch } />
       </Form.Item>
       <Form.Item label="默认最大批量取色个数">
-        <Space>
-          <div style={ {width: "520px"} }>
+        <Space style={{ width: "100%" }}>
+          <div style={ {width: "100%", maxWidth: 520} }>
             <Slider
               tooltip={{ formatter: (value? :number) => { return (value)? (value) : null; } }} 
               value={ pickMax }

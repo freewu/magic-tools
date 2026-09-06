@@ -85,12 +85,12 @@ export const AESCryptoSetting = () => {
         />
       </Form.Item>
       <Form.Item label="默认偏移量(IV)">
-        <Space>
+        <Space style={{ width: "100%" }}>
           <Input 
             status= { ivStatus }
             maxLength = { ivRequiredLen(mode) }
             allowClear
-            style={ { width: "520px" } }
+            style={ { width: "100%", maxWidth: 520 } }
             onChange={ onIVChange }
             value= { iv } />
           { iv.length? iv.length + " / " + ivRequiredLen(mode) : null }
@@ -98,12 +98,12 @@ export const AESCryptoSetting = () => {
         </Space>
       </Form.Item>
       <Form.Item label="默认密钥">
-        <Space>
+        <Space style={{ width: "100%" }}>
           <Input 
             status= { passphraseStatus }
             maxLength= { 32 }
             allowClear
-            style={ { width: "520px" } }
+            style={ { width: "100%", maxWidth: 520 } }
             onChange={ onPassphraseChange }
             value= { passphrase } />
           { passphrase.length? passphrase.length + " / " + passphraseLimitLength  : null }

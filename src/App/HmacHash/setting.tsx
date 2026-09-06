@@ -10,10 +10,10 @@ export const HmacHashSetting = () => {
     <>
       <Divider orientation="left" plain>HmacHash 值计算</Divider>
       <Form.Item label="默认密钥">
-        <Space>
+        <Space style={{ width: "100%" }}>
           <Input 
             allowClear
-            style={ { width: "520px" } }
+            style={ { width: "100%", maxWidth: 520 } }
             onChange={ (e) => { setPassphrase(e.target.value); setDefaultPassphrase(e.target.value); } }
             value= { passphrase } />
         </Space>

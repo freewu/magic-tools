@@ -26,8 +26,8 @@ export const BarcodeGeneratorSetting = () => {
         />
       </Form.Item>
       <Form.Item label="默认条宽">
-        <Space>
-          <div style={ { width: 520 } }>
+        <Space style={{ width: "100%" }}>
+          <div style={ { width: "100%", maxWidth: 520 } }>
             <Slider
               min={ 1 }
               max={ 5 }
@@ -40,8 +40,8 @@ export const BarcodeGeneratorSetting = () => {
         </Space>
       </Form.Item>
       <Form.Item label="默认高度">
-        <Space>
-          <div style={ { width: 520 } }>
+        <Space style={{ width: "100%" }}>
+          <div style={ { width: "100%", maxWidth: 520 } }>
             <Slider
               min={ 30 }
               max={ 300 }

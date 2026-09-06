@@ -53,7 +53,7 @@ export const SM2CryptoSetting = () => {
         <Input.TextArea
           status={ pubStatus }
           rows={ 2 }
-          style={ { fontFamily: "monospace", fontSize: 12, width: "520px" } }
+          style={ { fontFamily: "monospace", fontSize: 12, width: "100%", maxWidth: 520 } }
           onChange={ onPublicChange }
           placeholder="04 开头共 130 位 HEX, 由生成或「从私钥推导公钥」得到; 留空表示不配置"
           value={ publicKey }
@@ -63,14 +63,14 @@ export const SM2CryptoSetting = () => {
         <Input.TextArea
           status={ priStatus }
           rows={ 2 }
-          style={ { fontFamily: "monospace", fontSize: 12, width: "520px" } }
+          style={ { fontFamily: "monospace", fontSize: 12, width: "100%", maxWidth: 520 } }
           onChange={ onPrivateChange }
           placeholder="64 位 HEX; 留空表示不配置; 用于解密, 请妥善保管"
           value={ privateKey }
         />
       </Form.Item>
       <Form.Item label=" ">
-        <Space>
+        <Space style={{ width: "100%" }}>
           <Button size="small" danger onClick={ clear }>清空默认密钥</Button>
           <span style={ { color: "#999" } }>公钥 + 私钥均配置后, 打开 SM2 页将自动进入「加解密」</span>
         </Space>
