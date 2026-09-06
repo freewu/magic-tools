@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Button, Card, Collapse, message } from "antd";
+import { Button, Card, Checkbox, Collapse, message } from "antd";
 import { saveBytesFile } from "../../lib/tauri";
 import { zipStore } from "./lib";
 import { ALL_PLATFORMS, TOTAL_ICONS } from "./data";
@@ -17,8 +17,18 @@ const AppIconGenerator: React.FC = () => {
   const [ srcName, setSrcName ] = useState('');
   const [ master, setMaster ] = useState('');   // 1024 主图标 dataURL (预览)
   const [ busy, setBusy ] = useState(false);
+  // 勾选状态: 选中的平台才参与打包 (默认全选)
+  const [ selected, setSelected ] = useState<Set<string>>(() => new Set(ALL_PLATFORMS.map((p) => p.key)));
   const imgRef = useRef<HTMLImageElement | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
+
+  const togglePlatform = (key: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  };
 
   // 把原图等比拉伸绘制为 px×px PNG
   const renderPng = (img: HTMLImageElement, px: number): Promise<Rendered> => {
@@ -85,22 +95,22 @@ const AppIconGenerator: React.FC = () => {
     if (!img || !srcName) { message.warning('请先上传一张图片'); return; }
     setBusy(true);
     try {
+      const chosen = ALL_PLATFORMS.filter((p) => selected.has(p.key));
       const entries = [];
-      for (const platform of ALL_PLATFORMS) {
+      for (const platform of chosen) {
         for (const f of platform.files) {
           const r = await renderPng(img, f.px);
           entries.push({ path: f.path, bytes: r.bytes });
         }
       }
       const readme = [
-        'App Icon 生成 · 批量结果 (' + TOTAL_ICONS + ' 张)',
+        'App Icon 生成 · 批量结果 (' + entries.length + ' 张)',
         '',
-        '【iOS】按 Apple HIG 命名 (pt × 倍数)。AppIcon-1024.png 用于 App Store;',
-        '  建议源图为 1024×1024 方形且无透明背景 (Apple 审核要求)。',
-        '【Android】mipmap-*/ic_launcher.png 对应 Google 官方密度目录,',
-        '  可整体并入项目的 src/main/res; playstore-icon-512.png 用于商店。',
-        '【PhoneGap】Cordova res/icon 官方目录结构, 覆盖到项目 res/icon 即生效,',
-        '  config.xml 默认模板已按这些文件名引用。',
+        ...chosen.flatMap((p) => [
+          '【' + p.title + '】' + p.desc + ':',
+          ...p.files.map((f) => '  ' + f.path + ' (' + f.px + 'x' + f.px + ')'),
+          '',
+        ]),
       ].join('\n');
       entries.push({ path: 'README.txt', bytes: new TextEncoder().encode(readme) });
       const zip = zipStore(entries);
@@ -109,13 +119,16 @@ const AppIconGenerator: React.FC = () => {
         filterName: 'ZIP 压缩包',
         extensions: ['zip'],
       });
-      if (ok) message.success('已生成 ' + TOTAL_ICONS + ' 张图标并打包下载');
+      if (ok) message.success('已生成 ' + entries.length + ' 张图标并打包下载');
     } catch (err) {
       message.error(err instanceof Error ? err.message : '打包失败');
     } finally {
       setBusy(false);
     }
   };
+
+  // 选中平台合计张数
+  const selCount = ALL_PLATFORMS.filter((p) => selected.has(p.key)).reduce((s, p) => s + p.files.length, 0);
 
   return (
     <div>
@@ -147,18 +160,35 @@ const AppIconGenerator: React.FC = () => {
             onChange={ (e) => { const f = e.target.files?.[0]; if (f) loadFile(f); e.target.value = ''; } }
           />
 
-          {/* 平台规格 */}
+          {/* 平台规格: 卡片勾选, 选中边框高亮 */}
           <div style={ { display: 'flex', gap: 10, marginTop: 14, flexWrap: 'wrap' } }>
             { ALL_PLATFORMS.map((p) => {
+              const on = selected.has(p.key);
               const pxs = [...new Set(p.files.map((f) => f.px))].sort((a, b) => a - b);
               return (
-                <Card key={ p.key } size="small" style={ { width: 208 } }>
-                  <div style={ { fontWeight: 600 } }>{ p.title } · { p.files.length } 张</div>
-                  <div style={ { color: '#999', fontSize: 12, margin: '4px 0 6px' } }>{ p.desc }</div>
+                <Card
+                  key={ p.key }
+                  size="small"
+                  style={ {
+                    width: 208,
+                    cursor: 'pointer',
+                    borderColor: on ? '#1677ff' : undefined,
+                    boxShadow: on ? '0 0 0 1px #1677ff' : undefined,
+                    background: on ? '#f0f7ff' : undefined,
+                    transition: 'all 0.2s',
+                  } }
+                  onClick={ () => togglePlatform(p.key) }
+                  title={ <Checkbox checked={ on } onClick={ (e) => { e.stopPropagation(); togglePlatform(p.key); } }>{ p.title }</Checkbox> }
+                >
+                  <div style={ { fontWeight: 600, marginBottom: 2 } }>{ p.files.length } 张</div>
+                  <div style={ { color: '#999', fontSize: 12, margin: '0 0 6px' } }>{ p.desc }</div>
                   <div style={ { color: '#666', fontSize: 12 } }>像素: { pxs.join(' / ') }</div>
                 </Card>
               );
             }) }
+          </div>
+          <div style={ { color: '#999', fontSize: 12, marginTop: 6 } }>
+            点击卡片可勾选 / 取消平台, 选中的平台才会被打包下载 (当前选中 { selCount } 张)
           </div>
 
           <Button
@@ -166,11 +196,11 @@ const AppIconGenerator: React.FC = () => {
             size="large"
             block
             loading={ busy }
-            disabled={ !srcName }
+            disabled={ !srcName || selCount === 0 }
             onClick={ downloadAll }
-            style={ { marginTop: 14 } }
+            style={ { marginTop: 10 } }
           >
-            { busy ? '正在生成…' : '生成并批量下载全部图标 (.zip · ' + TOTAL_ICONS + ' 张)' }
+            { busy ? '正在生成…' : '下载所选平台图标 (.zip · ' + selCount + ' 张)' }
           </Button>
         </div>
 
@@ -196,10 +226,10 @@ const AppIconGenerator: React.FC = () => {
         items={ [
           {
             key: 'list',
-            label: '查看全部 ' + TOTAL_ICONS + ' 个输出文件清单 (遵循 Apple / Google / Cordova 官方标准)',
+            label: '查看输出文件清单 (' + TOTAL_ICONS + ' 个可选, 以下仅列出已选平台)',
             children: (
               <div style={ { fontFamily: 'Consolas, monospace', fontSize: 12, color: '#666', lineHeight: 1.9 } }>
-                { ALL_PLATFORMS.map((p) => (
+                { ALL_PLATFORMS.filter((p) => selected.has(p.key)).map((p) => (
                   <div key={ p.key }>
                     { p.files.map((f) => (
                       <div key={ f.path }>{ f.path } <span style={ { color: '#aaa' } }>({ f.px }×{ f.px })</span></div>
