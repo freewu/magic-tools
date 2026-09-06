@@ -47,6 +47,7 @@ const list = [
   'Base58Codec',
   'GzipCodec',
   'PBKDF2Calc',
+  'PPICalc',
   'BCCCheck',
   'LRCCheck',
   'CRCCheck',
