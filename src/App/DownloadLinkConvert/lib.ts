@@ -33,6 +33,30 @@ export interface DownloadLinks {
 
 const SCHEME_RE = /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//;
 
+export type DownloadFormat = keyof DownloadLinks;
+
+export const DOWNLOAD_FORMATS: { value: DownloadFormat; label: string }[] = [
+  { value: 'real', label: '真实地址' },
+  { value: 'thunder', label: '迅雷地址' },
+  { value: 'qqdl', label: '快车地址' },
+  { value: 'qdl', label: '旋风地址' },
+];
+
+// 批量转换: 每行一条, 自动识别后统一转为目标格式; 空行忽略; 任一无效行抛错 (含行号)
+export const batchConvert = (input: string, format: DownloadFormat): string => {
+  const lines = input.split(/\r?\n/).map((l) => l.trim());
+  const out: string[] = [];
+  lines.forEach((line, idx) => {
+    if (line === '') return;
+    try {
+      out.push(convertDownloadLink(line)[format]);
+    } catch (err) {
+      throw new Error('第 ' + (idx + 1) + ' 行: ' + (err instanceof Error ? err.message : String(err)));
+    }
+  });
+  return out.join('\n');
+};
+
 // 自动识别输入并转换出四种格式; 无法识别时抛错
 export const convertDownloadLink = (input: string): DownloadLinks => {
   const text = input.trim();

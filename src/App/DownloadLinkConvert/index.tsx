@@ -1,7 +1,7 @@
-import { useRef, useState, type ReactNode } from "react";
-import { Input, message } from "antd";
+import { useRef, useState } from "react";
+import { Input, Select, Tabs, message } from "antd";
 import { copyTextToClipboard } from "./../../lib";
-import { convertDownloadLink, type DownloadLinks } from "./lib";
+import { batchConvert, convertDownloadLink, DOWNLOAD_FORMATS, type DownloadLinks, type DownloadFormat } from "./lib";
 
 const { TextArea } = Input;
 
@@ -14,7 +14,8 @@ const toRows = (r: DownloadLinks): RowItem[] => [
   { label: '旋风地址', color: '#52c41a', value: r.qdl },
 ];
 
-const DownloadLinkConvert: React.FC = () => {
+// ---------- 单个转换 ----------
+const SinglePanel: React.FC = () => {
   const [ rows, setRows ] = useState<RowItem[]>([]);
   const [ error, setError ] = useState('');
   const [ notEmpty, setNotEmpty ] = useState(false);
@@ -57,8 +58,9 @@ const DownloadLinkConvert: React.FC = () => {
         { notEmpty && <span onClick={ clear } style={ { color: '#999', cursor: 'pointer', fontSize: 12 } }>清空</span> }
       </div>
       { error && <div style={ { color: '#ff4d4f', margin: '4px 0' } }>⚠ { error }</div> }
-      { rows.map((item) => {
-        const node: ReactNode = (
+      { rows.map((item) => (
+        <div key={ item.label } style={ { display: 'flex', alignItems: 'center', gap: 10, margin: '6px 0' } }>
+          <span style={ { width: 76, flex: 'none', color: item.color, fontWeight: 600, textAlign: 'right' } }>{ item.label }</span>
           <Input
             readOnly
             value={ item.value }
@@ -67,15 +69,87 @@ const DownloadLinkConvert: React.FC = () => {
             onClick={ () => { copy(item); } }
             title="点击复制到剪贴板"
           />
-        );
-        return (
-          <div key={ item.label } style={ { display: 'flex', alignItems: 'center', gap: 10, margin: '6px 0' } }>
-            <span style={ { width: 76, flex: 'none', color: item.color, fontWeight: 600, textAlign: 'right' } }>{ item.label }</span>
-            { node }
-          </div>
-        );
-      }) }
+        </div>
+      )) }
     </div>
+  );
+}
+
+// ---------- 批量转换 ----------
+const BatchPanel: React.FC = () => {
+  const [ input, setInput ] = useState('');
+  const [ format, setFormat ] = useState<DownloadFormat>('thunder');
+  const [ output, setOutput ] = useState('');
+  const [ error, setError ] = useState('');
+
+  const run = (text: string, fmt: DownloadFormat) => {
+    try {
+      setOutput(batchConvert(text, fmt));
+      setError('');
+    } catch (err) {
+      setOutput('');
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
+  const onInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const v = e.target.value;
+    setInput(v);
+    run(v, format);
+  };
+
+  const onFormatChange = (v: DownloadFormat) => {
+    setFormat(v);
+    run(input, v);
+  };
+
+  const copyAll = async () => {
+    if (!output) return;
+    await copyTextToClipboard(output);
+    message.success('已复制全部结果到剪贴板 (' + output.split('\n').length + ' 条)');
+  };
+
+  return (
+    <div>
+      <TextArea
+        rows={ 7 }
+        value={ input }
+        onChange={ onInputChange }
+        placeholder={ '每行粘贴一个下载地址 (自动识别):\nhttp(s):// 或 ftp:// 真实地址\nthunder:// 迅雷地址\nqqdl:// 快车地址\nqdl:// 旋风地址' }
+      />
+      <div style={ { display: 'flex', alignItems: 'center', gap: 10, margin: '10px 0 6px' } }>
+        <span style={ { color: '#888' } }>转换为</span>
+        <Select
+          style={ { width: 160 } }
+          value={ format }
+          onChange={ onFormatChange }
+          options={ DOWNLOAD_FORMATS.map((f) => ({ value: f.value, label: f.label })) }
+        />
+        <span style={ { color: '#bbb', fontSize: 12 } }>输出按行对应输入, 结果可点击复制</span>
+      </div>
+      { error && <div style={ { color: '#ff4d4f', margin: '4px 0' } }>⚠ { error }</div> }
+      <TextArea
+        rows={ 7 }
+        readOnly
+        value={ output }
+        placeholder={ '转换结果将显示在这里' }
+        style={ { cursor: output ? 'copy' : 'default', background: '#fafafa' } }
+        onFocus={ (e) => output && e.target.select() }
+        onClick={ () => { if (output) copyAll(); } }
+        title="点击复制全部结果到剪贴板"
+      />
+    </div>
+  );
+}
+
+const DownloadLinkConvert: React.FC = () => {
+  return (
+    <Tabs
+      items={ [
+        { key: 'single', label: '单个转换', children: <SinglePanel /> },
+        { key: 'batch', label: '批量转换', children: <BatchPanel /> },
+      ] }
+    />
   );
 }
 

@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "noEmit": true, "skipLibCheck": true, "incremental": false, "module": "esnext" },
+  "include": ["src/App/DownloadLinkConvert/**/*", "src/App/index.tsx", "src/App/app-modules.ts", "src/types/vendor-shims.d.ts", "src/Main.tsx", "src/index.tsx"],
+  "exclude": []
+}
