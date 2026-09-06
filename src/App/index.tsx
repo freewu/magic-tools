@@ -63,6 +63,7 @@ const list = [
   'JsonFormatter',
   'CronRules',
   'IcoGenerator',
+  'AppIconGenerator',
   'WebTDKCheck',
   'RobotsTxtGenerator',
 ];
