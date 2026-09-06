@@ -65,6 +65,7 @@ const list = [
   'IcoGenerator',
   'AppIconGenerator',
   'PlaceholderImage',
+  'ShieldBadgeGenerator',
   'WebTDKCheck',
   'RobotsTxtGenerator',
 ];
