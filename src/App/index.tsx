@@ -62,6 +62,7 @@ const list = [
   'RegexTester',
   'JsonFormatter',
   'CronRules',
+  'IcoGenerator',
   'WebTDKCheck',
   'RobotsTxtGenerator',
 ];
