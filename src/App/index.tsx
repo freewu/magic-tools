@@ -1,5 +1,7 @@
 // 分类图标: 侧边栏(尤其折叠时)展示用
 import { SwapOutlined, CodeOutlined, LockOutlined, CalculatorOutlined, GlobalOutlined, EllipsisOutlined } from '@ant-design/icons';
+import { Badge } from 'antd';
+import type { ReactNode } from 'react';
 
 const list = [
   'Hash',
@@ -116,15 +118,16 @@ const appList = await getAppList();
 
 // 生成 menu
 export const genMenuList = (appList :Array<AppItem>) => {
+  type MenuGroup = { key: string; label: ReactNode; icon: ReactNode; children: AppItem[] };
   // 菜单分组 key/icon 与 App define 中的 Type 对应
-  let menuList = new Map([
-    ["convert", { key: 'convert',  label: '类型转换',  icon: <SwapOutlined />, children: new Array<AppItem> }],
-    ["codec", { key: 'codec',  label: '编解码',  icon: <CodeOutlined />, children: new Array<AppItem> }],
-    ["crypto", { key: 'crypto',  label: '加解密',  icon: <LockOutlined />, children: new Array<AppItem> }],
-    ["value-calc", { key: 'value-calc',  label: '值计算',  icon: <CalculatorOutlined />, children: new Array<AppItem> }],
-    //["formatter", { key: 'formatter',  label: '格式化',  icon: '', children: new Array<AppItem> }],
-    ["webmaster", { key: 'webmaster',  label: '站长工具',  icon: <GlobalOutlined />, children:[] }],
-    ["misc", { key: 'misc',  label: '其它',  icon: <EllipsisOutlined />, children:[] }],
+  let menuList = new Map<string, MenuGroup>([
+    ["convert", { key: 'convert',  label: '类型转换',  icon: <SwapOutlined />, children: new Array<AppItem>() }],
+    ["codec", { key: 'codec',  label: '编解码',  icon: <CodeOutlined />, children: new Array<AppItem>() }],
+    ["crypto", { key: 'crypto',  label: '加解密',  icon: <LockOutlined />, children: new Array<AppItem>() }],
+    ["value-calc", { key: 'value-calc',  label: '值计算',  icon: <CalculatorOutlined />, children: new Array<AppItem>() }],
+    //["formatter", { key: 'formatter',  label: '格式化',  icon: '', children: new Array<AppItem>() }],
+    ["webmaster", { key: 'webmaster',  label: '站长工具',  icon: <GlobalOutlined />, children: [] as AppItem[] }],
+    ["misc", { key: 'misc',  label: '其它',  icon: <EllipsisOutlined />, children: [] as AppItem[] }],
   ]);
 
   // todo 收藏
@@ -135,6 +138,16 @@ export const genMenuList = (appList :Array<AppItem>) => {
       v?.children?.push(item)
       if(v !== undefined) menuList.set(item.type,v);
     }
+  }
+  // 分类应用数徽标: 菜单展开时各分类标题右侧显示所属应用数量
+  for (const g of menuList.values()) {
+    const count = g.children.length;
+    g.label = (
+      <span className="menu-group-label">
+        <span>{ g.label }</span>
+        { count > 0 && <Badge count={ count } size="small" overflowCount={ 999 } style={ { backgroundColor: '#1677ff' } } /> }
+      </span>
+    );
   }
   return Array.from(menuList.values());
 }

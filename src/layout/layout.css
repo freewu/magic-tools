@@ -93,6 +93,17 @@ select {
   height: 100%;
 }
 
+/* 侧边菜单分类标题: 应用数徽标与分类名同行右侧对齐 */
+.menu-group-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.menu-group-label .ant-badge {
+  flex-shrink: 0;
+}
+
 /* ---- 滚动条美化 (Chromium/WebView2, Firefox scrollbar-width) ---- */
 ::-webkit-scrollbar {
   width: 8px;
