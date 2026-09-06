@@ -61,6 +61,7 @@ const list = [
   'HtpasswdGenerator',
   'RegexTester',
   'JsonFormatter',
+  'AsciiImageGenerator',
   'CronRules',
   'IcoGenerator',
   'AppIconGenerator',
