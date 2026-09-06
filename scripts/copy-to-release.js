@@ -5,7 +5,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const projectRoot = path.resolve(__dirname, '..', '..');
+// 脚本位于 <项目根>/scripts/ 下, __dirname 上溯一级即项目根
+// (迁移自 .erb/scripts/ 后目录层级由两级变为一级)
+const projectRoot = path.resolve(__dirname, '..');
 const bundleDir = path.join(projectRoot, 'src-tauri', 'target', 'release', 'bundle');
 const releaseDir = path.join(projectRoot, 'release');
 const targetReleaseDir = path.join(projectRoot, 'src-tauri', 'target', 'release');
