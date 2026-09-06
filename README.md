@@ -99,8 +99,10 @@ magic-tools
 │   ├── hook/                   # 全局状态 (主题/应用上下文)
 │   ├── layout/                 # 主框架 (侧边栏/内容区)
 │   └── lib/                    # 通用工具库
-├── .erb/                     # 构建辅助脚本 (jest 环境补丁 / release 复制等)
 ├── vite.config.ts            # Vite 渲染进程构建配置 (入口 src/index.html)
+├── jest.setup.ts             # jest 环境补丁 (TextEncoder/matchMedia 等)
+├── mocks/                    # jest 静态资源 mock
+├── scripts/                  # 发布辅助脚本 (产物复制到 release/)
 ├── dist/                     # React 打包产物 (Tauri frontendDist)
 └── justfile                    # 构建/打包/发布脚本
 ```

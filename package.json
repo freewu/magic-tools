@@ -62,19 +62,18 @@
       "json"
     ],
     "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/.erb/mocks/fileMock.js",
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/mocks/fileMock.js",
       "\\.(css|less|sass|scss)$": "identity-obj-proxy"
     },
     "setupFiles": [
-      "./.erb/scripts/jest-setup.ts"
+      "<rootDir>/jest.setup.ts"
     ],
     "testEnvironment": "jsdom",
     "testEnvironmentOptions": {
       "url": "http://localhost/"
     },
     "testPathIgnorePatterns": [
-      "dist",
-      ".erb/dll"
+      "dist"
     ],
     "transform": {
       "\\.(ts|tsx|js|jsx)$": "ts-jest"

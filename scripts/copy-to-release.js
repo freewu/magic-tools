@@ -1,6 +1,6 @@
 /*
  * 将 Tauri bundle 产物复制到项目根目录 release/
- * 用法: node .erb/scripts/copy-to-release.js
+ * 用法: node scripts/copy-to-release.js
  */
 const fs = require('fs');
 const path = require('path');
