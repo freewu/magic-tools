@@ -96,7 +96,7 @@ const BaseXCodec = () => {
 
       <Divider> BaseX 编码说明 </Divider>
 
-      <BaseXIntro />
+      <BaseXIntro code={ code } />
     </div>
   );
 }

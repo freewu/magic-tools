@@ -1,4 +1,5 @@
 import { BaseXEncode, BaseXDecode, getDefaultCode, setDefaultCode } from './lib';
+import { codeNotes, codeList, codeMap } from './data';
 
 describe('BaseX 编解码', () => {
   it('默认码型为 Base91', () => {
@@ -37,5 +38,22 @@ describe('BaseX 编解码', () => {
 
   it('非法字符解码抛错', () => {
     expect(() => BaseXDecode('!!!不是Base16!!!', 'Base16')).toThrow();
+  });
+
+  it('码型说明覆盖全部码型且字母表长度即进制', () => {
+    expect(codeList.length).toBe(codeMap.size);
+    // 每个码型都有配套详细说明
+    codeList.forEach((c) => {
+      const note = codeNotes.get(c);
+      expect(note && note.length > 10).toBe(true);
+    });
+    // 说明表不包含未注册码型
+    Array.from(codeNotes.keys()).forEach((k) => expect(codeMap.has(k)).toBe(true));
+    // 字母表字符唯一 (base-x 要求) 且长度 > 1
+    codeList.forEach((c) => {
+      const alpha = codeMap.get(c)!;
+      expect(new Set(alpha).size).toBe(alpha.length);
+      expect(alpha.length).toBeGreaterThan(1);
+    });
   });
 });
