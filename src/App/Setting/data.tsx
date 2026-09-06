@@ -3,6 +3,7 @@ import { SettingSystem } from "./setting-system"
 import { SettingCrypto } from "./setting-crypto"
 import { SettingValueCalc } from "./setting-value-calc"
 import { SettingConvert } from "./setting-convert"
+import { SettingCodec } from "./setting-codec"
 import { SettingMisc } from "./setting-misc"
 
 export const itemList = [
@@ -10,6 +11,16 @@ export const itemList = [
     key : 'system',
     label : '系统设置',
     children: <SettingSystem />
+  },
+  {
+    key : 'convert',
+    label : '类型转换',
+    children: <SettingConvert />
+  },
+  {
+    key : 'codec',
+    label : '编解码',
+    children: <SettingCodec />
   },
   {
     key : 'crypto',
@@ -20,11 +31,6 @@ export const itemList = [
     key : 'value-calc',
     label : '值计算',
     children: <SettingValueCalc />
-  },
-  {
-    key : 'convert',
-    label : '类型转换',
-    children: <SettingConvert />
   },
   {
     key : 'misc',

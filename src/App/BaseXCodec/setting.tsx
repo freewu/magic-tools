@@ -4,7 +4,7 @@ import { useState } from "react";
 import { codeList } from "./data";
 import { arrayToOptions } from "../../lib/array"
 
-const BaseXCodecSetting = () => {
+export const BaseXCodecSetting = () => {
 
   const [ code, setCode ] = useState(getDefaultCode()); // 默认编码
 
@@ -22,5 +22,3 @@ const BaseXCodecSetting = () => {
     </>
   );
 }
-
-export default BaseXCodecSetting;
