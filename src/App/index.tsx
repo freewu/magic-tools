@@ -84,6 +84,7 @@ const list = [
   'DotMatrixFont',
   'KeyboardKeyInfo',
   'Chmod',
+  'OTPGenerator',
   'AsciiImageGenerator',
   'AsciiTextArt',
   'CronRules',
