@@ -28,8 +28,8 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      # 从 tag (v2.5.0) 取版本号 (2.5.0), 用于产物文件命名 (仿 Linux AppImage 的
-      # MagicTools_<版本>_<架构> 风格, 见 tauri 自动命名 MagicTools_2.5.0_amd64.AppImage)
+      # 从 tag (v2.6.0) 取版本号 (2.6.0), 用于产物文件命名 (仿 Linux AppImage 的
+      # MagicTools_<版本>_<架构> 风格, 见 tauri 自动命名 MagicTools_2.6.0_amd64.AppImage)
       - name: Compute version from tag
         # Windows runner 默认 PowerShell 不认 ${VAR#v} bash 展开, 必须显式 bash
         shell: bash

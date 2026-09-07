@@ -27,6 +27,25 @@ export const eventList = [
     color: "green",
     children: (
       <>
+        <p>2026-09-08 V2.6.0 Release</p>
+        <ul style={ {listStyle: "none" }}>
+          <li>新增「格式化」分类: JSON / JSON5 / SQL 格式化移入独立分类 (侧边菜单/应用中心/设置页同步分组)</li>
+          <li>字幕格式转换: SRT/VTT/SBV/SUB/SSA/ASS/SMI/LRC/JSON 九格式互转 (本地解析, 样式指令剥除, 自动检测 + MicroDVD fps)</li>
+          <li>加解密新增 RC5 / RC2 / Blowfish / RC6 (参考 AES 的五模式 UI) 与 ChaCha20 (RFC 7539, 官方向量验证)</li>
+          <li>值计算新增 CMAC / HKDF / KMAC、原码/反码/补码; 颜色格式转换新增 7 组配色方案 (主色居中, 点击复制 HEX)</li>
+          <li>编解码新增 HTTP Basic Auth 与 Chmod 权限; 其它新增 IP 转换 (IPv4 ↔ 整数/HEX/BIN) 与 OTP 密码生成器 (TOTP/HOTP, otpauth URI 扫码导入)</li>
+          <li>其它新增键盘按键信息、点阵字生成器、文件比较; 配置转换支持 XML 互转 + 拖入自动识别</li>
+          <li>时间工具新增 GPS/北斗/伽利略/格洛纳斯/儒略日输出</li>
+          <li>启动后自动检测 GitHub 新版本 (右下角弹窗提示, 点击打开下载页)</li>
+          <li>修复应用中心分类布局与分割线显示问题</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    color: "green",
+    children: (
+      <>
         <p>2026-09-07 V2.5.0 Release</p>
         <ul style={ {listStyle: "none" }}>
           <li>值计算新增 BCrypt 生成/校验、Scrypt (RFC 7914 零依赖实现)、PPI 计算 (标准 RGB / Pentile 等效 PPI, 含 13 种常用屏幕预设)</li>
