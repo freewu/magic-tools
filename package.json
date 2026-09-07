@@ -77,7 +77,7 @@
       "dist"
     ],
     "transform": {
-      "\\.(ts|tsx|js|jsx)$": "ts-jest"
+      "\\.(ts|tsx|js|jsx)$": ["ts-jest", { "tsconfig": { "module": "commonjs", "skipLibCheck": true } }]
     }
   },
   "dependencies": {

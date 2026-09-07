@@ -63,7 +63,8 @@ const ImageColor = () => {
             // 文件加载完毕
             reader.onload = () => {
               setValue(reader.result as string);
-              const myCanvas :HTMLCanvasElement = document.getElementById("canvas-img")!;
+              const myCanvas = document.getElementById("canvas-img") as HTMLCanvasElement | null;
+              if (myCanvas === null) { return; }
               const ctx: CanvasRenderingContext2D = myCanvas.getContext('2d')!;
 
               let img = new Image();
