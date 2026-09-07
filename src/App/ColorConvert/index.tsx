@@ -2,7 +2,7 @@ import { Checkbox, Form, Input, Divider, message, Space, Radio, Button, ColorPic
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
-import { genColorString, transalte2Hex } from "./lib"
+import { genColorString, transalte2Hex, calcColorSchemes } from "./lib"
 import { colorTypeList, emptyResult } from "./data"
 import type { RadioChangeEvent } from 'antd';
 import type { Color } from 'antd/es/color-picker';
@@ -111,6 +111,24 @@ const ColorConvert = () => {
     setShowPercent(!showPercent);
   }
 
+  // ---- 配色方案 ----
+  const schemes = colorData.hex ? calcColorSchemes(colorData.hex) : [];
+
+  // 根据背景色亮度决定前景文字颜色
+  const schemeTextColor = (hex :string) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return (0.299 * r + 0.587 * g + 0.114 * b) > 150 ? '#333' : '#fff';
+  };
+
+  const copyHex = (hex :string) => {
+    copyTextToClipboard(hex);
+    notice.success(hex + ' 已复制');
+  };
+
+  const offsetText = (o :number) => o === 0 ? '主色' : ((o > 0 ? '+' : '') + o + '°');
+
   return (
     <div>
       {contextHolder}
@@ -192,6 +210,44 @@ const ColorConvert = () => {
           </Form>
         </Col>
       </Row>
+
+      <Divider dashed>配色方案</Divider>
+      <div style={ { marginBottom: 8 } }>
+        <span style={ { fontSize: 12, color: '#999' } }>
+          基于主色 { colorData.hex ? <b>{ colorData.hex }</b> : '…' } 的色相旋转生成, 点击色块复制 HEX; 若主色为灰色 (无彩色) 各方案颜色相同属正常现象
+        </span>
+      </div>
+      { schemes.length === 0 ? (
+        <div style={ { fontSize: 13, color: '#999' } }>输入有效颜色后展示相似 / 分离 / 三角 / 四角 / 方形 / 复合 / 双分离配色</div>
+      ) : (
+        schemes.map((s) => (
+          <div key={ s.key } style={ { margin: '10px 0' } }>
+            <Space size={ 8 } align="baseline">
+              <b style={ { fontSize: 14 } }>{ s.label }</b>
+              <span style={ { fontSize: 12, color: '#999' } }>{ s.desc }</span>
+            </Space>
+            <div style={ { display: 'flex', gap: 8, marginTop: 6, flexWrap: 'wrap' } }>
+              { s.colors.map((c) => (
+                <div
+                  key={ c.hex + c.offset }
+                  onClick={ () => copyHex(c.hex) }
+                  title={ c.hex + ' (点击复制)' }
+                  style={ {
+                    flex: 1, minWidth: 96, height: 64, borderRadius: 6, background: c.hex,
+                    cursor: 'pointer', padding: '6px 8px', boxSizing: 'border-box',
+                    display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                    color: schemeTextColor(c.hex), fontFamily: 'monospace', fontSize: 12,
+                    boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.06)',
+                  } }
+                >
+                  <span>{ c.hex }{ c.isMain ? ' (主)' : (c.isComplement ? ' (补)' : '') }</span>
+                  <span>{ offsetText(c.offset) }</span>
+                </div>
+              )) }
+            </div>
+          </div>
+        ))
+      ) }
 
     </div>
   );
