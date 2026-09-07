@@ -7,6 +7,18 @@ export const emptyResult = {
   "locale": "",
   "utc": "",
   "custom": "",
+  "gps": "",
+  "gpsWeekTow": "",
+  "gpsTotal": "",
+  "bdt": "",
+  "bdtWeekTow": "",
+  "bdtTotal": "",
+  "gst": "",
+  "gstWeekTow": "",
+  "gstTotal": "",
+  "glonass": "",
+  "jd": "",
+  "mjd": "",
 };
 
 import { getLastWeek, getNextWeek, getLastMonth, getNextMonth,formatDateTime } from "./lib"

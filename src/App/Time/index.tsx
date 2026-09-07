@@ -3,14 +3,14 @@ import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib";
 import { emptyResult, timeList } from "./data";
-import { formatDateTime } from "./lib";
+import { formatDateTime, gpsTimeOf, bdtTimeOf, gstTimeOf, glonassTimeText, julianDayOf } from "./lib";
 import { InputStatus } from "antd/es/_util/statusUtils";
 
 const Time = () => {
 
   const [ status, setStatus ] = useState('');
   const [ value, setValue ] = useState('');
-  const [ data, setData ] = useState(emptyResult);
+  const [ data, setData ] = useState<Record<string, string>>(emptyResult);
   const [ notice, contextHolder ] = message.useMessage();
 
   const inputStyle = { cursor: "pointer" };
@@ -24,7 +24,7 @@ const Time = () => {
 
   const updateDate = (d: Date) => {
     setStatus('');
-    const r = {
+    const r :Record<string, string> = {
       "ts10": "",
       "ts13": d.getTime() + "",
       "rfc3339": "",
@@ -35,6 +35,24 @@ const Time = () => {
       "custom": formatDateTime(d),
     };
     r["ts10"] = Math.round(d.getTime() / 1000) + "";
+    // 导航/天文时间系统 (与 UTC 的关系见 lib.ts 注释)
+    const ms = d.getTime();
+    const g = gpsTimeOf(ms);
+    const b = bdtTimeOf(ms);
+    const s = gstTimeOf(ms);
+    const jd = julianDayOf(ms);
+    r["gps"] = `${g.week} 周 + ${g.tow} 秒`;
+    r["gpsWeekTow"] = `${g.week}, ${g.tow}`;
+    r["gpsTotal"] = `${g.total}`;
+    r["bdt"] = `${b.week} 周 + ${b.tow} 秒`;
+    r["bdtWeekTow"] = `${b.week}, ${b.tow}`;
+    r["bdtTotal"] = `${b.total}`;
+    r["gst"] = `${s.week} 周 + ${s.tow} 秒`;
+    r["gstWeekTow"] = `${s.week}, ${s.tow}`;
+    r["gstTotal"] = `${s.total}`;
+    r["glonass"] = glonassTimeText(ms);
+    r["jd"] = jd.jd.toFixed(6);
+    r["mjd"] = jd.mjd.toFixed(6);
     setData(r);
   }
 
@@ -145,6 +163,42 @@ const Time = () => {
           <Input readOnly style={ inputStyle} onClick={ inputClick } value= { 
             data.custom? data.custom.split(" ")["0"] : '' 
           }/>
+        </Form.Item>
+        <Form.Item label="GPS 时间">
+          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gps }/>
+        </Form.Item>
+        <Form.Item label="GPS 时间 (周,秒)">
+          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gpsWeekTow }/>
+        </Form.Item>
+        <Form.Item label="GPS 时间 (总秒)">
+          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gpsTotal }/>
+        </Form.Item>
+        <Form.Item label="北斗时间">
+          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.bdt }/>
+        </Form.Item>
+        <Form.Item label="北斗时间 (周,秒)">
+          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.bdtWeekTow }/>
+        </Form.Item>
+        <Form.Item label="北斗时间 (总秒)">
+          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.bdtTotal }/>
+        </Form.Item>
+        <Form.Item label="伽利略时间">
+          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gst }/>
+        </Form.Item>
+        <Form.Item label="伽利略时间 (周,秒)">
+          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gstWeekTow }/>
+        </Form.Item>
+        <Form.Item label="伽利略时间 (总秒)">
+          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gstTotal }/>
+        </Form.Item>
+        <Form.Item label="格洛纳斯时间 (UTC+3)">
+          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.glonass }/>
+        </Form.Item>
+        <Form.Item label="儒略日 (JD)">
+          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.jd }/>
+        </Form.Item>
+        <Form.Item label="简化儒略日 (MJD)">
+          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.mjd }/>
         </Form.Item>
       </Form>
 
