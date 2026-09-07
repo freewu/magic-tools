@@ -171,9 +171,10 @@ magic-tools
 # Web 版无 Tauri 能力, OS 级操作已做平替/降级: 保存文件自动变为浏览器下载、
 # 外部链接新窗口打开、托盘菜单事件为空操作、TDK 抓取受浏览器 CORS 限制 (见 src/lib/tauri.ts)
 
-    just web              # 构建到 dist/ (base './' 已适配子路径) 并触发 Pages 部署
+    just web              # 构建到 dist/ 并触发 Pages 部署
 
-# 发布 Web 版到 GitHub Pages (需要 gh CLI: gh auth login)
+# 发布 Web 版到 GitHub Pages (复用 git push 的凭据, 无需额外登录/无需 gh CLI;
+# 若已装 gh CLI 且已登录则优先用 gh)
 # ① 先推送代码: git push origin master
 # ② 再执行:     just web
 # 说明: 打版本 tag (vX.Y.Z) 也会自动触发 deploy-pages.yml 部署 (见 just tag);

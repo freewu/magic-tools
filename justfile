@@ -51,18 +51,16 @@ preview:
     npm run preview:renderer
 
 # 1) vite build -> dist/ (纯前端, base './' 已适配 Pages 子路径)
-# 2) gh workflow run deploy-pages.yml (workflow_dispatch, 基于 master) 触发 Pages 部署
+# 2) scripts/trigger-pages.sh: 优先 gh workflow run, 无 gh 时复用 git 凭据调 REST API
+#    触发 deploy-pages.yml workflow_dispatch (基于 master) —— 无需额外登录
 # Web 版无 Tauri 能力, OS 级操作已平替/降级: 保存文件=浏览器下载, 外部链接=新窗口,
 # 托盘事件=空操作, TDK 抓取受浏览器 CORS 限制 (见 src/lib/tauri.ts / WebTDKCheck)
-# 前提: gh CLI 已登录 (gh auth login); 代码先 git push origin master;
-#       仓库 Settings -> Pages -> Source = GitHub Actions
-# Build and deploy the pure-web version to GitHub Pages (vite build + gh workflow run)
+# 前提: 代码先 git push origin master; 仓库 Settings -> Pages -> Source = GitHub Actions
+# Build and deploy the pure-web version to GitHub Pages (vite build + trigger deploy workflow)
 web:
     npm run build:renderer
     @echo "✓ Web 版构建完成 (dist/, 纯前端无 Tauri 能力)"
-    gh workflow run deploy-pages.yml --ref master
-    @echo "✓ 已触发 GitHub Pages 部署 (deploy-pages.yml @ master)"
-    @echo "  进度: gh run watch --workflow=deploy-pages.yml"
+    bash scripts/trigger-pages.sh
 
 # Build the production app: renderer + Rust + installers (bundle)
 build:

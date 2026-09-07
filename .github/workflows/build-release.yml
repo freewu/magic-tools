@@ -19,15 +19,19 @@ jobs:
           # Windows: 单体免安装 exe (依赖系统自带 WebView2)
           - platform: 'windows-latest'
             args: '--no-bundle'
-          # macOS: 免安装 .app (打包为 zip)
+          # macOS: 免安装 .app (universal — Intel & Apple Silicon 单包, 打包为 zip)
           - platform: 'macos-latest'
-            args: '--bundles app'
           # Linux: 免安装 AppImage
           - platform: 'ubuntu-22.04'
             args: '--bundles appimage'
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
+
+      # 从 tag (v2.5.0) 取版本号 (2.5.0), 用于产物文件命名 (仿 Linux AppImage 的
+      # MagicTools_<版本>_<架构> 风格, 见 tauri 自动命名 MagicTools_2.5.0_amd64.AppImage)
+      - name: Compute version from tag
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
 
       - name: Install Linux dependencies
         if: matrix.platform == 'ubuntu-22.04'
@@ -55,16 +59,27 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci || npm install
 
-      - name: Build with Tauri (${{ matrix.platform }})
-        run: npm run tauri build -- ${{ matrix.args }}
-
-      - name: Package macOS app as zip
+      - name: Build with Tauri (macOS universal — Intel & Apple Silicon 单包)
         if: matrix.platform == 'macos-latest'
         run: |
-          APP=$(find src-tauri/target/release/bundle/macos -maxdepth 1 -name '*.app' | head -n 1)
+          rustup target add aarch64-apple-darwin x86_64-apple-darwin
+          npm run tauri build -- --target universal-apple-darwin --bundles app
+
+      - name: Build with Tauri (${{ matrix.platform }})
+        if: matrix.platform != 'macos-latest'
+        run: npm run tauri build -- ${{ matrix.args }}
+
+      - name: Rename Windows portable exe with version
+        if: matrix.platform == 'windows-latest'
+        run: mv src-tauri/target/release/magic-tools.exe "MagicTools_${VERSION}_x64.exe"
+
+      - name: Package macOS universal app as zip
+        if: matrix.platform == 'macos-latest'
+        run: |
+          APP=$(find src-tauri/target/universal-apple-darwin/release/bundle/macos -maxdepth 1 -name '*.app' | head -n 1)
           echo "app bundle: $APP"
-          ditto -c -k --keepParent "$APP" "MagicTools-macOS-aarch64.zip"
-          ls -la MagicTools-macOS-aarch64.zip
+          ditto -c -k --keepParent "$APP" "MagicTools_${VERSION}_macOS-universal.zip"
+          ls -la "MagicTools_${VERSION}_macOS-universal.zip"
 
       # 发布说明: 只取 update.md 顶部第一个版本节 (从文件头到第二个 "# MagicTools v" 标题之前),
       # 不要把历史版本内容带进本次 Release 说明
@@ -79,6 +94,6 @@ jobs:
         with:
           body_path: release-notes.md
           files: |
-            src-tauri/target/release/*.exe
-            MagicTools-macOS-aarch64.zip
+            MagicTools_*.exe
+            MagicTools_*_macOS-universal.zip
             src-tauri/target/release/bundle/appimage/*.AppImage
