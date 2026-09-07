@@ -38,6 +38,7 @@ const list = [
   'JWTDecoder',
   'DESCrypto',
   'RabbitCrypto',
+  'RC2Crypto',
   'RC4Crypto',
   'RC5Crypto',
   'TripleDESCrypto',
