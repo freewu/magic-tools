@@ -26,6 +26,7 @@
     "dev:renderer": "vite",
     "build": "just build",
     "build:renderer": "vite build",
+    "package": "vite build",
     "bundle": "just bundle",
     "publish": "just publish",
     "lint": "cross-env NODE_ENV=development eslint . --ext .js,.jsx,.ts,.tsx",
