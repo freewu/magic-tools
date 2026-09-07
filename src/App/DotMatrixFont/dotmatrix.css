@@ -1,0 +1,60 @@
+/* 点阵字生成器 */
+.dot-label {
+  font-size: 13px;
+  color: var(--app-text, inherit);
+  opacity: 0.75;
+}
+
+.dot-result {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: start;
+  margin-top: 4px;
+}
+
+.dot-preview-title {
+  font-size: 12px;
+  opacity: 0.65;
+  margin-bottom: 6px;
+}
+
+.dot-preview-cell {
+  border: 1px solid var(--app-border, #d9d9d9);
+  border-radius: 6px;
+  padding: 10px;
+  display: inline-block;
+  background: var(--app-raised, #ffffff);
+}
+
+.dot-canvas {
+  display: block;
+}
+
+.dot-bin {
+  margin-top: 8px !important;
+  font-family: Consolas, Monaco, 'Courier New', monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--app-text, inherit);
+  opacity: 0.75;
+  user-select: text;
+  max-width: 220px;
+  overflow: auto;
+}
+
+.dot-code {
+  margin: 0;
+  border: 1px solid var(--app-border, #d9d9d9);
+  border-radius: 6px;
+  padding: 10px 12px;
+  max-height: calc(100vh - 380px);
+  min-height: 160px;
+  overflow: auto;
+  font-family: Consolas, Monaco, 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--app-text, inherit);
+  background: var(--app-raised, #ffffff);
+  user-select: text;
+}

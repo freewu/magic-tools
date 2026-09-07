@@ -42,6 +42,10 @@ const buildNode = (value: unknown, label: string, prefix: string): JsonTreeNode 
 
 // 解析 JSON 并构造树 (虚拟根, key 固定为 '0')
 export const jsonToTree = (text: string): JsonTreeNode => {
-  const root = buildNode(JSON.parse(text), '$', '0');
-  return root;
+  return jsonValueToTree(JSON.parse(text));
+};
+
+// 由任意解析后的值构造树 (JSON5 等其它解析器解析后可直接复用)
+export const jsonValueToTree = (value: unknown, label = '$'): JsonTreeNode => {
+  return buildNode(value, label, '0');
 };
