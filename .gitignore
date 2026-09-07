@@ -36,3 +36,6 @@ npm-debug.log.*
 
 
 *.lock
+
+# 临时验证参考包 (勿提交)
+tmp-sym-ref/

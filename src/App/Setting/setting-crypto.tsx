@@ -12,6 +12,7 @@ import { DESCryptoSetting } from "../DESCrypto/setting";
 import { TripleDESCryptoSetting } from "../TripleDESCrypto/setting";
 import { RabbitCryptoSetting } from "../RabbitCrypto/setting";
 import { RC4CryptoSetting } from "../RC4Crypto/setting";
+import { RC5CryptoSetting } from "../RC5Crypto/setting";
 import { TEACryptoSetting } from "../TEACrypto/setting";
 import { XTEACryptoSetting } from "../XTEACrypto/setting";
 import { XXTEACryptoSetting } from "../XXTEACrypto/setting";
@@ -32,6 +33,7 @@ export const SettingCrypto = () => {
       <TripleDESCryptoSetting />
       <RabbitCryptoSetting />
       <RC4CryptoSetting />
+      <RC5CryptoSetting />
       <TEACryptoSetting />
       <XTEACryptoSetting />
       <XXTEACryptoSetting />
