@@ -27,7 +27,19 @@ export const eventList = [
     color: "green",
     children: (
       <>
-        <p>2026-09-05 V2.4.1 Release（修复 v2.4.0 黑屏后的重新发布版）</p>
+        <p>2026-09-07 V2.5.0 Release</p>
+        <ul style={ {listStyle: "none" }}>
+          <li>值计算新增 BCrypt 生成/校验、Scrypt (RFC 7914 零依赖实现)、PPI 计算 (标准 RGB / Pentile 等效 PPI, 含 13 种常用屏幕预设)</li>
+          <li>加解密新增 Cisco Type 7; 编解码新增 Gzip (压缩率统计/双格式展示); Hash 值计算页移除 bcrypt 算法区</li>
+          <li>站长工具新增占位图片与 Shield Badge 生成, 设置页新增站长工具分类 tab, App Icon 三平台可勾选</li>
+          <li>其它分类新增 ASCII 图片与 ASCII 文字 (figlet 风格大字)</li>
+          <li>侧边菜单展开时分类标题显示所属应用数量徽标</li>
+          <li>修复 just release 产物复制 (路径层级/安装包过滤) 与面包屑误带徽标问题</li>
+        </ul>
+      </>
+    ),
+  },
+  {
         <ul style={ {listStyle: "none" }}>
           <li>【本版发布原因】修复 v2.4.0 安装包启动黑屏: 残留 CJS require 改 ESM import + CSP 调整兼容 antd 运行时样式 (webpack→Vite 产物兼容问题)</li>
           <li>新增站长工具分类: 网页 TDK 信息检测与 robots.txt 生成</li>
