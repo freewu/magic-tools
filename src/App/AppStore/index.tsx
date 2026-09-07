@@ -12,8 +12,7 @@ const AppStore = () => {
           <AppType 
             uri= { parent.key } 
             key= { parent.key + index } 
-            label=  {parent.label } 
-            icon= { parent.label } 
+            name= { parent.name } 
             children={ parent.children }/>
         );
       })

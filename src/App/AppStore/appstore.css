@@ -6,6 +6,34 @@
   align-content: flex-start; /* 处理数据太少 行间问题 */
 }
 
+/* 每个分类占满整行 (分割线 + 卡片) */
+.appstore-group {
+  width: 100%;
+}
+
+/* 分类分割线: 名字与数量使用柔和灰 */
+.appstore-group-divider {
+  margin: 18px 0 8px 0;
+}
+
+.appstore-group-divider .ant-divider-inner-text {
+  color: var(--app-text, rgba(0, 0, 0, 0.45));
+  opacity: 0.65;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.appstore-group-name {
+  letter-spacing: 1px;
+}
+
+.appstore-group-count {
+  margin-left: 8px;
+  font-size: 12px;
+  opacity: 0.55;
+}
+
 .app {
   width: 168px;
   height: 64px;
