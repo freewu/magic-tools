@@ -40,6 +40,10 @@ export const eventList = [
     ),
   },
   {
+    color: "green",
+    children: (
+      <>
+        <p>2026-09-05 V2.4.1 Release（修复 v2.4.0 黑屏后的重新发布版）</p>
         <ul style={ {listStyle: "none" }}>
           <li>【本版发布原因】修复 v2.4.0 安装包启动黑屏: 残留 CJS require 改 ESM import + CSP 调整兼容 antd 运行时样式 (webpack→Vite 产物兼容问题)</li>
           <li>新增站长工具分类: 网页 TDK 信息检测与 robots.txt 生成</li>
