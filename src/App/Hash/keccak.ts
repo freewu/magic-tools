@@ -150,3 +150,9 @@ export const keccak224 = makeDigest(144, 0x01, 28);
 export const keccak256 = makeDigest(136, 0x01, 32);
 export const keccak384 = makeDigest(104, 0x01, 48);
 export const keccak512 = makeDigest(72, 0x01, 64);
+
+// -------- 通用字节级海绵 (供 cSHAKE / KMAC / TupleHash 等 SP 800-185 调用) --------
+// rate = 吸收速率(字节), suffix = 填充域字节 (cSHAKE/KMAC 为 0x04), 输出 outBytes 字节
+// 消息前缀/后缀编码由调用方完成 (如 bytepad/right_encode)
+export const keccakBytes = (message :Uint8Array, rate :number, suffix :number, outBytes :number) :Uint8Array =>
+  sponge(message, rate, suffix, outBytes);

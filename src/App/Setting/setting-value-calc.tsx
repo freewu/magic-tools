@@ -3,6 +3,9 @@ import { HashSetting } from "../Hash/setting";
 import { SHA3HashSetting } from "../SHA3Hash/setting";
 import { KeccakHashSetting } from "../KeccakHash/setting";
 import { PBKDF2CalcSetting } from "../PBKDF2Calc/setting";
+import { CMACCalcSetting } from "../CMACCalc/setting";
+import { HKDFCalcSetting } from "../HKDFCalc/setting";
+import { KMACCalcSetting } from "../KMACCalc/setting";
 import { HmacHashSetting } from "../HmacHash/setting";
 import { BCCCheckSetting } from "../BCCCheck/setting";
 import { LRCCheckSetting } from "../LRCCheck/setting";
@@ -17,6 +20,9 @@ export const SettingValueCalc = () => {
       <SHA3HashSetting />
       <KeccakHashSetting />
       <PBKDF2CalcSetting />
+      <CMACCalcSetting />
+      <HKDFCalcSetting />
+      <KMACCalcSetting />
       <HmacHashSetting />
       <BCCCheckSetting />
       <LRCCheckSetting />
