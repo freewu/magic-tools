@@ -24,6 +24,21 @@ export function setDefaultOutputFormat(format :string) : void  {
   localStorage.setItem(DEFAULT_OUTPUT_FORMAT, format);
 }
 
+// 按文件名后缀猜测配置格式 (返回 typeList 中的 value; 识别不了返回 null)
+const FORMAT_BY_EXT: Record<string, string> = {
+  ini: 'ini', conf: 'ini', cfg: 'ini',
+  json: 'json', json5: 'json',
+  xml: 'xml',
+  yaml: 'yaml', yml: 'yaml',
+  toml: 'toml',
+  properties: 'properties', props: 'properties',
+};
+
+export const guessFormat = (filename :string) :string | null => {
+  const ext = (filename.split('.').pop() || '').toLowerCase();
+  return FORMAT_BY_EXT[ext] ?? null;
+};
+
 // ini <==> json
 import { IIniObject, parse as iniParse, stringify as iniStringify } from 'js-ini';
 
@@ -55,17 +70,49 @@ export const toml2json = (data :string) :Object => {
   return TOML.parse(data);
 }
 
-// xml <==> json
-// const options = { compact: true, ignoreComment: true, spaces: 4 };
-// const XML = require('xml-js');
-export const json2xml = (data :Object) :string => {
-  return '';
-  //return XML.json2xml(data, options);
-}
+// xml <==> json (fast-xml-parser)
+// 约定: 属性 -> 键名加 '@_' 前缀; 文本 -> '#text'; 重复子元素自动成数组
+import { XMLParser, XMLBuilder } from 'fast-xml-parser';
+
+const XML_PARSE_OPTS = {
+  ignoreAttributes: false,
+  attributeNamePrefix: '@_',
+  textNodeName: '#text',
+  trimValues: true,
+  // 保持配置值/属性为字符串, 避免 '01' 等被数值化
+  parseTagValue: false,
+  parseAttributeValue: false,
+};
+
+// 去掉 <!-- --> 注释 (fast-xml-parser 会产出 #comment 键, 配置互转场景直接忽略注释)
+const stripXmlComments = (text: string) :string => text.replace(/<!--[\s\S]*?-->/g, '');
+
+const xmlParser = () => new XMLParser(XML_PARSE_OPTS);
 
 export const xml2json = (data :string) :Object => {
-  return {};
-  //return XML.xml2json(data);
+  const cleaned = stripXmlComments(data);
+  if (cleaned.trim() === '') return {};
+  const obj = xmlParser().parse(cleaned);
+  // 非法/空文档 fxp 返回空串
+  if (typeof obj !== 'object' || obj === null) return {};
+  return obj;
+}
+
+export const json2xml = (data :Object) :string => {
+  if (data === null || typeof data !== 'object') return String(data);
+  // XML 只允许单个根元素: 数组 / 多键对象包一层 <root>
+  const keys = Array.isArray(data) ? [] : Object.keys(data);
+  const root = Array.isArray(data) || keys.length !== 1 ? { root: data } : data;
+  const builder = new XMLBuilder({
+    format: true,
+    indentBy: '  ',
+    ignoreAttributes: false,
+    attributeNamePrefix: '@_',
+    textNodeName: '#text',
+    suppressEmptyNode: true,
+  });
+  const xml = builder.build(root);
+  return typeof xml === 'string' ? xml : '';
 }
 
 // properties <==> json

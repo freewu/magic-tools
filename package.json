@@ -62,6 +62,7 @@
       "json"
     ],
     "moduleNameMapper": {
+      "^yaml$": "<rootDir>/node_modules/yaml/dist/index.js",
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/mocks/fileMock.js",
       "\\.(css|less|sass|scss)$": "identity-obj-proxy"
     },
@@ -91,6 +92,7 @@
     "color-convert": "^2.0.1",
     "crypto-js": "^4.1.1",
     "deepmerge": "^4.3.1",
+    "fast-xml-parser": "^4.5.7",
     "highlight.js": "^11.8.0",
     "js-base64": "^3.7.5",
     "js-ini": "^1.6.0",

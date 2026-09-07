@@ -1,12 +1,12 @@
 import { Radio, Divider, Button,Input, Space, message, Tabs } from "antd";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { RadioChangeEvent } from 'antd';
 const { TextArea } = Input;
+import { UploadOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "../../lib"
-import { openFile } from "../../lib/file"
 import { typeList } from "./data";
 import type { InputStatus } from "antd/es/_util/statusUtils";
-import { getDefaultInputFormat, getDefaultOutputFormat } from "./lib";
+import { getDefaultInputFormat, getDefaultOutputFormat, guessFormat } from "./lib";
 import { ConfigResult } from "./config-result"
 import { json2ini, ini2json } from "./lib";
 import { json2yaml, yaml2json } from "./lib";
@@ -23,6 +23,7 @@ const ConfigConvert = () => {
   const [ result, setResult ] = useState({});
   const [ notice, contextHolder ] = message.useMessage(); // 消息提醒
   const [ status, setStatus] = useState('');
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // 切换输入类型
   const onTypeChange = ({ target: { value } }: RadioChangeEvent) => {
@@ -31,11 +32,11 @@ const ConfigConvert = () => {
     setResult({});
   };
 
-  const convert2object = (data :string) => {
+  const convert2object = (data :string, fmt? :string) => {
     setValue(data);
     if(data.trim() === '') return ; // 输入空没有进行下面的处理
     try {
-      const json = convert2json(data,type);
+      const json = convert2json(data, fmt ?? type);
       setStatus('');
       setResult(json);
     } catch (error) {
@@ -43,6 +44,24 @@ const ConfigConvert = () => {
       setStatus('error');
       setResult({});
     }
+  };
+
+  // 读取文件并按扩展名自动识别输入格式 (xml/ini/json/yaml/toml/properties)
+  const handleFileList = (files: FileList | null) => {
+    const f = files?.[0];
+    if(!f) return;
+    const fmt = guessFormat(f.name);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const txt = String(reader.result ?? '');
+      if(fmt && typeList.some((t) => t.value === fmt)) setType(fmt);
+      setValue(txt);
+      convert2object(txt, fmt ?? type);
+      if(fmt) notice.success(`已按 ${fmt.toUpperCase()} 解析 ${f.name}`);
+      else notice.warning('未能识别文件扩展名, 按当前所选格式解析');
+    };
+    reader.onerror = () => notice.error('读取文件失败');
+    reader.readAsText(f);
   };
 
   const textareaDoubleClick = (e :React.MouseEvent<HTMLTextAreaElement>) => {
@@ -115,6 +134,16 @@ const ConfigConvert = () => {
           value={ type } 
         />
         <Button 
+          icon={ <UploadOutlined /> }
+          onClick={ () => fileInputRef.current?.click() }
+        >打开配置文件</Button>
+        <input
+          ref={ fileInputRef }
+          type="file" style={ { display: 'none' } }
+          accept=".ini,.conf,.cfg,.json,.json5,.xml,.yaml,.yml,.toml,.properties,.props"
+          onChange={ (e) => { handleFileList(e.target.files); e.target.value = ''; } }
+        />
+        <Button 
           onClick={ () => { setValue(''); setResult(''); setStatus(''); } }
           style={ { backgroundColor : "#dc3545", color: "#fff" }} 
         >清除</Button>
@@ -127,10 +156,10 @@ const ConfigConvert = () => {
         onChange={ (e) => { convert2object(e.target.value) } }
         title="双击复制内容到粘贴板"
         value= { value }
-        placeholder="输入需要转换的配置内容 或 拖拽配置文件到框内打开"
+        placeholder="输入需要转换的配置内容 或 拖拽配置文件到框内打开 (自动识别 xml/ini/json/yaml/toml/properties)"
         autoSize={{ minRows: 10, maxRows: 10 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
-        onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, convert2object ); } }
+        onDrop={ (e) => { e.preventDefault(); handleFileList(e.dataTransfer.files); } }
       />
 
       <Divider dashed plain> 转换结果 </Divider>

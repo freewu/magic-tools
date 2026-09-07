@@ -18,6 +18,24 @@ declare module 'toml-patch' {
   export function patch(source: string, ...rest: unknown[]): unknown;
 }
 
+// fast-xml-parser: CJS (src/fxp.js) 无自带类型; 镜像无 @types, 此处按实际使用面声明
+// (Vite 对 CJS 做 named-export interop, XMLParser/XMLBuilder 可直接具名导入)
+declare module 'fast-xml-parser' {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  export type XmlParserOptions = Record<string, any>;
+  export class XMLParser {
+    constructor(options?: XmlParserOptions);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    parse(xml: string): any;
+  }
+  export class XMLBuilder {
+    constructor(options?: XmlParserOptions);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    build(obj: any): string | boolean;
+  }
+}
+
+
 // CompressionStream / DecompressionStream (TS 4.9 的 DOM lib 未收录; 运行时为 Chromium/WebView2/Node 18+ 全局 API)
 // 本文件为 script (无 import/export), 顶层声明即全局; 使用方以 /// <reference> 引入
 interface CompressionStream {
