@@ -21,9 +21,11 @@ export default defineConfig({
     target: 'chrome105',
     sourcemap: false,
     // 入口 bundle 含 antd 等依赖体积较大, 提高告警阈值避免 CI 噪音
-    // antd 主包 (antd+rc-*) 约 800k 且随页面引用组件小幅增长; 拆成 antd/rc 两包
-    // 只会增加请求数与缓存碎片 (依赖必然同载), 故阈值提到 900 留余量
-    chunkSizeWarningLimit: 900,
+    // antd 主包 (antd+rc-*) 约 800k, 随工具页增多 (每页新增若干 antd 组件引用)
+    // 持续增长, 现已至 ~950k (gzip ~293k); 拆成 antd/rc 两包或让 rollup 自动分
+    // 只会增加请求数与缓存碎片 (碎片实验曾把 chunk 数从 ~30 拆到 299), 依赖同载
+    // 属桌面工具多页共享 UI 框架的固有成本, 阈值提到 1000 留余量
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         // 手动分包: 主入口 (layout/App 注册表) 只留业务骨架,
