@@ -73,6 +73,7 @@ jobs:
 
       - name: Rename Windows portable exe with version
         if: matrix.platform == 'windows-latest'
+        shell: bash
         run: mv src-tauri/target/release/magic-tools.exe "MagicTools_${VERSION}_x64.exe"
 
       - name: Package macOS universal app as zip
@@ -86,6 +87,7 @@ jobs:
       # 发布说明: 只取 update.md 顶部第一个版本节 (从文件头到第二个 "# MagicTools v" 标题之前),
       # 不要把历史版本内容带进本次 Release 说明
       - name: Extract top version section from update.md as release notes
+        shell: bash
         run: |
           awk 'BEGIN { n = 0 } /^# MagicTools v/ { n++; if (n > 1) exit } { print }' update.md > release-notes.md
           echo "==== release-notes.md (前 8 行) ===="
@@ -95,7 +97,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           body_path: release-notes.md
-          overwrite: true
+          overwrite_files: true
           files: |
             MagicTools_*.exe
             MagicTools_*_macOS-universal.zip
