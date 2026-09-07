@@ -37,6 +37,7 @@ const list = [
   'MorseCodec',
   'JWTDecoder',
   'DESCrypto',
+  'BlowfishCrypto',
   'RabbitCrypto',
   'RC2Crypto',
   'RC4Crypto',

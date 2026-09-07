@@ -9,6 +9,7 @@ import { RailFenceCryptoSetting } from "../RailFenceCrypto/setting";
 import { VigenereCryptoSetting } from "../VigenereCrypto/setting";
 import { HillCryptoSetting } from "../HillCrypto/setting";
 import { DESCryptoSetting } from "../DESCrypto/setting";
+import { BlowfishCryptoSetting } from "../BlowfishCrypto/setting";
 import { TripleDESCryptoSetting } from "../TripleDESCrypto/setting";
 import { RabbitCryptoSetting } from "../RabbitCrypto/setting";
 import { RC2CryptoSetting } from "../RC2Crypto/setting";
@@ -31,6 +32,7 @@ export const SettingCrypto = () => {
       <VigenereCryptoSetting />
       <HillCryptoSetting />
       <DESCryptoSetting />
+      <BlowfishCryptoSetting />
       <TripleDESCryptoSetting />
       <RabbitCryptoSetting />
       <RC2CryptoSetting />
