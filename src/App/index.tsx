@@ -72,6 +72,7 @@ const list = [
   'JSON5Formatter',
   'FileDiff',
   'DotMatrixFont',
+  'KeyboardKeyInfo',
   'AsciiImageGenerator',
   'AsciiTextArt',
   'CronRules',
