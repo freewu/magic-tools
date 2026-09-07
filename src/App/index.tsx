@@ -71,6 +71,7 @@ const list = [
   'TemperatureConvert',
   'DistanceConvert',
   'ConfigConvert',
+  'SubtitleConvert',
   'SpeedConvert',
   'VolumeConvert',
   'AreaConvert',
