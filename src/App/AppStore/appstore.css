@@ -6,14 +6,18 @@
   align-content: flex-start; /* 处理数据太少 行间问题 */
 }
 
-/* 每个分类占满整行 (分割线 + 卡片) */
+/* 每个分类占满整行 (分割线 + 卡片); 内部 flex 排列使卡片一行展示多个 */
 .appstore-group {
   width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
 }
 
-/* 分类分割线: 名字与数量使用柔和灰 */
+/* 分类分割线: 名字与数量使用柔和灰; 占满整行 (避免与卡片同行) */
 .appstore-group-divider {
   margin: 18px 0 8px 0;
+  flex: 0 0 100%;
 }
 
 .appstore-group-divider .ant-divider-inner-text {
