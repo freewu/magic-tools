@@ -16,6 +16,7 @@ import { RC2CryptoSetting } from "../RC2Crypto/setting";
 import { RC4CryptoSetting } from "../RC4Crypto/setting";
 import { RC5CryptoSetting } from "../RC5Crypto/setting";
 import { RC6CryptoSetting } from "../RC6Crypto/setting";
+import { ChaCha20CryptoSetting } from "../ChaCha20Crypto/setting";
 import { TEACryptoSetting } from "../TEACrypto/setting";
 import { XTEACryptoSetting } from "../XTEACrypto/setting";
 import { XXTEACryptoSetting } from "../XXTEACrypto/setting";
@@ -40,6 +41,7 @@ export const SettingCrypto = () => {
       <RC4CryptoSetting />
       <RC5CryptoSetting />
       <RC6CryptoSetting />
+      <ChaCha20CryptoSetting />
       <TEACryptoSetting />
       <XTEACryptoSetting />
       <XXTEACryptoSetting />

@@ -44,6 +44,7 @@ const list = [
   'RC4Crypto',
   'RC5Crypto',
   'RC6Crypto',
+  'ChaCha20Crypto',
   'TripleDESCrypto',
   'TEACrypto',
   'XTEACrypto',
