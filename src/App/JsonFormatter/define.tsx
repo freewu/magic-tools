@@ -1,6 +1,6 @@
 const AppName = 'JSON 格式化';
 const Icon = '';
-const Type = 'misc';
+const Type = 'formatter';
 
 export {
   AppName,

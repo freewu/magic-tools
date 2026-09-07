@@ -1,7 +1,6 @@
 const AppName = 'SQL 格式化';
 const Icon = '';
-//const Type = 'formatter';
-const Type = 'misc';
+const Type = 'formatter';
 
 export {
   AppName,

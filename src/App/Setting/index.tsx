@@ -1,5 +1,5 @@
 import { theme } from "antd";
-import { SettingOutlined, SafetyOutlined, CalculatorOutlined, SwapOutlined, MoreOutlined, CodeOutlined, GlobalOutlined } from '@ant-design/icons';
+import { SettingOutlined, SafetyOutlined, CalculatorOutlined, SwapOutlined, MoreOutlined, CodeOutlined, GlobalOutlined, FormatPainterOutlined } from '@ant-design/icons';
 import { useRef, useState, useEffect, type ReactNode, type UIEvent } from "react";
 import "./setting.css";
 import { itemList } from "./data";
@@ -8,6 +8,7 @@ const CATEGORY_ICONS: Record<string, ReactNode> = {
   system: <SettingOutlined />,
   crypto: <SafetyOutlined />,
   'value-calc': <CalculatorOutlined />,
+  formatter: <FormatPainterOutlined />,
   convert: <SwapOutlined />,
   codec: <CodeOutlined />,
   webmaster: <GlobalOutlined />,

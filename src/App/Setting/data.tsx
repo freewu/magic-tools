@@ -6,6 +6,7 @@ import { SettingConvert } from "./setting-convert"
 import { SettingCodec } from "./setting-codec"
 import { SettingMisc } from "./setting-misc"
 import { SettingWebmaster } from "./setting-webmaster"
+import { SettingFormatter } from "./setting-formatter"
 
 export const itemList = [
   {
@@ -32,6 +33,11 @@ export const itemList = [
     key : 'value-calc',
     label : '值计算',
     children: <SettingValueCalc />
+  },
+  {
+    key : 'formatter',
+    label : '格式化',
+    children: <SettingFormatter />
   },
   {
     key : 'webmaster',
