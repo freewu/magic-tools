@@ -26,7 +26,7 @@ jobs:
             args: '--bundles appimage'
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # 从 tag (v2.5.0) 取版本号 (2.5.0), 用于产物文件命名 (仿 Linux AppImage 的
       # MagicTools_<版本>_<架构> 风格, 见 tauri 自动命名 MagicTools_2.5.0_amd64.AppImage)
@@ -47,7 +47,7 @@ jobs:
             libxdo-dev \
             libssl-dev
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
@@ -94,7 +94,7 @@ jobs:
           head -8 release-notes.md
 
       - name: Upload release assets
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           body_path: release-notes.md
           overwrite_files: true
