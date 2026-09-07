@@ -93,6 +93,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           body_path: release-notes.md
+          overwrite: true
           files: |
             MagicTools_*.exe
             MagicTools_*_macOS-universal.zip
