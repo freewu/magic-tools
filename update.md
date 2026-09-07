@@ -1,3 +1,32 @@
+# MagicTools v2.6.0
+
+## 更新内容
+
+### ✨ 新增功能
+
+- **字幕格式转换**（新工具）：SRT / VTT / SBV / SUB / SSA / ASS / SMI / LRC / JSON 九种字幕格式互转，纯本地解析（内容不上传服务器），样式指令（ASS 特效、SRT <i>、MicroDVD {y:..} 等）自动剥除仅留文本与时间轴；自动检测输入格式，MicroDVD 可设帧率
+- 新增**「格式化」分类**：JSON / JSON5 / SQL 格式化移入独立分类（侧边菜单、应用中心、设置页分组同步）
+- 加解密新增：**ChaCha20**（RFC 7539，256 位密钥 + 96 位 nonce + 32 位计数器，OpenSSL/RFC 官方向量验证）与 **RC5 / RC2 / Blowfish / RC6**（统一参考 AES 的五模式/填充/编码 UI）
+- 值计算新增：**CMAC**（SP 800-38B）/ **HKDF**（RFC 5869）/ **KMAC**（SP 800-185）与**原码/反码/补码计算**
+- 颜色格式转换新增**配色方案**：相似/分离/三角/四角/方形/复合/双分离 7 组色相旋转展示（主色居中，点击复制 HEX）
+- 编解码新增：**HTTP Basic Auth** 编解码 与 **Chmod 权限**
+- 其它新增：**IP 转换**（IPv4 ↔ 整数/HEX/BIN 双向，支持 0x 输入，大端网络序）、**OTP 密码生成器**（TOTP/HOTP，SHA-1/256/512，Base32，otpauth URI 与扫码导入）、**键盘按键信息**、**点阵字生成器**、**文件比较**
+- 配置转换支持 **XML 互转** + 配置文件拖入自动识别格式
+- 时间工具新增 GPS / 北斗 / 伽利略（周/秒/总秒）/ 格洛纳斯 / 儒略日输出
+- **新版本检测**：启动后自动查询 GitHub Releases，有新版时右下角弹窗提示（点击直达下载页；同版本仅提示一次，网络失败静默）
+
+### 🐛 修复
+
+- 应用中心分类内卡片一行展示多个（组内 flex 布局），分割线独占整行且名称显示正常
+- 修复 tsc 全量门禁误扫构建产物导致 Debug Failure，与 import.meta/顶层 await 在 commonjs 下的误报（工程基建）
+
+### 🏗 工程
+
+- vendor-antd 随页面增多增至 ~950k，chunk 告警阈值提至 1000 并更新注释
+- GitHub Actions 升级消除 node20 deprecation（checkout@v5 / setup-node@v5 / action-gh-release@v3 / upload-pages-artifact@v5 / deploy-pages@v5）
+- Cloudflare Pages 构建：新增 `package` 脚本（vite build 别名）适配面板构建命令
+- 版本号升至 v2.6.0
+
 # MagicTools v2.5.0
 
 ## 更新内容
