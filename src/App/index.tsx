@@ -89,10 +89,12 @@ const list = [
   'AsciiImageGenerator',
   'AsciiTextArt',
   'CronRules',
+  'HtmlStripText',
   'IcoGenerator',
   'AppIconGenerator',
   'PlaceholderImage',
   'ShieldBadgeGenerator',
+  'CIDRCalc',
   'WebTDKCheck',
   'RobotsTxtGenerator',
 ];
