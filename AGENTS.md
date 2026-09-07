@@ -33,6 +33,9 @@ Cloudflare Pages 使用 **Node 18 / npm 9.6.7** 构建（本地 Node 24 / npm 11
 1. 按下表「版本号修改位置清单」**逐一同步所有版本号**为同一新版本号
 2. 在 `update.md` **顶部**新增本版本的发布说明节（格式：`# MagicTools vX.Y.Z` + 更新内容），历史版本节**保留在其下方**；
    **GitHub Release 说明只取本版本的更新内容**（顶部第一个版本节），不会包含历史版本内容
+   - 提交前用与 workflow 同款命令本地验证提取结果头部为新版本号：
+
+         awk 'BEGIN { n = 0 } /^# MagicTools v/ { n++; if (n > 1) exit } { print }' update.md | head -3
 3. 提交并推送代码（`git commit` + `git push origin master`）
 4. **自动打 tag 并推送**（无需询问，紧跟第 3 步执行）：
 
@@ -46,6 +49,11 @@ Cloudflare Pages 使用 **Node 18 / npm 9.6.7** 构建（本地 Node 24 / npm 11
 
 > **防漏检查（教训：v2.3.0 曾只升版本号未打 tag/未发 release）**：升版本前先 `git tag -l` 确认上一版本 tag 存在；commit 后立刻 `git tag vX.Y.Z` + push（用 `git ls-remote --tags origin vX.Y.Z` 复核）。若发现历史某版本号漏发（仅改了部分版本文件、无 tag），**不要**为历史版本补 tag，应把其变更并入下一实际发布的版本节，并在 update.md 该版本节开头注明“含此前未发布的 vX.Y.Z 变更”。
 
+> **防漏检查 2（教训：v2.6.0 只改了 Help/data.tsx、漏改 update.md → GitHub Release 说明仍是 v2.5.0）**：`update.md` 是 GitHub Release 说明的**唯一来源**，而 Help/data.tsx 只是应用内展示，两者都可能被遗漏，因此清单第 5/6 项必须**同步执行、逐项打勾**。发布后发现已打 tag 的 Release 说明错误时：**不要重推 tag/重跑三平台 CI**，直接用 API 更新已发布 Release 的 body（见下方命令）；但源码侧的 `update.md` 必须同时补上并提交，保证仓库与 Release 一致。
+
+      # 本地提取（与 workflow 同款 awk）后用 gh 或 API 更新: 先 git credential fill 拿 token,
+      # 再 PATCH api.github.com/repos/freewu/magic-tools/releases/<id> 的 body 字段 (GET /releases/tags/vX.Y.Z 取 id)
+
 > 记牢：**每次版本发布 = 打 tag → 自动三平台 Release (build-release.yml) + GitHub Pages 部署 (deploy-pages.yml) 双触发**，两步均无需询问用户
 
 ### 版本号修改位置清单（升版本时逐一检查，勿遗漏）
@@ -57,7 +65,7 @@ Cloudflare Pages 使用 **Node 18 / npm 9.6.7** 构建（本地 Node 24 / npm 11
 | 3 | `src-tauri/tauri.conf.json` | `"version": "x.y.z"`（打包/安装包版本号） |
 | 4 | `justfile` | `version := env_var_or_default("VERSION", "x.y.z")` 的默认值（可用 `VERSION=` 环境变量覆盖，不强制同步） |
 | 5 | `src/App/Help/data.tsx` | `eventList` 数组**顶部**新增一条更新日志：`<p>YYYY-MM-DD Vx.y.z Release</p>` + 本次更新内容 `<li>`（帮助页时间线） |
-| 6 | `update.md` | **顶部新增**一个版本节（`# MagicTools vX.Y.Z` + 本次更新内容），历史版本节保留在下文；GitHub Action 只取顶部第一个版本节作为 Release 说明（勿把历史内容混入本版本节内） |
+| 6 | `update.md` | **顶部新增**一个版本节（`# MagicTools vX.Y.Z` + 本次更新内容），历史版本节保留在下文；**本文件是 GitHub Release 说明的唯一来源**，漏改会导致 Release 正文沿用旧版本内容（v2.6.0 教训）；改后本地用下方 awk 验证提取头部为新版本：`awk 'BEGIN { n = 0 } /^# MagicTools v/ { n++; if (n > 1) exit } { print }' update.md \| head -3` |
 
 提示：
 
