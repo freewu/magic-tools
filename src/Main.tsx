@@ -5,6 +5,7 @@ import { ThemeProvider } from "./hook/theme-context"
 import { AppContextProvider } from "./hook/app-context"
 import { default as MainSider } from './layout/main-sider';
 import { default as MainContent } from './layout/main-content';
+import { default as UpdateChecker } from './layout/update-checker';
 import { listenOpenPage } from "./lib/tauri";
 
 const Main :React.FC = () => {
@@ -44,6 +45,7 @@ const Main :React.FC = () => {
           <MainSider />
           <MainContent />
         </Layout>
+        <UpdateChecker />
       </AppContextProvider>
     </ThemeProvider>
   );
