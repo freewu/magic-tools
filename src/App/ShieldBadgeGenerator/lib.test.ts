@@ -1,5 +1,5 @@
 import {
-  buildBadgeSvg, svgToDataUrl, badgeFileName, escapeXml, BADGE_DEFAULTS,
+  buildBadgeSvg, svgToDataUrl, badgeFileName, escapeXml, BADGE_DEFAULTS, parseSvgSize,
 } from './lib';
 
 describe('Shield Badge 生成', () => {
@@ -40,6 +40,13 @@ describe('Shield Badge 生成', () => {
 
   it('文字与状态均空返回空串', () => {
     expect(buildBadgeSvg({ label: '  ', value: ' ', fg: '#fff', status: '#4c1' })).toBe('');
+  });
+
+  it('parseSvgSize 解析声明尺寸, 空串返回 null', () => {
+    const svg = buildBadgeSvg({ label: 'php', value: '8.0', fg: '#fff', status: '#007ec6' });
+    expect(parseSvgSize(svg)).toEqual({ w: 64, h: 20 });
+    expect(parseSvgSize('')).toBeNull();
+    expect(parseSvgSize(buildBadgeSvg({ label: '   ', value: 'passing', fg: '#fff', status: '#4c1' }))?.h).toBe(20);
   });
 
   it('XML 特殊字符转义', () => {

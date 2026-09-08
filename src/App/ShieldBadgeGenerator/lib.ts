@@ -82,6 +82,15 @@ export const buildBadgeSvg = (o: BadgeOpts): string => {
 export const svgToDataUrl = (svg: string): string =>
   'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 
+/** 解析 SVG 声明尺寸 (矢量坐标), 用于 PNG 导出的放大计算 */
+export const parseSvgSize = (svg: string): { w: number; h: number } | null => {
+  const m = /<svg[^>]*\swidth="([0-9.]+)"\s+height="([0-9.]+)"/.exec(svg);
+  if (!m) return null;
+  const w = Number(m[1]);
+  const h = Number(m[2]);
+  return Number.isFinite(w) && Number.isFinite(h) && w > 0 && h > 0 ? { w, h } : null;
+};
+
 /** 导出文件名: 文字-状态.svg (去非法文件名字符) */
 export const badgeFileName = (label: string, value: string): string =>
   ((label || 'badge') + '-' + (value || 'status')).replace(/[\\/:*?"<>|]/g, '') + '.svg';
