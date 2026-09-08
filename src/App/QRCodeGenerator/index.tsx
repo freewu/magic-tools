@@ -1,4 +1,4 @@
-import { Radio, Divider, QRCode, Input, Space, message, Tooltip, ColorPicker, Row, Slider, Button, Alert, Tabs } from "antd";
+import { Radio, Divider, QRCode, Input, Space, message, Tooltip, ColorPicker, Row, Slider, Button, Alert, Tabs, theme } from "antd";
 import { useRef, useState } from "react";
 const { TextArea } = Input;
 import { errorCorrectionLevelList } from './data';
@@ -11,6 +11,7 @@ const MAX_BATCH = 200; // 批量行数上限
 const pad3 = (n: number): string => String(n).padStart(3, '0');
 
 const QRCodeGenerator = () => {
+  const { token } = theme.useToken();
 
   const [ value, setValue ] = useState(''); // 需要编码的内容
   const [ errorLevelTips, setErrorLevelTips ] = useState(getErrorLevelTip(getDefaultErrorLevel())); // 容错级别提示
@@ -218,7 +219,7 @@ const QRCodeGenerator = () => {
                 />
                 <Row style={ { marginTop: '4px' } }>
                   <Space wrap>
-                    <span style={{ fontSize: 13, color: 'rgba(0,0,0,0.55)' }}>
+                    <span style={{ fontSize: 13, color: token.colorTextSecondary }}>
                       { batchLines.length } 行{batchOver ? ` (超过 ${MAX_BATCH} 行, 已截断)` : ''}
                     </span>
                     <label style={{ fontSize: 13 }}>文件名前缀:</label>

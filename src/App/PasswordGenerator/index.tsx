@@ -1,4 +1,4 @@
-import { Alert, Button, Card, Checkbox, Col, Input, Progress, Row, Slider, Space, Tag, message } from "antd";
+import { Alert, Button, Card, Checkbox, Col, Input, Progress, Row, Slider, Space, Tag, message, theme } from "antd";
 import { useMemo, useState } from "react";
 import { CheckCircleFilled, CloseCircleFilled, CopyOutlined, ReloadOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from '../../lib';
@@ -8,10 +8,11 @@ import { genPassword, passwordStrength, humanSeconds, STRENGTH_LEVELS } from './
 const StrengthPanel: React.FC<{ pw: string }> = ({ pw }) => {
   const r = useMemo(() => passwordStrength(pw), [pw]);
   const [ notice, contextHolder ] = message.useMessage();
+  const { token } = theme.useToken();
 
   if (pw === '') {
     return (
-      <div style={ { color: 'rgba(0,0,0,0.45)', textAlign: 'center', padding: '24px 0' } }>
+      <div style={ { color: token.colorTextTertiary, textAlign: 'center', padding: '24px 0' } }>
         输入或生成一个密码后显示强度评估
       </div>
     );
@@ -35,11 +36,11 @@ const StrengthPanel: React.FC<{ pw: string }> = ({ pw }) => {
         <Space wrap>
           <span style={ { width: 72, textAlign: 'right' } }>参考熵:</span>
           <span>{ r.entropy >= 120 ? '≥120' : r.entropy.toFixed(1) } bits</span>
-          <span style={ { color: 'rgba(0,0,0,0.45)' } }>按每秒 1 万亿次猜测约需 { humanSeconds(r.offlineSec) }</span>
+          <span style={ { color: token.colorTextSecondary } }>按每秒 1 万亿次猜测约需 { humanSeconds(r.offlineSec) }</span>
         </Space>
         <Space wrap>
           <span style={ { width: 72, textAlign: 'right' } }>在线攻击:</span>
-          <span>按每秒 1000 次猜测约需 { humanSeconds(r.onlineSec) }</span>
+          <span style={ { color: token.colorTextSecondary } }>按每秒 1000 次猜测约需 { humanSeconds(r.onlineSec) }</span>
         </Space>
         <div style={ { color: r.level.color, fontSize: 13 } }>{ r.level.desc }</div>
         <div
@@ -53,7 +54,7 @@ const StrengthPanel: React.FC<{ pw: string }> = ({ pw }) => {
               { c.ok
                 ? <CheckCircleFilled style={ { color: '#52c41a', marginRight: 6 } } />
                 : <CloseCircleFilled style={ { color: '#ff4d4f', marginRight: 6 } } /> }
-              <span style={ { color: c.ok ? 'rgba(0,0,0,0.75)' : 'rgba(0,0,0,0.88)' } }>{ c.label }</span>
+              <span style={ { color: c.ok ? token.colorTextSecondary : token.colorText } }>{ c.label }</span>
             </div>
           )) }
         </div>

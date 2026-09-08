@@ -1,4 +1,4 @@
-import { Alert, Button, ColorPicker, Divider, Input, Select, Slider, Space, Switch, Tabs, Tooltip, message } from "antd";
+import { Alert, Button, ColorPicker, Divider, Input, Select, Slider, Space, Switch, Tabs, Tooltip, message, theme } from "antd";
 import { useEffect, useRef, useState } from "react";
 import type { Color } from 'antd/es/color-picker';
 import JsBarcode from 'jsbarcode';
@@ -59,6 +59,7 @@ const BarcodeCell: React.FC<{
 };
 
 const BarcodeGenerator = () => {
+  const { token } = theme.useToken();
 
   const [ format, setFormat ] = useState<string>(getDefaultFormat()); // 条码格式
   const [ value, setValue ] = useState(''); // 需要编码的内容
@@ -308,7 +309,7 @@ const BarcodeGenerator = () => {
                   spellCheck={ false }
                 />
                 <Space wrap style={ { marginTop: '4px' } }>
-                  <span style={{ fontSize: 13, color: 'rgba(0,0,0,0.55)' }}>
+                  <span style={{ fontSize: 13, color: token.colorTextSecondary }}>
                     { batchLines.length } 行{batchOver ? ` (超过 ${MAX_BATCH} 行, 已截断)` : ''}
                   </span>
                   <label style={{ fontSize: 13 }}>文件名前缀:</label>
