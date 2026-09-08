@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Magic Tools — 全能開發工具箱</title>
+<meta name="description" content="全能開發工具箱，內建 8 大分類、106 個實用工具：加解密、雜湊檢查碼、編解碼、類型轉換、格式化、圖片產生、站長工具與實用工具。既可安裝為 桌面應用（Windows / macOS / Linux），也可在瀏覽器中直接使用。">
+<link rel="icon" type="image/png" href="logo.png">
+<style>
+:root{--bg:#f6f8fb;--fg:#1f2937;--muted:#64748b;--card:#ffffff;--line:#e2e8f0;--brand:#1677ff;--brand2:#722ed1;--chip:#eef2ff;}
+@media(prefers-color-scheme:dark){:root{--bg:#0f172a;--fg:#e5e7eb;--muted:#94a3b8;--card:#1e293b;--line:#334155;--chip:#312e81;}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",sans-serif;}
+a{color:var(--brand);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+header{position:sticky;top:0;z-index:9;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.hbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;max-width:1040px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;color:var(--fg)}
+.brand img{width:28px;height:28px;border-radius:6px}
+.lang{display:flex;gap:6px}
+.lang a{font-size:13px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:var(--card)}
+.lang a.cur{color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2));border-color:transparent;font-weight:600}
+.hero{text-align:center;padding:72px 20px 44px}
+.hero .logo{width:96px;height:96px;border-radius:22px;box-shadow:0 12px 40px rgba(22,119,255,.28)}
+.hero h1{margin:22px 0 6px;font-size:42px;letter-spacing:.5px}
+.ver{display:inline-block;font-size:13px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 12px;margin-bottom:18px;background:var(--card)}
+.hero p{max-width:760px;margin:0 auto 30px;color:var(--muted);font-size:17px}
+.cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-block;padding:12px 26px;border-radius:12px;font-weight:600;font-size:15px;transition:.2s}
+.btn.primary{color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:0 8px 24px rgba(22,119,255,.35)}
+.btn.ghost{border:1px solid var(--line);background:var(--card);color:var(--fg)}
+.btn:hover{transform:translateY(-2px);text-decoration:none}
+section{padding:48px 0}
+h2{font-size:26px;text-align:center;margin:0 0 6px}
+.sub{text-align:center;color:var(--muted);margin:0 0 32px}
+.hl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.hl{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:22px}
+.hl .ic{font-size:26px}
+.hl h3{margin:8px 0 6px;font-size:17px}
+.hl p{margin:0;color:var(--muted);font-size:14.5px}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.cat{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:20px}
+.cat h3{margin:0 0 10px;font-size:17px;display:flex;align-items:center;gap:8px;justify-content:space-between}
+.cat h3 .n{font-size:12.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 9px;font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{font-size:12.5px;background:var(--chip);color:var(--fg);border-radius:8px;padding:3px 9px}
+.dl-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.dl{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:20px;text-align:center}
+.dl .os{font-weight:700;font-size:16px}
+.dl .pkg{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12.5px;color:var(--muted);margin:8px 0;word-break:break-all}
+.dl .go{font-size:13px;color:var(--brand);font-weight:600}
+.online{border:1px dashed var(--line);border-radius:16px;padding:26px;text-align:center;background:var(--card)}
+.online h3{margin:0 0 4px}
+.online p{margin:0 0 16px;color:var(--muted)}
+.privacy{text-align:center;color:var(--muted);font-size:13px;padding:0 0 30px}
+footer{border-top:1px solid var(--line);padding:28px 0 40px;text-align:center;color:var(--muted);font-size:14px}
+.foot-links{display:flex;flex-wrap:wrap;gap:18px;justify-content:center;margin-bottom:10px}
+.foot-links a{color:var(--muted)}
+@media(max-width:640px){.hero h1{font-size:32px}.hero{padding:44px 16px 30px}}
+</style>
+</head>
+<body>
+<header><div class="hbar">
+  <div class="brand"><img src="logo.png" alt="Magic Tools 圖示"><span>Magic Tools</span></div>
+  <nav class="lang"><a class="cur" href="zh-TW.html">繁體中文</a><a href="index.html" hreflang="index">English</a><a href="zh-CN.html" hreflang="zh-CN">简体中文</a></nav>
+</div></header>
+
+<div class="hero">
+  <img class="logo" src="logo.png" alt="Magic Tools 圖示">
+  <h1>Magic Tools</h1>
+  <div class="ver">v2.7.0 · Tauri 2 · React 18 · Ant Design 5</div>
+  <p>全能開發工具箱，內建 <b>8 大分類、106 個實用工具</b>：加解密、雜湊檢查碼、編解碼、類型轉換、格式化、圖片產生、站長工具與實用工具。既可安裝為 <b>桌面應用</b>（Windows / macOS / Linux），也可在<b>瀏覽器</b>中直接使用。</p>
+  <div class="cta">
+    <a class="btn primary" href="https://github.com/freewu/magic-tools/releases/latest">⬇ 下載桌面版</a>
+    <a class="btn ghost" href="https://freewu.github.io/magic-tools/">🌐 線上體驗 Web 版</a>
+  </div>
+</div>
+
+<section><div class="wrap">
+  <h2>為什麼選擇 Magic Tools？</h2><div class="sub"></div>
+  <div class="hl-grid"><div class="hl"><div class="ic">⚡</div><h3>本機即時、資料不出裝置</h3><p>所有工具都在本機執行——不需帳號、無追蹤、不上傳。</p></div>
+<div class="hl"><div class="ic">🖥️</div><h3>桌面 + Web 雙端</h3><p>Tauri 2 原生桌面應用支援 Windows / macOS / Linux，另有功能一致的純前端 Web 版。</p></div>
+<div class="hl"><div class="ic">🧰</div><h3>一站式工具箱</h3><p>編碼 / 雜湊 / 加密 / 轉換 / 格式化 / 產生，日常開發高頻操作一站搞定。</p></div>
+<div class="hl"><div class="ic">🌙</div><h3>舒適的介面</h3><p>Ant Design 5 介面，自動淺色 / 深色模式，支援批次匯出等工作流程。</p></div></div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>功能一覽</h2>
+  <p class="sub">8 大分類 · 共 106 個工具</p>
+  <div class="cat-grid"><div class="cat"><h3><span>🔐 加解密</span><span class="n">21 tools</span></h3>
+    <div class="chips"><span>AES</span><span>DES</span><span>3DES</span><span>RSA</span><span>SM2</span><span>SM4</span><span>ChaCha20</span><span>Blowfish</span><span>RC4</span><span>TEA</span></div></div>
+<div class="cat"><h3><span>🧮 雜湊與值計算</span><span class="n">16 tools</span></h3>
+    <div class="chips"><span>MD5 / SHA-2 / SM3</span><span>HMAC</span><span>SHA-3 / Keccak</span><span>BCrypt</span><span>PBKDF2</span><span>CRC 檢查碼</span><span>BCC / LRC</span></div></div>
+<div class="cat"><h3><span>🔄 編解碼</span><span class="n">13 tools</span></h3>
+    <div class="chips"><span>Base64</span><span>URL</span><span>Unicode</span><span>摩斯密碼</span><span>JWT 解碼</span><span>BCD</span><span>Gzip</span><span>UU / XXencode</span></div></div>
+<div class="cat"><h3><span>⚖️ 類型轉換</span><span class="n">17 tools</span></h3>
+    <div class="chips"><span>時間戳</span><span>進制</span><span>顏色</span><span>GPS 座標</span><span>人民幣大寫</span><span>12+ 單位換算</span><span>配置 (INI/JSON/YAML)</span><span>字幕</span></div></div>
+<div class="cat"><h3><span>🛠️ 格式化</span><span class="n">8 tools</span></h3>
+    <div class="chips"><span>JSON</span><span>JSON5</span><span>SQL</span><span>XML</span><span>HTML</span><span>SVG</span><span>Markdown 編輯器</span><span>中英排版</span></div></div>
+<div class="cat"><h3><span>🖼️ 圖片</span><span class="n">9 tools</span></h3>
+    <div class="chips"><span>QR Code (批次)</span><span>條碼</span><span>App 圖示</span><span>ICO</span><span>Shield 徽章</span><span>佔位圖</span><span>程式碼截圖</span><span>ASCII 字符畫</span></div></div>
+<div class="cat"><h3><span>🌐 站長工具</span><span class="n">9 tools</span></h3>
+    <div class="chips"><span>TDK 檢測</span><span>UA 解析</span><span>Cookie 分析</span><span>Sitemap 檢查</span><span>robots.txt</span><span>關鍵詞密度</span><span>URL 提取</span></div></div>
+<div class="cat"><h3><span>🧩 實用工具</span><span class="n">13 tools</span></h3>
+    <div class="chips"><span>密碼生成</span><span>OTP (TOTP/HOTP)</span><span>正則測試</span><span>Cron 規則</span><span>CIDR</span><span>htpasswd</span><span>Chmod</span><span>檔案比較</span></div></div></div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>下載 Magic Tools</h2>
+  <p class="sub">前往 GitHub Releases 下載最新桌面版，或直接開啟 Web 版。</p>
+  <div class="dl-cards"><a class="dl" href="https://github.com/freewu/magic-tools/releases/latest" style="color:inherit"><div class="os">Windows</div><div class="pkg">MagicTools_x64.exe</div><div style="font-size:13px;color:var(--muted)">單一免安裝 exe</div><div class="go">前往 Releases 下載 →</div></a>
+<a class="dl" href="https://github.com/freewu/magic-tools/releases/latest" style="color:inherit"><div class="os">macOS</div><div class="pkg">MagicTools_macOS-universal.zip</div><div style="font-size:13px;color:var(--muted)">Apple Silicon + Intel</div><div class="go">前往 Releases 下載 →</div></a>
+<a class="dl" href="https://github.com/freewu/magic-tools/releases/latest" style="color:inherit"><div class="os">Linux</div><div class="pkg">MagicTools_amd64.AppImage</div><div style="font-size:13px;color:var(--muted)">AppImage</div><div class="go">前往 Releases 下載 →</div></a></div>
+  <div style="height:22px"></div>
+  <div class="online">
+    <h3>想直接在瀏覽器使用？</h3><p>免安裝，開啟 Web 版並加入書籤即可。</p>
+    <a class="btn primary" href="https://freewu.github.io/magic-tools/">開啟 Web 版</a>
+  </div>
+</div></section>
+
+<p class="privacy wrap">🔒 所有計算都在本機完成，資料不會離開你的裝置。</p>
+
+<footer><div class="wrap">
+  <div class="foot-links"><a href="https://github.com/freewu/magic-tools" target="_blank" rel="noopener">GitHub 儲存庫</a><a href="https://github.com/freewu/magic-tools/releases" target="_blank" rel="noopener">Releases</a><a href="https://freewu.github.io/magic-tools/" target="_blank" rel="noopener">Web 版</a><a href="https://github.com/freewu/magic-tools/issues/new" target="_blank" rel="noopener">提交 Issue</a></div>
+  <div>Powered by Tauri 2 · React 18 · Ant Design 5 · <a href="https://github.com/freewu/magic-tools/blob/master/LICENSE">MIT License</a></div>
+  <div style="margin-top:4px;font-size:12.5px">© 2023–2025 Bluefrog · <a href="zh-TW.html">繁體中文</a>
+  · <a href="index.html">English</a>· <a href="zh-CN.html">简体中文</a></div>
+</div></footer>
+</body>
+</html>
