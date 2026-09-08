@@ -64,6 +64,7 @@
     ],
     "moduleNameMapper": {
       "^yaml$": "<rootDir>/node_modules/yaml/dist/index.js",
+      "^svgo/browser$": "<rootDir>/node_modules/svgo/dist/svgo-node.cjs",
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/mocks/fileMock.js",
       "\\.(css|less|sass|scss)$": "identity-obj-proxy"
     },

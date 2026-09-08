@@ -4,7 +4,6 @@
 import { createHighlighterCore } from 'shiki/core';
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
 import type { Highlighter } from 'shiki/core';
-import { languageNames } from '@shikijs/langs';
 import darkPlus from '@shikijs/themes/dark-plus';
 import lightPlus from '@shikijs/themes/light-plus';
 import githubDark from '@shikijs/themes/github-dark';
@@ -17,6 +16,7 @@ import gruvboxDarkHard from '@shikijs/themes/gruvbox-dark-hard';
 import gruvboxLightHard from '@shikijs/themes/gruvbox-light-hard';
 import everforestDark from '@shikijs/themes/everforest-dark';
 import everforestLight from '@shikijs/themes/everforest-light';
+import { CANONICAL_LANG_SET } from './canonical';
 import { THEME_MAP, USED_THEME_IDS } from './lib';
 import type { Appearance, EditorId } from './lib';
 
@@ -43,15 +43,17 @@ const THEME_BG: Record<string, string> = Object.fromEntries(
 
 /** 全部 canonical 语言按需加载器: path → loader (vite 编译期展开) */
 const LANG_LOADERS = import.meta.glob(
-  '../../../node_modules/@shikijs/langs/dist/*.mjs',
+  // !(index) 排除 dist/index.mjs: 它已被 canonical.ts 静态引用 (languageNames),
+  // 若再被 glob 动态引用会产生 vite 混合加载提示 (langs 均为 <id>.mjs, 无 index 语言)
+  '../../../node_modules/@shikijs/langs/dist/!(index).mjs',
 ) as unknown as Record<string, () => Promise<{ default?: unknown }>>;
 
-const CANONICAL = new Set<string>(languageNames);
+const CANONICAL = CANONICAL_LANG_SET;
 
 /** 页面可用语言 id 列表 (canonical, 按字母序) */
 export const ALL_LANG_IDS: string[] = Object.keys(LANG_LOADERS)
   .map((p) => p.slice(p.lastIndexOf('/') + 1).replace(/\.mjs$/, ''))
-  .filter((id) => CANONICAL.has(id))
+  .filter((id) => id !== 'index' && CANONICAL.has(id))
   .sort((a, b) => a.localeCompare(b));
 
 export function resolveThemeId(editor: EditorId, appearance: Appearance): string {

@@ -1,6 +1,7 @@
 // SVG 格式化/压缩 纯逻辑层 (基于 SVGO)
 // - svgoConfigFor: 构建 SVGO 配置 (可单测)
-// - optimizeSvgXml: 真实执行优化; node/jest 环境走 CJS 包, 浏览器走 svgo/browser (ESM 无 node 依赖)
+// - optimizeSvgXml: 真实执行优化; 浏览器走 svgo/browser (纯 ESM 无 node 依赖),
+//   jest 通过 moduleNameMapper 把 'svgo/browser' 映射到 CJS 主包执行 (见 package.json)
 
 import type { Config } from 'svgo';
 
@@ -14,8 +15,6 @@ export interface SvgResult {
   afterBytes?: number;
   error?: string;
 }
-
-const nodeEnv = typeof process !== 'undefined' && !!process.versions?.node;
 
 /** 依据模式构建 SVGO 配置 */
 export function svgoConfigFor(mode: SvgMode, indent = 2): Config {
@@ -47,11 +46,6 @@ function bytesOf(s: string): number {
 }
 
 async function loadSvgo(): Promise<{ optimize: (src: string, cfg: Config) => Promise<{ data?: string; error?: string }> }> {
-  if (nodeEnv) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const mod = await import('svgo');
-    return mod as unknown as { optimize: (src: string, cfg: Config) => Promise<{ data?: string; error?: string }> };
-  }
   const mod = await import('svgo/browser');
   return mod as unknown as { optimize: (src: string, cfg: Config) => Promise<{ data?: string; error?: string }> };
 }
