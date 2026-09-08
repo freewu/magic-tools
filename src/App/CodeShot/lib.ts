@@ -105,6 +105,7 @@ const KEYS = {
   editor: 'code-shot.default-editor',
   appearance: 'code-shot.default-appearance',
   padding: 'code-shot.default-padding',
+  lines: 'code-shot.default-lines',
 };
 
 const get = (k: string, fallback: string): string => {
@@ -127,7 +128,7 @@ export const setDefaultEditor = (v: EditorId): void => set(KEYS.editor, v);
 export const getDefaultAppearance = (): Appearance => get(KEYS.appearance, 'dark') === 'light' ? 'light' : 'dark';
 export const setDefaultAppearance = (v: Appearance): void => set(KEYS.appearance, v);
 
-export const PADDING_MIN = 8;
+export const PADDING_MIN = 0;
 export const PADDING_MAX = 72;
 
 export function getDefaultPadding(): number {
@@ -137,4 +138,42 @@ export function getDefaultPadding(): number {
 }
 export function setDefaultPadding(v: number): void {
   set(KEYS.padding, String(Math.max(PADDING_MIN, Math.min(PADDING_MAX, Math.round(v)))));
+}
+
+export function getDefaultShowLines(): boolean {
+  return get(KEYS.lines, '1') !== '0';
+}
+export function setDefaultShowLines(v: boolean): void {
+  set(KEYS.lines, v ? '1' : '0');
+}
+
+// ---- 高亮 HTML 装饰 (预览与导出共用) ----
+
+export interface DecorateOptions {
+  /** 是否在每行前插入行号 */
+  lineNumbers?: boolean;
+  /** 行号颜色 */
+  lineNoColor?: string;
+}
+
+/**
+ * 在 Shiki 产出的 <pre> 上做展示层装饰:
+ * 1. 清除浏览器对 <pre> 的 UA 默认 margin (1em 0) —— 否则内边距为 0 时代码顶部/底部仍
+ *    残留一大段空白 (看起来像圈住代码的边距, 且行号与代码错位);
+ * 2. 可选在每行 <span class="line"> 开头插入行号 (Shiki 高亮以行为单位输出, 行号随行
+ *    文本自然对齐, 预览与导出 PNG 完全一致)。
+ */
+export function decorateHtml(html: string, opts: DecorateOptions = {}): string {
+  let out = html.replace(/<pre([^>]*)style="([^"]*)"/, '<pre$1style="margin:0;$2"');
+  if (opts.lineNumbers) {
+    const color = opts.lineNoColor ?? 'rgba(128,128,128,0.75)';
+    let n = 0;
+    out = out.replace(/<span class="line">/g, () => {
+      n += 1;
+      return `<span class="line"><span class="line-no" `
+        + `style="display:inline-block;min-width:3ch;text-align:right;margin-right:1.25ch;`
+        + `color:${color};user-select:none;-webkit-user-select:none">${n}</span>`;
+    });
+  }
+  return out;
 }

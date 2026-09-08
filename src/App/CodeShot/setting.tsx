@@ -1,8 +1,9 @@
-import { Divider, Form, Select, Slider } from 'antd';
+import { Divider, Form, Select, Slider, Switch } from 'antd';
 import { useState } from 'react';
 import {
   APPEARANCES, COMMON_LANGS, EDITORS, PADDING_MAX, PADDING_MIN,
   getDefaultAppearance, getDefaultEditor, getDefaultLang, getDefaultPadding,
+  getDefaultShowLines, setDefaultShowLines,
   setDefaultAppearance, setDefaultEditor, setDefaultLang, setDefaultPadding,
 } from './lib';
 import type { Appearance, EditorId } from './lib';
@@ -13,6 +14,7 @@ export const CodeShotSetting: React.FC = () => {
   const [editor, setEditor] = useState<EditorId>(() => getDefaultEditor());
   const [appearance, setAppearance] = useState<Appearance>(() => getDefaultAppearance());
   const [padding, setPadding] = useState<number>(() => getDefaultPadding());
+  const [showLines, setShowLines] = useState<boolean>(() => getDefaultShowLines());
 
   return (
     <>
@@ -41,6 +43,12 @@ export const CodeShotSetting: React.FC = () => {
           value={padding}
           onChange={(v) => { setPadding(v); setDefaultPadding(v); }}
           tooltip={{ formatter: (val) => `${val}px` }}
+        />
+      </Form.Item>
+      <Form.Item label="默认显示行号">
+        <Switch
+          checked={showLines}
+          onChange={(v) => { setShowLines(v); setDefaultShowLines(v); }}
         />
       </Form.Item>
     </>

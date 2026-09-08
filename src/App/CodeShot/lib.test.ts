@@ -2,6 +2,7 @@ import {
   COMMON_LANGS, EDITORS, THEME_MAP, USED_THEME_IDS, langLabel,
   getDefaultLang, setDefaultLang, getDefaultEditor, setDefaultEditor,
   getDefaultAppearance, setDefaultAppearance, getDefaultPadding, setDefaultPadding,
+  getDefaultShowLines, setDefaultShowLines, decorateHtml,
 } from './lib';
 
 describe('代码截图 - 编辑器与主题映射', () => {
@@ -38,12 +39,13 @@ describe('代码截图 - 常用语言', () => {
 });
 
 describe('代码截图 - 设置默认值与持久化', () => {
-  test('需求默认: vim / 深色 / padding 24 / javascript', () => {
+  test('需求默认: vim / 深色 / padding 24 / javascript / 显示行号', () => {
     localStorage.clear();
     expect(getDefaultEditor()).toBe('vim');
     expect(getDefaultAppearance()).toBe('dark');
     expect(getDefaultPadding()).toBe(24);
     expect(getDefaultLang()).toBe('javascript');
+    expect(getDefaultShowLines()).toBe(true);
   });
   test('设置后可读回', () => {
     localStorage.clear();
@@ -61,7 +63,7 @@ describe('代码截图 - 设置默认值与持久化', () => {
     setDefaultPadding(999);
     expect(getDefaultPadding()).toBe(72);
     setDefaultPadding(-5);
-    expect(getDefaultPadding()).toBe(8);
+    expect(getDefaultPadding()).toBe(0);
   });
   test('非法持久化值回落默认', () => {
     localStorage.clear();
@@ -69,5 +71,41 @@ describe('代码截图 - 设置默认值与持久化', () => {
     expect(getDefaultPadding()).toBe(24);
     localStorage.setItem('code-shot.default-editor', 'nope');
     expect(getDefaultEditor()).toBe('vim');
+  });
+  test('行号默认开, 可关闭再打开', () => {
+    localStorage.clear();
+    expect(getDefaultShowLines()).toBe(true);
+    setDefaultShowLines(false);
+    expect(getDefaultShowLines()).toBe(false);
+    setDefaultShowLines(true);
+    expect(getDefaultShowLines()).toBe(true);
+  });
+});
+
+describe('代码截图 - 高亮 HTML 装饰 decorateHtml', () => {
+  const SAMPLE = '<pre class="shiki github-dark" style="background-color:#24292e;color:#e1e4e8" tabindex="0"><code>'
+    + '<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> a</span></span>\n'
+    + '<span class="line"><span style="color:#79B8FF">b</span></span>\n'
+    + '<span class="line"><span style="color:#6A737D">// hi</span></span>'
+    + '</code></pre>';
+
+  test('默认清除 pre 的 UA margin, 保留主题背景', () => {
+    const out = decorateHtml(SAMPLE);
+    expect(out).toContain('style="margin:0;background-color:#24292e;color:#e1e4e8"');
+    expect(out).not.toContain('line-no');
+  });
+
+  test('开启行号: 每行插入行号且计数正确', () => {
+    const out = decorateHtml(SAMPLE, { lineNumbers: true, lineNoColor: 'red' });
+    const lines = out.match(/<span class="line-no"/g) ?? [];
+    expect(lines).toHaveLength(3);
+    expect(out).toContain('>1</span>');
+    expect(out).toContain('>3</span>');
+    expect(out).toContain('color:red');
+  });
+
+  test('空/不含 line 的 html 安全返回', () => {
+    expect(decorateHtml('')).toBe('');
+    expect(decorateHtml('<pre style="color:#fff">x</pre>', { lineNumbers: true })).toContain('style="margin:0;color:#fff"');
   });
 });
