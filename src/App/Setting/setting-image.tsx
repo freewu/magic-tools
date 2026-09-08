@@ -3,8 +3,9 @@ import { QRCodeGeneratorSetting } from "../QRCodeGenerator/setting";
 import { BarcodeGeneratorSetting } from "../BarcodeGenerator/setting";
 import { CodeShotSetting } from "../CodeShot/setting";
 import { PlaceholderImageSetting } from "../PlaceholderImage/setting";
+import { IcoGeneratorSetting } from "../IcoGenerator/setting";
 
-// 图片分类设置: 二维码 / 条形码 / 代码截图 / 占位图片 (ASCII 图片暂无设置项)
+// 图片分类设置: 二维码 / 条形码 / 代码截图 / 占位图片 / ICO 生成 (ASCII 图片、App Icon 暂无设置项)
 export const SettingImage = () => {
 
   return (
@@ -13,6 +14,7 @@ export const SettingImage = () => {
       <BarcodeGeneratorSetting />
       <CodeShotSetting />
       <PlaceholderImageSetting />
+      <IcoGeneratorSetting />
     </Form>
   )
 }

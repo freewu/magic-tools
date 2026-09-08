@@ -6,7 +6,6 @@ import { SettingConvert } from "./setting-convert"
 import { SettingCodec } from "./setting-codec"
 import { SettingImage } from "./setting-image"
 import { SettingMisc } from "./setting-misc"
-import { SettingWebmaster } from "./setting-webmaster"
 import { SettingFormatter } from "./setting-formatter"
 
 export const itemList = [
@@ -44,11 +43,6 @@ export const itemList = [
     key : 'image',
     label : '图片',
     children: <SettingImage />
-  },
-  {
-    key : 'webmaster',
-    label : '站长工具',
-    children: <SettingWebmaster />
   },
   {
     key : 'misc',

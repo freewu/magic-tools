@@ -1,6 +1,6 @@
 const AppName = 'ICO 生成';
 const Icon = '';
-const Type = 'webmaster';
+const Type = 'image';
 
 export {
   AppName,
