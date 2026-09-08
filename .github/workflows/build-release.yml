@@ -59,7 +59,11 @@ jobs:
           workspaces: './src-tauri -> target'
 
       - name: Install frontend dependencies
-        run: npm ci || npm install
+        run: |
+          npm ci --no-audit --no-fund --registry=https://registry.npmjs.org || {
+            echo 'npm ci failed (lock drift?), falling back to npm install'; \
+            npm install --no-audit --no-fund --registry=https://registry.npmjs.org; \
+          }
 
       - name: Build with Tauri (macOS universal — Intel & Apple Silicon 单包)
         if: matrix.platform == 'macos-latest'
