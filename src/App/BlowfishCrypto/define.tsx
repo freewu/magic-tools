@@ -1,4 +1,9 @@
-export const BlowfishCrypto = {
-  AppName: 'Blowfish 加解密',
-  Type: 'crypto',
-};
+const AppName = 'Blowfish 加解密';
+const Icon = '';
+const Type = 'crypto';
+
+export {
+  AppName,
+  Icon,
+  Type,
+}

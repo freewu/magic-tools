@@ -1,4 +1,9 @@
-export const RC2Crypto = {
-  AppName: 'RC2 加解密',
-  Type: 'crypto',
-};
+const AppName = 'RC2 加解密';
+const Icon = '';
+const Type = 'crypto';
+
+export {
+  AppName,
+  Icon,
+  Type,
+}
