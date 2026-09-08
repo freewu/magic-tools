@@ -27,6 +27,22 @@ export const eventList = [
     color: "green",
     children: (
       <>
+        <p>2026-09-08 V2.7.0 Release</p>
+        <ul style={ {listStyle: "none" }}>
+          <li>二维码 / 条形码生成新增「批量」tab: 多行内容一次生成并预览, 桌面版选择文件夹一次导出全部 PNG (不再逐个弹保存框)</li>
+          <li>格式化分类新增 Markdown 编辑器 (自研渲染, 支持常用语法与行内/块级 LaTeX 公式子集, 可导出 .md 与自带样式 .html); 预览面板可一键隐藏专注编辑</li>
+          <li>其它分类新增密码生成: 安全随机生成 + 启发式强度检测 (熵估算 / 常见弱口令库含 leet 变体 / 破解时间估算); 站长工具新增 Sitemap 检测、关键词密度</li>
+          <li>Shield Badge 生成新增图片尺寸 (1-10 倍率) 设置与放大 PNG 导出; 新增路径转树工具</li>
+          <li>菜单分类调整: 占位图片 / Shield Badge / AppIcon / ICO 生成迁入「图片」分类, CIDR 计算器迁入「其它」, 设置页分组同步迁移</li>
+          <li>修复 RC2 / RC6 / Blowfish 与 Markdown 编辑器不在侧边菜单显示的问题; 字幕格式转换桌面版下载不弹保存框; 深色模式下固定灰字提示不可见; 左下角版本号移除多余悬停提示</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    color: "green",
+    children: (
+      <>
         <p>2026-09-08 V2.6.0 Release</p>
         <ul style={ {listStyle: "none" }}>
           <li>新增「格式化」分类: JSON / JSON5 / SQL 格式化移入独立分类 (侧边菜单/应用中心/设置页同步分组)</li>
