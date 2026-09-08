@@ -197,3 +197,119 @@ export function parseUserAgent(uaInput: string): UAInfo {
     botName: bot ? bot[1] : null,
   };
 }
+
+// ---- UA 生成 (供「生成」tab) ----
+
+export const GEN_OS_LIST = [
+  { value: 'win11', label: 'Windows 11' },
+  { value: 'win10', label: 'Windows 10' },
+  { value: 'win7', label: 'Windows 7' },
+  { value: 'mac', label: 'macOS' },
+  { value: 'linux', label: 'Linux' },
+  { value: 'android', label: 'Android 手机' },
+  { value: 'iphone', label: 'iPhone' },
+  { value: 'ipad', label: 'iPad' },
+] as const;
+export type GenOS = (typeof GEN_OS_LIST)[number]['value'];
+
+export const GEN_BROWSER_LIST = [
+  { value: 'chrome', label: 'Chrome' },
+  { value: 'edge', label: 'Edge' },
+  { value: 'firefox', label: 'Firefox' },
+  { value: 'safari', label: 'Safari' },
+] as const;
+export type GenBrowser = (typeof GEN_BROWSER_LIST)[number]['value'];
+
+const GEN_DEFAULT_VERSION: Record<GenBrowser, string> = {
+  chrome: '126.0.0.0',
+  edge: '126.0.0.0',
+  firefox: '126.0',
+  safari: '17.4',
+};
+
+const osLabelOf = (os: GenOS) => GEN_OS_LIST.find((o) => o.value === os)?.label ?? os;
+const browserLabelOf = (b: GenBrowser) => GEN_BROWSER_LIST.find((x) => x.value === b)?.label ?? b;
+
+function normVer(browser: GenBrowser, version?: string): string {
+  const s = String(version ?? '').trim();
+  if (!s) return GEN_DEFAULT_VERSION[browser];
+  if (browser === 'safari') return s.includes('.') ? s : `${s}.4`;
+  if (browser === 'firefox') return s.includes('.') ? s : `${s}.0`;
+  return s.includes('.') ? s : `${s}.0.0.0`;
+}
+
+const WK = 'AppleWebKit/537.36 (KHTML, like Gecko)';
+const WK_IOS = 'AppleWebKit/605.1.15 (KHTML, like Gecko)';
+
+/**
+ * 按平台 × 浏览器生成一条 UA 字符串。
+ * Safari 仅支持 macOS / iOS (无 Windows/Linux/Android 版), 其它组合均返回 null。
+ * @param version 可选浏览器版本 (主版本或完整版本); 留空用各浏览器默认较新版本。
+ */
+export function generateUa(os: GenOS, browser: GenBrowser, version?: string): string | null {
+  const ver = normVer(browser, version);
+  switch (os) {
+    case 'win11':
+    case 'win10': {
+      if (browser === 'firefox') return `Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:${ver}) Gecko/20100101 Firefox/${ver}`;
+      if (browser === 'safari') return null;
+      const base = `Mozilla/5.0 (Windows NT 10.0; Win64; x64) ${WK} Chrome/${ver} Safari/537.36`;
+      return browser === 'edge' ? `${base} Edg/${ver}` : base;
+    }
+    case 'win7': {
+      if (browser === 'firefox') return `Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:${ver}) Gecko/20100101 Firefox/${ver}`;
+      if (browser === 'safari') return null;
+      const base = `Mozilla/5.0 (Windows NT 6.1; Win64; x64) ${WK} Chrome/${ver} Safari/537.36`;
+      return browser === 'edge' ? `${base} Edg/${ver}` : base;
+    }
+    case 'mac': {
+      if (browser === 'firefox') return `Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:${ver}) Gecko/20100101 Firefox/${ver}`;
+      if (browser === 'safari') return `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) ${WK_IOS} Version/${ver} Safari/605.1.15`;
+      const base = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) ${WK} Chrome/${ver} Safari/537.36`;
+      return browser === 'edge' ? `${base} Edg/${ver}` : base;
+    }
+    case 'linux': {
+      if (browser === 'firefox') return `Mozilla/5.0 (X11; Linux x86_64; rv:${ver}) Gecko/20100101 Firefox/${ver}`;
+      if (browser === 'safari') return null;
+      const base = `Mozilla/5.0 (X11; Linux x86_64) ${WK} Chrome/${ver} Safari/537.36`;
+      return browser === 'edge' ? `${base} Edg/${ver}` : base;
+    }
+    case 'android': {
+      if (browser === 'firefox') return `Mozilla/5.0 (Android 14; Mobile; rv:${ver}) Gecko/${ver} Firefox/${ver}`;
+      if (browser === 'safari') return null;
+      const base = `Mozilla/5.0 (Linux; Android 14; Pixel 8) ${WK} Chrome/${ver} Mobile Safari/537.36`;
+      return browser === 'edge' ? `${base} Edg/${ver}` : base;
+    }
+    case 'iphone': {
+      if (browser === 'safari') return `Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) ${WK_IOS} Version/${ver} Mobile/15E148 Safari/604.1`;
+      if (browser === 'firefox') return `Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) ${WK_IOS} FxiOS/${ver} Mobile/15E148 Safari/604.1`;
+      const token = browser === 'edge' ? 'EdgiOS' : 'CriOS';
+      return `Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) ${WK_IOS} ${token}/${ver} Mobile/15E148 Safari/604.1`;
+    }
+    case 'ipad': {
+      if (browser === 'firefox') return `Mozilla/5.0 (iPad; CPU OS 17_4 like Mac OS X) ${WK_IOS} FxiOS/${ver} Mobile/15E148 Safari/604.1`;
+      if (browser === 'safari') return `Mozilla/5.0 (iPad; CPU OS 17_4 like Mac OS X) ${WK_IOS} Version/${ver} Safari/605.1.15`;
+      const token = browser === 'edge' ? 'EdgiOS' : 'CriOS';
+      return `Mozilla/5.0 (iPad; CPU OS 17_4 like Mac OS X) ${WK_IOS} ${token}/${ver} Mobile/15E148 Safari/604.1`;
+    }
+  }
+}
+
+export interface GenResult {
+  os: GenOS;
+  browser: GenBrowser;
+  label: string;
+  /** 不支持的组合为 null (如 Windows × Safari) */
+  ua: string | null;
+}
+
+/** 勾选多平台 × 多浏览器 → 全部组合 (按平台 × 浏览器选项顺序)。 */
+export function generateUaList(oses: GenOS[], browsers: GenBrowser[], version?: string): GenResult[] {
+  const list: GenResult[] = [];
+  for (const os of oses) {
+    for (const b of browsers) {
+      list.push({ os, browser: b, label: `${osLabelOf(os)} × ${browserLabelOf(b)}`, ua: generateUa(os, b, version) });
+    }
+  }
+  return list;
+}

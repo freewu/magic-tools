@@ -1,4 +1,4 @@
-import { parseUserAgent } from './lib';
+import { parseUserAgent, generateUa, generateUaList } from './lib';
 
 describe('UA 解析 - Chrome/Edge 系列', () => {
   test('Chrome (Windows 10, x64)', () => {
@@ -125,5 +125,56 @@ describe('UA 解析 - 其它', () => {
     const r = parseUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2486.0 Safari/537.36 Edge/13.10586');
     expect(r.browserName).toBe('Microsoft Edge (EdgeHTML)');
     expect(r.engine).toBe('EdgeHTML');
+  });
+});
+
+describe('UA 生成', () => {
+  test('Win11 × Chrome: 生成结果可被解析器反向识别', () => {
+    const ua = generateUa('win11', 'chrome')!;
+    expect(ua).toContain('(Windows NT 10.0; Win64; x64)');
+    const r = parseUserAgent(ua);
+    expect(r.browserName).toBe('Chrome');
+    expect(r.osName).toBe('Windows');
+    expect(r.cpuArch).toBe('x64');
+  });
+  test('macOS × Firefox / Safari', () => {
+    const f = parseUserAgent(generateUa('mac', 'firefox')!);
+    expect(f.browserName).toBe('Firefox');
+    expect(f.osName).toBe('macOS');
+    expect(f.engine).toBe('Gecko');
+    const s = parseUserAgent(generateUa('mac', 'safari')!);
+    expect(s.browserName).toBe('Safari');
+    expect(s.engine).toBe('WebKit');
+  });
+  test('Android × Chrome 与 iPhone × Safari', () => {
+    const a = parseUserAgent(generateUa('android', 'chrome')!);
+    expect(a.browserName).toBe('Chrome');
+    expect(a.deviceType).toBe('mobile');
+    expect(a.deviceModel).toBe('Pixel 8');
+    const i = parseUserAgent(generateUa('iphone', 'safari')!);
+    expect(i.browserName).toBe('Safari');
+    expect(i.osName).toBe('iOS');
+    expect(i.deviceType).toBe('mobile');
+  });
+  test('Windows × Safari 不支持', () => {
+    expect(generateUa('win11', 'safari')).toBeNull();
+    expect(generateUa('android', 'safari')).toBeNull();
+  });
+  test('自定义主版本号归一化', () => {
+    expect(generateUa('win11', 'chrome', '130')).toContain('Chrome/130.0.0.0');
+    expect(generateUa('mac', 'firefox', '127')).toContain('Firefox/127.0');
+    expect(generateUa('mac', 'safari', '18')).toContain('Version/18.4');
+    expect(generateUa('mac', 'safari', '18.2')).toContain('Version/18.2');
+    expect(generateUa('win11', 'chrome', '')).toContain('Chrome/126.0.0.0');
+  });
+  test('多选组合全部展开 (含不支持项标记 null)', () => {
+    const list = generateUaList(['win11', 'mac'], ['chrome', 'safari'], '130');
+    expect(list).toHaveLength(4);
+    expect(list.map((x) => `${x.os}:${x.browser}`)).toEqual(['win11:chrome', 'win11:safari', 'mac:chrome', 'mac:safari']);
+    expect(list.map((x) => x.ua === null)).toEqual([false, true, false, false]);
+    expect(list[0].label).toContain('Windows 11');
+    expect(list[1].label).toContain('Windows 11');
+    expect(list[3].label).toContain('Safari');
+    expect(list[3].ua).not.toBeNull();
   });
 });
