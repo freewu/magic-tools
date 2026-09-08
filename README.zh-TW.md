@@ -63,7 +63,7 @@ CSS 配色 · 行數統計 · htpasswd 生成 · 正則表達式 · 檔案比較
 
 👉 **[前往 Releases 下載最新版](https://github.com/freewu/magic-tools/releases/latest)**
 
-**Web 版**：免安裝，直接前往 [freewu.github.io/magic-tools](https://freewu.github.io/magic-tools/)。
+**Web 版**：免安裝，直接前往 [freewu.github.io/magic-tools/tools](https://freewu.github.io/magic-tools/tools/)。
 
 ## 🛠 技術棧
 

@@ -17,9 +17,9 @@ header{position:sticky;top:0;z-index:9;background:color-mix(in srgb,var(--bg) 86
 .hbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;max-width:1040px;margin:0 auto}
 .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;color:var(--fg)}
 .brand img{width:28px;height:28px;border-radius:6px}
-.lang{display:flex;gap:6px}
-.lang a{font-size:13px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:var(--card)}
-.lang a.cur{color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2));border-color:transparent;font-weight:600}
+.lang{display:flex;align-items:center;gap:6px}
+.langselect{font:inherit;font-size:13px;padding:5px 28px 5px 10px;border:1px solid var(--line);border-radius:8px;color:var(--fg);background:var(--card);cursor:pointer;outline:none}
+.langselect:hover{border-color:var(--brand)}
 .hero{text-align:center;padding:72px 20px 44px}
 .hero .logo{width:96px;height:96px;border-radius:22px;box-shadow:0 12px 40px rgba(22,119,255,.28)}
 .hero h1{margin:22px 0 6px;font-size:42px;letter-spacing:.5px}
@@ -62,7 +62,7 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;text-align:center;co
 <body>
 <header><div class="hbar">
   <div class="brand"><img src="logo.png" alt="Magic Tools 图标"><span>Magic Tools</span></div>
-  <nav class="lang"><a class="cur" href="zh-CN.html">简体中文</a><a href="index.html" hreflang="index">English</a><a href="zh-TW.html" hreflang="zh-TW">繁體中文</a></nav>
+  <nav class="lang"><select class="langselect" aria-label="语言 / Language" onchange="if(this.value)location.href=this.value"><option value="index.html">English</option><option value="zh-CN.html" selected>简体中文</option><option value="zh-TW.html">繁體中文</option></select></nav>
 </div></header>
 
 <div class="hero">
@@ -72,7 +72,7 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;text-align:center;co
   <p>全能开发工具箱，内置 <b>8 大分类、106 个实用工具</b>：加解密、哈希校验、编解码、类型转换、格式化、图片生成、站长工具与实用小工具。既可安装为 <b>桌面应用</b>（Windows / macOS / Linux），也可在<b>浏览器</b>中直接使用。</p>
   <div class="cta">
     <a class="btn primary" href="https://github.com/freewu/magic-tools/releases/latest">⬇ 下载桌面版</a>
-    <a class="btn ghost" href="https://freewu.github.io/magic-tools/">🌐 在线体验 Web 版</a>
+    <a class="btn ghost" href="https://freewu.github.io/magic-tools/tools/">🌐 在线体验 Web 版</a>
   </div>
 </div>
 
@@ -114,7 +114,7 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;text-align:center;co
   <div style="height:22px"></div>
   <div class="online">
     <h3>想直接在浏览器使用？</h3><p>无需安装，打开 Web 版并收藏即可。</p>
-    <a class="btn primary" href="https://freewu.github.io/magic-tools/">打开 Web 版</a>
+    <a class="btn primary" href="https://freewu.github.io/magic-tools/tools/">打开 Web 版</a>
   </div>
 </div></section>
 

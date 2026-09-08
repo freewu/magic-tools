@@ -63,7 +63,7 @@ CSS colors · Line counter · htpasswd generator · Regex tester (17 presets) ·
 
 👉 **[Download the latest release](https://github.com/freewu/magic-tools/releases/latest)**
 
-**Web version:** no install needed — try it at [freewu.github.io/magic-tools](https://freewu.github.io/magic-tools/).
+**Web version:** no install needed — try it at [freewu.github.io/magic-tools/tools](https://freewu.github.io/magic-tools/tools/).
 
 ## 🛠 Tech Stack
 

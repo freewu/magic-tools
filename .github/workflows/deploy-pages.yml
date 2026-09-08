@@ -40,10 +40,21 @@ jobs:
       - name: Build renderer (纯前端版)
         run: npm run build:renderer
 
+      # 站点布局: 根目录 = 三语官网 (docs/), 子路径 /tools/ = Web 版应用
+      # https://freewu.github.io/magic-tools/         -> docs 官网
+      # https://freewu.github.io/magic-tools/tools/   -> Web 版 (vite base './' + hash 路由, 子路径可直接访问)
+      - name: Assemble site (docs at root, web app under /tools/)
+        run: |
+          mkdir -p _site/tools
+          cp -R dist/. _site/tools/
+          cp docs/index.html docs/zh-CN.html docs/zh-TW.html docs/logo.png _site/
+          echo '--- assembled site ---'
+          ls _site && echo '--- _site/tools ---' && ls _site/tools | head -10
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: dist
+          path: _site
 
   deploy:
     environment:

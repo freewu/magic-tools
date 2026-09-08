@@ -17,9 +17,9 @@ header{position:sticky;top:0;z-index:9;background:color-mix(in srgb,var(--bg) 86
 .hbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;max-width:1040px;margin:0 auto}
 .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;color:var(--fg)}
 .brand img{width:28px;height:28px;border-radius:6px}
-.lang{display:flex;gap:6px}
-.lang a{font-size:13px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:var(--card)}
-.lang a.cur{color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2));border-color:transparent;font-weight:600}
+.lang{display:flex;align-items:center;gap:6px}
+.langselect{font:inherit;font-size:13px;padding:5px 28px 5px 10px;border:1px solid var(--line);border-radius:8px;color:var(--fg);background:var(--card);cursor:pointer;outline:none}
+.langselect:hover{border-color:var(--brand)}
 .hero{text-align:center;padding:72px 20px 44px}
 .hero .logo{width:96px;height:96px;border-radius:22px;box-shadow:0 12px 40px rgba(22,119,255,.28)}
 .hero h1{margin:22px 0 6px;font-size:42px;letter-spacing:.5px}
@@ -62,7 +62,7 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;text-align:center;co
 <body>
 <header><div class="hbar">
   <div class="brand"><img src="logo.png" alt="Magic Tools logo"><span>Magic Tools</span></div>
-  <nav class="lang"><a class="cur" href="index.html">English</a><a href="zh-CN.html" hreflang="zh-CN">简体中文</a><a href="zh-TW.html" hreflang="zh-TW">繁體中文</a></nav>
+  <nav class="lang"><select class="langselect" aria-label="Language / 语言" onchange="if(this.value)location.href=this.value"><option value="index.html" selected>English</option><option value="zh-CN.html">简体中文</option><option value="zh-TW.html">繁體中文</option></select></nav>
 </div></header>
 
 <div class="hero">
@@ -72,7 +72,7 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;text-align:center;co
   <p>An all-in-one developer toolbox with <b>106 utilities in 8 categories</b> — cryptography, hashing, codecs, converters, formatters, image generators, webmaster tools and more. Run it as a native <b>desktop app</b> (Windows / macOS / Linux) or right in your <b>browser</b>.</p>
   <div class="cta">
     <a class="btn primary" href="https://github.com/freewu/magic-tools/releases/latest">⬇ Download for Desktop</a>
-    <a class="btn ghost" href="https://freewu.github.io/magic-tools/">🌐 Try the Web Version</a>
+    <a class="btn ghost" href="https://freewu.github.io/magic-tools/tools/">🌐 Try the Web Version</a>
   </div>
 </div>
 
@@ -114,7 +114,7 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;text-align:center;co
   <div style="height:22px"></div>
   <div class="online">
     <h3>Prefer the browser?</h3><p>No installation needed — open the Web version and bookmark it.</p>
-    <a class="btn primary" href="https://freewu.github.io/magic-tools/">Launch Web Version</a>
+    <a class="btn primary" href="https://freewu.github.io/magic-tools/tools/">Launch Web Version</a>
   </div>
 </div></section>
 
