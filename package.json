@@ -78,7 +78,15 @@
       "dist"
     ],
     "transform": {
-      "\\.(ts|tsx|js|jsx)$": ["ts-jest", { "tsconfig": { "module": "commonjs", "skipLibCheck": true } }]
+      "\\.(ts|tsx|js|jsx)$": [
+        "ts-jest",
+        {
+          "tsconfig": {
+            "module": "commonjs",
+            "skipLibCheck": true
+          }
+        }
+      ]
     }
   },
   "dependencies": {
@@ -95,6 +103,7 @@
     "deepmerge": "^4.3.1",
     "fast-xml-parser": "^4.5.7",
     "highlight.js": "^11.8.0",
+    "html-to-image": "^1.11.13",
     "js-base64": "^3.7.5",
     "js-ini": "^1.6.0",
     "jsbarcode": "^3.12.3",
@@ -103,7 +112,9 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.1",
+    "shiki": "^4.4.3",
     "sql-formatter": "^12.2.1",
+    "svgo": "^4.1.0",
     "toml-patch": "^0.2.3",
     "yaml": "^2.3.1"
   },

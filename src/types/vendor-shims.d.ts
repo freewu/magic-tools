@@ -55,3 +55,33 @@ declare var DecompressionStream: {
   new (format: 'gzip' | 'deflate' | 'deflate-raw'): DecompressionStream;
 };
 
+
+// svgo: 浏览器分支子路径 (svgo 自身类型仅覆盖主入口; moduleResolution=node 下子路径无类型)
+// 实际实现为 ESM 的 svgo/dist/svgo.browser.js (无 node 内建依赖), 由 vite exports 映射解析
+declare module 'svgo/browser' {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  export function optimize(source: string, config?: any): Promise<{ data?: string; error?: string }>;
+}
+
+// ---- Shiki (代码截图): 浏览器按需语言/主题模块 ----
+// shiki v4 仅提供 exports 子路径/ESM 类型; 项目 moduleResolution=node 无法解析子路径类型,
+// 运行时由 vite 依据 package exports 映射, 此处仅保证 tsc/jest 类型面可用 (实现见 node_modules/@shikijs)
+declare module 'shiki/core' {
+  export function createHighlighterCore(options?: Record<string, unknown>): Promise<Highlighter>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  export type Highlighter = any;
+}
+declare module 'shiki/engine/javascript' {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  export function createJavaScriptRegexEngine(): any;
+}
+declare module '@shikijs/langs/*' {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const lang: any;
+  export default lang;
+}
+declare module '@shikijs/themes/*' {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const theme: any;
+  export default theme;
+}

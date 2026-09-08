@@ -59,6 +59,11 @@ export default defineConfig({
           if (/node_modules\/pinyin-pro\//.test(id)) {
             return 'vendor-pinyin';
           }
+          // Shiki 语言语法包: 保持独立 dynamic chunk (import.meta.glob 按需加载),
+          // 不并入 vendor-misc, 否则代码截图首次打开会拉取全部语言 (gzip ~1.7MB)
+          if (id.includes('node_modules/@shikijs/langs')) {
+            return undefined;
+          }
           return 'vendor-misc';
         },
       },
