@@ -1,4 +1,4 @@
-import { Alert, Button, Card, Input, Segmented, Select, Slider, Space, Spin, Tag, Typography, message } from 'antd';
+import { Alert, Button, Card, Col, Input, Row, Segmented, Select, Slider, Space, Spin, Tag, Typography, message } from 'antd';
 import { DownloadOutlined, PictureOutlined } from '@ant-design/icons';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { toPng } from 'html-to-image';
@@ -87,14 +87,16 @@ const CodeShot: React.FC = () => {
   };
 
   return (
-    <Space direction="vertical" size={16} style={{ width: '100%' }}>
+    <div style={{ width: '100%' }}>
       <Alert
         type="info"
         showIcon
         message="代码截图"
         description="Shiki 语法高亮 + 一键导出 PNG。支持全部内置语言（常用语言置顶），编辑器风格可选 Mac / VSCode / IntelliJ / Sublime / Vim / Emacs，明暗自适应配色，默认值均可在「设置 → 其它」中调整。"
       />
-      <Card size="small" title="代码与外观" extra={
+      <Row gutter={16} wrap align="stretch" style={{ marginTop: 16 }}>
+        <Col xs={24} lg={13} xxl={12}>
+          <Card size="small" title="代码与外观" style={{ height: '100%' }} extra={
         <Space size={8}>
           <Button size="small" onClick={() => setCode(SAMPLE_CODE)}>载入示例</Button>
           <Button size="small" disabled={!code} onClick={() => setCode('')} danger>清空</Button>
@@ -143,21 +145,18 @@ const CodeShot: React.FC = () => {
             value={code}
             onChange={(e) => setCode(e.target.value)}
             placeholder="粘贴需要截图的代码…"
-            autoSize={{ minRows: 6, maxRows: 14 }}
+            autoSize={{ minRows: 8, maxRows: 22 }}
             style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 13 }}
           />
         </Space>
-      </Card>
-
-      <Card
-        size="small"
-        title="截图预览"
-        extra={
-          <Button type="primary" size="small" icon={<DownloadOutlined />} loading={exporting} disabled={!html} onClick={exportPng}>
-            导出 PNG
-          </Button>
-        }
-      >
+        </Card>
+        </Col>
+        <Col xs={24} lg={11} xxl={12}>
+          <Card size="small" title="截图预览" style={{ height: '100%' }} extra={
+            <Button type="primary" size="small" icon={<DownloadOutlined />} loading={exporting} disabled={!html} onClick={exportPng}>
+              导出 PNG
+            </Button>
+          }>
         {err ? (
           <Alert type="error" showIcon message="高亮失败" description={err} />
         ) : busy ? (
@@ -192,8 +191,10 @@ const CodeShot: React.FC = () => {
         ) : (
           <Text type="secondary">输入代码后实时预览，点击「导出 PNG」生成图片。</Text>
         )}
-      </Card>
-    </Space>
+        </Card>
+        </Col>
+      </Row>
+    </div>
   );
 };
 
