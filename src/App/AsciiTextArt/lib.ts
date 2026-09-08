@@ -1,132 +1,72 @@
-// ASCII 文字 (Text to ASCII Art): 类 figlet 大字渲染, 零依赖
+// ASCII 文字: figlet 引擎 (支持 289 款 figlet 字体切换)
+// - 逻辑层: 字体数据懒加载 + parseFont 注册 + 渲染 + 默认字体设置存取
+// - 渲染引擎: figlet (MIT, https://github.com/patorjk/figlet.js)
+// - 字体数据: fonts-data.ts (生成文件, 来自 patorjk/figlet.js fonts 目录)
 
-/** 字形行数 */
-export const GLYPH_ROWS = 5;
-/** 常规字形宽度 (空格 3 列) */
-export const GLYPH_W = 5;
-export const SPACE_W = 3;
+import figlet from 'figlet';
+import { FONT_NAMES } from './fontNames';
 
-/**
- * 字形表: 每字符 5 行位图, '#' 为实心; 覆盖 A-Z 0-9 与常见英文标点, 其余回退 '?'
- * 空格单独处理 (宽 3), 不在此表
- */
-export const GLYPHS: Record<string, string[]> = {
-  A: ['.###.', '#...#', '#...#', '#####', '#...#'],
-  B: ['####.', '#...#', '####.', '#...#', '####.'],
-  C: ['.####', '#....', '#....', '#....', '.####'],
-  D: ['####.', '#...#', '#...#', '#...#', '####.'],
-  E: ['#####', '#....', '####.', '#....', '#####'],
-  F: ['#####', '#....', '####.', '#....', '#....'],
-  G: ['.####', '#....', '#.###', '#...#', '.###.'],
-  H: ['#...#', '#...#', '#####', '#...#', '#...#'],
-  I: ['#####', '..#..', '..#..', '..#..', '#####'],
-  J: ['..###', '...#.', '...#.', '#..#.', '.##..'],
-  K: ['#...#', '#..#.', '##...', '#..#.', '#...#'],
-  L: ['#....', '#....', '#....', '#....', '#####'],
-  M: ['#...#', '##.##', '#.#.#', '#...#', '#...#'],
-  N: ['#...#', '##..#', '#.#.#', '#..##', '#...#'],
-  O: ['.###.', '#...#', '#...#', '#...#', '.###.'],
-  P: ['####.', '#...#', '####.', '#....', '#....'],
-  Q: ['.###.', '#...#', '#...#', '#..#.', '.##.#'],
-  R: ['####.', '#...#', '####.', '#..#.', '#...#'],
-  S: ['.####', '#....', '.###.', '....#', '####.'],
-  T: ['#####', '..#..', '..#..', '..#..', '..#..'],
-  U: ['#...#', '#...#', '#...#', '#...#', '.###.'],
-  V: ['#...#', '#...#', '#...#', '.#.#.', '..#..'],
-  W: ['#...#', '#...#', '#.#.#', '##.##', '#...#'],
-  X: ['#...#', '.#.#.', '..#..', '.#.#.', '#...#'],
-  Y: ['#...#', '.#.#.', '..#..', '..#..', '..#..'],
-  Z: ['#####', '....#', '..#..', '#....', '#####'],
-  '0': ['.###.', '#...#', '#...#', '#...#', '.###.'],
-  '1': ['..#..', '.##..', '..#..', '..#..', '#####'],
-  '2': ['.###.', '....#', '.###.', '#....', '#####'],
-  '3': ['.###.', '....#', '..##.', '....#', '.###.'],
-  '4': ['#...#', '#...#', '#####', '....#', '....#'],
-  '5': ['#####', '#....', '####.', '....#', '####.'],
-  '6': ['.###.', '#....', '####.', '#...#', '.###.'],
-  '7': ['#####', '....#', '...#.', '..#..', '..#..'],
-  '8': ['.###.', '#...#', '.###.', '#...#', '.###.'],
-  '9': ['.###.', '#...#', '.####', '....#', '.###.'],
-  '!': ['..#..', '..#..', '..#..', '.....', '..#..'],
-  '?': ['.###.', '....#', '..#..', '.....', '..#..'],
-  '.': ['.....', '.....', '.....', '.....', '.###.'],
-  ',': ['.....', '.....', '.....', '.#...', '#....'],
-  ':': ['.....', '..#..', '.....', '..#..', '.....'],
-  ';': ['.....', '..#..', '.....', '..#..', '.#...'],
-  "'": ['..#..', '..#..', '.....', '.....', '.....'],
-  '"': ['.#.#.', '.#.#.', '.....', '.....', '.....'],
-  '-': ['.....', '.....', '.###.', '.....', '.....'],
-  '_': ['.....', '.....', '.....', '.....', '#####'],
-  '=': ['.....', '.###.', '.....', '.###.', '.....'],
-  '+': ['.....', '..#..', '.###.', '..#..', '.....'],
-  '/': ['....#', '...#.', '..#..', '.#...', '#....'],
-  '\\': ['#....', '.#...', '..#..', '...#.', '....#'],
-  '|': ['..#..', '..#..', '..#..', '..#..', '..#..'],
-  '(': ['...#.', '..#..', '.#...', '..#..', '...#.'],
-  ')': ['.#...', '..#..', '...#.', '..#..', '.#...'],
-  '[': ['..##.', '..#..', '..#..', '..#..', '..##.'],
-  ']': ['.##..', '..#..', '..#..', '..#..', '.##..'],
-  '{': ['...##', '..#..', '.##..', '..#..', '...##'],
-  '}': ['##...', '..#..', '..##.', '..#..', '##...'],
-  '<': ['...#.', '..#..', '.#...', '..#..', '...#.'],
-  '>': ['.#...', '..#..', '...#.', '..#..', '.#...'],
-  '@': ['.###.', '#.#.#', '#.###', '#...#', '.###.'],
-  '#': ['.#.#.', '#####', '.#.#.', '#####', '.#.#.'],
-  '%': ['#...#', '...#.', '..#..', '.#...', '#...#'],
-  '*': ['.#.#.', '#...#', '..#..', '#...#', '.#.#.'],
-  '^': ['#...#', '.#.#.', '..#..', '.....', '.....'],
-  '&': ['.....', '.##..', '#.#..', '.##.#', '#.##.'],
+export { FONT_NAMES } from './fontNames';
+
+/** 字体清单缺失时的兜底字体 (必须存在于 FONT_NAMES) */
+export const DEFAULT_FONT = 'Standard';
+
+// ---- 设置存取 (设置 → 其它 → ASCII 文字) ----
+const KEY_FONT = 'ascii-text-art.default-font';
+
+const rawGet = (k: string): string | null => {
+  try { return localStorage.getItem(k); } catch { return null; }
+};
+const rawSet = (k: string, v: string): void => {
+  try { localStorage.setItem(k, v); } catch { /* ignore */ }
 };
 
-export interface FigletOpts {
-  /** 实心像素字符 (取首字符) */
-  pixel?: string;
-  /** 放大倍数 (横向/纵向字符), 1-4 */
-  scale?: number;
-  /** 字符间距 (像素列, 放大前), 0-6 */
-  spacing?: number;
+/** 默认字体 (若本地保存值不在字体清单中则回退 Standard) */
+export function getDefaultFont(): string {
+  const v = rawGet(KEY_FONT);
+  return v && FONT_NAMES.includes(v) ? v : DEFAULT_FONT;
+}
+export function setDefaultFont(v: string): void {
+  rawSet(KEY_FONT, FONT_NAMES.includes(v) ? v : DEFAULT_FONT);
 }
 
-const lookup = (ch: string): string[] => {
-  if (ch === ' ') return ['   ', '   ', '   ', '   ', '   '];
-  return GLYPHS[ch.toUpperCase()] ?? GLYPHS['?'];
+// ---- 渲染 ----
+/** 字体数据 (懒加载, 独立 chunk); 解析过的字体记录于 parsedFonts */
+let fontData: Record<string, string> | null = null;
+let dataPromise: Promise<Record<string, string>> | null = null;
+const parsedFonts = new Set<string>();
+
+const loadFontData = async (): Promise<void> => {
+  if (fontData) return;
+  if (!dataPromise) {
+    dataPromise = import('./fonts-data').then((m) => m.FONT_DATA).catch((err) => {
+      dataPromise = null;
+      throw err;
+    });
+  }
+  fontData = await dataPromise;
+};
+
+const ensureParsed = (name: string): void => {
+  if (parsedFonts.has(name) || !fontData) return;
+  figlet.parseFont(name, fontData[name]);
+  parsedFonts.add(name);
 };
 
 /**
- * 文本 -> ASCII 大字 (figlet 风格)
- * - 多行输入按行渲染, 段落间以空行分隔
- * - 仅 A-Z a-z 0-9 与常见英文标点有字形; 中文等未知字符回退为 '?'
- * - 输出每行等宽 (尾空格保留以保证字形对齐)
+ * 文本 -> figlet 大字
+ * - 字体名不合法时回退默认字体; 空文本返回空串
+ * - 多行文本逐行独立排版; 未收录字符按字体回退 (通常为 ? 或空格)
+ * - 首次调用会动态加载字体数据模块
  */
-export const renderFiglet = (text: string, o: FigletOpts = {}): string => {
-  const pixel = (o.pixel || '#').charAt(0);
-  const scale = Math.max(1, Math.min(4, Math.round(o.scale ?? 1)));
-  const spacing = Math.max(0, Math.min(6, Math.round(o.spacing ?? 1)));
-  const gap = ' '.repeat(spacing);
-
-  const blocks: string[][] = [];
-  for (const line of text.split('\n')) {
-    if (!line) { blocks.push(['']); continue; }
-    const glyphs = line.split('').map(lookup);
-    const rows: string[] = [];
-    for (let r = 0; r < GLYPH_ROWS; r++) {
-      rows.push(glyphs.map((g) => g[r]).join(gap));
-    }
-    blocks.push(rows);
+export async function renderText(text: string, font = DEFAULT_FONT): Promise<string> {
+  const name = FONT_NAMES.includes(font) ? font : DEFAULT_FONT;
+  if (!text) return '';
+  try {
+    await loadFontData();
+    ensureParsed(name);
+    return figlet.textSync(text, { font: name }) ?? '';
+  } catch {
+    return '';
   }
-
-  const outRows: string[] = [];
-  blocks.forEach((block, bi) => {
-    if (bi > 0) outRows.push('');
-    for (const row of block) {
-      if (!row) { outRows.push(''); continue; }
-      let expanded = '';
-      for (const ch of row) {
-        // 空心 '.' 与空格均渲染为空白像素
-        expanded += ch === ' ' || ch === '.' ? ' '.repeat(scale) : pixel.repeat(scale);
-      }
-      for (let i = 0; i < scale; i++) outRows.push(expanded);
-    }
-  });
-  return outRows.join('\n');
-};
+}

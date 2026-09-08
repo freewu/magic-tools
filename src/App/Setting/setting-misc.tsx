@@ -6,6 +6,7 @@ import { BarcodeGeneratorSetting } from "../BarcodeGenerator/setting";
 import { HtpasswdGeneratorSetting } from "../HtpasswdGenerator/setting";
 import { RegexTesterSetting } from "../RegexTester/setting";
 import { CodeShotSetting } from "../CodeShot/setting";
+import { AsciiTextArtSetting } from "../AsciiTextArt/setting";
 
 export const SettingMisc = () => {
 
@@ -17,6 +18,7 @@ export const SettingMisc = () => {
       <HtpasswdGeneratorSetting />
       <RegexTesterSetting />
       <CodeShotSetting />
+      <AsciiTextArtSetting />
     </Form>
   )
 }

@@ -1,22 +1,28 @@
-import { Button, Input, InputNumber, Space, message } from "antd";
+import { Button, Input, InputNumber, Select, Space, message } from "antd";
 import { CopyOutlined, DownloadOutlined } from '@ant-design/icons';
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { copyTextToClipboard } from "../../lib";
 import { saveBytesFile } from "../../lib/tauri";
-import { GLYPHS, renderFiglet } from "./lib";
+import { FONT_NAMES, getDefaultFont, renderText } from "./lib";
 
 const SAMPLE = 'Hello ASCII!';
+/** 预览字号 (仅 CSS 缩放, 不影响复制的文本) */
+const FONT_SIZE_MIN = 4;
+const FONT_SIZE_MAX = 32;
 
 const AsciiTextArt: React.FC = () => {
   const [ text, setText ] = useState(SAMPLE);
-  const [ pixel, setPixel ] = useState('#');
-  const [ scale, setScale ] = useState(2);
-  const [ spacing, setSpacing ] = useState(1);
+  const [ font, setFont ] = useState<string>(() => getDefaultFont());
+  const [ fontSize, setFontSize ] = useState(12);
+  const [ art, setArt ] = useState('');
 
-  const art = useMemo(
-    () => renderFiglet(text, { pixel, scale, spacing }),
-    [ text, pixel, scale, spacing ],
-  );
+  // 渲染: 首次渲染需动态加载字体数据模块; 文字/字体任一变化即重新排版
+  useEffect(() => {
+    let alive = true;
+    renderText(text, font).then((out) => { if (alive) setArt(out); });
+    return () => { alive = false; };
+  }, [ text, font ]);
+
   const artRows = useMemo(() => art.split('\n'), [ art ]);
 
   const doCopy = async () => {
@@ -45,27 +51,38 @@ const AsciiTextArt: React.FC = () => {
   const labelStyle = { color: '#666', whiteSpace: 'nowrap' } as const;
 
   return (
-    <div style={ { maxWidth: 980 } }>
+    <div style={ { maxWidth: 1080 } }>
       <div style={ row }>
         <span style={ labelStyle }>文字</span>
         <Input.TextArea
           value={ text } onChange={ (e) => setText(e.target.value) }
           placeholder="输入要生成大字的内容 (支持多行, 每行独立排版)"
-          autoSize={ { minRows: 2, maxRows: 6 } } style={ { width: 320, maxWidth: '100%' } }
+          autoSize={ { minRows: 2, maxRows: 8 } } style={ { width: 400, maxWidth: '100%' } }
         />
       </div>
       <div style={ row }>
-        <span style={ labelStyle }>像素字符</span>
-        <Input value={ pixel } onChange={ (e) => setPixel(e.target.value.charAt(0)) } maxLength={ 1 }
-          style={ { width: 70, fontFamily: 'monospace' } } />
-        <span style={ { color: '#bbb', fontSize: 12 } }>可用 # . @ 0 * 或 █ 等</span>
-        <span style={ labelStyle }>放大</span>
-        <InputNumber min={ 1 } max={ 4 } value={ scale } onChange={ (v) => { if (v != null) setScale(v); } } style={ { width: 70 } } />
-        <span style={ labelStyle }>字距</span>
-        <InputNumber min={ 0 } max={ 6 } value={ spacing } onChange={ (v) => { if (v != null) setSpacing(v); } } style={ { width: 70 } } />
+        <span style={ labelStyle }>字体</span>
+        <Select
+          value={ font }
+          style={ { width: 340, maxWidth: '100%' } }
+          showSearch
+          onChange={ setFont }
+          placeholder="选择 figlet 字体"
+          options={ FONT_NAMES.map((v) => ({ value: v, label: v })) }
+          filterOption={ (kw, opt) => String(opt?.label ?? '').toLowerCase().includes(kw.toLowerCase()) }
+        />
+        <span style={ { color: '#bbb', fontSize: 12 } }>共 { FONT_NAMES.length } 款 figlet 字体</span>
+      </div>
+      <div style={ row }>
+        <span style={ labelStyle }>预览字号</span>
+        <InputNumber
+          min={ FONT_SIZE_MIN } max={ FONT_SIZE_MAX } value={ fontSize }
+          onChange={ (v) => { if (v != null) setFontSize(v); } } style={ { width: 80 } }
+        />
+        <span style={ { color: '#bbb', fontSize: 12 } }>仅缩放预览显示, 复制的文本不受影响</span>
       </div>
       <div style={ { color: '#bbb', fontSize: 12, marginBottom: 10 } }>
-        支持 A-Z a-z 0-9 与常见英文标点; 中文等未收录字符以 ? 显示; 空格宽 3 列 · 实时生成, 改任意参数立即重排
+        字体来自 figlet 经典字体集; 支持英文字母 / 数字 / 常用标点, 中文等未收录字符按字体回退显示 · 默认字体可在「设置 → 其它」中调整
       </div>
 
       <div style={ { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 } }>
@@ -77,8 +94,8 @@ const AsciiTextArt: React.FC = () => {
       </div>
       <pre style={ {
         background: '#f6f8fa', color: '#222', borderRadius: 8, padding: 12,
-        fontSize: 9, lineHeight: 0.9, letterSpacing: 0, whiteSpace: 'pre',
-        overflow: 'auto', maxHeight: 480, margin: 0,
+        fontSize, lineHeight: fontSize <= 8 ? 1.1 : 1.2, letterSpacing: 0, whiteSpace: 'pre',
+        overflow: 'auto', maxHeight: 520, margin: 0,
         fontFamily: 'Consolas, "Courier New", monospace',
       } }>{ art }</pre>
       <div style={ { color: '#bbb', fontSize: 12, marginTop: 6 } }>
