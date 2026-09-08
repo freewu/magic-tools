@@ -102,6 +102,7 @@ const list = [
   'PlaceholderImage',
   'ShieldBadgeGenerator',
   'CIDRCalc',
+  'PasswordGenerator',
   'BrowserFingerprint',
   'UrlExtract',
   'CookieAnalyzer',

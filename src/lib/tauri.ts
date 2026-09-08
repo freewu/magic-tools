@@ -165,6 +165,64 @@ export async function saveBytesFile(
 }
 
 /**
+ * 批量保存 PNG 图片 (二维码 / 条形码批量导出)
+ * - Tauri 环境: 弹「选择文件夹」对话框, 一次写入全部文件 (不逐个弹保存窗)
+ * - 普通浏览器: 逐个触发 <a download> 下载 (浏览器可能弹出“允许多个下载”的确认)
+ * @param defaultNames 文件名数组 (含 .png 后缀, 与 dataUrls 一一对应)
+ * @param dataUrls canvas.toDataURL('image/png') 得到的 data URL 数组
+ * @returns 实际保存/触发的数量 (取消文件夹选择返回 0)
+ */
+export async function savePngBatch(defaultNames: string[], dataUrls: string[]): Promise<number> {
+  const names = defaultNames.slice(0, dataUrls.length);
+  if (names.length === 0) return 0;
+  if (isTauri()) {
+    try {
+      const { open } = await import('@tauri-apps/plugin-dialog');
+      const { writeFile } = await import('@tauri-apps/plugin-fs');
+      const dir = await open({
+        directory: true,
+        multiple: false,
+        title: '选择保存文件夹',
+      });
+      // 用户取消文件夹选择
+      if (dir === null) return 0;
+      let ok = 0;
+      for (let i = 0; i < names.length; i++) {
+        const base64 = dataUrls[i].slice(dataUrls[i].indexOf(',') + 1);
+        const bin = atob(base64);
+        const bytes = new Uint8Array(bin.length);
+        for (let j = 0; j < bin.length; j++) bytes[j] = bin.charCodeAt(j);
+        try {
+          await writeFile(String(dir) + '/' + names[i], bytes);
+          ok += 1;
+        } catch (err) {
+          console.error('write batch file failed:', names[i], err);
+        }
+      }
+      return ok;
+    } catch (err) {
+      // 插件/权限异常时回退到浏览器逐个下载方式
+      console.error('tauri savePngBatch failed:', err);
+    }
+  }
+  // 浏览器回退: 逐个触发下载 (间隔 250ms, 避免被当成垃圾行为)
+  let ok = 0;
+  for (let i = 0; i < names.length; i++) {
+    const url = dataUrls[i];
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = names[i];
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    ok += 1;
+    // 给浏览器留出处理时间
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+  return ok;
+}
+
+/**
  * 通知 Tauri 主进程显示模式已变化 (同步托盘菜单勾选)
  * @param mode 'light' | 'dark' | 'system'
  */
