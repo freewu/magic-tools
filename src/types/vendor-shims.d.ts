@@ -33,6 +33,9 @@ declare module 'fast-xml-parser' {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     build(obj: any): string | boolean;
   }
+  export class XMLValidator {
+    static validate(xmlData: string, options?: Record<string, unknown>): true | { err: { code?: string; msg: string; line?: number; col?: number } };
+  }
 }
 
 
