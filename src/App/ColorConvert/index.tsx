@@ -1,4 +1,4 @@
-import { Checkbox, Form, Input, Divider, message, Space, Radio, Button, ColorPicker, Row, Col } from "antd";
+import { Checkbox, Form, Input, Divider, message, Space, Radio, Button, ColorPicker, Row, Col, Tabs } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
@@ -17,6 +17,7 @@ const ColorConvert = () => {
   const [ notice, contextHolder] = message.useMessage();
   const [ colorPickerHex, setColorPickerHex ] = useState<Color | string>('#1677ff'); // colorPicker 默认颜色
   const [ showPercent, setShowPercent ] = useState(false); // 是否显示 % 
+  const [ schemeKey, setSchemeKey ] = useState('analogous'); // 配色方案当前激活的 tab
 
   const inputStyle = { cursor: "pointer" };
 
@@ -92,18 +93,16 @@ const ColorConvert = () => {
     setColorData(result);
   }
 
-  // 取色器选择颜色事件
+  // 把 hex 转成当前输入格式的文本 (输入格式与对应输出格式保持一致)
+  const fmtText = (hex :string) :string => upperLowerTranslate(genColorString(hex, colorType));
+
+  // 取色器选择颜色事件: 填入/输出格式跟随当前输入格式 (默认输入 HEX 时仍是 #rrggbb)
   const onColorPickerChange = (value: Color, hex: string) => {
     setColorPickerHex(value);
-    setColorType('HEX');
-    setValue(hex);
-
-    // 更新输入提示信息
-    const tips = colorTypeList.find(item => item.label === 'HEX')?.placeholder;
-    setPlaceholder(tips + "");
-    
-    // 转换 
-    covertColor(hex);
+    const text = fmtText(hex);
+    setValue(text);
+    // 转换 (按当前输入格式解析, 不再强制切回 HEX)
+    covertColor(text);
   }
 
   // 切换显示 %
@@ -123,8 +122,9 @@ const ColorConvert = () => {
   };
 
   const copyHex = (hex :string) => {
-    copyTextToClipboard(hex);
-    notice.success(hex + ' 已复制');
+    const txt = fmtText(hex);
+    copyTextToClipboard(txt);
+    notice.success(txt + ' 已复制');
   };
 
   const offsetText = (o :number) => o === 0 ? '主色' : ((o > 0 ? '+' : '') + o + '°');
@@ -167,7 +167,7 @@ const ColorConvert = () => {
             <Form.Item label="颜色">
               <Input readOnly onClick={ inputClick }  
                 style={ { cursor: "pointer", backgroundColor: colorData.hex, color: colorData.complementaryColor } } 
-                value= { colorData.hex }/>
+                value= { colorData.hex ? fmtText(colorData.hex) : '' }/>
             </Form.Item>
             <Form.Item label="HEX">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { colorData.hex } />
@@ -192,7 +192,7 @@ const ColorConvert = () => {
               <Input 
                 readOnly onClick={ inputClick } 
                 style={ { cursor: "pointer", backgroundColor: colorData.complementaryColor, color: colorData.hex } } 
-                value={ colorData.complementaryColor } 
+                value={ colorData.complementaryColor ? fmtText(colorData.complementaryColor) : '' } 
               />
             </Form.Item>
             <Form.Item label="HSV">
@@ -214,39 +214,45 @@ const ColorConvert = () => {
       <Divider dashed>配色方案</Divider>
       <div style={ { marginBottom: 8 } }>
         <span style={ { fontSize: 12, color: '#999' } }>
-          基于主色 { colorData.hex ? <b>{ colorData.hex }</b> : '…' } 的色相旋转生成, 点击色块复制 HEX; 若主色为灰色 (无彩色) 各方案颜色相同属正常现象
+          基于主色 { colorData.hex ? <b>{ fmtText(colorData.hex) }</b> : '…' } 的色相旋转生成, 点击色块复制 (格式跟随输入 { colorType }); 若主色为灰色 (无彩色) 各方案颜色相同属正常现象
         </span>
       </div>
       { schemes.length === 0 ? (
         <div style={ { fontSize: 13, color: '#999' } }>输入有效颜色后展示相似 / 分离 / 三角 / 四角 / 方形 / 复合 / 双分离配色</div>
       ) : (
-        schemes.map((s) => (
-          <div key={ s.key } style={ { margin: '10px 0' } }>
-            <Space size={ 8 } align="baseline">
-              <b style={ { fontSize: 14 } }>{ s.label }</b>
-              <span style={ { fontSize: 12, color: '#999' } }>{ s.desc }</span>
-            </Space>
-            <div style={ { display: 'flex', gap: 8, marginTop: 6, flexWrap: 'wrap' } }>
-              { s.colors.map((c) => (
-                <div
-                  key={ c.hex + c.offset }
-                  onClick={ () => copyHex(c.hex) }
-                  title={ c.hex + ' (点击复制)' }
-                  style={ {
-                    flex: 1, minWidth: 96, height: 64, borderRadius: 6, background: c.hex,
-                    cursor: 'pointer', padding: '6px 8px', boxSizing: 'border-box',
-                    display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-                    color: schemeTextColor(c.hex), fontFamily: 'monospace', fontSize: 12,
-                    boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.06)',
-                  } }
-                >
-                  <span>{ c.hex }{ c.isMain ? ' (主)' : (c.isComplement ? ' (补)' : '') }</span>
-                  <span>{ offsetText(c.offset) }</span>
+        <Tabs
+          size="small"
+          activeKey={ schemes.some((s) => s.key === schemeKey) ? schemeKey : schemes[0].key }
+          onChange={ (k :string) => setSchemeKey(k) }
+          items={ schemes.map((s) => ({
+            key: s.key,
+            label: s.label,
+            children: (
+              <div>
+                <div style={ { marginBottom: 8, fontSize: 12, color: '#999' } }>{ s.desc }</div>
+                <div style={ { display: 'flex', gap: 8, flexWrap: 'wrap' } }>
+                  { s.colors.map((c) => (
+                    <div
+                      key={ c.hex + c.offset }
+                      onClick={ () => copyHex(c.hex) }
+                      title={ fmtText(c.hex) + ' (点击复制)' }
+                      style={ {
+                        flex: 1, minWidth: 96, height: 64, borderRadius: 6, background: c.hex,
+                        cursor: 'pointer', padding: '6px 8px', boxSizing: 'border-box',
+                        display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                        color: schemeTextColor(c.hex), fontFamily: 'monospace', fontSize: 12,
+                        boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.06)',
+                      } }
+                    >
+                      <span>{ fmtText(c.hex) }{ c.isMain ? ' (主)' : (c.isComplement ? ' (补)' : '') }</span>
+                      <span>{ offsetText(c.offset) }</span>
+                    </div>
+                  )) }
                 </div>
-              )) }
-            </div>
-          </div>
-        ))
+              </div>
+            ),
+          })) }
+        />
       ) }
 
     </div>

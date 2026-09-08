@@ -6,6 +6,7 @@ const { Sider, Content } = Layout;
 import { useNavigate } from "react-router-dom"
 import { appList, genMenuList } from "../App";
 import { getSiderFlag } from "../lib/setting";
+import { getVersion } from "../version";
 import "./layout.css";
 
 const MainSider: React.FC = () => {
@@ -61,15 +62,37 @@ const MainSider: React.FC = () => {
         />
       </div>
 
-      {/* 设置按钮: 固定在侧栏下方靠左 (折叠时仅图标居中) */}
+      {/* 底部区: 展开时左侧显示版本号(点击进帮助), 右侧设置图标; 折叠时仅设置图标居中 */}
       <div style={ {
         flexShrink: 0,
         background: '#001529',
         borderTop: '1px solid rgba(255,255,255,0.12)',
         padding: '6px 8px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: collapsed ? 'center' : 'space-between',
+        gap: 8,
       } }>
+        { !collapsed && (
+          <div
+            title={ `Magic Tools v${getVersion()} · 点击进入帮助页面` }
+            onClick={ () => { setApp('Help'); navigate('Help', { replace: true }); } }
+            style={ {
+              cursor: 'pointer',
+              lineHeight: 1.35,
+              fontSize: 12,
+              color: 'rgba(255,255,255,0.65)',
+              userSelect: 'none',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+            } }
+          >
+            <div>Magic Tools</div>
+            <div style={ { color: 'rgba(255,255,255,0.45)', fontSize: 11 } }>v{ getVersion() }</div>
+          </div>
+        ) }
         <Button
-            title = { "设置" }
+            title={ "设置" }
             type="text"
             icon={ <SettingOutlined /> }
             onClick={ () => { setApp('Setting'); navigate('Setting', { replace: true }); } }
@@ -77,16 +100,13 @@ const MainSider: React.FC = () => {
               color: 'rgba(255,255,255,0.85)',
               fontSize: '15px',
               height: 34,
-              width: collapsed ? '100%' : 'auto',
+              width: collapsed ? '100%' : 34,
+              padding: 0,
               display: 'inline-flex',
               alignItems: 'center',
-              justifyContent: collapsed ? 'center' : 'flex-start',
-              gap: 8,
-              padding: collapsed ? 0 : '0 12px',
+              justifyContent: 'center',
             } }
-        >
-          { !collapsed && <span style={ { fontSize: 13 } }>设置</span> }
-        </Button>
+        />
       </div>
     </div>
   </Sider>

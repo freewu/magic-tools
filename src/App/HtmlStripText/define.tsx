@@ -1,6 +1,6 @@
 const AppName = 'HTML 标签去除';
 const Icon = '';
-const Type = 'misc';
+const Type = 'webmaster';
 
 export {
   AppName,

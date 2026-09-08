@@ -134,7 +134,9 @@ const Time = () => {
 
       <Divider dashed />
 
-      <Form name="basic" labelCol={{ span: 4 }}autoComplete="off">
+      {/* 结果分两排展示: 两列网格 (每列内部保持表单 label+输入行式布局) */}
+      <Form name="basic" labelCol={{ span: 9 }} autoComplete="off">
+        <div style={ { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', columnGap: 16 } }>
         <Form.Item label="时间戳(10位)">
           <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.ts10 } />
         </Form.Item>
@@ -200,6 +202,7 @@ const Time = () => {
         <Form.Item label="简化儒略日 (MJD)">
           <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.mjd }/>
         </Form.Item>
+        </div>
       </Form>
 
     </div>

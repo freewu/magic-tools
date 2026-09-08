@@ -1,33 +1,21 @@
 import { Input } from "antd";
 const { TextArea } = Input;
+import { saveTextFile } from "../../lib/tauri";
 import { ConvertResult } from "./interface";
 
 export const ConfigResult = ({ data, click, type } :ConfigResultProps ) => {
 
-  // 保存成配置文件
-  const saveConfigFile = (e :React.MouseEvent<HTMLTextAreaElement>) => {
-    /**
-      0	规定鼠标左键。
-      1	规定鼠标中键。
-      2	规定鼠标右键。
-
-      //IE 参数不同：
-      1	规定鼠标左键。
-      4	规定鼠标中键。
-      2	规定鼠标右键。
-     */
-    // 判断是否是右键按下 
+  // 保存成配置文件 (右键结果框) -> 统一走系统保存框/浏览器下载
+  const saveConfigFile = async (e :React.MouseEvent<HTMLTextAreaElement>) => {
+    // 0/1/2: 左/中/右 (IE 键位编码不同), 仅响应右键
     if(e.button !== 2) return ;
     const txt = (e.target as HTMLInputElement).value.trim();
-    if(txt !== '') {
-      const blob = new Blob([data.data], {type: 'application/' + type})
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.download = 'config.' + type; // 下载文件名
-      a.href = url;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+    if(txt !== '' && !data.error) {
+      const ok = await saveTextFile('config.' + type, data.data, '保存配置文件', {
+        filterName: `${type.toUpperCase()} 配置文件`,
+        extensions: [type],
+      });
+      if (!ok) return;
     }
   };
 

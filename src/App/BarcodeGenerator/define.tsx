@@ -1,6 +1,6 @@
 const AppName = '条形码生成';
 const Icon = '';
-const Type = 'misc';
+const Type = 'image';
 
 export {
   AppName,

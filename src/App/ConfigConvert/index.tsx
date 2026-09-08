@@ -2,11 +2,12 @@ import { Radio, Divider, Button,Input, Space, message, Tabs } from "antd";
 import { useRef, useState } from "react";
 import type { RadioChangeEvent } from 'antd';
 const { TextArea } = Input;
-import { UploadOutlined } from '@ant-design/icons';
+import { UploadOutlined, DownloadOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "../../lib"
 import { typeList } from "./data";
 import type { InputStatus } from "antd/es/_util/statusUtils";
 import { getDefaultInputFormat, getDefaultOutputFormat, guessFormat } from "./lib";
+import { saveTextFile } from "../../lib/tauri";
 import { ConfigResult } from "./config-result"
 import { json2ini, ini2json } from "./lib";
 import { json2yaml, yaml2json } from "./lib";
@@ -122,6 +123,20 @@ const ConfigConvert = () => {
     }
   });
 
+  // 当前输出 tab 的内容 (供保存按钮使用)
+  const activeData = convert(outputFormat);
+  const canSave = activeData.data.trim() !== '' && !activeData.error;
+
+  // 把当前格式的转换结果保存为对应扩展名的文件 (桌面弹系统保存框 / 浏览器下载)
+  const saveCurrent = async () => {
+    const label = typeList.find((t) => t.value === outputFormat)?.label ?? outputFormat;
+    const ok = await saveTextFile(`config.${outputFormat}`, activeData.data, '保存配置文件', {
+      filterName: `${label} 配置文件`,
+      extensions: [outputFormat],
+    });
+    if (ok) notice.success(`已保存 config.${outputFormat} 文件`);
+  };
+
   return (
     <div>
       {contextHolder}
@@ -163,6 +178,16 @@ const ConfigConvert = () => {
       />
 
       <Divider dashed plain> 转换结果 </Divider>
+
+      {/* 保存按钮: 直接保存当前输出格式的结果 */}
+      <div style={ { display: 'flex', justifyContent: 'flex-end', margin: '0 0 4px 0' } }>
+        <Button
+          icon={ <DownloadOutlined /> }
+          disabled={ !canSave }
+          onClick={ () => { void saveCurrent(); } }
+          title={ canSave ? `将当前结果保存为 config.${outputFormat}` : '先输入内容生成转换结果' }
+        >保存为 .{outputFormat} 文件</Button>
+      </div>
 
       <Tabs activeKey={ outputFormat } items={ items } onChange={ (key: string) => { setOutputFormat(key) } } />
 

@@ -1,6 +1,6 @@
 const AppName = 'ASCII 图片';
 const Icon = '';
-const Type = 'misc';
+const Type = 'image';
 
 export {
   AppName,

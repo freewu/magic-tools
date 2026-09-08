@@ -8,7 +8,8 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   root: 'src',
   base: './',
-  publicDir: false,
+  // 静态资源目录 (src/public): 存放 favicon 等无需打包处理、原样拷入产物的文件
+  publicDir: 'public',
   plugins: [react()],
   server: {
     port: 1212,

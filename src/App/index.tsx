@@ -1,5 +1,5 @@
 // 分类图标: 侧边栏(尤其折叠时)展示用
-import { SwapOutlined, CodeOutlined, LockOutlined, CalculatorOutlined, GlobalOutlined, EllipsisOutlined, FormatPainterOutlined } from '@ant-design/icons';
+import { SwapOutlined, CodeOutlined, LockOutlined, CalculatorOutlined, GlobalOutlined, EllipsisOutlined, FormatPainterOutlined, PictureOutlined } from '@ant-design/icons';
 import { Badge } from 'antd';
 import type { ReactNode } from 'react';
 
@@ -153,6 +153,7 @@ export const genMenuList = (appList :Array<AppItem>) => {
     ["crypto", { key: 'crypto',  label: '加解密',  name: '加解密',  icon: <LockOutlined />, children: new Array<AppItem>() }],
     ["value-calc", { key: 'value-calc',  label: '值计算',  name: '值计算',  icon: <CalculatorOutlined />, children: new Array<AppItem>() }],
     ["formatter", { key: 'formatter',  label: '格式化',  name: '格式化',  icon: <FormatPainterOutlined />, children: new Array<AppItem>() }],
+    ["image", { key: 'image',  label: '图片',  name: '图片',  icon: <PictureOutlined />, children: new Array<AppItem>() }],
     ["webmaster", { key: 'webmaster',  label: '站长工具',  name: '站长工具',  icon: <GlobalOutlined />, children: [] as AppItem[] }],
     ["misc", { key: 'misc',  label: '其它',  name: '其它',  icon: <EllipsisOutlined />, children: [] as AppItem[] }],
   ]);

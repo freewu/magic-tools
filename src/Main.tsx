@@ -7,10 +7,16 @@ import { default as MainSider } from './layout/main-sider';
 import { default as MainContent } from './layout/main-content';
 import { default as UpdateChecker } from './layout/update-checker';
 import { listenOpenPage } from "./lib/tauri";
+import { getVersion } from './version';
 
 const Main :React.FC = () => {
 
   const navigate = useNavigate();
+
+  // 页面标题带当前版本号 (与 package.json 同步, 免手工维护)
+  useEffect(() => {
+    document.title = `Magic Tools v${getVersion()}`;
+  }, []);
 
   // 托盘菜单「设置 / 帮助 / 应用列表」-> 前端页面跳转
   useEffect(() => {
