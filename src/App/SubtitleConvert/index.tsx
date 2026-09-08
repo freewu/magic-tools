@@ -98,8 +98,13 @@ const SubtitleConvert :React.FC = () => {
     const a = document.createElement('a');
     a.href = url;
     a.download = `${base}.${meta.ext}`;
+    // 先挂到文档再触发、延时回收 Blob URL: 部分环境 (如桌面 WebView) 要求 a 在文档中且
+    // URL 稍晚释放, 否则会出现“点击下载无反应/不弹保存框”的现象
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    message.success(`已下载 ${a.download}`);
   };
 
   const totalMs = (cues ?? []).reduce((s, c) => s + Math.max(0, (c.end ?? 0) - (c.start ?? 0)), 0);
