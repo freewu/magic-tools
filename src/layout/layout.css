@@ -129,3 +129,19 @@ select {
   scrollbar-width: thin;
   scrollbar-color: rgba(128, 128, 128, 0.5) transparent;
 }
+/* ---- 侧栏底部版本号: 有新版本时的呼吸角标 ---- */
+.update-badge-dot {
+  box-shadow: 0 0 0 0 rgba(255, 77, 79, 0.7);
+  animation: update-badge-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes update-badge-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 77, 79, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(255, 77, 79, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 77, 79, 0);
+  }
+}

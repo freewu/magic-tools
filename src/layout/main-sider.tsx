@@ -6,12 +6,15 @@ const { Sider, Content } = Layout;
 import { useNavigate } from "react-router-dom"
 import { appList, genMenuList } from "../App";
 import { getSiderFlag } from "../lib/setting";
+import { openUrl } from "../lib/tauri";
+import { useUpdate } from "./update-context";
 import { getVersion } from "../version";
 import "./layout.css";
 
 const MainSider: React.FC = () => {
 
   const { app, setApp } = useContext(AppContext)!
+  const { hasUpdate, latest, dismiss } = useUpdate();
   const [ collapsed, setCollapsed ] = useState(!getSiderFlag());
   const navigate = useNavigate();
 
@@ -62,7 +65,7 @@ const MainSider: React.FC = () => {
         />
       </div>
 
-      {/* 底部区: 展开时左侧显示版本号(点击进帮助), 右侧设置图标; 折叠时仅设置图标居中 */}
+      {/* 底部区: 展开时左侧显示版本号 (有新版本时右上角呼吸角标, 点击进帮助; 角标点击直达更新页), 右侧设置图标; 折叠时仅设置图标居中 */}
       <div style={ {
         flexShrink: 0,
         background: '#001529',
@@ -75,20 +78,41 @@ const MainSider: React.FC = () => {
       } }>
         { !collapsed && (
           <div
-            title={ `Magic Tools v${getVersion()} · 点击进入帮助页面` }
+            title={ hasUpdate ? `发现新版本 v${latest?.version}, 点击角标查看更新` : `Magic Tools v${getVersion()} · 点击进入帮助页面` }
             onClick={ () => { setApp('Help'); navigate('Help', { replace: true }); } }
             style={ {
               cursor: 'pointer',
-              lineHeight: 1.35,
+              position: 'relative',
+              lineHeight: 1,
+              padding: '6px 0',
               fontSize: 12,
               color: 'rgba(255,255,255,0.65)',
               userSelect: 'none',
               whiteSpace: 'nowrap',
-              overflow: 'hidden',
             } }
           >
-            <div>Magic Tools</div>
-            <div style={ { color: 'rgba(255,255,255,0.45)', fontSize: 11 } }>v{ getVersion() }</div>
+            v{ getVersion() }
+            { hasUpdate && (
+              <span
+                title={ `有新版 v${latest?.version} 可用, 点击查看更新内容并下载` }
+                onClick={ (e) => {
+                  e.stopPropagation();
+                  if (latest) void openUrl(latest.url);
+                  dismiss();
+                } }
+                className="update-badge-dot"
+                style={ {
+                  position: 'absolute',
+                  top: 2,
+                  right: -8,
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  background: '#ff4d4f',
+                  cursor: 'pointer',
+                } }
+              />
+            ) }
           </div>
         ) }
         <Button

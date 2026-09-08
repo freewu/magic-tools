@@ -17,7 +17,6 @@ const ColorConvert = () => {
   const [ notice, contextHolder] = message.useMessage();
   const [ colorPickerHex, setColorPickerHex ] = useState<Color | string>('#1677ff'); // colorPicker 默认颜色
   const [ showPercent, setShowPercent ] = useState(false); // 是否显示 % 
-  const [ schemeKey, setSchemeKey ] = useState('analogous'); // 配色方案当前激活的 tab
 
   const inputStyle = { cursor: "pointer" };
 
@@ -122,16 +121,15 @@ const ColorConvert = () => {
   };
 
   const copyHex = (hex :string) => {
-    const txt = fmtText(hex);
-    copyTextToClipboard(txt);
-    notice.success(txt + ' 已复制');
+    copyTextToClipboard(hex);
+    notice.success(upperLowerTranslate(hex) + ' 已复制');
   };
 
   const offsetText = (o :number) => o === 0 ? '主色' : ((o > 0 ? '+' : '') + o + '°');
 
-  return (
-    <div>
-      {contextHolder}
+  // 格式页: 输入与结果区 (结果行包含全部格式, 首行"颜色"大色卡跟随所选输入格式)
+  const formatPane = (
+    <>
       <Space>
         <Radio.Group 
           optionType = "button" buttonStyle="solid"
@@ -210,51 +208,62 @@ const ColorConvert = () => {
           </Form>
         </Col>
       </Row>
+    </>
+  );
 
-      <Divider dashed>配色方案</Divider>
-      <div style={ { marginBottom: 8 } }>
+  // 配色方案页: 7 组方案平铺展示, 色块以 HEX 文本呈现 (简洁可读, 不随输入格式变成长文本)
+  const schemePane = (
+    <>
+      <div style={ { marginBottom: 12 } }>
         <span style={ { fontSize: 12, color: '#999' } }>
-          基于主色 { colorData.hex ? <b>{ fmtText(colorData.hex) }</b> : '…' } 的色相旋转生成, 点击色块复制 (格式跟随输入 { colorType }); 若主色为灰色 (无彩色) 各方案颜色相同属正常现象
+          基于主色 { colorData.hex ? <b>{ upperLowerTranslate(colorData.hex) }</b> : '…' } 的色相旋转生成, 点击色块复制 HEX;
+          若主色为灰色 (无彩色) 各方案颜色相同属正常现象
         </span>
       </div>
       { schemes.length === 0 ? (
-        <div style={ { fontSize: 13, color: '#999' } }>输入有效颜色后展示相似 / 分离 / 三角 / 四角 / 方形 / 复合 / 双分离配色</div>
+        <div style={ { fontSize: 13, color: '#999' } }>在「格式」页输入有效颜色后, 自动生成相似 / 分离 / 三角 / 四角 / 方形 / 复合 / 双分离配色</div>
       ) : (
-        <Tabs
-          size="small"
-          activeKey={ schemes.some((s) => s.key === schemeKey) ? schemeKey : schemes[0].key }
-          onChange={ (k :string) => setSchemeKey(k) }
-          items={ schemes.map((s) => ({
-            key: s.key,
-            label: s.label,
-            children: (
-              <div>
-                <div style={ { marginBottom: 8, fontSize: 12, color: '#999' } }>{ s.desc }</div>
-                <div style={ { display: 'flex', gap: 8, flexWrap: 'wrap' } }>
-                  { s.colors.map((c) => (
-                    <div
-                      key={ c.hex + c.offset }
-                      onClick={ () => copyHex(c.hex) }
-                      title={ fmtText(c.hex) + ' (点击复制)' }
-                      style={ {
-                        flex: 1, minWidth: 96, height: 64, borderRadius: 6, background: c.hex,
-                        cursor: 'pointer', padding: '6px 8px', boxSizing: 'border-box',
-                        display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-                        color: schemeTextColor(c.hex), fontFamily: 'monospace', fontSize: 12,
-                        boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.06)',
-                      } }
-                    >
-                      <span>{ fmtText(c.hex) }{ c.isMain ? ' (主)' : (c.isComplement ? ' (补)' : '') }</span>
-                      <span>{ offsetText(c.offset) }</span>
-                    </div>
-                  )) }
-                </div>
+        <div style={ { display: 'flex', flexDirection: 'column', gap: 18 } }>
+          { schemes.map((s) => (
+            <div key={ s.key }>
+              <div style={ { fontWeight: 600, fontSize: 13, marginBottom: 2 } }>{ s.label }</div>
+              <div style={ { marginBottom: 8, fontSize: 12, color: '#999' } }>{ s.desc }</div>
+              <div style={ { display: 'flex', gap: 8, flexWrap: 'wrap' } }>
+                { s.colors.map((c) => (
+                  <div
+                    key={ c.hex + c.offset }
+                    onClick={ () => copyHex(c.hex) }
+                    title={ upperLowerTranslate(c.hex) + (c.isMain ? ' (主色)' : c.isComplement ? ' (互补)' : '') + ' · 点击复制 HEX' }
+                    style={ {
+                      flex: 1, minWidth: 96, height: 64, borderRadius: 6, background: c.hex,
+                      cursor: 'pointer', padding: '6px 8px', boxSizing: 'border-box',
+                      display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                      color: schemeTextColor(c.hex), fontFamily: 'monospace', fontSize: 12,
+                      boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.06)',
+                    } }
+                  >
+                    <span>{ upperLowerTranslate(c.hex) }{ c.isMain ? ' (主)' : (c.isComplement ? ' (补)' : '') }</span>
+                    <span>{ offsetText(c.offset) }</span>
+                  </div>
+                )) }
               </div>
-            ),
-          })) }
-        />
+            </div>
+          )) }
+        </div>
       ) }
+    </>
+  );
 
+  return (
+    <div>
+      {contextHolder}
+      <Tabs
+        defaultActiveKey="format"
+        items={ [
+          { key: 'format', label: '格式', children: formatPane },
+          { key: 'scheme', label: '配色方案', children: schemePane },
+        ] }
+      />
     </div>
   );
 }

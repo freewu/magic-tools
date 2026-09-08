@@ -4,6 +4,7 @@ import { SettingCrypto } from "./setting-crypto"
 import { SettingValueCalc } from "./setting-value-calc"
 import { SettingConvert } from "./setting-convert"
 import { SettingCodec } from "./setting-codec"
+import { SettingImage } from "./setting-image"
 import { SettingMisc } from "./setting-misc"
 import { SettingWebmaster } from "./setting-webmaster"
 import { SettingFormatter } from "./setting-formatter"
@@ -38,6 +39,11 @@ export const itemList = [
     key : 'formatter',
     label : '格式化',
     children: <SettingFormatter />
+  },
+  {
+    key : 'image',
+    label : '图片',
+    children: <SettingImage />
   },
   {
     key : 'webmaster',

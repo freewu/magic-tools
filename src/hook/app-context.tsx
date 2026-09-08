@@ -51,7 +51,7 @@ const routeKeyOf = (pathname :string) => {
 }
 
 // ContextProvide组件
-export const AppContextProvider: React.FC<{ children: React.ReactNode[] }> = (props) => {
+export const AppContextProvider: React.FC<{ children: React.ReactNode }> = (props) => {
 
     const location = useLocation();
     const navigate = useNavigate();

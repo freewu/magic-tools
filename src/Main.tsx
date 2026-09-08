@@ -5,7 +5,7 @@ import { ThemeProvider } from "./hook/theme-context"
 import { AppContextProvider } from "./hook/app-context"
 import { default as MainSider } from './layout/main-sider';
 import { default as MainContent } from './layout/main-content';
-import { default as UpdateChecker } from './layout/update-checker';
+import { UpdateProvider } from './layout/update-context';
 import { listenOpenPage } from "./lib/tauri";
 import { getVersion } from './version';
 
@@ -46,12 +46,12 @@ const Main :React.FC = () => {
   return (
     <ThemeProvider>
       <AppContextProvider>
-        <></>
-        <Layout style={ { height: '100vh' } }>
-          <MainSider />
-          <MainContent />
-        </Layout>
-        <UpdateChecker />
+        <UpdateProvider>
+          <Layout style={ { height: '100vh' } }>
+            <MainSider />
+            <MainContent />
+          </Layout>
+        </UpdateProvider>
       </AppContextProvider>
     </ThemeProvider>
   );
