@@ -39,11 +39,11 @@ describe('代码截图 - 常用语言', () => {
 });
 
 describe('代码截图 - 设置默认值与持久化', () => {
-  test('需求默认: vim / 深色 / padding 24 / javascript / 显示行号', () => {
+  test('需求默认: vim / 深色 / padding 40 / javascript / 显示行号', () => {
     localStorage.clear();
     expect(getDefaultEditor()).toBe('vim');
     expect(getDefaultAppearance()).toBe('dark');
-    expect(getDefaultPadding()).toBe(24);
+    expect(getDefaultPadding()).toBe(40);
     expect(getDefaultLang()).toBe('javascript');
     expect(getDefaultShowLines()).toBe(true);
   });
@@ -61,14 +61,14 @@ describe('代码截图 - 设置默认值与持久化', () => {
   test('padding 越界被钳制', () => {
     localStorage.clear();
     setDefaultPadding(999);
-    expect(getDefaultPadding()).toBe(72);
+    expect(getDefaultPadding()).toBe(96);
     setDefaultPadding(-5);
     expect(getDefaultPadding()).toBe(0);
   });
   test('非法持久化值回落默认', () => {
     localStorage.clear();
     localStorage.setItem('code-shot.default-padding', 'abc');
-    expect(getDefaultPadding()).toBe(24);
+    expect(getDefaultPadding()).toBe(40);
     localStorage.setItem('code-shot.default-editor', 'nope');
     expect(getDefaultEditor()).toBe('vim');
   });

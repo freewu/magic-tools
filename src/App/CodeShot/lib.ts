@@ -129,11 +129,11 @@ export const getDefaultAppearance = (): Appearance => get(KEYS.appearance, 'dark
 export const setDefaultAppearance = (v: Appearance): void => set(KEYS.appearance, v);
 
 export const PADDING_MIN = 0;
-export const PADDING_MAX = 72;
+export const PADDING_MAX = 96;
 
 export function getDefaultPadding(): number {
-  const v = Number(get(KEYS.padding, '24'));
-  if (Number.isNaN(v)) return 24;
+  const v = Number(get(KEYS.padding, '40'));
+  if (Number.isNaN(v)) return 40;
   return Math.max(PADDING_MIN, Math.min(PADDING_MAX, Math.round(v)));
 }
 export function setDefaultPadding(v: number): void {
