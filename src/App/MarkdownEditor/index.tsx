@@ -1,5 +1,5 @@
 import { Alert, Button, Card, Input, Segmented, Space, Tooltip, Typography, message } from 'antd';
-import { CopyOutlined, DownloadOutlined } from '@ant-design/icons';
+import { CopyOutlined, DownloadOutlined, EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { useMemo, useRef, useState } from 'react';
 import { renderMarkdown, wrapExportHtml, MD_EXPORT_CSS } from './lib';
 
@@ -96,6 +96,7 @@ const download = (text: string, filename: string) => {
 const MarkdownEditor: React.FC = () => {
   const [md, setMd] = useState(SAMPLE);
   const [view, setView] = useState<'preview' | 'html'>('preview');
+  const [showPreview, setShowPreview] = useState(true); // 是否显示右侧预览/HTML 面板
   const taRef = useRef<{ textArea: HTMLTextAreaElement }>(null);
 
   const html = useMemo(() => renderMarkdown(md), [md]);
@@ -167,7 +168,18 @@ const MarkdownEditor: React.FC = () => {
           size="small"
           title="Markdown 源码"
           style={{ flex: '1 1 360px', minWidth: 300 }}
-          extra={<Text type="secondary" style={{ fontSize: 12 }}>{statLines} 行 / {statChars} 字符</Text>}
+          extra={
+            <Space size={8}>
+              <Tooltip title={showPreview ? '收起右侧预览, 专注编辑' : '恢复右侧预览面板'}>
+                <Button
+                  size="small"
+                  icon={showPreview ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                  onClick={() => setShowPreview(!showPreview)}
+                >{showPreview ? '隐藏预览' : '显示预览'}</Button>
+              </Tooltip>
+              <Text type="secondary" style={{ fontSize: 12 }}>{statLines} 行 / {statChars} 字符</Text>
+            </Space>
+          }
         >
           <Input.TextArea
             ref={taRef as never}
@@ -178,38 +190,40 @@ const MarkdownEditor: React.FC = () => {
             placeholder="在此输入 Markdown…"
           />
         </Card>
-        <Card
-          size="small"
-          title="预览"
-          style={{ flex: '1 1 380px', minWidth: 300 }}
-          extra={
-            <Space size={8}>
-              <Segmented
-                size="small"
-                value={view}
-                onChange={(v) => setView(v as typeof view)}
-                options={[{ label: '预览', value: 'preview' }, { label: 'HTML 源码', value: 'html' }]}
+        {showPreview && (
+          <Card
+            size="small"
+            title="预览"
+            style={{ flex: '1 1 380px', minWidth: 300 }}
+            extra={
+              <Space size={8}>
+                <Segmented
+                  size="small"
+                  value={view}
+                  onChange={(v) => setView(v as typeof view)}
+                  options={[{ label: '预览', value: 'preview' }, { label: 'HTML 源码', value: 'html' }]}
+                />
+                <Button size="small" icon={<CopyOutlined />} onClick={() => copyText(view === 'preview' ? html : md, '已复制预览 HTML')}>复制{view === 'preview' ? ' HTML' : ' 源文件'}</Button>
+                <Button size="small" icon={<DownloadOutlined />} onClick={() => download(md, 'markdown.md')}>.md</Button>
+                <Button size="small" type="primary" icon={<DownloadOutlined />} onClick={() => download(wrapExportHtml(html, 'Markdown 预览'), 'markdown.html')}>导出 HTML</Button>
+              </Space>
+            }
+          >
+            {view === 'preview' ? (
+              <div style={{ maxHeight: 520, overflow: 'auto' }}>
+                <style>{MD_EXPORT_CSS}</style>
+                <div className="md-preview" dangerouslySetInnerHTML={{ __html: html || '<p style="color:#999">(空内容)</p>' }} />
+              </div>
+            ) : (
+              <Input.TextArea
+                value={html}
+                readOnly
+                autoSize={false}
+                style={{ minHeight: 460, fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 12, lineHeight: 1.6, resize: 'vertical' }}
               />
-              <Button size="small" icon={<CopyOutlined />} onClick={() => copyText(view === 'preview' ? html : md, '已复制预览 HTML')}>复制{view === 'preview' ? ' HTML' : ' 源文件'}</Button>
-              <Button size="small" icon={<DownloadOutlined />} onClick={() => download(md, 'markdown.md')}>.md</Button>
-              <Button size="small" type="primary" icon={<DownloadOutlined />} onClick={() => download(wrapExportHtml(html, 'Markdown 预览'), 'markdown.html')}>导出 HTML</Button>
-            </Space>
-          }
-        >
-          {view === 'preview' ? (
-            <div style={{ maxHeight: 520, overflow: 'auto' }}>
-              <style>{MD_EXPORT_CSS}</style>
-              <div className="md-preview" dangerouslySetInnerHTML={{ __html: html || '<p style="color:#999">(空内容)</p>' }} />
-            </div>
-          ) : (
-            <Input.TextArea
-              value={html}
-              readOnly
-              autoSize={false}
-              style={{ minHeight: 460, fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 12, lineHeight: 1.6, resize: 'vertical' }}
-            />
-          )}
-        </Card>
+            )}
+          </Card>
+        )}
       </div>
     </Space>
   );
