@@ -78,7 +78,6 @@ const MainSider: React.FC = () => {
       } }>
         { !collapsed && (
           <div
-            title={ hasUpdate ? `发现新版本 v${latest?.version}, 点击角标查看更新` : `Magic Tools v${getVersion()} · 点击进入帮助页面` }
             onClick={ () => { setApp('Help'); navigate('Help', { replace: true }); } }
             style={ {
               cursor: 'pointer',

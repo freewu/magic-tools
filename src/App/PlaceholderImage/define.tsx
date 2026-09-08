@@ -1,6 +1,6 @@
 const AppName = '占位图片';
 const Icon = '';
-const Type = 'webmaster';
+const Type = 'image';
 
 export {
   AppName,
