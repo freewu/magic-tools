@@ -1,5 +1,6 @@
 // 帮助页面
 import { Layout,Card, Avatar, Space,Row, Col,Timeline } from 'antd';
+import { GithubOutlined, BugOutlined } from '@ant-design/icons';
 import { compomentList, developerList, eventList } from "./data"
 import "./help.css";
 
@@ -32,6 +33,16 @@ const Help = () => {
               );
             })
           }
+          </Card>
+          <Card title="项目" className='help-card'>
+            <p>
+              <GithubOutlined style={ { marginRight: 6 } } />
+              <a target="_blank" href="https://github.com/freewu/magic-tools">https://github.com/freewu/magic-tools</a>
+            </p>
+            <p>
+              <BugOutlined style={ { marginRight: 6 } } />
+              <a target="_blank" href="https://github.com/freewu/magic-tools/issues/new">提交 Issue / 功能建议</a>
+            </p>
           </Card>
         </Col>
         <Col span={ 16 }>
