@@ -1,7 +1,7 @@
 import { Alert, Button, Card, Checkbox, Input, Space, Tag, Typography, message } from 'antd';
 import { CopyOutlined, DownloadOutlined, LinkOutlined } from '@ant-design/icons';
-import { useMemo, useRef, useState } from 'react';
-import { extractUrls, urlsToText } from './lib';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { extractUrls, urlsToText, getUrlDedupeDefault, setUrlDedupeDefault, URL_DEDUPE_CHANGED } from './lib';
 
 const { Text, Paragraph } = Typography;
 
@@ -16,8 +16,15 @@ ftp 老地址: ftp://files.example.com/pub/readme.txt`;
 
 const UrlExtract: React.FC = () => {
   const [raw, setRaw] = useState('');
-  const [dedupe, setDedupe] = useState(true);
+  const [dedupe, setDedupe] = useState<boolean>(() => getUrlDedupeDefault()); // 默认取设置 (默认开启)
   const [httpOnly, setHttpOnly] = useState(false);
+
+  // 设置页修改默认值后, 已打开的工具页即时同步勾选状态
+  useEffect(() => {
+    const onChanged = () => setDedupe(getUrlDedupeDefault());
+    window.addEventListener(URL_DEDUPE_CHANGED, onChanged);
+    return () => window.removeEventListener(URL_DEDUPE_CHANGED, onChanged);
+  }, []);
 
   const urls = useMemo(() => extractUrls(raw, { dedupe, httpOnly }), [raw, dedupe, httpOnly]);
   const resultText = useMemo(() => urlsToText(urls), [urls]);
@@ -51,7 +58,7 @@ const UrlExtract: React.FC = () => {
         type="info"
         showIcon
         message="URL 提取"
-        description="从任意文本（日志、邮件、页面源码…）中批量提取链接。自动清理行尾句读标点与不成对括号，勾选「去重」可去掉重复 URL（按出现顺序保留首个）。"
+        description="从任意文本（日志、邮件、页面源码…）中批量提取链接。自动清理行尾句读标点与不成对括号；「去重」默认开启，可在 设置 → 站长工具 中调整默认值。"
       />
       <Card size="small" title={<Space><LinkOutlined /> 原始文本</Space>} extra={
         <Space size={8}>
@@ -68,7 +75,14 @@ const UrlExtract: React.FC = () => {
             style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 13 }}
           />
           <Space size={16} wrap>
-            <Checkbox checked={dedupe} onChange={(e) => setDedupe(e.target.checked)}>去重</Checkbox>
+            <Checkbox
+              checked={dedupe}
+              onChange={(e) => {
+                const v = e.target.checked;
+                setDedupe(v);
+                setUrlDedupeDefault(v); // 工具页内切换同时写入默认设置
+              }}
+            >去重</Checkbox>
             <Checkbox checked={httpOnly} onChange={(e) => setHttpOnly(e.target.checked)}>仅 http/https</Checkbox>
             {raw && <Text type="secondary" style={{ fontSize: 12 }}>原文 {raw.length.toLocaleString()} 字符, 检出 {rawCount.toLocaleString()} 条 (去重前)</Text>}
           </Space>

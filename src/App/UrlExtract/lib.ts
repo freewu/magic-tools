@@ -76,3 +76,34 @@ export function dedupeByOrigin(urls: string[]): string[] {
   }
   return out;
 }
+
+// ---------- 设置: 结果去重默认值 (设置-站长工具 可调整, 默认开启) ----------
+const DEDUPE_STORAGE_KEY = 'url-extract-dedupe';
+
+/** 设置页改动后广播, 已打开的工具页监听后即时刷新默认值 */
+export const URL_DEDUPE_CHANGED = 'url-extract-dedupe-changed';
+
+/** 读取「去重」默认值 (默认 true; localStorage 不可用/数据损坏时回退默认) */
+export const getUrlDedupeDefault = (): boolean => {
+  try {
+    const raw = localStorage.getItem(DEDUPE_STORAGE_KEY);
+    if (raw === null) return true;
+    return raw !== '0';
+  } catch (e) {
+    return true;
+  }
+};
+
+/** 保存「去重」默认值并通知已打开的工具页 */
+export const setUrlDedupeDefault = (v: boolean): void => {
+  try {
+    localStorage.setItem(DEDUPE_STORAGE_KEY, v ? '1' : '0');
+  } catch (e) {
+    /* ignore */
+  }
+  try {
+    window.dispatchEvent(new Event(URL_DEDUPE_CHANGED));
+  } catch (e) {
+    /* ignore */
+  }
+};

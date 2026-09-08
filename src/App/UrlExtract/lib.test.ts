@@ -1,4 +1,4 @@
-import { extractUrls, urlsToText, dedupeByOrigin } from './lib';
+import { extractUrls, urlsToText, dedupeByOrigin, getUrlDedupeDefault, setUrlDedupeDefault } from './lib';
 
 const TXT = `官网地址: https://www.example.com 与文档 https://docs.example.com/api
 邮件里附带了 https://en.wikipedia.org/wiki/JSON_(file_format) 这个链接。
@@ -44,5 +44,32 @@ describe('URL 提取', () => {
     expect(urlsToText(['https://a.com', 'https://b.com'])).toBe('https://a.com\nhttps://b.com');
     const deduped = dedupeByOrigin(['https://www.example.com', 'https://www.example.com/a', 'https://docs.example.com']);
     expect(deduped).toEqual(['https://www.example.com', 'https://docs.example.com']);
+  });
+});
+
+describe('URL 提取 - 去重默认设置 (localStorage)', () => {
+  const KEY = 'url-extract-dedupe';
+  beforeEach(() => {
+    try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ }
+  });
+  test('未设置过时默认开启', () => {
+    expect(getUrlDedupeDefault()).toBe(true);
+  });
+  test('写入后读取往返一致', () => {
+    setUrlDedupeDefault(false);
+    expect(getUrlDedupeDefault()).toBe(false);
+    expect(localStorage.getItem(KEY)).toBe('0');
+    setUrlDedupeDefault(true);
+    expect(getUrlDedupeDefault()).toBe(true);
+    expect(localStorage.getItem(KEY)).toBe('1');
+  });
+  test('localStorage 数据损坏/异常时回退默认开启', () => {
+    try {
+      localStorage.setItem(KEY, '{broken');
+      expect(getUrlDedupeDefault()).toBe(true);
+    } catch (e) {
+      // jsdom 无 localStorage 时直接断言兜底行为
+      expect(getUrlDedupeDefault()).toBe(true);
+    }
   });
 });

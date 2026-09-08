@@ -5,6 +5,7 @@ import { SettingValueCalc } from "./setting-value-calc"
 import { SettingConvert } from "./setting-convert"
 import { SettingCodec } from "./setting-codec"
 import { SettingImage } from "./setting-image"
+import { SettingWebmaster } from "./setting-webmaster"
 import { SettingMisc } from "./setting-misc"
 import { SettingFormatter } from "./setting-formatter"
 
@@ -43,6 +44,11 @@ export const itemList = [
     key : 'image',
     label : '图片',
     children: <SettingImage />
+  },
+  {
+    key : 'webmaster',
+    label : '站长工具',
+    children: <SettingWebmaster />
   },
   {
     key : 'misc',
