@@ -8,6 +8,7 @@ import {
 } from './lib';
 import type { Appearance, EditorId } from './lib';
 import { useLocale } from "../../hook/locale-context";
+import { im } from '../image-lang';
 import { row as _r, rowT } from "../Setting/rows-lang";
 
 /** 代码截图默认值设置 (挂载到 设置 → 其它) */
@@ -37,7 +38,7 @@ export const CodeShotSetting: React.FC = () => {
         <Select style={{ width: 280 }} value={editor} onChange={(v) => { setEditor(v as EditorId); setDefaultEditor(v as EditorId); }} options={EDITORS} />
       </Form.Item>
       <Form.Item label={ st('默认外观') }>
-        <Select style={{ width: 280 }} value={appearance} onChange={(v) => { setAppearance(v as Appearance); setDefaultAppearance(v as Appearance); }} options={APPEARANCES} />
+        <Select style={{ width: 280 }} value={appearance} onChange={(v) => { setAppearance(v as Appearance); setDefaultAppearance(v as Appearance); }} options={APPEARANCES.map((a) => ({ ...a, label: im(locale, a.label) }))} />
       </Form.Item>
       <Form.Item label={ st('默认内边距') } extra={ rowT(locale, '当前 ${padding}px', { padding: padding }) }>
         <Slider
