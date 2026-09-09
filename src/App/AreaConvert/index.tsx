@@ -6,8 +6,16 @@ import { unitTypeList } from "./data"
 import type { RadioChangeEvent } from 'antd';
 import { getDefaultUnitType, getTypeList, getDefaultType, getTypePlaceholder } from "./lib"
 import { InputStatus } from "antd/es/_util/statusUtils";
+import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
+import arLang from "./lang";
 
 const AreaConvert = () => {
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(arLang, locale, key, fallback);
+  const getPlaceholder = (type :string) :string => {
+    return t('p_' + type.replace(/-/g,'_'), getTypePlaceholder(type) ?? '');
+  }
 
   const ut = getDefaultUnitType();
   const [ unitType, setUnitType ] = useState(ut); // 制式 
@@ -17,17 +25,17 @@ const AreaConvert = () => {
 
   const dt = getDefaultType(ut);
   const [ type, setType ] = useState(dt); // 转换类型
-  const [ placeholder, setPlaceholder ] = useState(getTypePlaceholder(dt)); // 数字类型的输入提示
+  const [ placeholder, setPlaceholder ] = useState(getPlaceholder(dt)); // 数字类型的输入提示
   const [ result, setResult ] = useState(0); // 转换的结果 统一转换成 
   const [ notice, contextHolder] = message.useMessage();
 
   const inputStyle = { cursor: "pointer" };
 
   // 切换类型
-  const onTypeChange = ({ target: { value : t } }: RadioChangeEvent) => {
-    setType(t);
-    setPlaceholder(getTypePlaceholder(t));
-    convert(value,t);
+  const onTypeChange = ({ target: { value : v } }: RadioChangeEvent) => {
+    setType(v);
+    setPlaceholder(getPlaceholder(v));
+    convert(value,v);
   };
 
   // 点击结果框,把结果复制到粘贴板
@@ -35,7 +43,7 @@ const AreaConvert = () => {
     const txt = (e.target as HTMLInputElement).value.trim();
     if(txt != "") {
       copyTextToClipboard(txt);
-      notice.success("复制到粘贴板成功！！！");
+      notice.success(t('copyOk', '复制到粘贴板成功！！！'));
     }
   };
 
@@ -110,21 +118,21 @@ const AreaConvert = () => {
             setTypeList(getTypeList(v));
             const dt = getDefaultType(v);
             setType(dt);
-            setPlaceholder(getTypePlaceholder(dt));
+            setPlaceholder(getPlaceholder(dt));
             convert(value,dt);
           } }
-          options={ unitTypeList }
+          options={ unitTypeList.map(i => ({ ...i, label: t('ut_' + i.value, i.label) })) }
         />
         <Radio.Group
           optionType = "button" buttonStyle="solid"
-          options = { typeList } 
+          options = { typeList.map(i => ({ ...i, label: t('u_' + i.value.replace(/-/g,'_'), i.label) })) } 
           onChange={ onTypeChange } 
           value={ type } 
         />
         <Button 
           onClick={ () => { setValue(''); setStatus(''); setResult(0); } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-        >清除</Button>
+        >{t('clear', '清除')}</Button>
       </Space>
 
       <TextArea
@@ -138,105 +146,105 @@ const AreaConvert = () => {
 
       <Row wrap>
         <Col span={6}>
-          <Divider dashed plain>公制</Divider>
+          <Divider dashed plain>{t('ut_ms', '公制')}</Divider>
           <Form name="basic1" labelCol={{ span: 8 }} autoComplete="off">
-            <Form.Item label="平方公里">
+            <Form.Item label={t('u_km2', '平方公里')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000000) } />
             </Form.Item>
-            <Form.Item label="公顷">
+            <Form.Item label={t('u_gq', '公顷')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 10000) } />
             </Form.Item>
-            <Form.Item label="公亩">
+            <Form.Item label={t('u_gm', '公亩')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 100) } />
             </Form.Item>
-            <Form.Item label="平方米">
+            <Form.Item label={t('u_m2', '平方米')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result) }/>
             </Form.Item>
-            <Form.Item label="平方分米">
+            <Form.Item label={t('u_dm2', '平方分米')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 100) } />
             </Form.Item>
-            <Form.Item label="平方厘米">
+            <Form.Item label={t('u_cm2', '平方厘米')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 10000 ) } />
             </Form.Item>
-            <Form.Item label="平方毫米">
+            <Form.Item label={t('u_mm2', '平方毫米')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000000 ) } />
             </Form.Item>
           </Form>
         </Col>
 
         <Col span={6}>
-          <Divider dashed plain>英制</Divider>
+          <Divider dashed plain>{t('ut_iu', '英制')}</Divider>
           <Form name="basic2" labelCol={{ span: 10 }} autoComplete="off" >
-            <Form.Item label="平方英里">
+            <Form.Item label={t('u_mile2', '平方英里')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 2590000) } />
             </Form.Item>
-            <Form.Item label="英亩">
+            <Form.Item label={t('u_ym', '英亩')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 4046.85642 ) } />
             </Form.Item>
-            <Form.Item label="路得">
+            <Form.Item label={t('u_ld', '路得')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1011.7136203 ) } />
             </Form.Item>
-            <Form.Item label="平方杆">
+            <Form.Item label={t('u_g', '平方杆')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 25.2928469 )  }/>
             </Form.Item>
-            <Form.Item label="平方码">
+            <Form.Item label={t('u_yard2', '平方码')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.83612736 )  }/>
             </Form.Item>
-            <Form.Item label="平方英尺">
+            <Form.Item label={t('u_foot2', '平方英尺')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.09290304 )  }/>
             </Form.Item>
-            <Form.Item label="平方英寸">
+            <Form.Item label={t('u_inch2', '平方英寸')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.00064516 )  }/>
             </Form.Item>
           </Form>
         </Col>
 
         <Col span={6}>
-          <Divider dashed plain>市制</Divider>
+          <Divider dashed plain>{t('ut_cn', '市制')}</Divider>
           <Form name="basic3" labelCol={{ span: 8 }} autoComplete="off">
-            <Form.Item label="顷">
+            <Form.Item label={t('u_qin', '顷')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 66666 ) } />
             </Form.Item>
-            <Form.Item label="亩">
+            <Form.Item label={t('u_mu', '亩')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 666.66 ) } />
             </Form.Item>
-            <Form.Item label="分">
+            <Form.Item label={t('u_fen', '分')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 66.666 ) } />
             </Form.Item>
-            <Form.Item label="厘">
+            <Form.Item label={t('u_li', '厘')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 6.6666 ) } />
             </Form.Item>
-            <Form.Item label="毫">
+            <Form.Item label={t('u_hao', '毫')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.66666 ) } />
             </Form.Item>
-            <Form.Item label="平方丈">
+            <Form.Item label={t('u_zhuang2', '平方丈')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 11.11 ) } />
             </Form.Item>
-            <Form.Item label="平方尺">
+            <Form.Item label={t('u_chi2', '平方尺')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.1111 ) } />
             </Form.Item>
-            <Form.Item label="平方寸">
+            <Form.Item label={t('u_cun2', '平方寸')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.001111 ) } />
             </Form.Item>
           </Form>
         </Col>
 
         <Col span={6}>
-          <Divider dashed plain>日式</Divider>
+          <Divider dashed plain>{t('ut_jp', '日式')}</Divider>
           <Form name="basic4" labelCol={{ span: 8 }} autoComplete="off" >
-            <Form.Item label="坪">
+            <Form.Item label={t('u_jp_ping', '坪')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 3.30578622) } />
             </Form.Item>
-            <Form.Item label="叠">
+            <Form.Item label={t('u_jp_die', '叠')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1.62) } />
             </Form.Item>
-            <Form.Item label="町">
+            <Form.Item label={t('u_jp_ding', '町')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.00991736 ) } />
             </Form.Item>
-            <Form.Item label="段">
+            <Form.Item label={t('u_jp_duan', '段')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.00099174 )  }/>
             </Form.Item>
-            <Form.Item label="亩">
+            <Form.Item label={t('u_jp_mu', '亩')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.00009917 )  }/>
             </Form.Item>
           </Form>

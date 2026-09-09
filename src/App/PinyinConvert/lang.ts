@@ -1,5 +1,30 @@
-// PinyinConvert 语言包: 名称 (zh-CN = define.tsx AppName 默认; 缺省回退 zh-CN)
 export default {
   default: 'zh-CN',
-  en: { appName: "Chinese Pinyin" },
+  'zh-CN': {
+    clear: '清除',
+    copyOk: '复制到粘贴板成功！！！',
+    tipDbl: '双击复制内容到粘贴板',
+    tipClick: '点击复制内容到粘贴板',
+    divider: '转换的结果',
+    phInput: '请输入中文',
+    phResult: '点击复制内容到粘贴板',
+  },
+  'zh-TW': {
+    clear: '清除',
+    copyOk: '複製到剪貼簿成功！！！',
+    tipDbl: '雙擊複製內容到剪貼簿',
+    tipClick: '點擊複製內容到剪貼簿',
+    divider: '轉換的結果',
+    phInput: '請輸入中文',
+    phResult: '點擊複製內容到剪貼簿',
+  },
+  en: {
+    clear: 'Clear',
+    copyOk: 'Copied to clipboard!!!',
+    tipDbl: 'Double-click to copy the content to clipboard',
+    tipClick: 'Click to copy the content to clipboard',
+    divider: 'Conversion Result',
+    phInput: 'Enter Chinese text',
+    phResult: 'Click to copy the content to clipboard',
+  },
 } as const;
