@@ -136,7 +136,7 @@ const IcoGenerator: React.FC = () => {
             />
             { info && <span style={ { color: '#999', fontSize: 12 } }>{ info }</span> }
           </div>
-          { srcName && !preview && <div style={ { color: '#999', marginTop: 8, fontSize: 12 } }>正在生成…</div> }
+          { srcName && !preview && <div style={ { color: '#999', marginTop: 8, fontSize: 12 } }>{t('正在生成…')}</div> }
         </div>
 
         {/* 右: 图标预览 (点击弹窗保存) */}

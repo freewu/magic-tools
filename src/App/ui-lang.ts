@@ -673,6 +673,7 @@ const D: UiRec = {
   '输入 Cron 表达式, 如 0 9 * * 1 (格式需与上方一致)': ['輸入 Cron 表達式, 如 0 9 * * 1 (格式需與上方一致)', 'Enter a cron expression, e.g. 0 9 * * 1 (must match the format above)'],
   '每月 1 日 03:15': ['每月 1 日 03:15', '1st of every month at 03:15'],
   '每年元旦 (2026)': ['每年元旦 (2026)', 'New Year\u2019s Day (2026)'],
+  '正在生成…': ['正在生成…', 'Generating…'],
 };
 
 export const u = (locale: string, zh: string): string => {
