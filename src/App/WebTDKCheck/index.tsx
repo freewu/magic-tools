@@ -8,9 +8,14 @@ import { copyTextToClipboard } from '../../lib';
 import { isTauri } from '../../lib/tauri';
 import { checkTdkField, parseTdk, TDK_FIELDS, type TdkResult } from './lib';
 import { fetchPageHtml } from './fetch';
+import { useLocale } from '../../hook/locale-context';
+import { wm, wmT } from '../webmaster-lang';
 import WebTDKIntro from './intro';
 
 const WebTDKCheck = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => wm(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => wmT(locale, zh, v);
 
   const { token } = theme.useToken();
 
@@ -23,7 +28,7 @@ const WebTDKCheck = () => {
   // 检测
   const check = async () => {
     if (url.trim() === '') {
-      notice.warning('请先输入要检测的网址');
+      notice.warning(t('请先输入要检测的网址'));
       return;
     }
     setLoading(true);
@@ -34,7 +39,7 @@ const WebTDKCheck = () => {
       setTdk(parseTdk(page.html));
       setFinalUrl(page.finalUrl);
     } catch (err) {
-      notice.error('检测失败: ' + (err as Error).message);
+      notice.error(tt('检测失败: {msg}', { msg: (err as Error).message }));
     } finally {
       setLoading(false);
     }
@@ -44,7 +49,7 @@ const WebTDKCheck = () => {
   const copyField = (text :string) => {
     if (text === '') return;
     copyTextToClipboard(text);
-    notice.success('复制到粘贴板成功!!!');
+    notice.success(t('复制到粘贴板成功!!!'));
   };
 
   return (
@@ -56,7 +61,7 @@ const WebTDKCheck = () => {
           allowClear
           prefix={ <SearchOutlined /> }
           value={ url }
-          placeholder="输入网址, 如 https://example.com"
+          placeholder={t('输入网址, 如 https://example.com')}
           onChange={ (e) => { setUrl(e.target.value); } }
           onPressEnter={ check }
         />
@@ -64,17 +69,17 @@ const WebTDKCheck = () => {
           type="primary"
           loading={ loading }
           onClick={ check }
-        >检测</Button>
+        >{t('检测')}</Button>
       </Space.Compact>
       { !isTauri() && (
         <div style={ { marginTop: 6, color: token.colorTextTertiary, fontSize: 12 } }>
-          浏览器演示版受 CORS 限制, 多数外部站点无法抓取; 桌面版 (Tauri) 无此限制
+          {t('浏览器演示版受 CORS 限制, 多数外部站点无法抓取; 桌面版 (Tauri) 无此限制')}
         </div>
       ) }
 
       { finalUrl !== '' && (
         <div style={ { marginTop: 12, color: token.colorTextSecondary } }>
-          检测完成: { finalUrl }
+          { tt('检测完成: {url}', { url: finalUrl }) }
         </div>
       ) }
 
@@ -102,17 +107,17 @@ const WebTDKCheck = () => {
             } }
           >
             <div style={ { display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 8 } }>
-              <b>{ label }</b>
-              <Tag color={ tag.color }>{ tag.text }</Tag>
+              <b>{ t(label) }</b>
+              <Tag color={ tag.color }>{ t(tag.text) }</Tag>
               <span style={ { color: token.colorTextSecondary, fontSize: 12 } }>
-                当前 { check.length } / 建议不超过 { check.limit } 字符
+                { tt('当前 {a} / 建议不超过 {b} 字符', { a: check.length, b: check.limit }) }
               </span>
               <Button
                 size="small"
                 icon={ <CopyOutlined /> }
                 disabled={ text === '' }
                 onClick={ () => { copyField(text); } }
-              >复制</Button>
+              >{t('复制')}</Button>
             </div>
             <Progress
               percent={ check.percent }
@@ -123,10 +128,10 @@ const WebTDKCheck = () => {
               style={ { margin: '6px 0 2px 0' } }
             />
             { check.status === 'empty' ? (
-              <div style={ { color: token.colorTextTertiary } }>{ emptyTip }</div>
+              <div style={ { color: token.colorTextTertiary } }>{ t(emptyTip) }</div>
             ) : (
               <div
-                title="双击复制内容"
+                title={t('双击复制内容')}
                 onDoubleClick={ () => { copyField(text); } }
                 style={ {
                   maxHeight: 120,
@@ -151,12 +156,12 @@ const WebTDKCheck = () => {
       {/* 未检测时的占位提示 */}
       { tdk === null && !loading && (
         <div style={ { color: token.colorTextTertiary, margin: '16px 0' } }>
-          输入网址后点击「检测」, 将解析网页 &lt;title&gt; 与
-          keywords / description 两个 meta 标签并给出长度建议
+          {t('输入网址后点击「检测」, 将解析网页 &lt;title&gt; 与')}
+          {t('keywords / description 两个 meta 标签并给出长度建议')}
         </div>
       ) }
 
-      <Divider>网页 TDK 信息检测说明</Divider>
+      <Divider>{t('网页 TDK 信息检测说明')}</Divider>
 
       <WebTDKIntro />
     </div>
