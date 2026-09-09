@@ -69,7 +69,7 @@ const MainSider: React.FC = () => {
   }, [locale]);
 
   return (
-  <Sider trigger={null} collapsible collapsed={ collapsed } style={ { height: '100%' } }>
+  <Sider trigger={null} collapsible collapsed={ collapsed } width={230} style={ { height: '100%' } }>
     <div style={ { display: 'flex', flexDirection: 'column', height: '100%' } }>
       <Space style={ { padding: '4px 8px', flexShrink: 0 } }>
         <Button
@@ -110,7 +110,7 @@ const MainSider: React.FC = () => {
       </div>
 
       {/* 底部区: 展开时左侧版本号 (有新版本时右上角呼吸角标, 点击进帮助; 角标点击直达更新页),
-          右侧紧贴的语言切换 + 设置图标; 折叠时两图标紧贴靠左下角 */}
+          右侧紧贴的语言切换 + 设置图标 (贴在一起靠右, 不居中); 折叠时两图标紧贴靠左下角 */}
       <div style={ {
         flexShrink: 0,
         background: '#001529',
@@ -159,46 +159,49 @@ const MainSider: React.FC = () => {
             ) }
           </div>
         ) }
-        <Dropdown menu={ langMenu } trigger={ ['click'] } placement="top">
+        {/* 右侧操作组: 语言切换紧贴设置图标, 与左侧版本号不产生中间留白 */}
+        <div style={ { display: 'flex', alignItems: 'center', flexShrink: 0 } }>
+          <Dropdown menu={ langMenu } trigger={ ['click'] } placement="top">
+            <Button
+              title={ tr(shell, locale, 'lang', '界面语言') }
+              type="text"
+              style={ {
+                color: 'rgba(255,255,255,0.85)',
+                fontSize: '15px',
+                height: 34,
+                width: 34,
+                padding: 0,
+                margin: 0,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              } }
+            >
+              <img
+                src={ LOCALE_FLAG[locale] }
+                alt=""
+                style={ { width: 20, height: 15, objectFit: 'cover', borderRadius: 2 } }
+              />
+            </Button>
+          </Dropdown>
           <Button
-            title={ tr(shell, locale, 'lang', '界面语言') }
-            type="text"
-            style={ {
-              color: 'rgba(255,255,255,0.85)',
-              fontSize: '15px',
-              height: 34,
-              width: 34,
-              padding: 0,
-              margin: 0,
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            } }
-          >
-            <img
-              src={ LOCALE_FLAG[locale] }
-              alt=""
-              style={ { width: 20, height: 15, objectFit: 'cover', borderRadius: 2 } }
-            />
-          </Button>
-        </Dropdown>
-        <Button
-            title={ appNameOf(locale, 'Setting', '设置') }
-            type="text"
-            icon={ <SettingOutlined /> }
-            onClick={ () => { setApp('Setting'); navigate('Setting', { replace: true }); } }
-            style={ {
-              color: 'rgba(255,255,255,0.85)',
-              fontSize: '15px',
-              height: 34,
-              width: 34,
-              padding: 0,
-              margin: 0,
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            } }
-        />
+              title={ appNameOf(locale, 'Setting', '设置') }
+              type="text"
+              icon={ <SettingOutlined /> }
+              onClick={ () => { setApp('Setting'); navigate('Setting', { replace: true }); } }
+              style={ {
+                color: 'rgba(255,255,255,0.85)',
+                fontSize: '15px',
+                height: 34,
+                width: 34,
+                padding: 0,
+                margin: 0,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              } }
+          />
+        </div>
       </div>
     </div>
   </Sider>
