@@ -7,6 +7,8 @@ import {
   detectCookieInput, parseCookies, cookiesToMap, cookiesToArray, cookiesToHeader,
 } from './lib';
 import type { CookieItem } from './lib';
+import { useLocale } from '../../hook/locale-context';
+import { wm, wmT } from '../webmaster-lang';
 
 const { Text, Paragraph } = Typography;
 
@@ -36,19 +38,21 @@ const KIND_LABEL: Record<string, string> = {
   document: 'document.cookie',
 };
 
-const copyText = async (text: string, tip = '已复制') => {
-  try {
-    await navigator.clipboard.writeText(text);
-    message.success(tip);
-  } catch {
-    message.error('复制失败, 请手动选择复制');
-  }
-};
-
 const BoolTag: React.FC<{ v: boolean | undefined; yes?: string }> = ({ v, yes = '是' }) =>
   v ? <Tag color="green">{yes}</Tag> : <Tag>—</Tag>;
 
 const CookieAnalyzer: React.FC = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => wm(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => wmT(locale, zh, v);
+  const copyText = async (text: string, tip: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      message.success(tip);
+    } catch {
+      message.error(t('复制失败, 请手动选择复制'));
+    }
+  };
   const [raw, setRaw] = useState('');
   const [format, setFormat] = useState<'map' | 'array' | 'table'>('table');
 
@@ -59,30 +63,30 @@ const CookieAnalyzer: React.FC = () => {
 
   const loadSample = (kind: 'string' | 'headers' | 'document') => {
     setRaw(kind === 'string' ? SAMPLE_STRING : kind === 'headers' ? SAMPLE_HEADERS : SAMPLE_DOCUMENT);
-    message.info(`已载入 ${KIND_LABEL[kind]} 示例`);
+    message.info(tt('已载入 {label} 示例', { label: t(KIND_LABEL[kind]) }));
   };
 
   const columns: ColumnsType<CookieItem> = [
-    { title: '名称', dataIndex: 'name', key: 'name', ellipsis: true, width: 150 },
-    { title: '值', dataIndex: 'value', key: 'value', ellipsis: true },
+    { title: t('名称'), dataIndex: 'name', key: 'name', ellipsis: true, width: 150 },
+    { title: t('值'), dataIndex: 'value', key: 'value', ellipsis: true },
     {
-      title: '来源', dataIndex: 'source', key: 'source', width: 90,
+      title: t('来源'), dataIndex: 'source', key: 'source', width: 90,
       render: (v: string) => (v === 'headers'
         ? <Tag color="blue">Headers</Tag>
-        : <Tag color="purple">字符串</Tag>),
+        : <Tag color="purple">{t('字符串')}</Tag>),
     },
     { title: 'Domain', dataIndex: 'domain', key: 'domain', width: 140, ellipsis: true, render: (v?: string) => v || <Text type="secondary">—</Text> },
     { title: 'Path', dataIndex: 'path', key: 'path', width: 100, ellipsis: true, render: (v?: string) => v || <Text type="secondary">—</Text> },
-    { title: 'Expires', dataIndex: 'expires', key: 'expires', width: 190, ellipsis: true, render: (v?: string) => v || <Text type="secondary">会话</Text> },
+    { title: 'Expires', dataIndex: 'expires', key: 'expires', width: 190, ellipsis: true, render: (v?: string) => v || <Text type="secondary">{t('会话')}</Text> },
     { title: 'Max-Age', dataIndex: 'maxAge', key: 'maxAge', width: 100, render: (v?: string) => v || <Text type="secondary">—</Text> },
     { title: 'SameSite', dataIndex: 'sameSite', key: 'sameSite', width: 100, render: (v?: string) => (v ? <Tag color="cyan">{v}</Tag> : <Text type="secondary">—</Text>) },
     {
       title: 'Secure', dataIndex: 'secure', key: 'secure', width: 84, align: 'center',
-      render: (v: boolean) => <BoolTag v={v} />,
+      render: (v: boolean) => <BoolTag v={v} yes={t('是')} />,
     },
     {
       title: 'HttpOnly', dataIndex: 'httpOnly', key: 'httpOnly', width: 96, align: 'center',
-      render: (v: boolean) => <BoolTag v={v} />,
+      render: (v: boolean) => <BoolTag v={v} yes={t('是')} />,
     },
   ];
 
@@ -91,18 +95,18 @@ const CookieAnalyzer: React.FC = () => {
       <Alert
         type="info"
         showIcon
-        message="Cookie 分析"
-        description="自动识别三种输入：Cookie 字符串、HTTP 请求/响应头（Cookie:/Set-Cookie: 行）、document.cookie 赋值语句。解析后可按 JSON 对象 / JSON 数组 / 表格三种视图查看，并一键拼回 Cookie 请求头。"
+        message={t('Cookie 分析')}
+        description={t('自动识别三种输入：Cookie 字符串、HTTP 请求/响应头（Cookie:/Set-Cookie: 行）、document.cookie 赋值语句。解析后可按 JSON 对象 / JSON 数组 / 表格三种视图查看，并一键拼回 Cookie 请求头。')}
       />
       <Card
         size="small"
-        title={<Space><DatabaseOutlined /> 原始输入</Space>}
+        title={<Space><DatabaseOutlined /> {t('原始输入')}</Space>}
         extra={
           <Space size={8}>
-            <Button size="small" onClick={() => loadSample('string')}>Cookie 字符串</Button>
-            <Button size="small" onClick={() => loadSample('headers')}>HTTP Headers</Button>
+            <Button size="small" onClick={() => loadSample('string')}>{t('Cookie 字符串')}</Button>
+            <Button size="small" onClick={() => loadSample('headers')}>{t('HTTP Headers')}</Button>
             <Button size="small" onClick={() => loadSample('document')}>document.cookie</Button>
-            <Button size="small" danger disabled={!raw} onClick={() => setRaw('')}>清空</Button>
+            <Button size="small" danger disabled={!raw} onClick={() => setRaw('')}>{t('清空')}</Button>
           </Space>
         }
       >
@@ -110,15 +114,15 @@ const CookieAnalyzer: React.FC = () => {
           <Input.TextArea
             value={raw}
             onChange={(e) => setRaw(e.target.value)}
-            placeholder={'粘贴 Cookie 数据, 三种格式均可:\n\n1) sessionid=abc123; theme=dark; HttpOnly\n2) 含 Cookie: / Set-Cookie: 行的 HTTP 报文片段\n3) document.cookie = "a=1; b=2";'}
+            placeholder={t('粘贴 Cookie 数据, 三种格式均可:\n\n1) sessionid=abc123; theme=dark; HttpOnly\n2) 含 Cookie: / Set-Cookie: 行的 HTTP 报文片段\n3) document.cookie = "a=1; b=2";')}
             autoSize={{ minRows: 7, maxRows: 16 }}
             style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 13 }}
           />
           {raw && (
             <Space size={8} wrap>
-              <Tag color="blue">识别为 {KIND_LABEL[kind]}</Tag>
+              <Tag color="blue">{tt('识别为 {k}', { k: t(KIND_LABEL[kind]) })}</Tag>
               <Text type="secondary" style={{ fontSize: 12 }}>
-                {raw.length.toLocaleString()} 字符
+                {tt('{c} 字符', { c: raw.length.toLocaleString() })}
               </Text>
             </Space>
           )}
@@ -127,29 +131,29 @@ const CookieAnalyzer: React.FC = () => {
 
       <Card
         size="small"
-        title="解析结果"
+        title={t('解析结果')}
         extra={
           <Space size={8}>
-            <Button size="small" disabled={!items.length} icon={<CopyOutlined />} onClick={() => copyText(format === 'table' ? headerText : format === 'map' ? mapJson : arrayJson, '已复制当前视图内容')}>
-              复制{format === 'table' ? ' Cookie 串' : ' JSON'}
+            <Button size="small" disabled={!items.length} icon={<CopyOutlined />} onClick={() => copyText(format === 'table' ? headerText : format === 'map' ? mapJson : arrayJson, t('已复制当前视图内容'))}>
+              {format === 'table' ? t('复制 Cookie 串') : t('复制 JSON')}
             </Button>
             {format === 'table' && items.length > 0 && (
-              <Button size="small" disabled={!items.length} icon={<CopyOutlined />} onClick={() => copyText(mapJson, '已复制 name=value JSON')}>复制 JSON</Button>
+              <Button size="small" disabled={!items.length} icon={<CopyOutlined />} onClick={() => copyText(mapJson, t('已复制 name=value JSON'))}>{t('复制 JSON')}</Button>
             )}
           </Space>
         }
       >
         {items.length === 0 ? (
-          <Paragraph type="secondary" style={{ margin: 0 }}>暂无结果 — 粘贴 Cookie 数据后自动解析。若粘贴了 Cookie 头请确保带 Cookie: 前缀。</Paragraph>
+          <Paragraph type="secondary" style={{ margin: 0 }}>{t('暂无结果 — 粘贴 Cookie 数据后自动解析。若粘贴了 Cookie 头请确保带 Cookie: 前缀。')}</Paragraph>
         ) : (
           <Space direction="vertical" size={8} style={{ width: '100%' }}>
             <Segmented
               value={format}
               onChange={(v) => setFormat(v as typeof format)}
               options={[
-                { label: `JSON 对象 (${items.length})`, value: 'map' },
-                { label: `JSON 数组 (${items.length})`, value: 'array' },
-                { label: `表格 (${items.length})`, value: 'table' },
+                { label: tt('JSON 对象 ({n})', { n: items.length }), value: 'map' },
+                { label: tt('JSON 数组 ({n})', { n: items.length }), value: 'array' },
+                { label: tt('表格 ({n})', { n: items.length }), value: 'table' },
               ]}
             />
             {format === 'table' ? (
@@ -170,7 +174,7 @@ const CookieAnalyzer: React.FC = () => {
               />
             )}
             <Text type="secondary" style={{ fontSize: 12 }}>
-              共解析 {items.length} 个 Cookie；拼接请求头: <Text code>{headerText || '—'}</Text>
+              {tt('共解析 {n} 个 Cookie；拼接请求头: ', { n: items.length })}<Text code>{headerText || '—'}</Text>
             </Text>
           </Space>
         )}
