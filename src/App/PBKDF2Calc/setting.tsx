@@ -41,7 +41,7 @@ export const PBKDF2CalcSetting = () => {
       </Form.Item>
       <Form.Item label={ st('迭代次数') }>
         <InputNumber
-          addonAfter="次"
+          addonAfter={ st('次') }
           min = { 1 }
           max = { 100000 }
           style={ { width: 200 } }
@@ -57,7 +57,7 @@ export const PBKDF2CalcSetting = () => {
       </Form.Item>
       <Form.Item label={ st('推导密钥长度') }>
         <InputNumber
-          addonAfter="位"
+          addonAfter={ st('位') }
           placeholder= { st('推荐 128 / 256 / 512') }
           title= { st('推荐 128 / 256 / 512') }
           min = { 16 }

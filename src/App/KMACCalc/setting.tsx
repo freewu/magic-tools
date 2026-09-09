@@ -28,7 +28,7 @@ export const KMACCalcSetting = () => {
       </Form.Item>
       <Form.Item label={ st('默认输出长度') }>
         <InputNumber
-          addonAfter="字节"
+          addonAfter={ st('字节') }
           min={ 1 }
           max={ 8192 }
           style={{ width: 240 }}

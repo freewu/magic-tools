@@ -27,7 +27,7 @@ export const HKDFCalcSetting = () => {
       </Form.Item>
       <Form.Item label={ st('默认输出长度') }>
         <InputNumber
-          addonAfter="字节"
+          addonAfter={ st('字节') }
           min={ 1 }
           max={ 8160 }
           style={{ width: 240 }}

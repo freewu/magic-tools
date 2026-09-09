@@ -7,12 +7,15 @@ import { getDefaultIUType,setDefaultIUType } from "./lib";
 import { getDefaultCNType,setDefaultCNType } from "./lib";
 import { getDefaultJPType,setDefaultJPType } from "./lib";
 import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
+import areaLang from "./lang";
 import { row as _r, rowT } from "../Setting/rows-lang";
 
 
 export const AreaConvertSetting = () => {
   const { locale } = useLocale();
   const st = (zh: string) => _r(locale, zh);
+  const t = (key: string, fallback: string) => tr(areaLang, locale, key, fallback);
   
   const [ type, setType ] = useState(getDefaultUnitType()); // 默认制式
   const [ msType, setMSType ] = useState(getDefaultMSType()); // 默认公制单位
@@ -28,7 +31,7 @@ export const AreaConvertSetting = () => {
           value={ type }
           style={{ width: 240 }}
           onChange={ (value: string) => { setType(value); setDefaultUnitType(value); } }
-          options={ unitTypeList }
+          options={ unitTypeList.map(i => ({ ...i, label: t('ut_' + i.value, i.label) })) }
         />
       </Form.Item>
       <Form.Item label={ st('默认公制单位') }>
@@ -36,7 +39,7 @@ export const AreaConvertSetting = () => {
           value={ msType }
           style={{ width: 240 }}
           onChange={ (value: string) => { setMSType(value); setDefaultMSType(value); } }
-          options={ getTypeList('ms') }
+          options={ getTypeList('ms').map(i => ({ ...i, label: t('u_' + i.value.replace(/-/g, '_'), i.label) })) }
         />
       </Form.Item>
       <Form.Item label={ st('默认英制单位') }>
@@ -44,7 +47,7 @@ export const AreaConvertSetting = () => {
           value={ iuType }
           style={{ width: 240 }}
           onChange={ (value: string) => { setIUType(value); setDefaultIUType(value); } }
-          options={ getTypeList('iu') }
+          options={ getTypeList('iu').map(i => ({ ...i, label: t('u_' + i.value.replace(/-/g, '_'), i.label) })) }
         />
       </Form.Item>
       <Form.Item label={ st('默认市制单位') }>
@@ -52,7 +55,7 @@ export const AreaConvertSetting = () => {
           value={ cnType }
           style={{ width: 240 }}
           onChange={ (value: string) => { setCNType(value); setDefaultCNType(value); } }
-          options={ getTypeList('cn') }
+          options={ getTypeList('cn').map(i => ({ ...i, label: t('u_' + i.value.replace(/-/g, '_'), i.label) })) }
         />
       </Form.Item>
       <Form.Item label={ st('默认日式单位') }>
@@ -60,7 +63,7 @@ export const AreaConvertSetting = () => {
           value={ jpType }
           style={{ width: 240 }}
           onChange={ (value: string) => { setJPType(value); setDefaultJPType(value); } }
-          options={ getTypeList('jp') }
+          options={ getTypeList('jp').map(i => ({ ...i, label: t('u_' + i.value.replace(/-/g, '_'), i.label) })) }
         />
       </Form.Item>
     </>
