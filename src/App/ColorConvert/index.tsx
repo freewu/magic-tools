@@ -80,9 +80,8 @@ const ColorConvert = () => {
     return checked? str.toUpperCase() : str.toLowerCase()
   }
 
-  const covertColor = (value :string) => {
-    setValue(value);
-    const colorHex = transalte2Hex(value, colorType);
+  // 由 HEX 生成全部结果行 (与 covertColor 共用; 取色器直接走此路径避免文本回读舍入漂移)
+  const buildResult = (colorHex :string) => {
     const result = {
       "hex": upperLowerTranslate(genColorString(colorHex, "HEX")),
       "rgb": upperLowerTranslate(genColorString(colorHex, "RGB")),
@@ -98,6 +97,11 @@ const ColorConvert = () => {
     setColorData(result);
   }
 
+  const covertColor = (value :string) => {
+    setValue(value);
+    buildResult(transalte2Hex(value, colorType));
+  }
+
   // 把 hex 转成当前输入格式的文本 (输入格式与对应输出格式保持一致)
   const fmtText = (hex :string) :string => upperLowerTranslate(genColorString(hex, colorType));
 
@@ -109,10 +113,9 @@ const ColorConvert = () => {
     // 带 alpha 时 toHexString() 返回 #rrggbbaa, 截取前 7 位以匹配本页支持的 #rrggbb 解析
     const raw = value.toHexString();
     const hex = raw.length > 7 ? raw.slice(0, 7) : raw;
-    const text = fmtText(hex);
-    setValue(text);
-    // 转换 (按当前输入格式解析, 不再强制切回 HEX)
-    covertColor(text);
+    // 输入框按当前输入格式回填 (LAB 等), 结果/配色方案直接用选中色 HEX 生成, 避免舍入漂移
+    setValue(fmtText(hex));
+    buildResult(hex);
   }
 
   // 切换显示 %

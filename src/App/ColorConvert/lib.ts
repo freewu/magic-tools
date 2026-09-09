@@ -35,60 +35,54 @@ const genColorString = (color :string,colorType :string) :string => {
   return color;
 };
 
-// 根据传入的值和颜色类型,转成  颜色的 HEX 值 
+// 根据传入的值和颜色类型,转成  颜色的 HEX 值
+// 各通道允许负数 (LAB a/b、LCH c 等通道可为负值) 与小数值, 否则取色器回填的 lab(-23) 等格式无法解析
 const transalte2Hex = (color:string,colorType:string) :string => {
   color = color.replaceAll(" ","");
   color = color.replaceAll("%","");
+  const chan = "(-?\\d+(?:\\.\\d+)?)";
+  const re3 = new RegExp(`\\(${chan},${chan},${chan}\\)`);
+  const re4 = new RegExp(`\\(${chan},${chan},${chan},${chan}\\)`);
+  const toNum = (s: string): number => parseFloat(s);
   switch(colorType) {
     case "HEX": return color;
-    case "RGB":
-      let colorRGB = /\((\d+),(\d+),(\d+)\)/.exec(color);
-      if (colorRGB === null) { // 处理 RGBA(R,G,B,A) 的情况
-        colorRGB = /\((\d+),(\d+),(\d+),(\d+)\)/.exec(color);
-      }
-      if (colorRGB !== null) {
-        return rgb.hex(parseInt(colorRGB[1]),parseInt(colorRGB[2]),parseInt(colorRGB[3]));
-      }
+    case "RGB": {
+      let m = re3.exec(color);
+      if (m === null) m = re4.exec(color); // 处理 RGBA(R,G,B,A) 的情况
+      if (m !== null) return rgb.hex(toNum(m[1]), toNum(m[2]), toNum(m[3]));
       break;
-    case "HSL":
-      let colorHSL = /\((\d+),(\d+),(\d+)\)/.exec(color);
-      if (colorHSL === null) { // 处理 HSLA(H,S,L,A) 的情况
-        colorHSL = /\((\d+),(\d+),(\d+),(\d+)\)/.exec(color);
-      }
-      if (colorHSL !== null) {
-        return hsl.hex([parseInt(colorHSL[1]), parseInt(colorHSL[2]), parseInt(colorHSL[3])]);
-      }
+    }
+    case "HSL": {
+      let m = re3.exec(color);
+      if (m === null) m = re4.exec(color); // 处理 HSLA(H,S,L,A) 的情况
+      if (m !== null) return hsl.hex([toNum(m[1]), toNum(m[2]), toNum(m[3])]);
       break;
-    case "CMYK":
-      let colorCMYK = /\((\d+),(\d+),(\d+),(\d+)\)/.exec(color);
-      if (colorCMYK !== null) {
-        return cmyk.hex([parseInt(colorCMYK[1]), parseInt(colorCMYK[2]), parseInt(colorCMYK[3]), parseInt(colorCMYK[4])]);
-      }
+    }
+    case "HSV": {
+      const m = re3.exec(color);
+      if (m !== null) return hsv.hex([toNum(m[1]), toNum(m[2]), toNum(m[3])]);
       break;
-    case "HSV":
-      let colorHSV = /\((\d+),(\d+),(\d+)\)/.exec(color);
-      if (colorHSV !== null) {
-        return hsl.hex([parseInt(colorHSV[1]), parseInt(colorHSV[2]), parseInt(colorHSV[3])]);
-      }
+    }
+    case "CMYK": {
+      const m = re4.exec(color);
+      if (m !== null) return cmyk.hex([toNum(m[1]), toNum(m[2]), toNum(m[3]), toNum(m[4])]);
       break;
-    case "LAB":
-      let colorLAB = /\((\d+),(\d+),(\d+)\)/.exec(color);
-      if (colorLAB !== null) {
-        return lab.hex([parseInt(colorLAB[1]), parseInt(colorLAB[2]), parseInt(colorLAB[3])]);
-      }
+    }
+    case "LAB": {
+      const m = re3.exec(color);
+      if (m !== null) return lab.hex([toNum(m[1]), toNum(m[2]), toNum(m[3])]);
       break;
-    case "LCH":
-      let colorLCH = /\((\d+),(\d+),(\d+)\)/.exec(color);
-      if (colorLCH !== null) {
-        return lch.hex([parseInt(colorLCH[1]), parseInt(colorLCH[2]), parseInt(colorLCH[3])]);
-      }
+    }
+    case "LCH": {
+      const m = re3.exec(color);
+      if (m !== null) return lch.hex([toNum(m[1]), toNum(m[2]), toNum(m[3])]);
       break;
-    case "XYZ":
-      let colorXYZ = /\((\d+),(\d+),(\d+)\)/.exec(color);
-      if (colorXYZ !== null) {
-        return xyz.hex([parseInt(colorXYZ[1]), parseInt(colorXYZ[2]), parseInt(colorXYZ[3])]);
-      }
+    }
+    case "XYZ": {
+      const m = re3.exec(color);
+      if (m !== null) return xyz.hex([toNum(m[1]), toNum(m[2]), toNum(m[3])]);
       break;
+    }
   }
   return "";
 };

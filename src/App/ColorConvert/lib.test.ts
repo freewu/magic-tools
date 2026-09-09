@@ -1,8 +1,22 @@
-import { calcColorSchemes } from './lib';
+import { calcColorSchemes, transalte2Hex } from './lib';
 
 // 参考色相表 (color-convert hsl.hex, S/L = 100/50):
 //  30=FF8000 60=FFFF00 90=80FF00 120=00FF00 150=00FF80 180=00FFFF
 // 210=007FFF 240=0000FF 270=7F00FF 300=FF00FF 330=FF0080
+
+describe('transalte2Hex', () => {
+  it('LAB 负通道可解析 (取色器回填 lab(47, 1, -23))', () => {
+    expect(transalte2Hex('lab(47, 1, -23)', 'LAB')).toBe('587196');
+  });
+  it('HSV 用 hsv 转换而非 hsl', () => {
+    expect(transalte2Hex('hsv(215, 42, 59)', 'HSV')).toBe('577296');
+    expect(transalte2Hex('hsv(215, 42, 59)', 'HSV')).not.toBe('567095'); // hsl 的旧错误结果
+  });
+  it('LCH / XYZ 可解析', () => {
+    expect(transalte2Hex('lch(47, 23, 271)', 'LCH')).toBe('577196');
+    expect(transalte2Hex('xyz(15, 16, 31)', 'XYZ')).toBe('537296');
+  });
+});
 
 describe('calcColorSchemes', () => {
   it('返回 7 组方案', () => {
