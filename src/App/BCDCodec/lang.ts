@@ -1,10 +1,12 @@
 // BCDCodec 语言包 (默认 zh-CN; 缺失词条回退默认语言)
 // 面板交互文案 (按需扩展); 说明性长文 (tips/intro) 暂保留简中, 后续批次再翻
-// 码型下拉选项取自 data.ts (8421/5421/2421/余3码 等技术名词), 作为内容数据保留原文
+// 码型下拉选项 (8421/5421/2421/余3码...) 为可见文案, 以 c_<value> 键做三语映射
 export default {
   default: 'zh-CN',
   'zh-CN': {
     // appName 缺省回退 define.tsx AppName (= 'BCD 编解码')
+    c_8421: '8421 码', c_5421: '5421 码', c_2421: '2421 码',
+    c_xs3: '余3码', c_xs3_gray: '余3循环码', c_gray: 'Gray 码',
     typeLabel: '码型:',
     encode: '编码',
     decode: '解码',
@@ -19,6 +21,8 @@ export default {
   },
   'zh-TW': {
     appName: 'BCD 編解碼',
+    c_8421: '8421 碼', c_5421: '5421 碼', c_2421: '2421 碼',
+    c_xs3: '餘3碼', c_xs3_gray: '餘3循環碼', c_gray: 'Gray 碼',
     typeLabel: '碼型：',
     encode: '編碼',
     decode: '解碼',
@@ -33,6 +37,8 @@ export default {
   },
   en: {
     appName: 'BCD Codec',
+    c_8421: '8421 code', c_5421: '5421 code', c_2421: '2421 code',
+    c_xs3: 'Excess-3 code', c_xs3_gray: 'Excess-3 Gray code', c_gray: 'Gray code',
     typeLabel: 'Code type:',
     encode: 'Encode',
     decode: 'Decode',

@@ -69,7 +69,7 @@ const BCDCodec = () => {
           value={ type }
           style={{ width: 150 }}
           onChange={ (v: string) => { setType(v as BCDType); setDecodeValue(''); } }
-          options={ codeList }
+          options={ codeList.map(i => ({ ...i, label: t('c_' + i.value.replace(/-/g, '_'), i.label) })) }
         />
         <Button 
           onClick={ encode }

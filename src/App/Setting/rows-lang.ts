@@ -109,7 +109,7 @@ const ROWS: Record<string, Row> = {
   '2 空格': ['2 空格', '2 spaces'],
   '4 空格': ['4 空格', '4 spaces'],
   '每行一条数据': ['每行一筆資料', 'One item per line'],
-  '展示默认字符串': ['顯示預設字串', 'Show a default sample string'],
+  '展示默认字符串': ['顯示預設字串', 'Sample String'],
   '结果大写展示': ['結果大寫顯示', 'Uppercase output'],
   '结果去重': ['結果去重', 'Deduplicate results'],
   'bcrypt 成本': ['bcrypt 成本', 'bcrypt cost'],

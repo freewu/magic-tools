@@ -4,11 +4,14 @@ import { getDefaultType, setDefaultType } from "./lib";
 import { codeList } from "./data"
 import type { BCDType } from "./data";
 import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
+import bcdLang from "./lang";
 import { row as _r, rowT } from "../Setting/rows-lang";
 
 export const BCDCodecSetting = () => {
   const { locale } = useLocale();
   const st = (zh: string) => _r(locale, zh);
+  const t = (key: string, fallback: string) => tr(bcdLang, locale, key, fallback);
 
   const [ type, setType ] = useState(getDefaultType()); // 默认码型
 
@@ -20,7 +23,7 @@ export const BCDCodecSetting = () => {
           value={ type }
           style={{ width: 180 }}
           onChange={ (v: string) => { setType(v as BCDType); setDefaultType(v as BCDType); } }
-          options={ codeList }
+          options={ codeList.map(i => ({ ...i, label: t('c_' + i.value.replace(/-/g, '_'), i.label) })) }
         />
       </Form.Item>
     </>
