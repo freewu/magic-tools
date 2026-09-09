@@ -5,7 +5,7 @@ const { Text } = Typography;
 import { ClearOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
 import { useLocale } from "./../../hook/locale-context"
-import { u, uT } from "./../ui-lang"
+import { u, uT } from './lang'
 import { default as LRCIntro } from "./intro"
 import { parseInput, computeLrc, parseExpected, byteToHex, byteToDec, byteToOct, byteToBin, getDefaultInputMode } from "./lib"
 import { InputStatus } from "antd/es/_util/statusUtils";

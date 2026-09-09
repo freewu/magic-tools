@@ -9,7 +9,7 @@ import { genColorMap, getTopArray } from "./lib"
 import "./image-color.css";
 import { default as LevitationBox } from "./levitation-box"
 import { useLocale } from "../../hook/locale-context";
-import { u } from "../ui-lang";
+import { u } from './lang';
 
 const ImageColor = () => {
 

@@ -4,7 +4,7 @@ import { CopyOutlined, DeleteOutlined, PlusOutlined, SaveOutlined } from '@ant-d
 import { copyTextToClipboard } from '../../lib';
 import { saveTextFile } from '../../lib/tauri';
 import { useLocale } from '../../hook/locale-context';
-import { wm } from '../webmaster-lang';
+import { wm } from './lang';
 import {
   buildRobotsTxt,
   newRuleId,

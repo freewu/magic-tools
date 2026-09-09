@@ -3,7 +3,7 @@ import { CopyOutlined, DownloadOutlined, FileTextOutlined } from '@ant-design/ic
 import { useMemo, useState } from 'react';
 import { formatXml, getXmlIndent, setXmlIndent } from './lib';
 import { useLocale } from '../../hook/locale-context';
-import { u, uT } from '../ui-lang';
+import { u, uT } from './lang';
 
 const { Text, Paragraph } = Typography;
 

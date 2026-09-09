@@ -4,7 +4,7 @@ import { saveBytesFile } from "../../lib/tauri";
 import { dataUrlToBytes, getDefaultSize, pngToIco } from "./lib";
 import { ICO_SIZES, type IcoSize } from "./data";
 import { useLocale } from "../../hook/locale-context";
-import { im, imT } from "../image-lang";
+import { im, imT } from './lang';
 
 // 透明棋盘背景 (便于观察透明图标)
 const checkerBg = {

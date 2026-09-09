@@ -8,7 +8,7 @@ import {
 import { useMemo, useRef, useState } from 'react';
 import { decodeText, diffText } from './lib';
 import { useLocale } from '../../hook/locale-context';
-import { u, uT } from '../ui-lang';
+import { u, uT } from './lang';
 import type { DiffRow, DiffResult } from './lib';
 import './filediff.css';
 

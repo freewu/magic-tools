@@ -18,7 +18,7 @@ import {
 import CronIntro from './intro'
 import CronParsePanel from './parse'
 import { useLocale } from '../../hook/locale-context';
-import { u, uT } from '../ui-lang';
+import { u, uT } from './lang';
 
 const MODE_OPTIONS = [
   { value: 'any',   label: '任意 (*)' },

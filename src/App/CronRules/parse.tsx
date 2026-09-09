@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { CopyOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from './../../lib'
 import { useLocale } from '../../hook/locale-context';
-import { u, uT } from '../ui-lang';
+import { u, uT } from './lang';
 import {
   CRON_FIELD_META,
   CRON_FORMAT_LIST,

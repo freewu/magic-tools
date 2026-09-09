@@ -6,7 +6,7 @@ import { typeList } from "./data"
 import { openFile } from "../../lib/file"
 import { copyTextToClipboard, debounce } from "./../../lib"
 import { useLocale } from "../../hook/locale-context";
-import { im } from "../image-lang";
+import { im } from './lang';
 import "./base64-image.css"
 
 const Base64Image = () => {

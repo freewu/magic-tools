@@ -7,7 +7,7 @@ import { openFile } from "../../lib/file"
 import { caesarEncrypt, caesarDecrypt, hasLetters, getDefaultShift } from "./lib"
 import CaesarIntro from "./intro"
 import { useLocale } from "../../hook/locale-context";
-import { cr, crT } from "../crypto-lang";
+import { cr, crT } from './lang';
 
 const CaesarCrypto = () => {
   const { locale } = useLocale();

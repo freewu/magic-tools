@@ -7,7 +7,7 @@ import { openFile } from "../../lib/file"
 import { hillEncrypt, hillDecrypt, hillKeySize, hillKeyShapeValid, getDefaultKey } from "./lib"
 import HillIntro from "./intro"
 import { useLocale } from "../../hook/locale-context";
-import { cr, crT } from "../crypto-lang";
+import { cr, crT } from './lang';
 
 const HillCrypto = () => {
   const { locale } = useLocale();

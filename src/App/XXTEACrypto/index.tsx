@@ -4,7 +4,7 @@ import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "../../lib"
 import { useLocale } from "../../hook/locale-context";
-import { cr, crT } from "../crypto-lang";
+import { cr, crT } from './lang';
 import { openFile } from "../../lib/file"
 import { arrayToOptions } from "../../lib/array"
 import { codeList } from "./data";

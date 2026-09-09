@@ -7,7 +7,7 @@ import { openFile } from "../../lib/file"
 import { InputStatus } from "antd/es/_util/statusUtils";
 import { calcLineCount, removeEmptyLine } from "./lib"
 import { useLocale } from "../../hook/locale-context";
-import { u } from "../ui-lang";
+import { u } from './lang';
 
 const LineCount = () => {
   const { locale } = useLocale();

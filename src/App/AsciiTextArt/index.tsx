@@ -5,7 +5,7 @@ import { copyTextToClipboard } from "../../lib";
 import { saveBytesFile } from "../../lib/tauri";
 import { FONT_NAMES, getDefaultFont, renderText } from "./lib";
 import { useLocale } from "../../hook/locale-context";
-import { u, uT } from "../ui-lang";
+import { u, uT } from './lang';
 
 const SAMPLE = 'Hello ASCII!';
 /** 预览字号 (仅 CSS 缩放, 不影响复制的文本) */

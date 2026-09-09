@@ -3,7 +3,7 @@ import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
 import { useLocale } from "./../../hook/locale-context"
-import { u, uT } from "./../ui-lang"
+import { u, uT } from './lang'
 import { bitLenList } from "./data"
 import { cmac, cmacText, hexToBytes, utf8Bytes, getDefaultBits } from "./lib"
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';

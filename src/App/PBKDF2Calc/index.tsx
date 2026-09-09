@@ -3,7 +3,7 @@ import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
 import { useLocale } from "./../../hook/locale-context"
-import { u, uT } from "./../ui-lang"
+import { u, uT } from './lang'
 import { openFile } from "../../lib/file"
 import { arrayToOptions } from "../../lib/array"
 import { hashAlgoList } from "./data"

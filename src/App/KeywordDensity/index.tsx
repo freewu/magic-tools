@@ -3,7 +3,7 @@ import { CopyOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useMemo, useState } from 'react';
 import { useLocale } from "../../hook/locale-context";
-import { wm, wmT } from "../webmaster-lang";
+import { wm, wmT } from './lang';
 import {
   analyzeText, buildTermTable, keywordsReport, levelLabel, LEVEL_COLOR,
 } from './lib';

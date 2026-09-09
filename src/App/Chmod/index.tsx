@@ -3,7 +3,7 @@ import { useState } from "react";
 import { SearchOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
 import { useLocale } from "../../hook/locale-context";
-import { u, uT } from "../ui-lang";
+import { u, uT } from './lang';
 import { parseChmod, modeDigits, lsSymbol, symbolicMode, chmodCommand, describeChmod } from "./lib"
 import type { ChmodPerm, ChmodMeaning } from "./lib"
 

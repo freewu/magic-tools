@@ -10,7 +10,7 @@ import { jsonPretty, jsonCompact, jsonToTree } from "./lib";
 import type { JsonTreeNode } from "./lib";
 import type { TreeDataNode } from "antd";
 import { useLocale } from '../../hook/locale-context';
-import { u, uT } from '../ui-lang';
+import { u, uT } from './lang';
 
 // 代码高亮 (按需注册 JSON 语言)
 import 'highlight.js/styles/monokai-sublime.css';

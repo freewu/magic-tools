@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { copyTextToClipboard } from '../../lib';
 import { TYPE7_SALT_MAX, TYPE7_SALT_MIN, decryptType7, encryptType7 } from './lib';
 import { useLocale } from '../../hook/locale-context';
-import { cr, crT } from '../crypto-lang';
+import { cr, crT } from './lang';
 
 const { TextArea } = Input;
 

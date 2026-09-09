@@ -10,7 +10,7 @@ import {
 } from './lib';
 import type { Appearance, EditorId } from './lib';
 import { useLocale } from '../../hook/locale-context';
-import { im, imT } from '../image-lang';
+import { im, imT } from './lang';
 
 const { Text } = Typography;
 

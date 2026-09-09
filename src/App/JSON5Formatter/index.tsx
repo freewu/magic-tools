@@ -11,7 +11,7 @@ import { jsonValueToTree } from "../JsonFormatter/lib";
 import type { JsonTreeNode } from "../JsonFormatter/lib";
 import type { TreeDataNode } from "antd";
 import { useLocale } from '../../hook/locale-context';
-import { u, uT } from '../ui-lang';
+import { u, uT } from './lang';
 
 // 代码高亮 (近似: JSON5 是 JSON 超集, 用 json 语言高亮, 注释部分以普通文本展示)
 import 'highlight.js/styles/monokai-sublime.css';

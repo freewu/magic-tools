@@ -2,7 +2,7 @@ import { Alert, Button, Card, Descriptions, Input, Space, Tag, Typography, messa
 import { ThunderboltOutlined, SwapOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { useLocale } from '../../hook/locale-context';
-import { u, uT } from '../ui-lang';
+import { u, uT } from './lang';
 import { calcCidr, CIDR_PRESETS } from './lib';
 import type { CIDRResult } from './lib';
 

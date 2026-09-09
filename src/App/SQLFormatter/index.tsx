@@ -8,7 +8,7 @@ import { saveTextFile } from "../../lib/tauri";
 import type { FormatOptionsWithLanguage,IndentStyle, KeywordCase, CommaPosition, LogicalOperatorNewline } from 'sql-formatter';
 import { languageList, keywordCaseList,indentStyleList,commaPositionList,logicalOperatorNewlineList } from "./data";
 import { useLocale } from '../../hook/locale-context';
-import { u, uT } from '../ui-lang';
+import { u, uT } from './lang';
 
 // 代码高亮 (按需: 仅注册 SQL 语言, 避免整库 190+ 语言全部打包)
 import 'highlight.js/styles/monokai-sublime.css';

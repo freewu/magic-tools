@@ -7,7 +7,7 @@ import { openFile } from "../../lib/file"
 import { railFenceEncrypt, railFenceDecrypt, getDefaultRails } from "./lib"
 import RailFenceIntro from "./intro"
 import { useLocale } from "../../hook/locale-context";
-import { cr, crT } from "../crypto-lang";
+import { cr, crT } from './lang';
 
 const RailFenceCrypto = () => {
   const { locale } = useLocale();

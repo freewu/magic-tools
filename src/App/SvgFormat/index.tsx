@@ -3,7 +3,7 @@ import { CopyOutlined, DownloadOutlined, FileImageOutlined, UploadOutlined } fro
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { optimizeSvgXml } from './lib';
 import { useLocale } from '../../hook/locale-context';
-import { u, uT } from '../ui-lang';
+import { u, uT } from './lang';
 import type { SvgMode } from './lib';
 
 const { Text } = Typography;

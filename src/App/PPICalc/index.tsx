@@ -2,7 +2,7 @@ import { Divider, InputNumber, Select, Space, Tag, theme } from 'antd';
 import { useMemo, useState } from 'react';
 import { calcPpi, SCREEN_PRESETS } from './lib';
 import { useLocale } from '../../hook/locale-context';
-import { u, uT } from '../ui-lang';
+import { u, uT } from './lang';
 
 // 结果统计块: 大字数值 + 小字说明 (颜色取自主题, 深浅模式自适应)
 const StatBlock = ({ label, value, note, color }: { label: string; value: string; note: string; color: string }) => (

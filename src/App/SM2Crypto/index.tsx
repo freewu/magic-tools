@@ -12,7 +12,7 @@ import {
 } from "./lib"
 import SM2Intro from "./intro"
 import { useLocale } from "../../hook/locale-context";
-import { cr, crT, crErr } from "../crypto-lang";
+import { cr, crT, crErr } from './lang';
 
 const SM2Crypto = () => {
   const { locale } = useLocale();

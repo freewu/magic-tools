@@ -8,7 +8,7 @@ import {
 } from './lib';
 import type { Appearance, EditorId } from './lib';
 import { useLocale } from "../../hook/locale-context";
-import { im } from '../image-lang';
+import { im } from './lang';
 import { row as _r, rowT } from "../Setting/rows-lang";
 
 /** 代码截图默认值设置 (挂载到 设置 → 其它) */

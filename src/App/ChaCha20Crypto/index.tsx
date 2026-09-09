@@ -3,7 +3,7 @@ import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { useState } from "react";
 const { TextArea } = Input;
 import { useLocale } from "../../hook/locale-context";
-import { cr, crT, crErr } from "../crypto-lang";
+import { cr, crT, crErr } from './lang';
 import { copyTextToClipboard } from "../../lib"
 import { openFile } from "../../lib/file"
 import { arrayToOptions } from "../../lib/array"

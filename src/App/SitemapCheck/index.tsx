@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import { isTauri } from '../../lib/tauri';
 import { parseSitemap, entriesToCsv } from './lib';
 import { useLocale } from '../../hook/locale-context';
-import { wm, wmT } from '../webmaster-lang';
+import { wm, wmT } from './lang';
 import type { SitemapEntry, SitemapReport } from './lib';
 
 const { Text } = Typography;

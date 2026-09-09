@@ -8,7 +8,7 @@ import {
   BADGE_DEFAULTS,
 } from "./lib";
 import { useLocale } from "../../hook/locale-context";
-import { im, imT } from "../image-lang";
+import { im, imT } from './lang';
 
 const ShieldBadgeGenerator: React.FC = () => {
   const { locale } = useLocale();

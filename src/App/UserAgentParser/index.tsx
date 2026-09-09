@@ -5,7 +5,7 @@ import { CompassOutlined, CopyOutlined, ExperimentOutlined, ThunderboltOutlined 
 import { useMemo, useState } from 'react';
 import { parseUserAgent, generateUaList, GEN_OS_LIST, GEN_BROWSER_LIST } from './lib';
 import { useLocale } from '../../hook/locale-context';
-import { wm, wmT } from '../webmaster-lang';
+import { wm, wmT } from './lang';
 import type { UAInfo, GenOS, GenBrowser } from './lib';
 
 const { Text } = Typography;

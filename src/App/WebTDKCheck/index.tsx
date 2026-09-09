@@ -9,7 +9,7 @@ import { isTauri } from '../../lib/tauri';
 import { checkTdkField, parseTdk, TDK_FIELDS, type TdkResult } from './lib';
 import { fetchPageHtml } from './fetch';
 import { useLocale } from '../../hook/locale-context';
-import { wm, wmT } from '../webmaster-lang';
+import { wm, wmT } from './lang';
 import WebTDKIntro from './intro';
 
 const WebTDKCheck = () => {

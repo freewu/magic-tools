@@ -2,7 +2,7 @@ import { Button, ColorPicker, Divider, Input, InputNumber, Modal, Select, Space,
 import { useEffect, useRef, useState } from "react";
 import { saveBytesFile } from "../../lib/tauri";
 import { useLocale } from "../../hook/locale-context";
-import { im, imT } from "../image-lang";
+import { im, imT } from './lang';
 import {
   buildFileName, checkSize, getDefaultBg, getDefaultFg, getDefaultSize,
   getCustomPresets, PH_FORMATS, PH_MAX, PH_MIN, dimKey, parseDimKey,

@@ -3,7 +3,7 @@ import { Divider, Button, Table, message, Tag } from "antd";
 import { keyLabel, locationNameOf, modsText, formatDuration, clockText } from "./lib";
 import "./keyboard.css";
 import { useLocale } from "../../hook/locale-context";
-import { u, uT } from "../ui-lang";
+import { u, uT } from './lang';
 
 type PressInfo = {
   key :string;

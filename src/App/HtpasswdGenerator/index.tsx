@@ -1,7 +1,7 @@
 import { Button, Divider, Input, message, Select, Space } from 'antd';
 import { useState } from 'react';
 import { useLocale } from '../../hook/locale-context';
-import { u, uT } from '../ui-lang';
+import { u, uT } from './lang';
 import { CopyOutlined, SaveOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from '../../lib';
 import { saveTextFile } from '../../lib/tauri';

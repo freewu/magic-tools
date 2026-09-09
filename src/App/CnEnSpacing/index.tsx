@@ -3,7 +3,7 @@ import { CopyOutlined, SwapOutlined } from '@ant-design/icons';
 import { useMemo, useState } from 'react';
 import { spaceCnEn } from './lib';
 import { useLocale } from '../../hook/locale-context';
-import { u } from '../ui-lang';
+import { u } from './lang';
 
 const { Text } = Typography;
 

@@ -5,7 +5,7 @@ import { hotp, totp, totpRemaining, randomBase32Secret, buildOtpUri } from './li
 import type { OtpAlgorithm } from './lib';
 import { copyTextToClipboard } from '../../lib';
 import { useLocale } from '../../hook/locale-context';
-import { u, uT } from '../ui-lang';
+import { u, uT } from './lang';
 import type { InputStatus } from 'antd/es/_util/statusUtils';
 
 const { Text } = Typography;

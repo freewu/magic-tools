@@ -12,7 +12,7 @@ import {
 } from "./lib"
 import RSAIntro from "./intro"
 import { useLocale } from "../../hook/locale-context";
-import { cr, crT, crErr } from "../crypto-lang";
+import { cr, crT, crErr } from './lang';
 
 // 密钥摘要 (用于「加解密」页展示当前使用的密钥)
 const pemSummary = (pem :string) :string => {

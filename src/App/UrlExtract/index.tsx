@@ -2,7 +2,7 @@ import { Alert, Button, Card, Checkbox, Input, Space, Tag, Typography, message }
 import { CopyOutlined, DownloadOutlined, LinkOutlined } from '@ant-design/icons';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocale } from "../../hook/locale-context";
-import { wm, wmT } from "../webmaster-lang";
+import { wm, wmT } from './lang';
 import { extractUrls, urlsToText, getUrlDedupeDefault, setUrlDedupeDefault, URL_DEDUPE_CHANGED } from './lib';
 
 const { Text, Paragraph } = Typography;

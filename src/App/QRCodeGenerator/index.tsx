@@ -7,7 +7,7 @@ import type { Color } from 'antd/es/color-picker';
 import { getDefaultErrorLevel, getErrorLevelTip, getDefaultSize } from './lib';
 import { savePngFile, savePngBatch } from '../../lib/tauri';
 import { useLocale } from '../../hook/locale-context';
-import { im, imT } from '../image-lang';
+import { im, imT } from './lang';
 
 const MAX_BATCH = 200; // 批量行数上限
 const pad3 = (n: number): string => String(n).padStart(3, '0');

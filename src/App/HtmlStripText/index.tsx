@@ -2,7 +2,7 @@ import { Alert, Button, Card, Checkbox, Input, Space, Tag, Typography, Upload, m
 import { CopyOutlined, DownloadOutlined, FileTextOutlined, UploadOutlined } from '@ant-design/icons';
 import { useMemo, useRef, useState } from 'react';
 import { useLocale } from "../../hook/locale-context";
-import { wm, wmT } from "../webmaster-lang";
+import { wm, wmT } from './lang';
 import { htmlToPlainText } from './lib';
 
 const { Text, Paragraph } = Typography;

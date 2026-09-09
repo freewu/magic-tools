@@ -2,7 +2,7 @@ import { Button, Checkbox, Divider, Input, InputNumber, Select, Space, Tag, mess
 import { useState } from 'react';
 import { copyTextToClipboard } from '../../lib';
 import { useLocale } from '../../hook/locale-context';
-import { u, uT } from '../ui-lang';
+import { u, uT } from './lang';
 import { scrypt, toHex } from './lib';
 
 // 默认参数参考 RFC 7914 交互式登录建议 (N=16384, r=8, p=1)

@@ -4,7 +4,7 @@ import type { RadioChangeEvent } from 'antd';
 import { copyTextToClipboard } from "../../lib";
 import { encodeNumber, decodeNumber, signedRangeText, unsignedRangeText } from "./lib";
 import { useLocale } from "../../hook/locale-context";
-import { u, uT } from "../ui-lang";
+import { u, uT } from './lang';
 import type { DecodeKind } from "./lib";
 import type { InputStatus } from "antd/es/_util/statusUtils";
 

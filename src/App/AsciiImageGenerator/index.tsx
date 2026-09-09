@@ -4,7 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import { copyTextToClipboard } from "../../lib";
 import { saveBytesFile } from "../../lib/tauri";
 import { useLocale } from "../../hook/locale-context";
-import { im, imT } from "../image-lang";
+import { im, imT } from './lang';
 import {
   GRAY_PALETTES, OUT_W_DEFAULT, OUT_W_MAX, OUT_W_MIN,
   STD_CHARS, renderAscii, toGray,

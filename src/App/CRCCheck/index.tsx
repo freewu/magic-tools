@@ -5,7 +5,7 @@ const { Text } = Typography;
 import { ClearOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
 import { useLocale } from "./../../hook/locale-context"
-import { u, uT } from "./../ui-lang"
+import { u, uT } from './lang'
 import { default as CRCIntro } from "./intro"
 import { parseInput } from "../../lib/byte"
 import { CRC_ALGOS, findAlgo, computeCrc, formatCrc, polyFormula, getDefaultInputMode, getDefaultAlgo } from "./lib"

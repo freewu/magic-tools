@@ -2,7 +2,7 @@ import { Alert, Button, Card, Collapse, Row, Col, Space, Spin, Tag, Typography, 
 import { CopyOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocale } from "../../hook/locale-context";
-import { wm, wmT } from "../webmaster-lang";
+import { wm, wmT } from './lang';
 import { runAllFingerprints, FINGERPRINT_CODE, FP_KIND_LABEL } from './lib';
 import type { FpKind, FpResult } from './lib';
 

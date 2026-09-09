@@ -4,7 +4,7 @@ import { saveBytesFile } from "../../lib/tauri";
 import { zipStore } from "./lib";
 import { ALL_PLATFORMS, TOTAL_ICONS } from "./data";
 import { useLocale } from "../../hook/locale-context";
-import { im, imT } from "../image-lang";
+import { im, imT } from './lang';
 
 const checkerBg = {
   backgroundImage: 'conic-gradient(#d9d9d9 25%, #fff 0 50%, #d9d9d9 0 75%, #fff 0)',

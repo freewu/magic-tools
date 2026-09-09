@@ -7,7 +7,7 @@ import {
 } from '@ant-design/icons';
 import { copyTextToClipboard } from '../../lib';
 import { useLocale } from '../../hook/locale-context';
-import { u, uT } from '../ui-lang';
+import { u, uT } from './lang';
 import { saveTextFile } from '../../lib/tauri';
 import {
   SPECS, specLabel, sampleGlyph, rowsToBytes, formatCArray, matrixToText,

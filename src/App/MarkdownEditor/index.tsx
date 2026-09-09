@@ -3,7 +3,7 @@ import { CopyOutlined, DownloadOutlined, EyeInvisibleOutlined, EyeOutlined } fro
 import { useMemo, useRef, useState } from 'react';
 import { renderMarkdown, wrapExportHtml, MD_EXPORT_CSS } from './lib';
 import { useLocale } from '../../hook/locale-context';
-import { u, uT } from '../ui-lang';
+import { u, uT } from './lang';
 
 const { Text } = Typography;
 

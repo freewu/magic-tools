@@ -4,7 +4,7 @@ import type { Color } from 'antd/es/color-picker';
 import JsBarcode from 'jsbarcode';
 import { barcodeFormatList } from './data';
 import { useLocale } from '../../hook/locale-context';
-import { im, imT } from '../image-lang';
+import { im, imT } from './lang';
 import { savePngFile, savePngBatch } from '../../lib/tauri';
 import {
   getDefaultFormat,

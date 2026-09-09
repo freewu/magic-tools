@@ -8,7 +8,7 @@ import {
 } from './lib';
 import type { CookieItem } from './lib';
 import { useLocale } from '../../hook/locale-context';
-import { wm, wmT } from '../webmaster-lang';
+import { wm, wmT } from './lang';
 
 const { Text, Paragraph } = Typography;
 

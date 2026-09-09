@@ -7,7 +7,7 @@ import { openFile } from "../../lib/file"
 import { vigenereEncrypt, vigenereDecrypt, vigenereKeyValid, getDefaultKey } from "./lib"
 import VigenereIntro from "./intro"
 import { useLocale } from "../../hook/locale-context";
-import { cr, crT } from "../crypto-lang";
+import { cr, crT } from './lang';
 
 const VigenereCrypto = () => {
   const { locale } = useLocale();

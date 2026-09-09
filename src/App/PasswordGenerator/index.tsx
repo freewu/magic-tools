@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { CheckCircleFilled, CloseCircleFilled, CopyOutlined, ReloadOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from '../../lib';
 import { useLocale } from '../../hook/locale-context';
-import { u, uT } from '../ui-lang';
+import { u, uT } from './lang';
 import { genPassword, passwordStrength, humanSeconds, STRENGTH_LEVELS } from './lib';
 
 // 强度面板: 进度条 + 估算信息 + 检查明细
