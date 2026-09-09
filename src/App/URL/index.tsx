@@ -5,8 +5,14 @@ import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
 import { openFile } from "../../lib/file"
 import { default as URLIntro } from "./intro"
+import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
+import urlLang from "./lang";
 
 const URL = () => {
+
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(urlLang, locale, key, fallback);
 
   const [ encodeValue, setEncodeValue ] = useState('');
   const [ decodeValue, setDecodeValue ] = useState('');
@@ -17,7 +23,7 @@ const URL = () => {
     const txt = (e.target as HTMLInputElement).value.trim();
     if(txt !== '') {
       copyTextToClipboard(txt);
-      notice.success("复制到粘贴板成功！！！");
+      notice.success(t('copyOk', '复制到粘贴板成功！！！'));
     }
   };
 
@@ -36,7 +42,7 @@ const URL = () => {
         try {
           r = func( decodeValue );
         } catch(err) {
-          notice.error("解码失败！！！");
+          notice.error(t('decodeFailed', '解码失败！！！'));
         }
         setEncodeValue(r);
       }
@@ -51,9 +57,9 @@ const URL = () => {
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setEncodeValue(e.target.value) ;} }
-        title="双击复制内容到粘贴板"
+        title={ t('copyTitle', '双击复制内容到粘贴板') }
         value= { encodeValue }
-        placeholder="输入需要进行 URL 编码的内容  或 拖拽文件到框内打开"
+        placeholder={ t('encodePh', '输入需要进行 URL 编码的内容  或 拖拽文件到框内打开') }
         autoSize={{ minRows: 5, maxRows: 5 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setEncodeValue ); } }
@@ -82,21 +88,21 @@ const URL = () => {
       <Button 
         onClick={ () => { setEncodeValue(''); setDecodeValue(''); } }
         style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-      >清除</Button>
+      >{ t('clear', '清除') }</Button>
   
       <TextArea
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setDecodeValue(e.target.value) ;} }
-        title="双击复制内容到粘贴板"
+        title={ t('copyTitle', '双击复制内容到粘贴板') }
         value= { decodeValue }
-        placeholder="输入需要进行 URL 解码的内容  或 拖拽文件到框内打开"
+        placeholder={ t('decodePh', '输入需要进行 URL 解码的内容  或 拖拽文件到框内打开') }
         autoSize={{ minRows: 5, maxRows: 5 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setDecodeValue ); } }
       />
       
-      <Divider> URL 编码说明 </Divider>
+      <Divider>{ t('divider', 'URL 编码说明') }</Divider>
 
       <URLIntro />
     </div>
