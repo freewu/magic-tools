@@ -9,8 +9,13 @@ import type { Sha3HashResult } from "./data"
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
 import { getPasswordList } from "../Hash/lib"
 import "../Hash/hash.css"
+import sha3Lang from "./lang";
+import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
 
 const SHA3Hash = () => {
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(sha3Lang, locale, key, fallback);
 
   const [ value, setValue ] = useState('');
   const [ checked, setChecked ] = useState(getDefaultUpper());
@@ -24,7 +29,7 @@ const SHA3Hash = () => {
     const txt = (e.target as HTMLInputElement).value.trim();
     if(txt !== "") {
       copyTextToClipboard(txt);
-      notice.success("复制到粘贴板成功！！！");
+      notice.success(t('copyOk','复制到粘贴板成功！！！'));
     }
   };
 
@@ -104,7 +109,7 @@ const SHA3Hash = () => {
         style={ { margin: "5px 0 5px 0" } }
         value={ value }
         onChange={ (e) => { changeValue(e.target.value) } }
-        placeholder="输入需要计算 SHA3 Hash 值的内容 或 拖拽文件到框内打开"
+        placeholder={ t('ph','输入需要计算 SHA3 Hash 值的内容 或 拖拽文件到框内打开') }
         autoSize={{ minRows: 5, maxRows: 5 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, changeValue); } }
@@ -113,15 +118,17 @@ const SHA3Hash = () => {
         <Button
           onClick={ () => { setValue(''); setShakeBits(getDefaultShakeBits()); setHash(emptyResult); } }
           style={ { backgroundColor: "#dc3545", color: "#fff" } }
-        >清除</Button>
-        <Checkbox checked={ checked } onChange={ onChangeUpper }>结果大写字符展示</Checkbox>
-        <span style={ { color: "#888" } }>SHAKE 输出长度</span>
+         >{ t('clear','清除') }</Button>
+        <Checkbox checked={ checked } onChange={ onChangeUpper } >{ t('upper','结果大写字符展示') }</Checkbox>
+        <span style={ { color: "#888" } }>
+          { t('shakeLen','SHAKE 输出长度') }
+        </span>
         <InputNumber
           min={ 8 }
           max={ 8192 }
           step={ 8 }
           style={ { width: 110 } }
-          title="SHAKE128/256 的输出长度 (bit), 须为 8 的整数倍"
+          title={ t('shakeTip','SHAKE128/256 的输出长度 (bit), 须为 8 的整数倍') }
           value={ shakeBits }
           onChange={ onChangeShakeBits }
         />

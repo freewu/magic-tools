@@ -3,10 +3,15 @@ import React, { useState } from 'react';
 import { SwapOutlined } from '@ant-design/icons';
 import { ipv4ToInt, ipv4Valid, intToIpv4, intTextValid, intToHex, intToBin } from './lib';
 import type { InputStatus } from 'antd/es/_util/statusUtils';
+import ipLang from "./lang";
+import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
 
 const { Text } = Typography;
 
 const IPConvert :React.FC = () => {
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(ipLang, locale, key, fallback);
 
   const [ ip, setIp ] = useState('');           // IPv4 输入
   const [ int, setInt ] = useState('');         // 整数输入
@@ -60,7 +65,7 @@ const IPConvert :React.FC = () => {
               status={ ipStatus }
               value={ ip }
               onChange={ onIpChange }
-              placeholder="IPv4 地址, 如 192.168.1.1"
+              placeholder={ t('ipPh','IPv4 地址, 如 192.168.1.1') }
             />
           </Col>
           <Col>
@@ -72,7 +77,7 @@ const IPConvert :React.FC = () => {
               status={ intStatus }
               value={ int }
               onChange={ onIntChange }
-              placeholder="十进制整数, 支持 0x 前缀"
+              placeholder={ t('intPh','十进制整数, 支持 0x 前缀') }
             />
           </Col>
         </Row>

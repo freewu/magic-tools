@@ -9,8 +9,13 @@ import type { KeccakHashResult } from "./data"
 import type { CheckboxChangeEvent } from 'antd/es/checkbox'
 import { getPasswordList } from "../Hash/lib"
 import "../Hash/hash.css"
+import keccakLang from "./lang";
+import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
 
 const KeccakHash = () => {
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(keccakLang, locale, key, fallback);
 
   const [ value, setValue ] = useState('');
   const [ checked, setChecked ] = useState(getDefaultUpper());
@@ -23,7 +28,7 @@ const KeccakHash = () => {
     const txt = (e.target as HTMLInputElement).value.trim();
     if(txt !== "") {
       copyTextToClipboard(txt);
-      notice.success("复制到粘贴板成功！！！");
+      notice.success(t('copyOk','复制到粘贴板成功！！！'));
     }
   };
 
@@ -96,7 +101,7 @@ const KeccakHash = () => {
         style={ { margin: "5px 0 5px 0" } }
         value={ value }
         onChange={ (e) => { changeValue(e.target.value) } }
-        placeholder="输入需要计算 Keccak Hash 值的内容 或 拖拽文件到框内打开"
+        placeholder={ t('ph','输入需要计算 Keccak Hash 值的内容 或 拖拽文件到框内打开') }
         autoSize={{ minRows: 5, maxRows: 5 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, changeValue); } }
@@ -105,8 +110,8 @@ const KeccakHash = () => {
         <Button
           onClick={ () => { setValue(''); setHash(emptyResult); } }
           style={ { backgroundColor: "#dc3545", color: "#fff" } }
-        >清除</Button>
-        <Checkbox checked={ checked } onChange={ onChangeUpper }>结果大写字符展示</Checkbox>
+         >{ t('clear','清除') }</Button>
+        <Checkbox checked={ checked } onChange={ onChangeUpper } >{ t('upper','结果大写字符展示') }</Checkbox>
       </Space>
 
       <Divider dashed />

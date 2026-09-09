@@ -18,8 +18,13 @@ import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { getPasswordList } from "../Hash/lib";
 import "./hmac-hash.css";
 import { getDefaultPassphrase } from "./lib"
+import hmacHashLang from "./lang";
+import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
 
 const HmacHash = () => {
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(hmacHashLang, locale, key, fallback);
 
   const [ value, setValue ] = useState('');
   const [ checked, setChecked ] = useState(false);
@@ -31,7 +36,7 @@ const HmacHash = () => {
     const txt = (e.target as HTMLInputElement).value.trim();
     if(txt != "") {
       copyTextToClipboard(txt);
-      notice.success("复制到粘贴板成功！！！");
+      notice.success(t('copyOk','复制到粘贴板成功！！！'));
     }
   };
 
@@ -118,7 +123,7 @@ const HmacHash = () => {
         style={ { margin: "5px 0 5px 0" }}
         value= { value }
         onChange={ (e) => { changeValue(e.target.value) } }
-        placeholder="输入需要计算 Hash 值的内容 或 拖拽文件到框内打开"
+        placeholder={ t('ph','输入需要计算 Hash 值的内容 或 拖拽文件到框内打开') }
         autoSize={{ minRows: 5, maxRows: 5 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, changeValue ); } }
@@ -128,10 +133,10 @@ const HmacHash = () => {
         <Button 
           onClick={ () => { setValue(''); setHash(emptyResult); } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-        >清除</Button>
-        <Checkbox onChange={onChange} checked={ checked }>结果大写字符显示</Checkbox>
+         >{ t('clear','清除') }</Button>
+        <Checkbox onChange={onChange} checked={ checked } >{ t('upper','结果大写字符显示') }</Checkbox>
         <Input
-          placeholder="密钥"
+          placeholder={ t('keyPh','密钥') }
           allowClear
           style={ { width: "240px" } }
           onChange={ (e) => { 
