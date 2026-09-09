@@ -6,5 +6,5 @@ export const typeList = [
   { label: '德利尔温标 °D', value: 'd', placeholder: '将水的沸点定于零度，然后将水银体积随温度降低收缩十万分之一定为一个间隔' },
   { label: '牛顿温标 °N', value: 'n', placeholder: '0 °N 定义为雪融化的温度（水的冰点）， 33 °N 定义为水沸腾的温度（水的沸点）' },
   { label: '列氏温标 °Ré', value: 're', placeholder: '水的冰点被定为列氏 0 度，而沸点则为列氏 80 度' },
-  { label: '罗氏温标 °Rø', value: 'ra', placeholder: '泽字节 Zetta Byte' },
+  { label: '罗氏温标 °Rø', value: 'ra', placeholder: '将水的冰点定为罗氏 7.5 度，沸点定为罗氏 60 度' },
 ];

@@ -7,18 +7,23 @@ import { typeList, emptyResult, ByteConvertResult } from "./data"
 import type { RadioChangeEvent } from 'antd';
 import { convertToByte, convertFromByte, getDefaultType } from "./lib"
 import { InputStatus } from "antd/es/_util/statusUtils";
+import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
+import byteLang from "./lang";
 
 const ByteConvert = () => {
-  const t = getDefaultType();
-  const getPlaceholder = (type :string) :string | undefined => {
-    return typeList.find(item => item.value === type)?.placeholder;
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(byteLang, locale, key, fallback);
+  const dtype = getDefaultType();
+  const getPlaceholder = (type :string) :string => {
+    return t('ph_' + type, typeList.find(item => item.value === type)?.placeholder ?? '');
   }
 
   const [ value, setValue ] = useState(''); // 输入数量
   const [ status, setStatus ] = useState(''); // 输入是否合法
   const [ b, setB ] = useState(0); // 数量
-  const [ type, setType ] = useState(t); // 类型,
-  const [ placeholder, setPlaceholder ] = useState(getPlaceholder(t)); // 数字类型的输入提示
+  const [ type, setType ] = useState(dtype); // 类型,
+  const [ placeholder, setPlaceholder ] = useState(getPlaceholder(dtype)); // 数字类型的输入提示
   const [ data, setData ] = useState(emptyResult); // 转换的结果
   const [ notice, contextHolder] = message.useMessage();
 
@@ -36,7 +41,7 @@ const ByteConvert = () => {
     const txt = (e.target as HTMLInputElement).value.trim();
     if(txt != "") {
       copyTextToClipboard(txt);
-      notice.success("复制到粘贴板成功！！！");
+      notice.success(t('copyOk', '复制到粘贴板成功！！！'));
     }
   };
 
@@ -75,7 +80,7 @@ const ByteConvert = () => {
         <Button 
           onClick={ () => { setValue(''); setB(0); setStatus(''); } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-        >清除</Button>
+        >{ t('clear', '清除') }</Button>
       </Space>
 
       <TextArea
@@ -89,7 +94,7 @@ const ByteConvert = () => {
 
       <Row wrap>
         <Col span={12}>
-          <Divider dashed plain>字节 ( Byte )</Divider>
+          <Divider dashed plain>{ t('divByte', '字节 ( Byte )') }</Divider>
           <Form name="basic1" labelCol={{ span: 8 }} autoComplete="off">
             <Form.Item label="B (Byte)">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b,'')) } />
@@ -121,7 +126,7 @@ const ByteConvert = () => {
           </Form>
         </Col>
         <Col span={12}>
-          <Divider dashed plain>位 ( bit )</Divider>
+          <Divider dashed plain>{ t('divBit', '位 ( bit )') }</Divider>
           <Form name="basic2" labelCol={{ span: 8 }} autoComplete="off">
           <Form.Item label="b (bit)">
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b * 8,'')) } />

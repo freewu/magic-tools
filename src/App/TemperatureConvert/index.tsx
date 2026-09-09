@@ -13,15 +13,20 @@ import { c2d,d2c } from "./lib";
 import { c2r,r2c } from "./lib";
 import { c2Re,re2c } from "./lib";
 import { c2Ra,ra2c } from "./lib";
+import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
+import tempLang from "./lang";
 
 const TemperatureConvert = () => {
-  const t = getDefaultType();
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(tempLang, locale, key, fallback);
+  const dtype = getDefaultType();
 
   const [ value, setValue ] = useState(''); // 输入数量
   const [ typeList, setTypeList ] = useState(pickTypeList()); // 类型
   const [ status, setStatus ] = useState(''); // 输入是否合法
-  const [ type, setType ] = useState(t); // 类型,
-  const [ placeholder, setPlaceholder ] = useState(getTypePlaceholder(t)); // 数字类型的输入提示
+  const [ type, setType ] = useState(dtype); // 类型,
+  const [ placeholder, setPlaceholder ] = useState(t('ph_' + dtype, getTypePlaceholder(dtype) ?? '')); // 数字类型的输入提示
   const [ data, setData ] = useState(0); // 转换的结果 统一转成 摄氏度 c
   const [ notice, contextHolder] = message.useMessage();
 
@@ -31,10 +36,10 @@ const TemperatureConvert = () => {
   const inputStyle = { cursor: "pointer" };
 
   // 切换类型
-  const onTypeChange = ({ target: { value : t } }: RadioChangeEvent) => {
-    setType(t);
+  const onTypeChange = ({ target: { value: v } }: RadioChangeEvent) => {
+    setType(v);
     setValue('');
-    setPlaceholder(getTypePlaceholder(t));
+    setPlaceholder(t('ph_' + v, getTypePlaceholder(v) ?? ''));
   };
 
   // 点击结果框,把结果复制到粘贴板
@@ -42,7 +47,7 @@ const TemperatureConvert = () => {
     const txt = (e.target as HTMLInputElement).value.trim();
     if(txt != "") {
       copyTextToClipboard(txt);
-      notice.success("复制到粘贴板成功！！！");
+      notice.success(t('copyOk', '复制到粘贴板成功！！！'));
     }
   };
 
@@ -54,7 +59,7 @@ const TemperatureConvert = () => {
       return ; // 没有内家直接返回不做下面的处理
     }
     if(/^[0-9\.\-]+$/.test(value)) {
-      switch(t) {
+      switch(dtype) {
         case "c": setData(parseFloat(value)); break;
         case "f": setData(f2c(parseFloat(value))); break;
         case "k": setData(k2c(parseFloat(value))); break;
@@ -83,14 +88,14 @@ const TemperatureConvert = () => {
       <Space>
         <Radio.Group
           optionType = "button" buttonStyle="solid"
-          options = { typeList } 
+          options = { typeList.map((it) => ({ ...it, label: t('unit_' + it.value, it.label) })) } 
           onChange={ onTypeChange } 
           value={ type } 
         />
         <Button 
           onClick={ () => { setValue(''); setData(0); setStatus(''); } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-        >清除</Button>
+        >{ t('clear', '清除') }</Button>
       </Space>
 
       <TextArea
@@ -105,28 +110,28 @@ const TemperatureConvert = () => {
       <Divider dashed />
 
       <Form name="basic1" labelCol={{ span: 3 }} autoComplete="off">
-        <Form.Item label="摄氏度 °C">
+        <Form.Item label={ t('unit_c', '摄氏度 °C') }>
           <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(data) } />
         </Form.Item>
-        <Form.Item label="华氏度 °F">
+        <Form.Item label={ t('unit_f', '华氏度 °F') }>
           <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(c2f(data)) } />
         </Form.Item>
-        <Form.Item label="开尔文 K">
+        <Form.Item label={ t('unit_k', '开尔文 K') }>
           <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(c2k(data)) } />
         </Form.Item>
-        <Form.Item label="兰金温标 °R">
+        <Form.Item label={ t('unit_r', '兰金温标 °R') }>
           <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(c2r(data)) } />
         </Form.Item>
-        <Form.Item label="德利尔温标 °D">
+        <Form.Item label={ t('unit_d', '德利尔温标 °D') }>
           <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(c2d(data)) } />
         </Form.Item>
-        <Form.Item label="牛顿温标 °N">
+        <Form.Item label={ t('unit_n', '牛顿温标 °N') }>
           <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(c2n(data)) } />
         </Form.Item>
-        <Form.Item label="列氏温标 °Ré">
+        <Form.Item label={ t('unit_re', '列氏温标 °Ré') }>
           <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(c2Re(data)) } />
         </Form.Item>
-        <Form.Item label="罗氏温标 °Rø">
+        <Form.Item label={ t('unit_ra', '罗氏温标 °Rø') }>
           <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(c2Ra(data)) } />
         </Form.Item>
       </Form>

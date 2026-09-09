@@ -25,7 +25,7 @@ export type GPSConvertResult = {
 
 // 提供的地图坐标拾取服务
 export const pickList = [
-  { label : "百度地图", url:"https://api.map.baidu.com/lbsapi/getpoint/index.html" },
-  { label : "高德地图", url:"https://lbs.amap.com/tools/picker" },
-  { label : "腾讯地图", url:"https://lbs.qq.com/getPoint/" },
+  { key: "baidu", label : "百度地图", url:"https://api.map.baidu.com/lbsapi/getpoint/index.html" },
+  { key: "amap", label : "高德地图", url:"https://lbs.amap.com/tools/picker" },
+  { key: "qq", label : "腾讯地图", url:"https://lbs.qq.com/getPoint/" },
 ];

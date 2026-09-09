@@ -8,14 +8,26 @@ import { pointToString,GPSPoint,tencentMapPointToString, getDefaultType } from "
 import { gcj02Tobd09, bd09Togcj02 } from "./lib"
 import { wgs84Togcj02, gcj02Towgs84 } from "./lib"
 import "./gps-convert.css"
+import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
+import gpsLang from "./lang";
 
 const GPSConvert = () => {
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(gpsLang, locale, key, fallback);
+  // 单选/占位文案按当前语言取词 (data.ts 保留 zh-CN 为默认回退)
+  const typeOpts = typeList.map((it) => ({
+    ...it,
+    label: t('unit_' + it.value, it.label),
+    placeholder: t('ph_' + it.value, it.placeholder),
+  }));
+
   const dt = getDefaultType();
   const dp = typeList.find(item => item.value === dt)?.placeholder
 
   const [ value, setValue ] = useState(''); // 需要转换的 GPS坐标 
   const [ type, setType ] = useState(dt); // 输入坐标类型,
-  const [ placeholder, setPlaceholder ] = useState(dp); // 数字类型的输入提示
+  const [ placeholder, setPlaceholder ] = useState(t('ph_' + dt, dp ?? '')); // 数字类型的输入提示
   const [ result, setResult] = useState(emptyResult); // 转换的结果
   const [ notice, contextHolder] = message.useMessage();
 
@@ -28,7 +40,7 @@ const GPSConvert = () => {
     setResult(emptyResult);
     // 更新输入提示信息
     const tips = typeList.find(item => item.value === value)?.placeholder;
-    setPlaceholder(tips + "");
+    setPlaceholder(t('ph_' + value, tips ?? ''));
   };
 
   // 点击结果框,把结果复制到粘贴板
@@ -36,7 +48,7 @@ const GPSConvert = () => {
     const txt = (e.target as HTMLInputElement).value.trim();
     if(txt != "") {
       copyTextToClipboard(txt);
-      notice.success("复制到粘贴板成功！！！");
+      notice.success(t('copyOk', '复制到粘贴板成功！！！'));
     }
   };
 
@@ -129,14 +141,14 @@ const GPSConvert = () => {
       <Space>
         <Radio.Group
           optionType = "button" buttonStyle="solid"
-          options = { typeList } 
+          options = { typeOpts } 
           onChange={ onTypeChange } 
           value={ type } 
         />
         <Button 
           onClick={ () => { setValue(''); setResult(emptyResult); } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-        >清除</Button>
+        >{ t('clear', '清除') }</Button>
 
       </Space>
 
@@ -160,7 +172,7 @@ const GPSConvert = () => {
                 color={ calcTagColor(index) }
                 onClick={ () => {
                   openUrl(item.url);
-                } } >{ item.label }</Tag>
+                } } >{ t('pick_' + item.key, item.label) }</Tag>
             )
           }
         })
@@ -182,7 +194,7 @@ const GPSConvert = () => {
         {/* <Form.Item label="CGCS (lng,lat)">
           <Input readOnly style={ inputStyle } onClick={ inputClick } value= { result.CGCS } />
         </Form.Item> */}
-        <Form.Item label="腾讯地图 (lat,lng)">
+        <Form.Item label={ t('tencentLabel', '腾讯地图 (lat,lng)') }>
           <Input readOnly style={ inputStyle } onClick={ inputClick } value= { result.TXMAP } />
         </Form.Item>
       </Form>
