@@ -4,11 +4,17 @@ import { ReloadOutlined, CopyOutlined } from '@ant-design/icons';
 import { hotp, totp, totpRemaining, randomBase32Secret, buildOtpUri } from './lib';
 import type { OtpAlgorithm } from './lib';
 import { copyTextToClipboard } from '../../lib';
+import { useLocale } from '../../hook/locale-context';
+import { u, uT } from '../ui-lang';
 import type { InputStatus } from 'antd/es/_util/statusUtils';
 
 const { Text } = Typography;
 
 const OTPGenerator :React.FC = () => {
+
+  const { locale } = useLocale();
+  const t = (zh: string) => u(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => uT(locale, zh, v);
 
   const [ notice, contextHolder ] = message.useMessage();
   const [ mode, setMode ] = useState<'totp' | 'hotp'>('totp');
@@ -58,49 +64,49 @@ const OTPGenerator :React.FC = () => {
   const copyCode = () => {
     if (code === '') return;
     copyTextToClipboard(code);
-    notice.success('验证码已复制');
+    notice.success(t('验证码已复制'));
   };
 
   const copyUri = () => {
     copyTextToClipboard(uri);
-    notice.success('otpauth 链接已复制');
+    notice.success(t('otpauth 链接已复制'));
   };
 
   return (
     <Space direction="vertical" size="middle" align="start" style={ { width: '100%', maxWidth: 880 } }>
       { contextHolder }
-      <Card size="small" style={ { width: '100%' } } title="动态口令">
+      <Card size="small" style={ { width: '100%' } } title={t('动态口令')}>
         <Space direction="vertical" size="middle" style={ { width: '100%' } }>
           <Space wrap>
             <Segmented
               value={ mode }
               onChange={ (v) => setMode(v as 'totp' | 'hotp') }
               options={ [
-                { label: 'TOTP (时间)', value: 'totp' },
-                { label: 'HOTP (计数)', value: 'hotp' },
+                { label: t('TOTP (时间)'), value: 'totp' },
+                { label: t('HOTP (计数)'), value: 'hotp' },
               ] }
             />
-            <Text type="secondary">兼容 Google / Microsoft Authenticator</Text>
+            <Text type="secondary">{t('兼容 Google / Microsoft Authenticator')}</Text>
           </Space>
           <Form layout="inline" style={ { rowGap: 12 } }>
-            <Form.Item label="密钥" style={ { marginBottom: 0 } }>
+            <Form.Item label={t('密钥')} style={ { marginBottom: 0 } }>
               <Space.Compact>
                 <Input
                   allowClear
                   status={ secretStatus }
                   value={ secret }
                   onChange={ (e) => setSecret(e.target.value.toUpperCase().replace(/\s/gu, '')) }
-                  placeholder="Base32, 如 GEZDGNBV…"
+                  placeholder={t('Base32, 如 GEZDGNBV…')}
                   style={ { width: 260, fontFamily: 'monospace' } }
                 />
                 <Button
                   icon={ <ReloadOutlined /> }
                   onClick={ () => setSecret(randomBase32Secret()) }
-                  title="随机生成密钥"
+                  title={t('随机生成密钥')}
                 />
               </Space.Compact>
             </Form.Item>
-            <Form.Item label="算法" style={ { marginBottom: 0 } }>
+            <Form.Item label={t('算法')} style={ { marginBottom: 0 } }>
               <Select
                 value={ algorithm }
                 style={ { width: 110 } }
@@ -108,58 +114,58 @@ const OTPGenerator :React.FC = () => {
                 options={ [{ value: 'SHA1' }, { value: 'SHA256' }, { value: 'SHA512' }] }
               />
             </Form.Item>
-            <Form.Item label="位数" style={ { marginBottom: 0 } }>
-              <Select value={ digits } style={ { width: 80 } } onChange={ setDigits } options={ [{ value: 6, label: '6 位' }, { value: 7, label: '7 位' }, { value: 8, label: '8 位' }] } />
+            <Form.Item label={t('位数')} style={ { marginBottom: 0 } }>
+              <Select value={ digits } style={ { width: 80 } } onChange={ setDigits } options={ [{ value: 6, label: t('6 位') }, { value: 7, label: t('7 位') }, { value: 8, label: t('8 位') }] } />
             </Form.Item>
             { mode === 'totp' && (
-              <Form.Item label="步长(秒)" style={ { marginBottom: 0 } }>
+              <Form.Item label={t('步长(秒)')} style={ { marginBottom: 0 } }>
                 <InputNumber min={ 10 } max={ 300 } step={ 10 } value={ period } onChange={ (v) => v && setPeriod(v) } style={ { width: 90 } } />
               </Form.Item>
             ) }
             { mode === 'hotp' && (
-              <Form.Item label="计数" style={ { marginBottom: 0 } }>
+              <Form.Item label={t('计数')} style={ { marginBottom: 0 } }>
                 <Space.Compact>
                   <InputNumber min={ 0 } precision={ 0 } value={ counter } onChange={ (v) => v != null && setCounter(v) } style={ { width: 110 } } />
-                  <Button onClick={ () => setCounter((c) => c + 1) }>+1</Button>
+                  <Button onClick={ () => setCounter((c) => c + 1) }>{t('+1')}</Button>
                 </Space.Compact>
               </Form.Item>
             ) }
           </Form>
           <Space.Compact style={ { width: '100%' } }>
-            <Input addonBefore="名称" value={ issuer } onChange={ (e) => setIssuer(e.target.value) } placeholder="如 GitHub (可选)" style={ { width: 220 } } />
-            <Input addonBefore="账号" value={ account } onChange={ (e) => setAccount(e.target.value) } placeholder="用于扫码导入的标签" />
+            <Input addonBefore={t('名称')} value={ issuer } onChange={ (e) => setIssuer(e.target.value) } placeholder={t('如 GitHub (可选)')} style={ { width: 220 } } />
+            <Input addonBefore={t('账号')} value={ account } onChange={ (e) => setAccount(e.target.value) } placeholder={t('用于扫码导入的标签')} />
           </Space.Compact>
           { err !== '' && <Text type="danger">{ err }</Text> }
         </Space>
       </Card>
 
-      <Card size="small" style={ { width: '100%' } } title={ mode === 'totp' ? '当前验证码' : '当前验证码 (每次使用后计数 +1)' }>
+      <Card size="small" style={ { width: '100%' } } title={ mode === 'totp' ? t('当前验证码') : t('当前验证码 (每次使用后计数 +1)') }>
         { secretValid ? (
           <Space direction="vertical" size="middle" style={ { width: '100%' } }>
             <Space align="center">
               <Text style={ { fontSize: 46, fontFamily: 'monospace', letterSpacing: 8, color: '#1677ff', lineHeight: 1.1 } }>
                 { code }
               </Text>
-              <Button icon={ <CopyOutlined /> } onClick={ copyCode }>复制</Button>
+              <Button icon={ <CopyOutlined /> } onClick={ copyCode }>{t('复制')}</Button>
             </Space>
             { mode === 'totp' && (
               <Space direction="vertical" size={ 0 } style={ { width: 260 } }>
                 <Progress percent={ Math.round((remaining / period) * 100) } showInfo={ false } size="small" strokeColor={ remaining <= 5 ? '#ff4d4f' : '#1677ff' } />
-                <Text type="secondary" style={ { fontSize: 12 } }>{ remaining } 秒后刷新</Text>
+                <Text type="secondary" style={ { fontSize: 12 } }>{tt('{r} 秒后刷新', { r: remaining })}</Text>
               </Space>
             ) }
             { uri !== '' && (
               <Space size="middle" align="center">
                 <QRCode value={ uri } size={ 132 } bordered={ false } icon="https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg" iconSize={ 22 } />
                 <Space direction="vertical">
-                  <Text type="secondary" style={ { fontSize: 12 } }>扫码添加至 Authenticator (otpauth://)</Text>
-                  <Button size="small" icon={ <CopyOutlined /> } onClick={ copyUri }>复制导入链接</Button>
+                  <Text type="secondary" style={ { fontSize: 12 } }>{t('扫码添加至 Authenticator (otpauth://)')}</Text>
+                  <Button size="small" icon={ <CopyOutlined /> } onClick={ copyUri }>{t('复制导入链接')}</Button>
                 </Space>
               </Space>
             ) }
           </Space>
         ) : (
-          <Text type="secondary">{ secret.trim() === '' ? '请输入或生成密钥' : '密钥格式有误' }</Text>
+          <Text type="secondary">{ secret.trim() === '' ? t('请输入或生成密钥') : t('密钥格式有误') }</Text>
         ) }
       </Card>
     </Space>
