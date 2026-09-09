@@ -1,4 +1,8 @@
 import { AppContext } from "../hook/app-context";
+import { useLocale } from "../hook/locale-context";
+import { tr } from "../i18n/lang";
+import shell from "../i18n/shell";
+import { appNameOf } from "../App/app-i18n";
 import React,{ useState,useContext } from "react";
 import { Breadcrumb, Dropdown, Layout, Tabs, theme } from "antd";
 const { Content } = Layout;
@@ -9,7 +13,7 @@ import { Suspense } from "react";
 import { getDefaultApp } from "../lib/setting";
 import "./layout.css"
 
-// 非工具类固定页面 (不在 appList 中): key -> 页面名称
+// 非工具类固定页面 (不在 appList 中): key -> zh-CN 页面名称 (显示名随语言动态取 lang 包)
 const PAGE_NAMES: Record<string,string> = {
   "AppStore": "应用中心",
   "Setting": "设置",
@@ -36,15 +40,18 @@ const MainContent :React.FC = () => {
   const { app, tabs, closeTab, closeLeft, closeRight, closeOthers } = useContext(AppContext)!
   const defaultApp = getDefaultApp();
   const navigate = useNavigate();
+  const { locale } = useLocale();
   const { token: { colorBgContainer } } = theme.useToken();
 
   // 类型分组 -> 分组名称 (面包屑的类型; 取纯文本 name, 避免带上菜单里的应用数徽标)
-  const groupLabels = new Map(genMenuList(appList).map((g) => [g.key, g.name ?? String(g.label)]));
+  const groupLabels = new Map(genMenuList(appList).map((g) => [g.key, tr(shell, locale, 'cat.' + g.key, g.name ?? String(g.label))]));
 
-  // 页面 key -> 应用名称
+  // 页面 key -> 应用名称 (随当前语言)
   const pageName = (key :string) => {
     const info = appList.find((item) => item.key === key);
-    return info ? info.label : (PAGE_NAMES[key] ?? key);
+    if (info) return appNameOf(locale, key, info.label);
+    if (PAGE_NAMES[key]) return appNameOf(locale, key, PAGE_NAMES[key]);
+    return key;
   };
 
   // 面包屑: <类型> / <应用名称> (固定页面只显示页面名称)
@@ -53,11 +60,11 @@ const MainContent :React.FC = () => {
     const info = appList.find((item) => item.key === key);
     if (info) {
       return [
-        { title: groupLabels.get(info.type) ?? '其它' },
-        { title: info.label },
+        { title: groupLabels.get(info.type) ?? tr(shell, locale, 'cat.misc', '其它') },
+        { title: appNameOf(locale, info.key, info.label) },
       ];
     }
-    return PAGE_NAMES[key] ? [{ title: PAGE_NAMES[key] }] : [{ title: key }];
+    return PAGE_NAMES[key] ? [{ title: appNameOf(locale, key, PAGE_NAMES[key]) }] : [{ title: key }];
   };
 
   // 保活容器: 所有已打开标签的页面保持挂载, 仅显示当前页
@@ -66,13 +73,13 @@ const MainContent :React.FC = () => {
   const showKey = validPage(app) ? app : (pages.length > 0 ? pages[pages.length - 1] : '');
   if (validPage(app) && !pages.includes(app)) pages.push(app);
 
-  // 标签右键菜单: 关闭左侧 / 关闭右侧 / 关闭其他
+  // 标签右键菜单: 关闭左侧 / 关闭右侧 / 关闭其他 (文案随语言)
   const tabMenuItems = (key :string) => {
     const idx = tabs.indexOf(key);
     return [
-      { key: 'left',  label: '关闭左侧', disabled: idx <= 0 },
-      { key: 'right', label: '关闭右侧', disabled: idx < 0 || idx === tabs.length - 1 },
-      { key: 'others', label: '关闭其他', disabled: tabs.length <= 1 },
+      { key: 'left',  label: tr(shell, locale, 'tabs.left', '关闭左侧'), disabled: idx <= 0 },
+      { key: 'right', label: tr(shell, locale, 'tabs.right', '关闭右侧'), disabled: idx < 0 || idx === tabs.length - 1 },
+      { key: 'others', label: tr(shell, locale, 'tabs.others', '关闭其他'), disabled: tabs.length <= 1 },
     ];
   };
   const tabActions: Record<string, (key :string) => void> = { left: closeLeft, right: closeRight, others: closeOthers };
@@ -124,7 +131,7 @@ const MainContent :React.FC = () => {
             {
               pages.map((key) => (
                 <div key={ key } className="keep-alive-item" style={ { display: key === showKey ? undefined : 'none' } }>
-                  <Suspense fallback={ <div>应用正在加载中...</div> }>
+                  <Suspense fallback={ <div>{ tr(shell, locale, 'loading', '应用正在加载中...') }</div> }>
                     <KeepAlivePage Page={ pageComps.get(key)! } />
                   </Suspense>
                 </div>

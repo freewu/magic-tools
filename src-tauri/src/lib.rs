@@ -44,6 +44,18 @@ fn set_theme_check(
     let _ = system.set_checked(mode == "system");
 }
 
+/// 同步托盘菜单中三个界面语言(简体中文/繁體中文/English)的勾选状态
+fn set_locale_check(
+    zh_cn: &CheckMenuItem<tauri::Wry>,
+    zh_tw: &CheckMenuItem<tauri::Wry>,
+    en: &CheckMenuItem<tauri::Wry>,
+    locale: &str,
+) {
+    let _ = zh_cn.set_checked(locale == "zh-CN");
+    let _ = zh_tw.set_checked(locale == "zh-TW");
+    let _ = en.set_checked(locale == "en");
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -61,7 +73,7 @@ pub fn run() {
         .setup(|app| {
             let version = app.package_info().version.to_string();
 
-            // 托盘菜单: [展示窗口, 设置, 帮助, 应用列表, 显示模式▸, MagicTools V{version}, 退出]
+            // 托盘菜单: [展示窗口, 设置, 帮助, 应用列表, 显示模式▸, 语言▸, MagicTools V{version}, 退出]
             let show_item =
                 MenuItem::with_id(app, "show", "展示窗口", true, None::<&str>)?;
             let open_setting_item = MenuItem::with_id(
@@ -127,6 +139,39 @@ pub fn run() {
                 &[&light_item, &dark_item, &system_item],
             )?;
 
+            // 语言子菜单: 简体中文 / 繁體中文 / English (单选勾选, 默认简体中文)
+            // 前端语言包位于每个应用目录 lang.ts (default 为该包回退语言)
+            let zh_cn_item = CheckMenuItem::with_id(
+                app,
+                "locale-zh-CN",
+                "简体中文",
+                true,
+                true,
+                None::<&str>,
+            )?;
+            let zh_tw_item = CheckMenuItem::with_id(
+                app,
+                "locale-zh-TW",
+                "繁體中文",
+                true,
+                false,
+                None::<&str>,
+            )?;
+            let en_item = CheckMenuItem::with_id(
+                app,
+                "locale-en",
+                "English",
+                true,
+                false,
+                None::<&str>,
+            )?;
+            let locale_submenu = Submenu::with_items(
+                app,
+                "语言",
+                true,
+                &[&zh_cn_item, &zh_tw_item, &en_item],
+            )?;
+
             let menu = Menu::with_items(
                 app,
                 &[
@@ -135,6 +180,7 @@ pub fn run() {
                     &open_help_item,
                     &open_appstore_item,
                     &theme_submenu,
+                    &locale_submenu,
                     &about_item,
                     &quit_item,
                 ],
@@ -169,6 +215,15 @@ pub fn run() {
                         };
                         let _ = app.emit("theme-mode-set", mode);
                     }
+                    // 托盘切换界面语言: 广播给前端 (locale-context)
+                    "locale-zh-CN" | "locale-zh-TW" | "locale-en" => {
+                        let locale = match event.id.as_ref() {
+                            "locale-zh-CN" => "zh-CN",
+                            "locale-zh-TW" => "zh-TW",
+                            _ => "en",
+                        };
+                        let _ = app.emit("locale-set", locale);
+                    }
                     _ => {}
                 })
                 .on_tray_icon_event(|tray, event| {
@@ -191,6 +246,16 @@ pub fn run() {
             app.listen("theme-mode-changed", move |event| {
                 if let Ok(mode) = serde_json::from_str::<String>(event.payload()) {
                     set_theme_check(&light_handle, &dark_handle, &system_handle, &mode);
+                }
+            });
+
+            // 监听前端(设置页/左下角)切换界面语言, 同步托盘「语言」菜单勾选状态
+            let zh_cn_handle = zh_cn_item.clone();
+            let zh_tw_handle = zh_tw_item.clone();
+            let en_handle = en_item.clone();
+            app.listen("locale-changed", move |event| {
+                if let Ok(locale) = serde_json::from_str::<String>(event.payload()) {
+                    set_locale_check(&zh_cn_handle, &zh_tw_handle, &en_handle, &locale);
                 }
             });
 

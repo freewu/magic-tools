@@ -2,6 +2,7 @@ import { Layout } from "antd";
 import React, { useEffect, useLayoutEffect } from "react";
 import { useNavigate } from "react-router-dom"
 import { ThemeProvider } from "./hook/theme-context"
+import { LocaleProvider } from "./hook/locale-context"
 import { AppContextProvider } from "./hook/app-context"
 import { default as MainSider } from './layout/main-sider';
 import { default as MainContent } from './layout/main-content';
@@ -58,16 +59,18 @@ const Main :React.FC = () => {
   });
 
   return (
-    <ThemeProvider>
-      <AppContextProvider>
-        <UpdateProvider>
-          <Layout style={ { height: '100vh' } }>
-            <MainSider />
-            <MainContent />
-          </Layout>
-        </UpdateProvider>
-      </AppContextProvider>
-    </ThemeProvider>
+    <LocaleProvider>
+      <ThemeProvider>
+        <AppContextProvider>
+          <UpdateProvider>
+            <Layout style={ { height: '100vh' } }>
+              <MainSider />
+              <MainContent />
+            </Layout>
+          </UpdateProvider>
+        </AppContextProvider>
+      </ThemeProvider>
+    </LocaleProvider>
   );
 };
 

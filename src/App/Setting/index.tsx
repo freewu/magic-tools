@@ -3,6 +3,10 @@ import { SettingOutlined, SafetyOutlined, CalculatorOutlined, SwapOutlined, More
 import { useRef, useState, useEffect, type ReactNode, type UIEvent } from "react";
 import "./setting.css";
 import { itemList } from "./data";
+import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
+import shell from "../../i18n/shell";
+import { appNameOf } from "../app-i18n";
 
 const CATEGORY_ICONS: Record<string, ReactNode> = {
   system: <SettingOutlined />,
@@ -29,6 +33,7 @@ const readSaved = (): string => {
 
 const Setting = () => {
   const { token } = theme.useToken();
+  const { locale } = useLocale();
   const [ active, setActive ] = useState<string>(readSaved);
   const [ hoverKey, setHoverKey ] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -38,6 +43,12 @@ const Setting = () => {
   const persist = (key: string) => {
     try { localStorage.setItem(STORAGE_KEY, key); } catch (e) { /* ignore */ }
   };
+
+  // 左侧分类栏名称: system 分组与工具分类共用 shell 词典 (fallback = itemList 原始中文 label)
+  const itemName = (itemKey: string, fallback: string): string =>
+    itemKey === 'system'
+      ? tr(shell, locale, 'system', fallback)
+      : tr(shell, locale, 'cat.' + itemKey, fallback);
 
   // 初始定位到上次浏览的分类
   useEffect(() => {
@@ -89,7 +100,7 @@ const Setting = () => {
         } }
       >
         <div style={ { fontSize: 11, fontWeight: 700, color: token.colorTextTertiary, textTransform: 'uppercase', letterSpacing: '0.08em', padding: '2px 10px 8px' } }>
-          设置
+          { appNameOf(locale, 'Setting', '设置') }
         </div>
         <div style={ { display: 'flex', flexDirection: 'column', gap: 2 } }>
           { itemList.map((item) => {
@@ -115,7 +126,7 @@ const Setting = () => {
                   <span style={ { position: 'absolute', left: 0, top: '20%', bottom: '20%', width: 3, borderRadius: 2, background: token.colorPrimary } } />
                 ) }
                 <span style={ { fontSize: 15, display: 'inline-flex' } }>{ CATEGORY_ICONS[item.key] ?? null }</span>
-                <span style={ { fontSize: 13 } }>{ item.label }</span>
+                <span style={ { fontSize: 13 } }>{ itemName(item.key, item.label) }</span>
               </div>
             );
           }) }
@@ -139,7 +150,7 @@ const Setting = () => {
           >
             <div style={ { display: 'flex', alignItems: 'center', gap: 8, fontSize: 16, fontWeight: 700, padding: '14px 2px 8px', color: token.colorText } }>
               <span style={ { fontSize: 15, display: 'inline-flex' } }>{ CATEGORY_ICONS[item.key] ?? null }</span>
-              { item.label }
+              { itemName(item.key, item.label) }
             </div>
             <div style={ { background: token.colorBgContainer, border: `1px solid ${token.colorBorderSecondary}`, borderRadius: 8, padding: '6px 16px 16px' } }>
               { item.children }

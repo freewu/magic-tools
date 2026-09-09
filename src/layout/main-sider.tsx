@@ -1,10 +1,15 @@
 import { AppContext } from "../hook/app-context";
-import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, SettingOutlined } from '@ant-design/icons';
-import { Button, Layout, Menu, Space } from "antd";
-import React,{ useState,useContext } from "react";
-const { Sider, Content } = Layout;
+import { useLocale, LOCALE_IDS, LOCALE_LABELS } from "../hook/locale-context";
+import type { LocaleId } from "../i18n/lang";
+import { tr, trTpl } from "../i18n/lang";
+import shell from "../i18n/shell";
+import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, SettingOutlined, GlobalOutlined, CheckOutlined } from '@ant-design/icons';
+import { Badge, Button, Dropdown, Layout, Menu, Space } from "antd";
+import React, { useMemo, useState, useContext } from "react";
+const { Sider } = Layout;
 import { useNavigate } from "react-router-dom"
 import { appList, genMenuList } from "../App";
+import { appNameOf } from "../App/app-i18n";
 import { getSiderFlag } from "../lib/setting";
 import { openUrl } from "../lib/tauri";
 import { useUpdate } from "./update-context";
@@ -15,6 +20,7 @@ const MainSider: React.FC = () => {
 
   const { app, setApp } = useContext(AppContext)!
   const { hasUpdate, latest, dismiss } = useUpdate();
+  const { locale, setLocale } = useLocale();
   const [ collapsed, setCollapsed ] = useState(!getSiderFlag());
   const navigate = useNavigate();
 
@@ -24,12 +30,41 @@ const MainSider: React.FC = () => {
     navigate(e.key, { replace: true });
   }
 
+  // 语言切换下拉 (托盘「语言」同构): 简 / 繁 / EN
+  const langMenu = {
+    items: LOCALE_IDS.map((id) => ({
+      key: id,
+      label: LOCALE_LABELS[id],
+      icon: id === locale ? <CheckOutlined /> : undefined,
+    })),
+    onClick: ({ key }: { key: string }) => setLocale(key as LocaleId),
+  };
+
+  // 菜单分类名 + 工具名随语言实时重算 (分类徽标逻辑与原 genMenuList 一致)
+  const menuItems = useMemo(() => {
+    return genMenuList(appList).map((g) => ({
+      key: g.key,
+      icon: g.icon,
+      label: (
+        <span className="menu-group-label">
+          <span>{ tr(shell, locale, 'cat.' + g.key, g.name) }</span>
+          { g.children.length > 0 && <Badge count={ g.children.length } size="small" overflowCount={ 999 } style={ { backgroundColor: '#1677ff' } } /> }
+        </span>
+      ),
+      children: g.children.map((c) => ({
+        key: c.key,
+        icon: c.icon,
+        label: appNameOf(locale, c.key, c.label),
+      })),
+    }));
+  }, [locale]);
+
   return (
   <Sider trigger={null} collapsible collapsed={ collapsed } style={ { height: '100%' } }>
     <div style={ { display: 'flex', flexDirection: 'column', height: '100%' } }>
       <Space style={ { padding: '4px 8px', flexShrink: 0 } }>
         <Button
-            title = { collapsed ? "展开" : "收起" }
+            title = { collapsed ? tr(shell, locale, 'sider.expand', '展开') : tr(shell, locale, 'sider.collapse', '收起') }
             type="link"
             icon={ collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             onClick={() => setCollapsed(!collapsed) }
@@ -39,7 +74,7 @@ const MainSider: React.FC = () => {
             }}
         />
         <Button
-            title = { "应用中心" }
+            title = { appNameOf(locale, 'AppStore', '应用中心') }
             type="link"
             icon={ <AppstoreOutlined />}
             onClick={() => { setApp('AppStore'); navigate('AppStore', { replace: true }); } }
@@ -61,11 +96,12 @@ const MainSider: React.FC = () => {
           selectedKeys= { [ app ] }
           // activeKey={ '' }
           onClick = { menuClick }
-          items={ genMenuList(appList) }
+          items={ menuItems }
         />
       </div>
 
-      {/* 底部区: 展开时左侧显示版本号 (有新版本时右上角呼吸角标, 点击进帮助; 角标点击直达更新页), 右侧设置图标; 折叠时仅设置图标居中 */}
+      {/* 底部区: 展开时左侧版本号 (有新版本时右上角呼吸角标, 点击进帮助; 角标点击直达更新页),
+          右侧语言切换 + 设置图标; 折叠时仅两图标居中 */}
       <div style={ {
         flexShrink: 0,
         background: '#001529',
@@ -93,7 +129,7 @@ const MainSider: React.FC = () => {
             v{ getVersion() }
             { hasUpdate && (
               <span
-                title={ `有新版 v${latest?.version} 可用, 点击查看更新内容并下载` }
+                title={ trTpl(shell, locale, 'update.dot', { v: latest?.version ?? '' }) }
                 onClick={ (e) => {
                   e.stopPropagation();
                   if (latest) void openUrl(latest.url);
@@ -114,8 +150,25 @@ const MainSider: React.FC = () => {
             ) }
           </div>
         ) }
+        <Dropdown menu={ langMenu } trigger={ ['click'] } placement="top">
+          <Button
+            title={ tr(shell, locale, 'lang', '界面语言') }
+            type="text"
+            icon={ <GlobalOutlined /> }
+            style={ {
+              color: 'rgba(255,255,255,0.85)',
+              fontSize: '15px',
+              height: 34,
+              width: 34,
+              padding: 0,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            } }
+          />
+        </Dropdown>
         <Button
-            title={ "设置" }
+            title={ appNameOf(locale, 'Setting', '设置') }
             type="text"
             icon={ <SettingOutlined /> }
             onClick={ () => { setApp('Setting'); navigate('Setting', { replace: true }); } }

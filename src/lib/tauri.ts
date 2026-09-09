@@ -237,6 +237,38 @@ export async function emitThemeMode(mode: string) {
 }
 
 /**
+ * 通知托盘同步「语言」子菜单勾选 (zh-CN / zh-TW / en)
+ */
+export async function emitLocale(locale: string) {
+  if (!isTauri()) return;
+  try {
+    const { emit } = await import('@tauri-apps/api/event');
+    await emit('locale-changed', locale);
+  } catch (err) {
+    console.error('tauri emitLocale failed:', err);
+  }
+}
+
+/**
+ * 监听托盘菜单「语言」子菜单的切换事件
+ * @param handler 收到语言 id ('zh-CN' | 'zh-TW' | 'en') 时回调
+ * @returns 取消监听的函数
+ */
+export async function listenLocale(handler: (locale: string) => void): Promise<() => void> {
+  if (!isTauri()) return () => {};
+  try {
+    const { listen } = await import('@tauri-apps/api/event');
+    const unlisten = await listen<string>('locale-set', (event) => {
+      handler(event.payload);
+    });
+    return unlisten;
+  } catch (err) {
+    console.error('tauri listenLocale failed:', err);
+    return () => {};
+  }
+}
+
+/**
  * 监听托盘菜单「设置 / 帮助 / 应用列表」的页面跳转事件
  * @param handler 收到目标页面 key ('Setting' | 'Help' | 'AppStore') 时回调
  * @returns 取消监听的函数
