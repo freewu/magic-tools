@@ -1,6 +1,8 @@
 import { Button, Checkbox, Divider, Input, InputNumber, Select, Space, Tag, message } from 'antd';
 import { useState } from 'react';
 import { copyTextToClipboard } from '../../lib';
+import { useLocale } from '../../hook/locale-context';
+import { u, uT } from '../ui-lang';
 import { scrypt, toHex } from './lib';
 
 // 默认参数参考 RFC 7914 交互式登录建议 (N=16384, r=8, p=1)
@@ -20,6 +22,9 @@ const randomSaltHex = (bytes = 16): string => {
 };
 
 const ScryptCalc = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => u(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => uT(locale, zh, v);
   const [ password, setPassword ] = useState(''); // 口令
   const [ salt, setSalt ] = useState(randomSaltHex()); // 盐(hex, 可随机)
   const [ n, setN ] = useState(16384); // CPU/内存成本
@@ -36,7 +41,7 @@ const ScryptCalc = () => {
     const txt = (e.target as HTMLInputElement).value.trim();
     if (txt !== '') {
       copyTextToClipboard(txt);
-      notice.success('复制到粘贴板成功！！！');
+      notice.success(t('复制到粘贴板成功！！！'));
     }
   };
 
@@ -44,11 +49,11 @@ const ScryptCalc = () => {
 
   const calc = async () => {
     if (password.trim() === '') {
-      notice.warning('请输入口令');
+      notice.warning(t('请输入口令'));
       return;
     }
     if (salt.trim() === '') {
-      notice.warning('请输入盐值');
+      notice.warning(t('请输入盐值'));
       return;
     }
     setBusy(true);
@@ -60,7 +65,7 @@ const ScryptCalc = () => {
       setResult(format(toHex(dk)));
       setCostMs(Math.round(performance.now() - t0));
     } catch (err) {
-      notice.error(`计算失败: ${(err as Error).message}`);
+      notice.error(tt('计算失败: {m}', { m: (err as Error).message }));
       setResult('');
       setCostMs(0);
     } finally {
@@ -73,17 +78,17 @@ const ScryptCalc = () => {
       {contextHolder}
 
       <Space wrap style={{ marginBottom: 4 }}>
-        <Tag color="#2db7f5">口令</Tag>
-        <Tag color="#87d068">盐</Tag>
+        <Tag color="#2db7f5">{t('口令')}</Tag>
+        <Tag color="#87d068">{t('盐')}</Tag>
         <Tag color="#108ee9">N / r / p</Tag>
-        <Tag color="#ff5500">内存开销 = 128 · N · r 字节</Tag>
+        <Tag color="#ff5500">{t('内存开销 = 128 · N · r 字节')}</Tag>
       </Space>
 
       <div style={{ margin: '6px 0' }}>
-        <span style={{ marginRight: 8 }}>口令:</span>
+        <span style={{ marginRight: 8 }}>{t('口令:')}</span>
         <Input
           allowClear
-          placeholder="口令 (Password)"
+          placeholder={t('口令 (Password)')}
           style={{ width: 320 }}
           value={ password }
           onChange={ (e) => setPassword(e.target.value) }
@@ -92,28 +97,28 @@ const ScryptCalc = () => {
       </div>
 
       <div style={{ margin: '6px 0' }}>
-        <span style={{ marginRight: 8 }}>盐值:</span>
+        <span style={{ marginRight: 8 }}>{t('盐值:')}</span>
         <Input
           allowClear
-          placeholder="盐 (Salt, 十六进制字符串或任意文本)"
+          placeholder={t('盐 (Salt, 十六进制字符串或任意文本)')}
           style={{ width: 480 }}
           value={ salt }
           onChange={ (e) => setSalt(e.target.value) }
           onPressEnter={ calc }
         />
-        <Button style={{ marginLeft: 8 }} onClick={ () => setSalt(randomSaltHex()) }>随机盐</Button>
+        <Button style={{ marginLeft: 8 }} onClick={ () => setSalt(randomSaltHex()) }>{t('随机盐')}</Button>
       </div>
 
       <div style={{ margin: '6px 0' }}>
         <Space wrap>
-          <span>N:</span>
+          <span>{t('N:')}</span>
           <Select
             style={{ width: 140 }}
             value={ n }
             onChange={ (v: number) => setN(v) }
             options={ N_OPTIONS }
           />
-          <span>r:</span>
+          <span>{t('r:')}</span>
           <InputNumber
             addonAfter=""
             min={ 1 }
@@ -121,26 +126,26 @@ const ScryptCalc = () => {
             value={ r }
             onChange={ (v: number | null) => { if (v != null) setR(v); } }
           />
-          <span>p:</span>
+          <span>{t('p:')}</span>
           <InputNumber
             min={ 1 }
             max={ 16 }
             value={ p }
             onChange={ (v: number | null) => { if (v != null) setP(v); } }
           />
-          <span>派生长度:</span>
+          <span>{t('派生长度:')}</span>
           <InputNumber
-            addonAfter="字节"
+            addonAfter={t('字节')}
             min={ 16 }
             max={ 256 }
             value={ dkLen }
             onChange={ (v: number | null) => { if (v != null) setDkLen(v); } }
           />
           <Checkbox checked={ upper } onChange={ (e) => { setUpper(e.target.checked); if (result !== '') setResult(e.target.checked ? result.toUpperCase() : result.toLowerCase()); } }>
-            大写显示
+            {t('大写显示')}
           </Checkbox>
-          <Button type="primary" loading={ busy } onClick={ calc }>计算</Button>
-          <Button onClick={ () => { setPassword(''); setResult(''); setCostMs(0); } } style={ { backgroundColor: '#dc3545', color: '#fff' } }>清除</Button>
+          <Button type="primary" loading={ busy } onClick={ calc }>{t('计算')}</Button>
+          <Button onClick={ () => { setPassword(''); setResult(''); setCostMs(0); } } style={ { backgroundColor: '#dc3545', color: '#fff' } }>{t('清除')}</Button>
         </Space>
       </div>
 
@@ -148,7 +153,7 @@ const ScryptCalc = () => {
 
       {costMs > 0 && (
         <div style={ { marginBottom: 4 } }>
-          <Tag color="geekblue">计算耗时: { costMs } ms</Tag>
+          <Tag color="geekblue">{tt('计算耗时: {ms} ms', { ms: costMs })}</Tag>
         </div>
       )}
 
@@ -156,10 +161,10 @@ const ScryptCalc = () => {
         showCount
         readOnly
         onDoubleClick={ inputClick }
-        title="双击复制结果到粘贴板"
+        title={t('双击复制结果到粘贴板')}
         style={ { margin: '5px 0' } }
         value={ result }
-        placeholder="派生密钥 (十六进制)"
+        placeholder={t('派生密钥 (十六进制)')}
         autoSize={ { minRows: 6, maxRows: 12 } }
       />
     </div>

@@ -2,6 +2,8 @@ import { Checkbox, Form, Input, Divider, message, Space, Tag, Button, InputNumbe
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
+import { useLocale } from "./../../hook/locale-context"
+import { u, uT } from "./../ui-lang"
 import { openFile } from "../../lib/file"
 import { arrayToOptions } from "../../lib/array"
 import { hashAlgoList } from "./data"
@@ -16,6 +18,9 @@ import "./pbkdf2.css";
 
 const PBKDF2Calc = () => {
 
+  const { locale } = useLocale();
+  const t = (zh: string) => u(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => uT(locale, zh, v);
 
   const [ value, setValue ] = useState(''); // 需要计算 hash 值的内容
   const [ algo, setAlgo ] = useState(getDefaultHashAlgo()); // 使用的 Hash 算法
@@ -31,7 +36,7 @@ const PBKDF2Calc = () => {
     const txt = (e.target as HTMLInputElement).value.trim();
     if(txt != "") {
       copyTextToClipboard(txt);
-      notice.success("复制到粘贴板成功！！！");
+      notice.success(t("复制到粘贴板成功！！！"));
     }
   };
 
@@ -120,10 +125,10 @@ const PBKDF2Calc = () => {
 
       <Row style = { { marginTop: "5px" }}>
         <Space>
-          <label>盐值:</label>
+          <label>{t('盐值:')}</label>
           <Input
             showCount
-            placeholder="盐值(Salt)"
+            placeholder={t('盐值(Salt)')}
             allowClear
             style={ { width: 735 } }
             onChange={ 
@@ -139,7 +144,7 @@ const PBKDF2Calc = () => {
 
       <Row style = { { marginTop: "5px" }}>
         <Space>
-          <label>算法:</label>
+          <label>{t('算法:')}</label>
           <Select
             value={ algo }
             style={{ width: 120 }}
@@ -150,9 +155,9 @@ const PBKDF2Calc = () => {
             } }
             options={ arrayToOptions(hashAlgoList) }
           />
-          <label>迭代次数:</label>
+          <label>{t('迭代次数:')}</label>
           <InputNumber
-            addonAfter="次"
+            addonAfter={t('次')}
             min = { 1 }
             max = { 100000 }
             style={ { width: 120 } }
@@ -165,9 +170,9 @@ const PBKDF2Calc = () => {
               } 
             } }
             value= { iter } />
-          <label>推导密钥长度:</label>
+          <label>{t('推导密钥长度:')}</label>
           <InputNumber
-            addonAfter="位"
+            addonAfter={t('位')}
             min = { 16 }
             max = { 2048 }
             style={ { width: 120 } }
@@ -180,11 +185,11 @@ const PBKDF2Calc = () => {
               } 
             } }
             value= { keyLength } />     
-          <Checkbox onChange={ onCheckChange } checked={ checked }>大写字符显示</Checkbox>
+          <Checkbox onChange={ onCheckChange } checked={ checked }>{t('大写字符显示')}</Checkbox>
           <Button 
             onClick={ () => { setValue(''); setResult(''); } }
             style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-          >清除</Button>
+          >{t('清除')}</Button>
         </Space>
       </Row>
 
@@ -194,10 +199,10 @@ const PBKDF2Calc = () => {
         showCount
         readOnly
         onDoubleClick={ inputClick }
-        title="双击复制结果到粘贴板"
+        title={t('双击复制结果到粘贴板')}
         style={ { margin: "5px 0 5px 0" }}
         value= { result }
-        placeholder="计算结果"
+        placeholder={t('计算结果')}
         autoSize={{ minRows: 10, maxRows: 15 }}
       />
       
