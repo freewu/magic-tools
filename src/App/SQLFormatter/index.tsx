@@ -7,6 +7,8 @@ import { format } from 'sql-formatter';
 import { saveTextFile } from "../../lib/tauri";
 import type { FormatOptionsWithLanguage,IndentStyle, KeywordCase, CommaPosition, LogicalOperatorNewline } from 'sql-formatter';
 import { languageList, keywordCaseList,indentStyleList,commaPositionList,logicalOperatorNewlineList } from "./data";
+import { useLocale } from '../../hook/locale-context';
+import { u, uT } from '../ui-lang';
 
 // 代码高亮 (按需: 仅注册 SQL 语言, 避免整库 190+ 语言全部打包)
 import 'highlight.js/styles/monokai-sublime.css';
@@ -16,6 +18,9 @@ highlight.registerLanguage('sql', sqlLang);
 import './sql-formatter.css';
 
 const URL = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => u(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => uT(locale, zh, v);
   // highlight配置
   //highlight.configure({ useBR: true});
 
@@ -44,20 +49,20 @@ const URL = () => {
   const textareaDoubleClick = (e :React.MouseEvent<HTMLElement>) => {
     if(result.trim() === "") return ;
     copyTextToClipboard(result);
-    notice.success( "复制到粘贴板成功！！！");
+    notice.success(t("复制到粘贴板成功！！！"));
   };
 
   // 保存格式化结果为 .sql 文件
   const saveSql = async () => {
     if (result.trim() === '') {
-      notice.warning('请先输入 SQL 语句进行格式化');
+      notice.warning(t('请先输入 SQL 语句进行格式化'));
       return;
     }
     try {
-      const saved = await saveTextFile('formatted.sql', result, '保存 SQL 文件', { filterName: 'SQL 文件', extensions: ['sql'] });
-      if (saved) notice.success('已保存 SQL 文件');
+      const saved = await saveTextFile('formatted.sql', result, t('保存 SQL 文件'), { filterName: t('SQL 文件'), extensions: ['sql'] });
+      if (saved) notice.success(t('已保存 SQL 文件'));
     } catch (err) {
-      notice.error('保存失败: ' + (err as Error).message);
+      notice.error(tt('保存失败: {m}', { m: (err as Error).message }));
     }
   };
 
@@ -145,22 +150,22 @@ const URL = () => {
         <Button 
           onClick={ () => { setResult(''); setValue(''); setHighLightResult(''); } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-        >清除</Button>
-        <label>语言类型:</label>
+        >{t('清除')}</Button>
+        <label>{t('语言类型:')}</label>
         <Select
           value={ language }
           style={{ width: 120 }}
           onChange={ (v :string) => { setLanguage(v); doFormatter(value,genConfig('language',v)) } }
           options={ arrayToOptions(languageList) }
         />
-        <label>关键字格式:</label>
+        <label>{t('关键字格式:')}</label>
         <Select
           value={ keywordCase }
           style={{ width: 100 }}
           onChange={ (v :string) => { setKeywordCase(v); doFormatter(value,genConfig('keywordCase',v)) } }
           options={ arrayToOptions(keywordCaseList) }
         />
-        <label>对齐方式:</label>
+        <label>{t('对齐方式:')}</label>
         <Select
           value={ indentStyle }
           style={{ width: 100 }}
@@ -170,11 +175,11 @@ const URL = () => {
         <Button 
           onClick={ saveSql }
           style={ { backgroundColor: "#17a2b8", color: "#fff" } } 
-        >保存为 .sql</Button>
+        >{t('保存为 .sql')}</Button>
         <Button 
           onClick={ ()=> { inputElement?.click() } }
           style={ { backgroundColor: "#007bff", color: "#fff" } } 
-        >打开 SQL 文件</Button>
+        >{t('打开 SQL 文件')}</Button>
         <input 
           onChange={ fileChange }
           ref={ input => inputElement = input as HTMLInputElement }
@@ -187,7 +192,7 @@ const URL = () => {
         style={ { margin: "12px 0 5px 0" }}
         onChange={ onTextAreaChange }
         value= { value }
-        placeholder="输入需要格式化的 SQL 语句 或 拖拽 .sql 文件到框内"
+        placeholder={t('输入需要格式化的 SQL 语句 或 拖拽 .sql 文件到框内')}
         autoSize={{ minRows: 5,maxRows: 5}}
       />
 
@@ -195,7 +200,7 @@ const URL = () => {
 
       <div
         style={ { height: resultHight }}
-        title="点击复制内容到粘贴板"
+        title={t('点击复制内容到粘贴板')}
         onClick={ textareaDoubleClick }
         className="code-output">
         <pre dangerouslySetInnerHTML={ { __html : highLightResult } } />
