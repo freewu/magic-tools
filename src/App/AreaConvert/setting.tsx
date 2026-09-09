@@ -6,9 +6,13 @@ import { getDefaultMSType,setDefaultMSType } from "./lib";
 import { getDefaultIUType,setDefaultIUType } from "./lib";
 import { getDefaultCNType,setDefaultCNType } from "./lib";
 import { getDefaultJPType,setDefaultJPType } from "./lib";
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
 
 
 export const AreaConvertSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
   
   const [ type, setType ] = useState(getDefaultUnitType()); // 默认制式
   const [ msType, setMSType ] = useState(getDefaultMSType()); // 默认公制单位
@@ -18,8 +22,8 @@ export const AreaConvertSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>面积转换</Divider>
-      <Form.Item label="默认制式">
+      <Divider orientation="left" plain>{ st('面积转换') }</Divider>
+      <Form.Item label={ st('默认制式') }>
         <Select
           value={ type }
           style={{ width: 240 }}
@@ -27,7 +31,7 @@ export const AreaConvertSetting = () => {
           options={ unitTypeList }
         />
       </Form.Item>
-      <Form.Item label="默认公制单位">
+      <Form.Item label={ st('默认公制单位') }>
         <Select
           value={ msType }
           style={{ width: 240 }}
@@ -35,7 +39,7 @@ export const AreaConvertSetting = () => {
           options={ getTypeList('ms') }
         />
       </Form.Item>
-      <Form.Item label="默认英制单位">
+      <Form.Item label={ st('默认英制单位') }>
         <Select
           value={ iuType }
           style={{ width: 240 }}
@@ -43,7 +47,7 @@ export const AreaConvertSetting = () => {
           options={ getTypeList('iu') }
         />
       </Form.Item>
-      <Form.Item label="默认市制单位">
+      <Form.Item label={ st('默认市制单位') }>
         <Select
           value={ cnType }
           style={{ width: 240 }}
@@ -51,7 +55,7 @@ export const AreaConvertSetting = () => {
           options={ getTypeList('cn') }
         />
       </Form.Item>
-      <Form.Item label="默认日式单位">
+      <Form.Item label={ st('默认日式单位') }>
         <Select
           value={ jpType }
           style={{ width: 240 }}

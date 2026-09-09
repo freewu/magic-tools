@@ -5,8 +5,12 @@ import { getDefaultOpacity, setDefaultOpacity } from "./lib";
 import { getDefaultPickMax, setDefaultPickMax } from "./lib";
 import { colorDataList } from "./data";
 import { useState } from "react";
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
 
 export const ColorSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
   const [ colorPad, setColorPad ] = useState(getDefaultColorPad()); // 默认展示的 颜色板
   const [ batchSwitch, setBatchSwitch ] = useState(getDefaultBatchSwitch()); // 默认是否开启批量取色
   const [ opacity, setOpacity ] = useState(getDefaultOpacity()); // 默认 opacity
@@ -23,8 +27,8 @@ export const ColorSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>CSS 配色</Divider>
-      <Form.Item label="默认展示配色板">
+      <Divider orientation="left" plain>{ st('CSS 配色') }</Divider>
+      <Form.Item label={ st('默认展示配色板') }>
         <Select
           value={ colorPad }
           style={{ width: 240 }}
@@ -32,7 +36,7 @@ export const ColorSetting = () => {
           options={ getColorPadList() }
         />
       </Form.Item>
-      <Form.Item label="默认 Opacity">
+      <Form.Item label={ st('默认 Opacity') }>
         <Space style={{ width: "100%" }}>
           <div style={ {width: "100%", maxWidth: 520} }>
             <Slider
@@ -46,13 +50,13 @@ export const ColorSetting = () => {
           { opacity / 10 }
         </Space>
       </Form.Item>
-      <Form.Item label="默认开启批量取色">
+      <Form.Item label={ st('默认开启批量取色') }>
         <Switch 
           onChange={ (value: boolean) => { setBatchSwitch(value); setDefaultBatchSwitch(value); } }
-          checkedChildren="开启" unCheckedChildren="关闭" 
+          checkedChildren={ st('开启') } unCheckedChildren={ st('关闭') } 
           checked={ batchSwitch } />
       </Form.Item>
-      <Form.Item label="默认最大批量取色个数">
+      <Form.Item label={ st('默认最大批量取色个数') }>
         <Space style={{ width: "100%" }}>
           <div style={ {width: "100%", maxWidth: 520} }>
             <Slider

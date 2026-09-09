@@ -2,15 +2,19 @@ import { Select, Form, Divider, notification, Slider, Space } from "antd";
 import { getDefaultErrorLevel, setDefaultErrorLevel, getDefaultSize, setDefaultSize } from "./lib";
 import { useState } from "react";
 import { errorCorrectionLevelList } from "./data";
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
 
 export const QRCodeGeneratorSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
   const [ level, setLevel ] = useState(getDefaultErrorLevel()); // 默认容错级别
   const [ size, setSize ] = useState(getDefaultSize()); // 默认尺寸
 
   return (
     <>
-      <Divider orientation="left" plain>二维码生成</Divider>
-      <Form.Item label="默认容错等级">
+      <Divider orientation="left" plain>{ st('二维码生成') }</Divider>
+      <Form.Item label={ st('默认容错等级') }>
         <Select
           value={ level }
           style={{ width: 240 }}
@@ -18,7 +22,7 @@ export const QRCodeGeneratorSetting = () => {
           options={ errorCorrectionLevelList }
         />
       </Form.Item>
-      <Form.Item label="默认尺寸">
+      <Form.Item label={ st('默认尺寸') }>
         <Space style={{ width: "100%" }}>
           <div style={ {width: "100%", maxWidth: 520} }>
             <Slider

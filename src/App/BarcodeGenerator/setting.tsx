@@ -7,8 +7,12 @@ import {
   getDefaultBarHeight, setDefaultBarHeight,
   getDefaultShowText, setDefaultShowText,
 } from "./lib";
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
 
 export const BarcodeGeneratorSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
   const [ format, setFormat ] = useState(getDefaultFormat()); // 默认格式
   const [ width, setWidth ] = useState(getDefaultBarWidth()); // 默认条宽
   const [ height, setHeight ] = useState(getDefaultBarHeight()); // 默认高度
@@ -16,8 +20,8 @@ export const BarcodeGeneratorSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>条形码生成</Divider>
-      <Form.Item label="默认格式">
+      <Divider orientation="left" plain>{ st('条形码生成') }</Divider>
+      <Form.Item label={ st('默认格式') }>
         <Select
           value={ format }
           style={ { width: 240 } }
@@ -25,7 +29,7 @@ export const BarcodeGeneratorSetting = () => {
           options={ barcodeFormatList }
         />
       </Form.Item>
-      <Form.Item label="默认条宽">
+      <Form.Item label={ st('默认条宽') }>
         <Space style={{ width: "100%" }}>
           <div style={ { width: "100%", maxWidth: 520 } }>
             <Slider
@@ -39,7 +43,7 @@ export const BarcodeGeneratorSetting = () => {
           { width }px
         </Space>
       </Form.Item>
-      <Form.Item label="默认高度">
+      <Form.Item label={ st('默认高度') }>
         <Space style={{ width: "100%" }}>
           <div style={ { width: "100%", maxWidth: 520 } }>
             <Slider
@@ -52,12 +56,12 @@ export const BarcodeGeneratorSetting = () => {
           { height }px
         </Space>
       </Form.Item>
-      <Form.Item label="显示内容">
+      <Form.Item label={ st('显示内容') }>
         <Radio.Group
           value={ showText }
           options={ [
-            { label: '显示', value: '1' },
-            { label: '隐藏', value: '0' },
+            { label: st('显示'), value: '1' },
+            { label: st('隐藏'), value: '0' },
           ] }
           optionType="button"
           buttonStyle="solid"

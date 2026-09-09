@@ -5,8 +5,12 @@ import { typeList, unitTypeList } from "./data";
 import { getDefaultMSType,setDefaultMSType } from "./lib";
 import { getDefaultIUType,setDefaultIUType } from "./lib";
 import { getDefaultCNType,setDefaultCNType } from "./lib";
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
 
 export const DistanceConvertSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
   
   const [ type, setType ] = useState(getDefaultUnitType()); // 默认制式
   const [ msType, setMSType ] = useState(getDefaultMSType()); // 默认公制单位
@@ -15,8 +19,8 @@ export const DistanceConvertSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>距离转换</Divider>
-      <Form.Item label="默认制式">
+      <Divider orientation="left" plain>{ st('距离转换') }</Divider>
+      <Form.Item label={ st('默认制式') }>
         <Select
           value={ type }
           style={{ width: 240 }}
@@ -24,7 +28,7 @@ export const DistanceConvertSetting = () => {
           options={ unitTypeList }
         />
       </Form.Item>
-      <Form.Item label="默认公制单位">
+      <Form.Item label={ st('默认公制单位') }>
         <Select
           value={ msType }
           style={{ width: 240 }}
@@ -32,7 +36,7 @@ export const DistanceConvertSetting = () => {
           options={ getTypeList('ms') }
         />
       </Form.Item>
-      <Form.Item label="默认英制单位">
+      <Form.Item label={ st('默认英制单位') }>
         <Select
           value={ iuType }
           style={{ width: 240 }}
@@ -40,7 +44,7 @@ export const DistanceConvertSetting = () => {
           options={ getTypeList('iu') }
         />
       </Form.Item>
-      <Form.Item label="默认市制单位">
+      <Form.Item label={ st('默认市制单位') }>
         <Select
           value={ cnType }
           style={{ width: 240 }}
