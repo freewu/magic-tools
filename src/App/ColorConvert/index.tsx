@@ -102,8 +102,13 @@ const ColorConvert = () => {
   const fmtText = (hex :string) :string => upperLowerTranslate(genColorString(hex, colorType));
 
   // 取色器选择颜色事件: 填入/输出格式跟随当前输入格式 (默认输入 HEX 时仍是 #rrggbb)
-  const onColorPickerChange = (value: Color, hex: string) => {
+  // 注意: antd ColorPicker onChange 第二参是 css 字符串(如 rgb(87,113,150)), 并非 hex,
+  // 必须用 value.toHexString() 取标准 #rrggbb 才能解析生成配色方案
+  const onColorPickerChange = (value: Color) => {
     setColorPickerHex(value);
+    // 带 alpha 时 toHexString() 返回 #rrggbbaa, 截取前 7 位以匹配本页支持的 #rrggbb 解析
+    const raw = value.toHexString();
+    const hex = raw.length > 7 ? raw.slice(0, 7) : raw;
     const text = fmtText(hex);
     setValue(text);
     // 转换 (按当前输入格式解析, 不再强制切回 HEX)
