@@ -6,8 +6,16 @@ import { unitTypeList } from "./data"
 import type { RadioChangeEvent } from 'antd';
 import { getDefaultUnitType, getTypeList, getDefaultType, getTypePlaceholder } from "./lib"
 import { InputStatus } from "antd/es/_util/statusUtils";
+import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
+import spLang from "./lang";
 
 const SpeedConvert = () => {
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(spLang, locale, key, fallback);
+  const getPlaceholder = (type :string) :string => {
+    return t('p_' + type, getTypePlaceholder(type) ?? '');
+  }
 
   const ut = getDefaultUnitType();
   const [ unitType, setUnitType ] = useState(ut); // 制式 
@@ -17,17 +25,17 @@ const SpeedConvert = () => {
 
   const dt = getDefaultType(ut);
   const [ type, setType ] = useState(dt); // 转换类型
-  const [ placeholder, setPlaceholder ] = useState(getTypePlaceholder(dt)); // 数字类型的输入提示
+  const [ placeholder, setPlaceholder ] = useState(getPlaceholder(dt)); // 数字类型的输入提示
   const [ result, setResult ] = useState(0); // 转换的结果 统一转换成 米
   const [ notice, contextHolder] = message.useMessage();
 
   const inputStyle = { cursor: "pointer" };
 
   // 切换类型
-  const onTypeChange = ({ target: { value : t } }: RadioChangeEvent) => {
-    setType(t);
-    setPlaceholder(getTypePlaceholder(t));
-    convert(value,t);
+  const onTypeChange = ({ target: { value : v } }: RadioChangeEvent) => {
+    setType(v);
+    setPlaceholder(getPlaceholder(v));
+    convert(value,v);
   };
 
   // 点击结果框,把结果复制到粘贴板
@@ -35,7 +43,7 @@ const SpeedConvert = () => {
     const txt = (e.target as HTMLInputElement).value.trim();
     if(txt != "") {
       copyTextToClipboard(txt);
-      notice.success("复制到粘贴板成功！！！");
+      notice.success(t('copyOk', '复制到粘贴板成功！！！'));
     }
   };
 
@@ -105,21 +113,21 @@ const SpeedConvert = () => {
             setTypeList(getTypeList(v));
             const dt = getDefaultType(v);
             setType(dt);
-            setPlaceholder(getTypePlaceholder(dt));
+            setPlaceholder(getPlaceholder(dt));
             convert(value,dt);
           } }
-          options={ unitTypeList }
+          options={ unitTypeList.map(i => ({ ...i, label: t('ut_' + i.value, i.label) })) }
         />
         <Radio.Group
           optionType = "button" buttonStyle="solid"
-          options = { typeList } 
+          options = { typeList.map(i => ({ ...i, label: t('u_' + i.value, i.label) })) } 
           onChange={ onTypeChange } 
           value={ type } 
         />
         <Button 
           onClick={ () => { setValue(''); setStatus(''); setResult(0); } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-        >清除</Button>
+        >{t('clear', '清除')}</Button>
       </Space>
 
       <TextArea
@@ -133,43 +141,43 @@ const SpeedConvert = () => {
 
       <Row wrap>
         <Col span={12}>
-          <Divider dashed plain>公制</Divider>
+          <Divider dashed plain>{t('ut_ms', '公制')}</Divider>
 
           <Form name="basic1" labelCol={{ span: 8 }} autoComplete="off">
-            <Form.Item label="米每秒(m/s)">
+            <Form.Item label={t('r_ms', '米每秒(m/s)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000 / 3600) } />
             </Form.Item>
-            <Form.Item label="千米每时(km/h)">
+            <Form.Item label={t('r_kmh', '千米每时(km/h)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result) } />
             </Form.Item>
-            <Form.Item label="厘米每秒(m/s)">
+            <Form.Item label={t('r_cms', '厘米每秒(m/s)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 100000 / 3600) } />
             </Form.Item>
-            <Form.Item label="千米每秒(km/s)">
+            <Form.Item label={t('r_kms', '千米每秒(km/s)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 3600) }/>
             </Form.Item>
-            <Form.Item label="马赫">
+            <Form.Item label={t('r_mach', '马赫')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1224) } />
             </Form.Item>
-            <Form.Item label="节">
+            <Form.Item label={t('r_knot', '节')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1.852) } />
             </Form.Item>
           </Form>
         </Col>
 
         <Col span={12}>
-          <Divider dashed plain>英制</Divider>
+          <Divider dashed plain>{t('ut_iu', '英制')}</Divider>
           <Form name="basic2" labelCol={{ span: 8 }} autoComplete="off" >
-            <Form.Item label="英里每时(m/h) 迈">
+            <Form.Item label={t('r_mph', '英里每时(m/h) 迈')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1.6093) } />
             </Form.Item>
-            <Form.Item label="英尺每秒(ft/s)">
+            <Form.Item label={t('r_fts', '英尺每秒(ft/s)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.3048 / 3600 * 1000 ) } />
             </Form.Item>
-            <Form.Item label="英尺每分钟(ft/min)">
+            <Form.Item label={t('r_ftmin', '英尺每分钟(ft/min)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.3048 / 60 * 1000) } />
             </Form.Item>
-            <Form.Item label="英寸每秒(in/s)">
+            <Form.Item label={t('r_ins', '英寸每秒(in/s)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 2.54 / 3600 * 100000)  }/>
             </Form.Item>
           </Form>

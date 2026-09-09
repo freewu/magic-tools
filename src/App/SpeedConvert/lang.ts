@@ -1,6 +1,40 @@
-// SpeedConvert 语言包: 名称 (zh-CN = define.tsx AppName 默认; 缺省回退 zh-CN)
+// 说明性长文 (data.ts 注释文档) 暂保留简中, 后续批次再翻
 export default {
   default: 'zh-CN',
-  'zh-TW': { appName: "速度轉換" },
-  en: { appName: "Speed Converter" },
+  'zh-CN': {
+    clear: '清除',
+    copyOk: '复制到粘贴板成功！！！',
+    ut_ms: '公制',
+    ut_iu: '英制',
+    u_cms: '厘米每秒(m/s)', u_ms: '米每秒(m/s)', u_kms: '千米每秒(km/s)', u_kmh: '千米每时(km/h)', u_mach: '马赫', u_knot: '节',
+    u_mph: '英里每时(m/h)', u_fts: '英尺每秒(ft/s)', u_ftmin: '英尺每分钟(ft/min)', u_ins: '英寸每秒(in/s)',
+    r_cms: '厘米每秒(m/s)', r_ms: '米每秒(m/s)', r_kms: '千米每秒(km/s)', r_kmh: '千米每时(km/h)', r_mach: '马赫', r_knot: '节',
+    r_mph: '英里每时(m/h) 迈', r_fts: '英尺每秒(ft/s)', r_ftmin: '英尺每分钟(ft/min)', r_ins: '英寸每秒(in/s)',
+    p_mach: '马赫的大约速度换算一般认为相当于340.3 m/s，又大约等同于1225 km/h，761.2 mph，或者1116 ft/s。即视为等于声音在15摄氏度（59华氏度，288.15开氏度）的空气中传播的速度',
+    p_knot: '指 海里 / 小时，节是航海中代表速度的单位',
+  },
+  'zh-TW': {
+    clear: '清除',
+    copyOk: '複製到剪貼簿成功！！！',
+    ut_ms: '公制',
+    ut_iu: '英制',
+    u_cms: '公分每秒 (cm/s)', u_ms: '公尺每秒 (m/s)', u_kms: '公里每秒 (km/s)', u_kmh: '公里每小時 (km/h)', u_mach: '馬赫', u_knot: '節',
+    u_mph: '英里每小時 (mph)', u_fts: '英呎每秒 (ft/s)', u_ftmin: '英呎每分鐘 (ft/min)', u_ins: '英吋每秒 (in/s)',
+    r_cms: '公分每秒 (cm/s)', r_ms: '公尺每秒 (m/s)', r_kms: '公里每秒 (km/s)', r_kmh: '公里每小時 (km/h)', r_mach: '馬赫', r_knot: '節',
+    r_mph: '英里每小時 (mph)', r_fts: '英呎每秒 (ft/s)', r_ftmin: '英呎每分鐘 (ft/min)', r_ins: '英吋每秒 (in/s)',
+    p_mach: '馬赫的大約速度換算一般認為相當於 340.3 m/s，又大約等同於 1225 km/h、761.2 mph 或 1116 ft/s，即視為等於聲音在 15 攝氏度（59 華氏度，288.15 克氏度）的空氣中傳播的速度',
+    p_knot: '指海浬 / 小時，節是航海中代表速度的單位',
+  },
+  en: {
+    clear: 'Clear',
+    copyOk: 'Copied to clipboard!!!',
+    ut_ms: 'Metric',
+    ut_iu: 'Imperial',
+    u_cms: 'cm/s', u_ms: 'm/s', u_kms: 'km/s', u_kmh: 'km/h', u_mach: 'Mach', u_knot: 'Knot',
+    u_mph: 'mph', u_fts: 'ft/s', u_ftmin: 'ft/min', u_ins: 'in/s',
+    r_cms: 'Centimetres per second (cm/s)', r_ms: 'Metres per second (m/s)', r_kms: 'Kilometres per second (km/s)', r_kmh: 'Kilometres per hour (km/h)', r_mach: 'Mach', r_knot: 'Knot',
+    r_mph: 'Miles per hour (mph)', r_fts: 'Feet per second (ft/s)', r_ftmin: 'Feet per minute (ft/min)', r_ins: 'Inches per second (in/s)',
+    p_mach: 'Mach number is roughly the speed of sound in air at 15 °C (59 °F, 288.15 K): about 340.3 m/s, 1225 km/h, 761.2 mph or 1116 ft/s',
+    p_knot: 'Knots (nautical miles per hour): the unit of speed used in navigation',
+  },
 } as const;

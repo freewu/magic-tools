@@ -6,8 +6,16 @@ import { unitTypeList } from "./data"
 import type { RadioChangeEvent } from 'antd';
 import { getDefaultUnitType, getTypeList, getDefaultType, getTypePlaceholder } from "./lib"
 import { InputStatus } from "antd/es/_util/statusUtils";
+import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
+import volLang from "./lang";
 
 export const VolumeConvert = () => {
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(volLang, locale, key, fallback);
+  const getPlaceholder = (type :string) :string => {
+    return t('p_' + type.replace(/-/g,'_'), getTypePlaceholder(type) ?? '');
+  }
 
   const ut = getDefaultUnitType();
   const [ unitType, setUnitType ] = useState(ut); // 制式 
@@ -17,17 +25,17 @@ export const VolumeConvert = () => {
 
   const dt = getDefaultType(ut);
   const [ type, setType ] = useState(dt); // 转换类型
-  const [ placeholder, setPlaceholder ] = useState(getTypePlaceholder(dt)); // 数字类型的输入提示
+  const [ placeholder, setPlaceholder ] = useState(getPlaceholder(dt)); // 数字类型的输入提示
   const [ result, setResult ] = useState(0); // 转换的结果 统一转换成 米
   const [ notice, contextHolder] = message.useMessage();
 
   const inputStyle = { cursor: "pointer" };
 
   // 切换类型
-  const onTypeChange = ({ target: { value : t } }: RadioChangeEvent) => {
-    setType(t);
-    setPlaceholder(getTypePlaceholder(t));
-    convert(value,t);
+  const onTypeChange = ({ target: { value : v } }: RadioChangeEvent) => {
+    setType(v);
+    setPlaceholder(getPlaceholder(v));
+    convert(value,v);
   };
 
   // 点击结果框,把结果复制到粘贴板
@@ -35,7 +43,7 @@ export const VolumeConvert = () => {
     const txt = (e.target as HTMLInputElement).value.trim();
     if(txt != "") {
       copyTextToClipboard(txt);
-      notice.success("复制到粘贴板成功！！！");
+      notice.success(t('copyOk', '复制到粘贴板成功！！！'));
     }
   };
 
@@ -117,21 +125,21 @@ export const VolumeConvert = () => {
             setTypeList(getTypeList(v));
             const dt = getDefaultType(v);
             setType(dt);
-            setPlaceholder(getTypePlaceholder(dt));
+            setPlaceholder(getPlaceholder(dt));
             convert(value,dt);
           } }
-          options={ unitTypeList }
+          options={ unitTypeList.map(i => ({ ...i, label: t('ut_' + i.value, i.label) })) }
         />
         <Radio.Group
           optionType = "button" buttonStyle="solid"
-          options = { typeList } 
+          options = { typeList.map(i => ({ ...i, label: t('u_' + i.value.replace(/-/g,'_'), i.label) })) } 
           onChange={ onTypeChange } 
           value={ type } 
         />
         <Button 
           onClick={ () => { setValue(''); setStatus(''); setResult(0); } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-        >清除</Button>
+        >{t('clear', '清除')}</Button>
       </Space>
 
       <TextArea
@@ -145,124 +153,124 @@ export const VolumeConvert = () => {
 
       <Row wrap>
         <Col span={6}>
-          <Divider dashed plain>公制</Divider>
+          <Divider dashed plain>{t('ut_ms', '公制')}</Divider>
           <Form name="basic1" labelCol={{ span: 12 }} autoComplete="off">
-            <Form.Item label="升(l)">
+            <Form.Item label={t('r_l', '升(l)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000) } />
             </Form.Item>
-            <Form.Item label="毫升(ml)">
+            <Form.Item label={t('r_ml', '毫升(ml)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result) } />
             </Form.Item>
-            <Form.Item label="立方米(m³)">
+            <Form.Item label={t('r_m3', '立方米(m³)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000000) } />
             </Form.Item>
-            <Form.Item label="立方分米(dm³)">
+            <Form.Item label={t('r_dm3', '立方分米(dm³)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000) }/>
             </Form.Item>
-            <Form.Item label="立方厘米(cm³)">
+            <Form.Item label={t('r_cm3', '立方厘米(cm³)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result) } />
             </Form.Item>
-            <Form.Item label="立方毫米(mm³)">
+            <Form.Item label={t('r_mm3', '立方毫米(mm³)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000) } />
             </Form.Item>
           </Form>
         </Col>
 
         <Col span={6}>
-          <Divider dashed plain>英制</Divider>
+          <Divider dashed plain>{t('ut_iu', '英制')}</Divider>
           <Form name="basic2" labelCol={{ span: 10 }} autoComplete="off" >
-            <Form.Item label="盎司">
+            <Form.Item label={t('r_iu_ounce', '盎司')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 28.4130625 ) } />
             </Form.Item>
-            <Form.Item label="加仑">
+            <Form.Item label={t('r_iu_gallon', '加仑')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 4546.09 ) } />
             </Form.Item>
-            <Form.Item label="打兰">
+            <Form.Item label={t('r_iu_dram', '打兰')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 3.5516328125 ) } />
             </Form.Item>
-            <Form.Item label="茶匙">
+            <Form.Item label={t('r_iu_teaspoon', '茶匙')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 4.7355125 )  }/>
             </Form.Item>
-            <Form.Item label="汤匙">
+            <Form.Item label={t('r_iu_tablespoon', '汤匙')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 14.2065375 )  }/>
             </Form.Item>
-            <Form.Item label="及耳">
+            <Form.Item label={t('r_iu_gill', '及耳')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 142.0653125 )  }/>
             </Form.Item>
-            <Form.Item label="杯">
+            <Form.Item label={t('r_iu_cup', '杯')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 284.130625 )  }/>
             </Form.Item>
-            <Form.Item label="品脱">
+            <Form.Item label={t('r_iu_pint', '品脱')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 568.26125 )  }/>
             </Form.Item>
-            <Form.Item label="夸脱">
+            <Form.Item label={t('r_iu_quart', '夸脱')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1136.5225 )  }/>
             </Form.Item>
-            <Form.Item label="立方英寸">
+            <Form.Item label={t('r_iu_inch3', '立方英寸')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 16.387064 )  }/>
             </Form.Item>
-            <Form.Item label="立方英尺">
+            <Form.Item label={t('r_iu_foot3', '立方英尺')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 28316.8466 )  }/>
             </Form.Item>
-            <Form.Item label="立方码">
+            <Form.Item label={t('r_iu_yard3', '立方码')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 764554.858 )  }/>
             </Form.Item>
           </Form>
         </Col>
 
         <Col span={6}>
-          <Divider dashed plain>美制</Divider>
+          <Divider dashed plain>{t('ut_us', '美制')}</Divider>
           <Form name="basic3" labelCol={{ span: 10 }} autoComplete="off" >
-            <Form.Item label="盎司">
+            <Form.Item label={t('r_us_ounce', '盎司')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 29.5735295625) } />
             </Form.Item>
-            <Form.Item label="加仑">
+            <Form.Item label={t('r_us_gallon', '加仑')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 3785.41178) } />
             </Form.Item>
-            <Form.Item label="打兰">
+            <Form.Item label={t('r_us_dram', '打兰')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 3.6966912) } />
             </Form.Item>
-            <Form.Item label="茶匙">
+            <Form.Item label={t('r_us_teaspoon', '茶匙')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 4.92892159)  }/>
             </Form.Item>
-            <Form.Item label="汤匙">
+            <Form.Item label={t('r_us_tablespoon', '汤匙')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 14.7867648)  }/>
             </Form.Item>
-            <Form.Item label="及耳">
+            <Form.Item label={t('r_us_gill', '及耳')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 118.294118)  }/>
             </Form.Item>
-            <Form.Item label="杯">
+            <Form.Item label={t('r_us_cup', '杯')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 236.588236)  }/>
             </Form.Item>
-            <Form.Item label="品脱">
+            <Form.Item label={t('r_us_pint', '品脱')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 473.176473)  }/>
             </Form.Item>
-            <Form.Item label="夸脱">
+            <Form.Item label={t('r_us_quart', '夸脱')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 946.352946)  }/>
             </Form.Item>
           </Form>
         </Col>
 
         <Col span={6}>
-          <Divider dashed plain>市制</Divider>
+          <Divider dashed plain>{t('ut_cn', '市制')}</Divider>
 
           <Form name="basic4" labelCol={{ span: 8 }} autoComplete="off">
-            <Form.Item label="石">
+            <Form.Item label={t('r_dan', '石')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 100000) } />
             </Form.Item>
-            <Form.Item label="斗">
+            <Form.Item label={t('r_dou', '斗')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 10000) } />
             </Form.Item>
-            <Form.Item label="升">
+            <Form.Item label={t('r_sheng', '升')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000) } />
             </Form.Item>
-            <Form.Item label="合">
+            <Form.Item label={t('r_he', '合')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 100) }/>
             </Form.Item>
-            <Form.Item label="勺">
+            <Form.Item label={t('r_shao', '勺')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 10) } />
             </Form.Item>
-            <Form.Item label="撮">
+            <Form.Item label={t('r_cuo', '撮')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result) } />
             </Form.Item>
           </Form>

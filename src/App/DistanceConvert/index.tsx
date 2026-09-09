@@ -6,8 +6,16 @@ import { unitTypeList } from "./data"
 import type { RadioChangeEvent } from 'antd';
 import { getDefaultUnitType, getTypeList, getDefaultType, getTypePlaceholder } from "./lib"
 import { InputStatus } from "antd/es/_util/statusUtils";
+import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
+import distLang from "./lang";
 
 const DistanceConvert = () => {
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(distLang, locale, key, fallback);
+  const getPlaceholder = (type :string) :string => {
+    return t('p_' + type, getTypePlaceholder(type) ?? '');
+  }
 
   const ut = getDefaultUnitType();
   const [ unitType, setUnitType ] = useState(ut); // 制式 
@@ -17,17 +25,17 @@ const DistanceConvert = () => {
 
   const dt = getDefaultType(ut);
   const [ type, setType ] = useState(dt); // 转换类型
-  const [ placeholder, setPlaceholder ] = useState(getTypePlaceholder(dt)); // 数字类型的输入提示
+  const [ placeholder, setPlaceholder ] = useState(getPlaceholder(dt)); // 数字类型的输入提示
   const [ result, setResult ] = useState(0); // 转换的结果 统一转换成 米
   const [ notice, contextHolder] = message.useMessage();
 
   const inputStyle = { cursor: "pointer" };
 
   // 切换类型
-  const onTypeChange = ({ target: { value : t } }: RadioChangeEvent) => {
-    setType(t);
-    setPlaceholder(getTypePlaceholder(t));
-    convert(value,t);
+  const onTypeChange = ({ target: { value : v } }: RadioChangeEvent) => {
+    setType(v);
+    setPlaceholder(getPlaceholder(v));
+    convert(value,v);
   };
 
   // 点击结果框,把结果复制到粘贴板
@@ -35,7 +43,7 @@ const DistanceConvert = () => {
     const txt = (e.target as HTMLInputElement).value.trim();
     if(txt != "") {
       copyTextToClipboard(txt);
-      notice.success("复制到粘贴板成功！！！");
+      notice.success(t('copyOk', '复制到粘贴板成功！！！'));
     }
   };
 
@@ -108,21 +116,21 @@ const DistanceConvert = () => {
             setTypeList(getTypeList(v));
             const dt = getDefaultType(v);
             setType(dt);
-            setPlaceholder(getTypePlaceholder(dt));
+            setPlaceholder(getPlaceholder(dt));
             convert(value,dt);
           } }
-          options={ unitTypeList }
+          options={ unitTypeList.map(i => ({ ...i, label: t('ut_' + i.value, i.label) })) }
         />
         <Radio.Group
           optionType = "button" buttonStyle="solid"
-          options = { typeList } 
+          options = { typeList.map(i => ({ ...i, label: t('u_' + i.value, i.label) })) } 
           onChange={ onTypeChange } 
           value={ type } 
         />
         <Button 
           onClick={ () => { setValue(''); setStatus(''); setResult(0); } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-        >清除</Button>
+        >{t('clear', '清除')}</Button>
       </Space>
 
       <TextArea
@@ -136,33 +144,33 @@ const DistanceConvert = () => {
 
       <Row wrap>
         <Col span={8}>
-          <Divider dashed plain>公制</Divider>
+          <Divider dashed plain>{t('ut_ms', '公制')}</Divider>
           <Form name="basic1" labelCol={{ span: 8 }} autoComplete="off">
-            <Form.Item label="千米">
+            <Form.Item label={t('r_km', '千米')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000) } />
             </Form.Item>
-            <Form.Item label="米">
+            <Form.Item label={t('r_m', '米')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result) } />
             </Form.Item>
-            <Form.Item label="分米">
+            <Form.Item label={t('r_dm', '分米')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 10) } />
             </Form.Item>
-            <Form.Item label="厘米">
+            <Form.Item label={t('r_cm', '厘米')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 100) }/>
             </Form.Item>
-            <Form.Item label="毫米">
+            <Form.Item label={t('r_mm', '毫米')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000) } />
             </Form.Item>
-            <Form.Item label="微米">
+            <Form.Item label={t('r_μm', '微米')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000 * 1000) } />
             </Form.Item>
-            <Form.Item label="纳米">
+            <Form.Item label={t('r_nm', '纳米')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000 * 1000 * 1000) } />
             </Form.Item>
-            <Form.Item label="皮米">
+            <Form.Item label={t('r_pm', '皮米')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000 * 1000 * 1000 * 1000) } />
             </Form.Item>
-            <Form.Item label="海里">
+            <Form.Item label={t('r_nmile', '海里')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1852) } />
             </Form.Item>
             {/* <Form.Item label="光年">
@@ -175,60 +183,60 @@ const DistanceConvert = () => {
         </Col>
 
         <Col span={8}>
-          <Divider dashed plain>英制</Divider>
+          <Divider dashed plain>{t('ut_iu', '英制')}</Divider>
           <Form name="basic2" labelCol={{ span: 10 }} autoComplete="off" >
-            <Form.Item label="英寸 (inch)">
+            <Form.Item label={t('r_inch', '英寸 (inch)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 2.54 * 100) } />
             </Form.Item>
-            <Form.Item label="英尺 (foot)">
+            <Form.Item label={t('r_foot', '英尺 (foot)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.3048) } />
             </Form.Item>
-            <Form.Item label="码 (yard)">
+            <Form.Item label={t('r_yard', '码 (yard)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 0.9144) } />
             </Form.Item>
-            <Form.Item label="英里 (mile)">
+            <Form.Item label={t('r_mile', '英里 (mile)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1609.3)  }/>
             </Form.Item>
-            <Form.Item label="英寻 (fathom)">
+            <Form.Item label={t('r_fathom', '英寻 (fathom)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1.829)  }/>
             </Form.Item>
-            <Form.Item label="链 (chain)">
+            <Form.Item label={t('r_chain', '链 (chain)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 20.1168)  }/>
             </Form.Item>
-            <Form.Item label="化朗 (furlong)">
+            <Form.Item label={t('r_furlong', '化朗 (furlong)')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 201.168)  }/>
             </Form.Item>
           </Form>
         </Col>
 
         <Col span={8}>
-          <Divider dashed plain>市制</Divider>
+          <Divider dashed plain>{t('ut_cn', '市制')}</Divider>
           <Form name="basic3" labelCol={{ span: 8 }} autoComplete="off">
-            <Form.Item label="里">
+            <Form.Item label={t('r_li', '里')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 500) } />
             </Form.Item>
-            <Form.Item label="引">
+            <Form.Item label={t('r_ying', '引')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 500 * 15) } />
             </Form.Item>
-            <Form.Item label="丈">
+            <Form.Item label={t('r_zhang', '丈')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 50 * 15) } />
             </Form.Item>
-            <Form.Item label="尺">
+            <Form.Item label={t('r_chi', '尺')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 15) }/>
             </Form.Item>
-            <Form.Item label="寸">
+            <Form.Item label={t('r_cun', '寸')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 150) } />
             </Form.Item>
-            <Form.Item label="分">
+            <Form.Item label={t('r_fen', '分')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 1500) } />
             </Form.Item>
-            <Form.Item label="厘">
+            <Form.Item label={t('r_l', '厘')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 15000) } />
             </Form.Item>
-            <Form.Item label="毫">
+            <Form.Item label={t('r_hao', '毫')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 150000) } />
             </Form.Item>
-            <Form.Item label="丝">
+            <Form.Item label={t('r_si', '丝')}>
               <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 15000000) } />
             </Form.Item>
           </Form>
