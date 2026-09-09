@@ -31,6 +31,30 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-09-10 V2.7.2 Release", "2026-09-10 V2.7.2 Release", "2026-09-10 V2.7.2 Release"),
+    items: trio(
+      [
+        "Web 版 (网页演示) 支持 URL ?lang= 参数指定界面语言 (如 ?lang=en / zh-TW), 优先级高于本地记忆; 官网 demo 入口链接按页面语言自动带上参数",
+        "颜色格式转换: 「格式/配色方案」页签移到输入框下方, 输入区常驻顶部",
+        "颜色格式转换修复: 取色器填充非 #rrggbb 且不生成配色方案 (onChange 参数误用 css 字符串); LAB/LCH/XYZ 负值通道解析失败导致无结果/无方案; HSV 误用 hsl 转换",
+        "删除 App 级共享 ui-lang / crypto-lang 等公共词条表, 各工具词条拆回自己的 lang.ts, 便于独立维护",
+      ],
+      [
+        "Web 版 (網頁示範) 支援 URL ?lang= 參數指定介面語言 (如 ?lang=en / zh-TW), 優先於本地記憶; 官網 demo 入口連結按頁面語言自動帶上參數",
+        "顏色格式轉換:「格式/配色方案」頁籤移到輸入框下方, 輸入區常駐頂部",
+        "顏色格式轉換修正: 取色器填入非 #rrggbb 且不產生配色方案 (onChange 參數誤用 css 字串); LAB/LCH/XYZ 負值通道解析失敗導致無結果/無方案; HSV 誤用 hsl 轉換",
+        "刪除 App 層級共享 ui-lang / crypto-lang 等公共詞條表, 各工具詞條拆回自己的 lang.ts, 便於獨立維護",
+      ],
+      [
+        "Web demo now supports a URL ?lang= parameter to pick the UI language (e.g. ?lang=en / zh-TW), taking precedence over the saved preference; official-site demo buttons carry the matching parameter automatically",
+        "Color Convert: the Format / Color-scheme tabs moved below the textarea so the input stays on top",
+        "Color Convert fixes: color-picker fill was not #rrggbb and produced no color schemes (misread onChange's CSS-string argument); LAB/LCH/XYZ negative-channel values failed to parse so results and schemes were missing; HSV mistakenly used the HSL conversion",
+        "Removed App-level shared ui-lang / crypto-lang dictionaries; each tool's rows now live in its own lang.ts for easier maintenance",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-09-09 V2.7.1 Release", "2026-09-09 V2.7.1 Release", "2026-09-09 V2.7.1 Release"),
     items: trio(
       [
