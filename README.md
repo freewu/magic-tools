@@ -63,7 +63,7 @@ CSS colors · Line counter · htpasswd generator · Regex tester (17 presets) ·
 
 👉 **[Download the latest release](https://github.com/freewu/magic-tools/releases/latest)**
 
-**Web version:** no install needed — try it at [freewu.github.io/magic-tools/tools](https://freewu.github.io/magic-tools/tools/).
+**Web version:** no install needed — try it at [freewu.github.io/magic-tools/tools](https://freewu.github.io/magic-tools/tools/). Append `?lang=` to preselect the UI language for deep links (e.g. `?lang=zh-CN` from Simplified-Chinese docs, `?lang=en` from English docs; `cn` / `tw` / `en` short forms also work).
 
 ## 🛠 Tech Stack
 

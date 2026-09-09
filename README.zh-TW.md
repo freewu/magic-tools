@@ -63,7 +63,7 @@ CSS 配色 · 行數統計 · htpasswd 生成 · 正則表達式 · 檔案比較
 
 👉 **[前往 Releases 下載最新版](https://github.com/freewu/magic-tools/releases/latest)**
 
-**Web 版**：免安裝，直接前往 [freewu.github.io/magic-tools/tools](https://freewu.github.io/magic-tools/tools/)。
+**Web 版**：免安裝，直接前往 [freewu.github.io/magic-tools/tools](https://freewu.github.io/magic-tools/tools/)。支援在 URL 加上 `?lang=` 參數指定語言供外部深層連結跳轉（如簡體文件跳轉 `?lang=zh-CN`、English 文件跳轉 `?lang=en`，也支援 `cn` / `tw` / `en` 簡寫）。
 
 ## 🛠 技術棧
 
