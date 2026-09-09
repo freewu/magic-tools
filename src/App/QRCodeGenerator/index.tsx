@@ -6,11 +6,16 @@ import type { RadioChangeEvent, QRCodeProps } from 'antd';
 import type { Color } from 'antd/es/color-picker';
 import { getDefaultErrorLevel, getErrorLevelTip, getDefaultSize } from './lib';
 import { savePngFile, savePngBatch } from '../../lib/tauri';
+import { useLocale } from '../../hook/locale-context';
+import { im, imT } from '../image-lang';
 
 const MAX_BATCH = 200; // 批量行数上限
 const pad3 = (n: number): string => String(n).padStart(3, '0');
 
 const QRCodeGenerator = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => im(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => imT(locale, zh, v);
   const { token } = theme.useToken();
 
   const [ value, setValue ] = useState(''); // 需要编码的内容
@@ -42,7 +47,7 @@ const QRCodeGenerator = () => {
     const img = box?.querySelector('img');
 
     if (!canvas) {
-      if (value.trim() === '') notice.warning('请先输入内容生成二维码');
+      if (value.trim() === '') notice.warning(t('请先输入内容生成二维码'));
       return;
     }
 
@@ -53,7 +58,7 @@ const QRCodeGenerator = () => {
       img.crossOrigin = 'anonymous';
     }
     const ok = await savePngFile('QRCode.png', canvas.toDataURL('image/png'));
-    if (ok) notice.success('二维码图片已保存');
+    if (ok) notice.success(t('二维码图片已保存'));
   };
 
   // 批量行解析: 每行一个内容
@@ -64,7 +69,7 @@ const QRCodeGenerator = () => {
   // 批量导出: 逐卡片抓取 canvas, 桌面版选文件夹一次写入 / 网页版逐个下载
   const exportBatch = async () => {
     if (batchLines.length === 0) {
-      notice.warning('请先输入内容');
+      notice.warning(t('请先输入内容'));
       return;
     }
     // 稍等 React/antd QRCode 完成 canvas 绘制
@@ -85,14 +90,14 @@ const QRCodeGenerator = () => {
       }
     });
     if (dataUrls.length === 0) {
-      notice.error('二维码生成失败, 请检查内容后重试');
+      notice.error(t('二维码生成失败, 请检查内容后重试'));
       return;
     }
     const n = await savePngBatch(names, dataUrls);
     if (n > 0) {
-      notice.success(failed > 0 ? `已保存 ${n} 个 (${failed} 行内容过长未生成)` : `已保存 ${n} 个二维码`);
+      notice.success(failed > 0 ? tt('已保存 {n} 个 ({f} 行内容过长未生成)', { n, f: failed }) : tt('已保存 {n} 个二维码', { n }));
     } else {
-      notice.info('已取消保存');
+      notice.info(t('已取消保存'));
     }
   };
 
@@ -113,7 +118,7 @@ const QRCodeGenerator = () => {
       <Row style = { { marginTop: "5px" }}>
         <Space wrap>
           <Tooltip placement="topLeft" title={ "Error Resistance: " + errorLevelTips }>
-            <label>容错等级:</label>
+            <label>{t('容错等级:')}</label>
           </Tooltip>
           <Radio.Group
             optionType="button" buttonStyle="solid"
@@ -121,19 +126,19 @@ const QRCodeGenerator = () => {
             onChange={ onErrorLevelChange }
             value={ errorLevel }
           />
-          <label>颜色:</label>
+          <label>{t('颜色:')}</label>
           <ColorPicker
             format={ 'hex' }
             value={ color }
             onChange={ onColorChange }
           />
-          <label>背景色:</label>
+          <label>{t('背景色:')}</label>
           <ColorPicker
             format={ 'hex' }
             value={ backgroudColor }
             onChange={ onBackgroudColorChange }
           />
-          <label>尺寸:</label>
+          <label>{t('尺寸:')}</label>
           <div style={ { width: 180 } }>
             <Slider
               value={ size }
@@ -155,7 +160,7 @@ const QRCodeGenerator = () => {
         items={ [
           {
             key: 'single',
-            label: '单个',
+            label: t('单个'),
             children: (
               <>
                 <TextArea
@@ -164,7 +169,7 @@ const QRCodeGenerator = () => {
                   maxLength={ 100 }
                   onChange={ (e) => { setValue(e.target.value); } }
                   value= { value }
-                  placeholder="需要生成二维码的内容"
+                  placeholder={t('需要生成二维码的内容')}
                   autoSize={{ minRows: 5 }}
                 />
                 <Row style={ { marginTop: '4px' } }>
@@ -173,16 +178,16 @@ const QRCodeGenerator = () => {
                       type="primary"
                       disabled={ value.trim() === '' }
                       onClick={ downloadQRCode }
-                    >保存图片</Button>
+                    >{t('保存图片')}</Button>
                     <Button
                       onClick={ () => { setValue(''); } }
                       style={ { backgroundColor: "#dc3545", color: "#fff" } }
-                    >清除</Button>
+                    >{t('清除')}</Button>
                   </Space>
                 </Row>
                 <Divider dashed />
                 { value.trim() !== '' ? (
-                  <div id="myqrcode" onClick={ downloadQRCode } title="点击下载二维码">
+                  <div id="myqrcode" onClick={ downloadQRCode } title={t('点击下载二维码')}>
                     <QRCode
                       style={{ marginBottom: 16 }}
                       errorLevel={ errorLevel as QRCodeProps['errorLevel'] }
@@ -200,29 +205,29 @@ const QRCodeGenerator = () => {
           },
           {
             key: 'batch',
-            label: '批量',
+            label: t('批量'),
             children: (
               <>
                 <Alert
                   type="info"
                   showIcon
                   style={{ marginBottom: 8 }}
-                  message={ `每行一个二维码内容, 一次生成 ${MAX_BATCH} 行以内; 导出时桌面版选择文件夹一次保存全部图片, 网页版逐个下载。` }
+                  message={ tt('每行一个二维码内容, 一次生成 {n} 行以内; 导出时桌面版选择文件夹一次保存全部图片, 网页版逐个下载。', { n: MAX_BATCH }) }
                 />
                 <TextArea
                   style={ { margin: "5px 0 5px 0" } }
                   value={ batchText }
                   onChange={ (e) => setBatchText(e.target.value) }
-                  placeholder={ `批量内容 (每行一个二维码)\n\n示例:\nhttps://example.com/page/1\nhttps://example.com/page/2\nhttps://example.com/page/3` }
+                  placeholder={ t('批量内容 (每行一个二维码)\n\n示例:\nhttps://example.com/page/1\nhttps://example.com/page/2\nhttps://example.com/page/3') }
                   autoSize={{ minRows: 6, maxRows: 12 }}
                   spellCheck={ false }
                 />
                 <Row style={ { marginTop: '4px' } }>
                   <Space wrap>
                     <span style={{ fontSize: 13, color: token.colorTextSecondary }}>
-                      { batchLines.length } 行{batchOver ? ` (超过 ${MAX_BATCH} 行, 已截断)` : ''}
+                      { tt('{n} 行', { n: batchLines.length }) }{batchOver ? tt(' (超过 {m} 行, 已截断)', { m: MAX_BATCH }) : ''}
                     </span>
-                    <label style={{ fontSize: 13 }}>文件名前缀:</label>
+                    <label style={{ fontSize: 13 }}>{t('文件名前缀:')}</label>
                     <Input
                       style={ { width: 120 } }
                       value={ batchPrefix }
@@ -234,11 +239,11 @@ const QRCodeGenerator = () => {
                       type="primary"
                       disabled={ batchLines.length === 0 }
                       onClick={ exportBatch }
-                    >导出全部 PNG</Button>
+                    >{t('导出全部 PNG')}</Button>
                     <Button
                       onClick={ () => { setBatchText(''); } }
                       style={ { backgroundColor: "#dc3545", color: "#fff" } }
-                    >清空</Button>
+                    >{t('清空')}</Button>
                   </Space>
                 </Row>
                 <Divider dashed />

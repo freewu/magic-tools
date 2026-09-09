@@ -9,6 +9,8 @@ import {
   getDefaultShowLines, setDefaultShowLines, decorateHtml,
 } from './lib';
 import type { Appearance, EditorId } from './lib';
+import { useLocale } from '../../hook/locale-context';
+import { im, imT } from '../image-lang';
 
 const { Text } = Typography;
 
@@ -27,6 +29,9 @@ const users: User[] = [
 users.forEach((u) => console.log(greet(u)));`;
 
 const CodeShot: React.FC = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => im(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => imT(locale, zh, v);
   const [code, setCode] = useState('');
   const [langs, setLangs] = useState<string[]>(() => ALL_LANG_IDS);
   const [lang, setLang] = useState<string>(() => getDefaultLang());
@@ -86,9 +91,9 @@ const CodeShot: React.FC = () => {
       a.href = dataUrl;
       a.download = `code-shot-${lang}-${Date.now()}.png`;
       a.click();
-      message.success('已导出 PNG');
+      message.success(t('已导出 PNG'));
     } catch (e) {
-      message.error(`导出失败: ${e instanceof Error ? e.message : String(e)}`);
+      message.error(tt('导出失败: {msg}', { msg: e instanceof Error ? e.message : String(e) }));
     } finally {
       setExporting(false);
     }
@@ -99,21 +104,21 @@ const CodeShot: React.FC = () => {
       <Alert
         type="info"
         showIcon
-        message="代码截图"
-        description="Shiki 语法高亮 + 一键导出 PNG。支持全部内置语言（常用语言置顶），编辑器风格可选 Mac / VSCode / IntelliJ / Sublime / Vim / Emacs，明暗自适应配色，默认值均可在「设置 → 其它」中调整。"
+        message={t('代码截图')}
+        description={t('Shiki 语法高亮 + 一键导出 PNG。支持全部内置语言（常用语言置顶），编辑器风格可选 Mac / VSCode / IntelliJ / Sublime / Vim / Emacs，明暗自适应配色，默认值均可在「设置 → 其它」中调整。')}
       />
       <Row gutter={16} wrap align="stretch" style={{ marginTop: 16 }}>
         <Col xs={24} lg={13} xxl={12}>
-          <Card size="small" title="代码与外观" style={{ height: '100%' }} extra={
+          <Card size="small" title={t('代码与外观')} style={{ height: '100%' }} extra={
             <Space size={8}>
-              <Button size="small" onClick={() => setCode(SAMPLE_CODE)}>载入示例</Button>
-              <Button size="small" disabled={!code} onClick={() => setCode('')} danger>清空</Button>
+              <Button size="small" onClick={() => setCode(SAMPLE_CODE)}>{t('载入示例')}</Button>
+              <Button size="small" disabled={!code} onClick={() => setCode('')} danger>{t('清空')}</Button>
             </Space>
           }>
             <Space direction="vertical" size={12} style={{ width: '100%' }}>
               <Space wrap size={12}>
                 <span>
-                  <Text type="secondary" style={{ fontSize: 12, marginRight: 6 }}>语言</Text>
+                  <Text type="secondary" style={{ fontSize: 12, marginRight: 6 }}>{t('语言')}</Text>
                   <Select
                     size="small"
                     style={{ width: 220 }}
@@ -122,22 +127,22 @@ const CodeShot: React.FC = () => {
                     showSearch
                     filterOption={(kw, opt) => String(opt?.label ?? '').toLowerCase().includes(kw.toLowerCase()) || String((opt as { value?: string } | undefined)?.value ?? '').includes(kw)}
                     options={[
-                      { label: '常用', options: commonOpts },
-                      { label: `全部 (${langs.length})`, options: allOpts },
+                      { label: t('常用'), options: commonOpts },
+                      { label: tt('全部 ({n})', { n: langs.length }), options: allOpts },
                     ]}
                   />
                 </span>
                 <span>
-                  <Text type="secondary" style={{ fontSize: 12, marginRight: 6 }}>编辑器</Text>
+                  <Text type="secondary" style={{ fontSize: 12, marginRight: 6 }}>{t('编辑器')}</Text>
                   <Segmented size="small" value={editor} onChange={(v) => setEditor(v as EditorId)} options={EDITORS} />
                 </span>
                 <span>
-                  <Text type="secondary" style={{ fontSize: 12, marginRight: 6 }}>外观</Text>
-                  <Segmented size="small" value={appearance} onChange={(v) => setAppearance(v as Appearance)} options={APPEARANCES} />
+                  <Text type="secondary" style={{ fontSize: 12, marginRight: 6 }}>{t('外观')}</Text>
+                  <Segmented size="small" value={appearance} onChange={(v) => setAppearance(v as Appearance)} options={APPEARANCES.map((a) => ({ ...a, label: t(a.label) }))} />
                 </span>
               </Space>
               <Space align="center" size={12} wrap>
-                <Text type="secondary" style={{ fontSize: 12 }}>内边距</Text>
+                <Text type="secondary" style={{ fontSize: 12 }}>{t('内边距')}</Text>
                 <Slider
                   style={{ width: 220 }}
                   min={PADDING_MIN}
@@ -150,13 +155,15 @@ const CodeShot: React.FC = () => {
                 <Checkbox
                   checked={showLines}
                   onChange={(e) => { setShowLines(e.target.checked); setDefaultShowLines(e.target.checked); }}
-                >显示行号</Checkbox>
+>
+                {t('显示行号')}
+              </Checkbox>
                 <Tag color="blue">{langLabel(lang)} · {themeId}</Tag>
               </Space>
               <Input.TextArea
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                placeholder="粘贴需要截图的代码…"
+                placeholder={t('粘贴需要截图的代码…')}
                 autoSize={{ minRows: 8, maxRows: 22 }}
                 style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 13 }}
               />
@@ -164,15 +171,15 @@ const CodeShot: React.FC = () => {
           </Card>
         </Col>
         <Col xs={24} lg={11} xxl={12}>
-          <Card size="small" title="截图预览" style={{ height: '100%' }} extra={
+          <Card size="small" title={t('截图预览')} style={{ height: '100%' }} extra={
             <Button type="primary" size="small" icon={<DownloadOutlined />} loading={exporting} disabled={!html} onClick={exportPng}>
-              导出 PNG
+              {t('导出 PNG')}
             </Button>
           }>
             {err ? (
-              <Alert type="error" showIcon message="高亮失败" description={err} />
+              <Alert type="error" showIcon message={t('高亮失败')} description={err} />
             ) : busy ? (
-              <div style={{ textAlign: 'center', padding: 20 }}><Spin tip="高亮中…"><PictureOutlined style={{ fontSize: 28 }} /></Spin></div>
+              <div style={{ textAlign: 'center', padding: 20 }}><Spin tip={t('高亮中…')}><PictureOutlined style={{ fontSize: 28 }} /></Spin></div>
             ) : html ? (
               <Space direction="vertical" size={8} style={{ width: '100%' }}>
                 {/* 预览视口负责滚动/限高; 截图节点本身不裁剪, 导出包含全部代码行且无滚动条/黑边 */}
@@ -200,10 +207,10 @@ const CodeShot: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <Text type="secondary" style={{ fontSize: 12 }}>导出尺寸 = 截图内容实际像素 × 2 (pixelRatio); 行号随行对齐并随 PNG 一并导出。若内边距较小时圆角会自动收小, 避免代码压弧产生暗圈。</Text>
+                <Text type="secondary" style={{ fontSize: 12 }}>{t('导出尺寸 = 截图内容实际像素 × 2 (pixelRatio); 行号随行对齐并随 PNG 一并导出。若内边距较小时圆角会自动收小, 避免代码压弧产生暗圈。')}</Text>
               </Space>
             ) : (
-              <Text type="secondary">输入代码后实时预览，点击「导出 PNG」生成图片。</Text>
+              <Text type="secondary">{t('输入代码后实时预览，点击「导出 PNG」生成图片。')}</Text>
             )}
           </Card>
         </Col>

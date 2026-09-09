@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import type { Color } from 'antd/es/color-picker';
 import JsBarcode from 'jsbarcode';
 import { barcodeFormatList } from './data';
+import { useLocale } from '../../hook/locale-context';
+import { im, imT } from '../image-lang';
 import { savePngFile, savePngBatch } from '../../lib/tauri';
 import {
   getDefaultFormat,
@@ -59,6 +61,9 @@ const BarcodeCell: React.FC<{
 };
 
 const BarcodeGenerator = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => im(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => imT(locale, zh, v);
   const { token } = theme.useToken();
 
   const [ format, setFormat ] = useState<string>(getDefaultFormat()); // 条码格式
@@ -81,6 +86,11 @@ const BarcodeGenerator = () => {
   // 渲染期同步校验 (避免先展示旧图/旧错误一帧)
   const vmsg = value === '' ? '' : validateBarcode(format, value);
   const errorText = vmsg !== '' ? vmsg : runtimeError;
+  const displayError = errorText === ''
+    ? ''
+    : vmsg !== ''
+      ? t(vmsg)
+      : t('生成失败: ') + (runtimeError.startsWith('生成失败: ') ? runtimeError.slice('生成失败: '.length) : runtimeError);
 
   // 渲染条码到 canvas
   const render = () => {
@@ -119,11 +129,11 @@ const BarcodeGenerator = () => {
   const download = async () => {
     const canvas = canvasRef.current;
     if (!canvas || canvas.width === 0) {
-      notice.warning('请先输入内容生成条形码');
+      notice.warning(t('请先输入内容生成条形码'));
       return;
     }
     const ok = await savePngFile('barcode-' + format.toLowerCase() + '.png', canvas.toDataURL('image/png'));
-    if (ok) notice.success('条形码图片已保存');
+    if (ok) notice.success(t('条形码图片已保存'));
   };
 
   // 批量行解析
@@ -134,7 +144,7 @@ const BarcodeGenerator = () => {
   // 批量导出: 逐卡片抓取 canvas, 桌面版选文件夹一次写入 / 网页版逐个下载
   const exportBatch = async () => {
     if (batchLines.length === 0) {
-      notice.warning('请先输入内容');
+      notice.warning(t('请先输入内容'));
       return;
     }
     await new Promise((resolve) => setTimeout(resolve, 60));
@@ -154,14 +164,14 @@ const BarcodeGenerator = () => {
       }
     });
     if (dataUrls.length === 0) {
-      notice.error('条形码生成失败, 请检查内容后重试');
+      notice.error(t('条形码生成失败, 请检查内容后重试'));
       return;
     }
     const n = await savePngBatch(names, dataUrls);
     if (n > 0) {
-      notice.success(failed > 0 ? `已保存 ${n} 个 (${failed} 行内容不符合 ${format} 规则被跳过)` : `已保存 ${n} 个条形码`);
+      notice.success(failed > 0 ? tt('已保存 {n} 个 ({f} 行内容不符合 {fmt} 规则被跳过)', { n, f: failed, fmt: format }) : tt('已保存 {n} 个条形码', { n }));
     } else {
-      notice.info('已取消保存');
+      notice.info(t('已取消保存'));
     }
   };
 
@@ -174,16 +184,16 @@ const BarcodeGenerator = () => {
       { contextHolder }
       {/* 公共生成参数: 单个 / 批量 共用 */}
       <Space style={ { margin: "5px 0 5px 0", flexWrap: "wrap" } }>
-        <Tooltip placement="topLeft" title={ getFormatHint(format) }>
-          <label>格式:</label>
+        <Tooltip placement="topLeft" title={t(getFormatHint(format))}>
+          <label>{t('格式:')}</label>
         </Tooltip>
         <Select
           style={ { width: 200 } }
           value={ format }
           onChange={ (v) => { setFormat(v); } }
-          options={ barcodeFormatList }
+          options={ barcodeFormatList.map((it) => ({ ...it, label: t(it.label) })) }
         />
-        <label>条宽:</label>
+        <label>{t('条宽:')}</label>
         <div style={ { width: 130 } }>
           <Slider
             min={ 1 }
@@ -194,7 +204,7 @@ const BarcodeGenerator = () => {
           />
         </div>
         <span>{ barWidth }px</span>
-        <label>高度:</label>
+        <label>{t('高度:')}</label>
         <div style={ { width: 130 } }>
           <Slider
             min={ 30 }
@@ -204,23 +214,23 @@ const BarcodeGenerator = () => {
           />
         </div>
         <span>{ barHeight }px</span>
-        <label>颜色:</label>
+        <label>{t('颜色:')}</label>
         <ColorPicker
           format={ 'hex' }
           value={ lineColor }
           onChange={ onLineColorChange }
         />
-        <label>背景色:</label>
+        <label>{t('背景色:')}</label>
         <ColorPicker
           format={ 'hex' }
           value={ backgroudColor }
           onChange={ onBackgroudColorChange }
         />
-        <label>显示内容:</label>
+        <label>{t('显示内容:')}</label>
         <Switch
           checked={ showText }
-          checkedChildren="显示"
-          unCheckedChildren="隐藏"
+          checkedChildren={t('显示')}
+          unCheckedChildren={t('隐藏')}
           onChange={ (v) => { setShowText(v); } }
         />
       </Space>
@@ -234,7 +244,7 @@ const BarcodeGenerator = () => {
         items={ [
           {
             key: 'single',
-            label: '单个',
+            label: t('单个'),
             children: (
               <>
                 <Input
@@ -243,7 +253,7 @@ const BarcodeGenerator = () => {
                   maxLength={ 200 }
                   value={ value }
                   onChange={ (e) => { setValue(e.target.value); } }
-                  placeholder={ "输入内容后自动生成条形码 (" + getFormatHint(format) + ")" }
+                  placeholder={ tt('输入内容后自动生成条形码 ({h})', { h: t(getFormatHint(format)) }) }
                 />
 
                 <Space style={ { margin: "5px 0 5px 0" } }>
@@ -251,15 +261,15 @@ const BarcodeGenerator = () => {
                     type="primary"
                     onClick={ download }
                     disabled={ value === '' || errorText !== '' }
-                  >下载 PNG</Button>
+                  >{t('下载 PNG')}</Button>
                   <Button
                     onClick={ () => { setValue(''); } }
                     style={ { backgroundColor: "#dc3545", color: "#fff" } }
-                  >清除</Button>
+                  >{t('清除')}</Button>
                 </Space>
 
                 { errorText !== '' && (
-                  <div style={ { color: '#ff4d4f', margin: "5px 0" } }>{ errorText }</div>
+                  <div style={ { color: '#ff4d4f', margin: "5px 0" } }>{ displayError }</div>
                 ) }
 
                 <Divider dashed />
@@ -268,7 +278,7 @@ const BarcodeGenerator = () => {
                   <div
                     id="barcodebox"
                     onClick={ download }
-                    title="点击下载条形码 PNG"
+                    title={t('点击下载条形码 PNG')}
                     style={ {
                       display: 'inline-block',
                       padding: 10,
@@ -291,28 +301,28 @@ const BarcodeGenerator = () => {
           },
           {
             key: 'batch',
-            label: '批量',
+            label: t('批量'),
             children: (
               <>
                 <Alert
                   type="info"
                   showIcon
                   style={{ marginBottom: 8 }}
-                  message={ `每行一个编码内容, 一次生成 ${MAX_BATCH} 行以内; 不符合当前 ${format} 编码规则的行走自动跳过; 导出时桌面版选择文件夹一次保存全部图片, 网页版逐个下载。` }
+                  message={ tt('每行一个编码内容, 一次生成 {n} 行以内; 不符合当前 {fmt} 编码规则的行走自动跳过; 导出时桌面版选择文件夹一次保存全部图片, 网页版逐个下载。', { n: MAX_BATCH, fmt: format }) }
                 />
                 <Input.TextArea
                   style={ { margin: "5px 0 5px 0" } }
                   value={ batchText }
                   onChange={ (e) => setBatchText(e.target.value) }
-                  placeholder={ `批量内容 (每行一个条形码)\n\n示例:\n6901028040479\n4006381333931\nABC-12345\nhttps://example.com` }
+                  placeholder={ t('批量内容 (每行一个条形码)\n\n示例:\n6901028040479\n4006381333931\nABC-12345\nhttps://example.com') }
                   autoSize={{ minRows: 6, maxRows: 12 }}
                   spellCheck={ false }
                 />
                 <Space wrap style={ { marginTop: '4px' } }>
                   <span style={{ fontSize: 13, color: token.colorTextSecondary }}>
-                    { batchLines.length } 行{batchOver ? ` (超过 ${MAX_BATCH} 行, 已截断)` : ''}
+                    { tt('{n} 行', { n: batchLines.length }) }{batchOver ? tt(' (超过 {m} 行, 已截断)', { m: MAX_BATCH }) : ''}
                   </span>
-                  <label style={{ fontSize: 13 }}>文件名前缀:</label>
+                  <label style={{ fontSize: 13 }}>{t('文件名前缀:')}</label>
                   <Input
                     style={ { width: 120 } }
                     value={ batchPrefix }
@@ -324,11 +334,11 @@ const BarcodeGenerator = () => {
                     type="primary"
                     disabled={ batchLines.length === 0 }
                     onClick={ exportBatch }
-                  >导出全部 PNG</Button>
+                  >{t('导出全部 PNG')}</Button>
                   <Button
                     onClick={ () => { setBatchText(''); } }
                     style={ { backgroundColor: "#dc3545", color: "#fff" } }
-                  >清空</Button>
+                  >{t('清空')}</Button>
                 </Space>
                 <Divider dashed />
                 { batchLines.length > 0 && (
@@ -338,6 +348,7 @@ const BarcodeGenerator = () => {
                   >
                     { batchLines.map((line, i) => {
                       const lineErr = validateBarcode(format, line);
+                      const lineErrT = t(lineErr);
                       return (
                         <div
                           key={ i }
@@ -351,7 +362,7 @@ const BarcodeGenerator = () => {
                           } }
                         >
                           { lineErr !== '' ? (
-                            <div style={ { color: '#ff4d4f', fontSize: 12, maxWidth: 200 } }>{ lineErr }</div>
+                            <div style={ { color: '#ff4d4f', fontSize: 12, maxWidth: 200 } }>{ lineErrT }</div>
                           ) : (
                             <BarcodeCell
                               text={ line }
