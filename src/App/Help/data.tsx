@@ -31,6 +31,30 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-09-09 V2.7.1 Release", "2026-09-09 V2.7.1 Release", "2026-09-09 V2.7.1 Release"),
+    items: trio(
+      [
+        "界面全面三语化 (简中/繁中/English)：全部工具页面、设置中心（单位与下拉选项）、About/说明、Help 时间线均按界面语言切换",
+        "托盘菜单 (原生) 文案随语言动态切换；新增 ui-lang / rows-lang 三语词条表 (470+ 条)",
+        "About 三语化：正则表达式、Morse、JWT、BCD、BaseX (含 16 种码型详述)、HTTP Basic Auth 等；Cron 解析支持按语言输出",
+        "侧边栏宽度/底部按钮样式调整，修复多处残留硬编码中文与显示问题",
+      ],
+      [
+        "介面全面三語化 (簡中/繁中/English)：全部工具頁面、設定中心 (單位與下拉選項)、About/說明、Help 時間軸均隨介面語言切換",
+        "托盤選單 (原生) 文案隨語言動態切換；新增 ui-lang / rows-lang 三語詞條表 (470+ 條)",
+        "About 三語化：正則表達式、Morse、JWT、BCD、BaseX (含 16 種碼型詳述)、HTTP Basic Auth 等；Cron 解析支援依語言輸出",
+        "側邊欄寬度/底部按鈕樣式調整，修復多處殘留硬編碼中文與顯示問題",
+      ],
+      [
+        "Full UI trilingual (Simplified / Traditional Chinese / English): every tool page, the Settings center (units and dropdown options), About sections and the Help timeline follow the UI language",
+        "Native tray menu text switches with the language; added shared ui-lang / rows-lang tri-lingual dictionaries (470+ rows)",
+        "About sections trilingual: Regex Tester, Morse, JWT, BCD, BaseX (incl. notes for all 16 alphabets), HTTP Basic Auth, etc.; Cron parsing output is locale-aware",
+        "Sidebar width / bottom-button style tweaks; fixed assorted leftover hardcoded Chinese and display issues",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-09-08 V2.7.0 Release", "2026-09-08 V2.7.0 Release", "2026-09-08 V2.7.0 Release"),
     items: trio(
       [
