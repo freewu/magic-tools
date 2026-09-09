@@ -1,6 +1,8 @@
 import { Alert, Button, Card, Checkbox, Input, Space, Tag, Typography, Upload, message } from 'antd';
 import { CopyOutlined, DownloadOutlined, FileTextOutlined, UploadOutlined } from '@ant-design/icons';
 import { useMemo, useRef, useState } from 'react';
+import { useLocale } from "../../hook/locale-context";
+import { wm, wmT } from "../webmaster-lang";
 import { htmlToPlainText } from './lib';
 
 const { Text, Paragraph } = Typography;
@@ -30,6 +32,9 @@ const SAMPLE_HTML = [
 ].join('\n');
 
 const HtmlStripText: React.FC = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => wm(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => wmT(locale, zh, v);
   const [raw, setRaw] = useState('');
   const [selectValue, setSelectValue] = useState(true);
   const outRef = useRef<HTMLTextAreaElement>(null);
@@ -41,9 +46,9 @@ const HtmlStripText: React.FC = () => {
     reader.onload = () => {
       const content = String(reader.result ?? '');
       setRaw(content);
-      message.success(`已载入文件 ${file.name} (${content.length} 字符)`);
+      message.success(tt('已载入文件 {name} ({c} 字符)', { name: file.name, c: content.length }));
     };
-    reader.onerror = () => message.error('文件读取失败');
+    reader.onerror = () => message.error(t('文件读取失败'));
     reader.readAsText(file);
     return false;
   };
@@ -51,9 +56,9 @@ const HtmlStripText: React.FC = () => {
   const copyOut = async () => {
     try {
       await navigator.clipboard.writeText(result);
-      message.success('已复制提取结果');
+      message.success(t('已复制提取结果'));
     } catch {
-      message.error('复制失败, 请手动全选复制');
+      message.error(t('复制失败, 请手动全选复制'));
     }
   };
 
@@ -66,7 +71,7 @@ const HtmlStripText: React.FC = () => {
     a.download = 'extracted-text.txt';
     a.click();
     URL.revokeObjectURL(url);
-    message.success('已下载 extracted-text.txt');
+    message.success(t('已下载 extracted-text.txt'));
   };
 
   const rawLines = raw ? raw.split('\n').length : 0;
@@ -77,50 +82,50 @@ const HtmlStripText: React.FC = () => {
       <Alert
         type="info"
         showIcon
-        message="HTML 标签去除"
+        message={t('HTML 标签去除')}
         description={
           <>
-            去掉 HTML 标签只保留文本内容, 并按段落 / 列表 / 表格结构保留换行。<br />
-            <Text strong>select 下拉框</Text>: 默认把每个 {'<option>'} 提取为
-            <Text code>value: 文本</Text> 一行(如 <Text code>cn: 中国</Text>),
-            避免下拉选项文本粘连丢失。script / style / 注释等内容自动剔除。
+            {t('去掉 HTML 标签只保留文本内容, 并按段落 / 列表 / 表格结构保留换行。')}<br />
+            <Text strong>{t('select 下拉框')}</Text>{t(': 默认把每个 ')}{'<option>'}{t(' 提取为')}
+            <Text code>{t('value: 文本')}</Text>{t(' 一行(如 ')}<Text code>cn: 中国</Text>
+            {t('), 避免下拉选项文本粘连丢失。')}{t('script / style / 注释等内容自动剔除。')}
           </>
         }
       />
 
       <Card size="small" title={
-        <Space><FileTextOutlined /> 原始 HTML</Space>
+        <Space><FileTextOutlined /> {t('原始 HTML')}</Space>
       } extra={
         <Space size={8}>
           <Upload accept=".html,.htm,.txt,.xml" showUploadList={false} beforeUpload={(f) => handleFile(f)}>
-            <Button size="small" icon={<UploadOutlined />}>读取文件</Button>
+            <Button size="small" icon={<UploadOutlined />}>{t('读取文件')}</Button>
           </Upload>
-          <Button size="small" onClick={() => { setRaw(SAMPLE_HTML); message.info('已载入示例 HTML'); }}>载入示例</Button>
-          <Button size="small" danger disabled={!raw} onClick={() => setRaw('')}>清空</Button>
+          <Button size="small" onClick={() => { setRaw(SAMPLE_HTML); message.info(t('已载入示例 HTML')); }}>{t('载入示例')}</Button>
+          <Button size="small" danger disabled={!raw} onClick={() => setRaw('')}>{t('清空')}</Button>
         </Space>
       }>
         <Space direction="vertical" size={8} style={{ width: '100%' }}>
           <Input.TextArea
             value={raw}
             onChange={(e) => setRaw(e.target.value)}
-            placeholder={'在此粘贴 HTML 源码…\n\n例如: <p>Hello <b>World</b></p>'}
+            placeholder={t('在此粘贴 HTML 源码…\n\n例如: <p>Hello <b>World</b></p>')}
             autoSize={{ minRows: 8, maxRows: 18 }}
           />
           <Checkbox checked={selectValue} onChange={(e) => setSelectValue(e.target.checked)}>
-            select 下拉框选项提取为 <Text code>value: 文本</Text> 行
+            {t('select 下拉框选项提取为')} <Text code>{t('value: 文本')}</Text>{t(' 行')}
           </Checkbox>
           {raw && (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              原始 {raw.length.toLocaleString()} 字符 / {rawLines} 行
+              {tt('原始 {c} 字符 / {n} 行', { c: raw.length.toLocaleString(), n: rawLines })}
             </Text>
           )}
         </Space>
       </Card>
 
-      <Card size="small" title="提取结果 (纯文本)" extra={
+      <Card size="small" title={t('提取结果 (纯文本)')} extra={
         <Space size={8}>
-          <Button size="small" icon={<CopyOutlined />} disabled={!result} onClick={copyOut}>复制</Button>
-          <Button size="small" icon={<DownloadOutlined />} disabled={!result} onClick={downloadOut}>下载 .txt</Button>
+          <Button size="small" icon={<CopyOutlined />} disabled={!result} onClick={copyOut}>{t('复制')}</Button>
+          <Button size="small" icon={<DownloadOutlined />} disabled={!result} onClick={downloadOut}>{t('下载 .txt')}</Button>
         </Space>
       }>
         {result ? (
@@ -133,12 +138,12 @@ const HtmlStripText: React.FC = () => {
               style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 13 }}
             />
             <Space size={8} wrap>
-              <Tag color="green">提取后 {result.length.toLocaleString()} 字符</Tag>
-              <Tag>{outLines} 行</Tag>
+              <Tag color="green">{tt('提取后 {c} 字符', { c: result.length.toLocaleString() })}</Tag>
+              <Tag>{tt('{n} 行', { n: outLines })}</Tag>
             </Space>
           </Space>
         ) : (
-          <Paragraph type="secondary" style={{ margin: 0 }}>暂无结果 — 在上方粘贴 HTML 后会自动提取。</Paragraph>
+          <Paragraph type="secondary" style={{ margin: 0 }}>{t('暂无结果 — 在上方粘贴 HTML 后会自动提取。')}</Paragraph>
         )}
       </Card>
     </Space>
