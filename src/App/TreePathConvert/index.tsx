@@ -2,11 +2,13 @@ import { Alert, Button, Card, Input, Segmented, Space, Tabs, Tag, Tree, Typograp
 import { CopyOutlined, DownloadOutlined, SwapOutlined } from '@ant-design/icons';
 import type { DataNode } from 'antd/es/tree';
 import { useMemo, useState } from 'react';
-import {
-  parsePathsTextToRoots, rootsToPaths, rootsToIndentedText,
+import { parsePathsTextToRoots, rootsToPaths, rootsToIndentedText,
   parseIndentedTextToRoots, rootsToJson, jsonToRoots,
 } from './lib';
 import type { PNode } from './lib';
+import { useLocale } from '../../hook/locale-context';
+import { tr, trTpl } from '../../i18n/lang';
+import tpLang from './lang';
 
 const { Text } = Typography;
 
@@ -35,16 +37,16 @@ const SAMPLE_TREE = [
   'README.md',
 ].join('\n');
 
-const copyText = async (text: string, tip = '已复制') => {
+const copyText = async (text: string, tip: string, fail: string) => {
   try {
     await navigator.clipboard.writeText(text);
     message.success(tip);
   } catch {
-    message.error('复制失败, 请手动选择复制');
+    message.error(fail);
   }
 };
 
-const download = (text: string, filename: string) => {
+const download = (text: string, filename: string, okMsg: string) => {
   const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -52,7 +54,7 @@ const download = (text: string, filename: string) => {
   a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
-  message.success(`已下载 ${filename}`);
+  message.success(okMsg);
 };
 
 const toTreeData = (nodes: PNode[]): DataNode[] => nodes.map((n) => ({
@@ -63,6 +65,11 @@ const toTreeData = (nodes: PNode[]): DataNode[] => nodes.map((n) => ({
 }));
 
 const TreePathConvert: React.FC = () => {
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(tpLang, locale, key, fallback);
+  const tpl = (key: string, vars: Record<string, string | number>, fallback: string) => trTpl(tpLang, locale, key, vars, fallback);
+  const treeErrText = (raw :string) :string => raw === 'JSON 根应为对象' ? t('errRoot', raw) : raw;
+
   const [mode, setMode] = useState<'to-tree' | 'to-paths'>('to-tree');
   const [pathsText, setPathsText] = useState('');
   const [treeText, setTreeText] = useState('');
@@ -93,8 +100,8 @@ const TreePathConvert: React.FC = () => {
 
   const inputModeExtra = (
     <Space size={8}>
-      <Button size="small" onClick={() => setPathsText(SAMPLE_PATHS)}>载入示例</Button>
-      <Button size="small" danger disabled={!pathsText} onClick={() => setPathsText('')}>清空</Button>
+      <Button size="small" onClick={() => setPathsText(SAMPLE_PATHS)}>{t('load', '载入示例')}</Button>
+      <Button size="small" danger disabled={!pathsText} onClick={() => setPathsText('')}>{t('clear', '清空')}</Button>
     </Space>
   );
 
@@ -103,11 +110,10 @@ const TreePathConvert: React.FC = () => {
       <Alert
         type="info"
         showIcon
-        message="树形和路径转换"
+        message={t('title', '树形和路径转换')}
         description={
           <>
-            在「路径列表 ↔ 树形」之间互转: 每行一条路径(支持 <Text code>/</Text> 与 <Text code>\</Text> 分隔),
-            树形文本约定每层 2 空格缩进, 也兼容 <Text code>├── └── │</Text> 目录树输出; 亦可与嵌套 JSON 互转。
+            { t('d1', '在「路径列表 ↔ 树形」之间互转: 每行一条路径(支持 ') }<Text code>/</Text>{ t('d2', ' 与 ') }<Text code>\</Text>{ t('d3', ' 分隔), 树形文本约定每层 2 空格缩进, 也兼容 ') }<Text code>├── └── │</Text>{ t('d4', ' 目录树输出; 亦可与嵌套 JSON 互转。') }
           </>
         }
       />
@@ -117,25 +123,25 @@ const TreePathConvert: React.FC = () => {
         items={[
           {
             key: 'to-tree',
-            label: <Space><SwapOutlined /> 路径 → 树</Space>,
+            label: <Space><SwapOutlined /> {t('tabToTree', '路径 → 树')}</Space>,
             children: (
               <Space direction="vertical" size={12} style={{ width: '100%' }}>
-                <Card size="small" title="路径列表 (每行一条)" extra={inputModeExtra}>
+                <Card size="small" title={t('cardPaths', '路径列表 (每行一条)')} extra={inputModeExtra}>
                   <Space direction="vertical" size={8} style={{ width: '100%' }}>
                     <Input.TextArea
                       value={pathsText}
                       onChange={(e) => setPathsText(e.target.value)}
-                      placeholder={'每行一条路径, 例如:\n\nsrc/components/App.tsx\nsrc/index.tsx\ndocs/guide.md'}
+                      placeholder={t('phPaths', '每行一条路径, 例如:\n\nsrc/components/App.tsx\nsrc/index.tsx\ndocs/guide.md')}
                       autoSize={{ minRows: 6, maxRows: 12 }}
                       style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 13 }}
                     />
                     <Space size={16} wrap>
-                      {pathsText.trim() && <Text type="secondary" style={{ fontSize: 12 }}>{lines.length} 行{dupLines > 0 ? `, 重复 ${dupLines} 行` : ''}, 重复分支自动合并</Text>}
+                      {pathsText.trim() && <Text type="secondary" style={{ fontSize: 12 }}>{dupLines > 0 ? tpl('statB', { n: lines.length, dup: dupLines }, `${lines.length} 行, 重复 ${dupLines} 行, 重复分支自动合并`) : tpl('statA', { n: lines.length }, `${lines.length} 行, 重复分支自动合并`)}</Text>}
                     </Space>
                   </Space>
                 </Card>
-                <Card size="small" title="树形结构" extra={
-                  <Button size="small" icon={<CopyOutlined />} disabled={!indented} onClick={() => copyText(indented)}>复制文本</Button>
+                <Card size="small" title={t('cardTree', '树形结构')} extra={
+                  <Button size="small" icon={<CopyOutlined />} disabled={!indented} onClick={() => copyText(indented, t('copied', '已复制'), t('copyFail', '复制失败, 请手动选择复制'))}>{t('copyTextBtn', '复制文本')}</Button>
                 }>
                   {roots.length ? (
                     <Space direction="vertical" size={8} style={{ width: '100%' }}>
@@ -150,7 +156,7 @@ const TreePathConvert: React.FC = () => {
                       />
                     </Space>
                   ) : (
-                    <Text type="secondary">暂无内容 — 输入路径后自动生成树形。</Text>
+                    <Text type="secondary">{t('emptyTree', '暂无内容 — 输入路径后自动生成树形。')}</Text>
                   )}
                 </Card>
               </Space>
@@ -158,26 +164,26 @@ const TreePathConvert: React.FC = () => {
           },
           {
             key: 'to-paths',
-            label: <Space><SwapOutlined /> 树 → 路径</Space>,
+            label: <Space><SwapOutlined /> {t('tabToPaths', '树 → 路径')}</Space>,
             children: (
               <Space direction="vertical" size={12} style={{ width: '100%' }}>
-                <Card size="small" title="树形内容" extra={
+                <Card size="small" title={t('cardTreeIn', '树形内容')} extra={
                   <Space size={8}>
                     <Segmented
                       size="small"
                       value={treeInput}
                       onChange={(v) => setTreeInput(v as typeof treeInput)}
-                      options={[{ label: '缩进树文本', value: 'text' }, { label: '嵌套 JSON', value: 'json' }]}
+                      options={[{ label: t('segText', '缩进树文本'), value: 'text' }, { label: t('segJson', '嵌套 JSON'), value: 'json' }]}
                     />
-                    <Button size="small" onClick={() => { setTreeText(SAMPLE_TREE); setTreeInput('text'); message.info('已载入示例树'); }}>载入示例</Button>
-                    <Button size="small" danger disabled={!treeText && !jsonText} onClick={() => { setTreeText(''); setJsonText(''); }}>清空</Button>
+                    <Button size="small" onClick={() => { setTreeText(SAMPLE_TREE); setTreeInput('text'); message.info(t('loadInfo', '已载入示例树')); }}>{t('load', '载入示例')}</Button>
+                    <Button size="small" danger disabled={!treeText && !jsonText} onClick={() => { setTreeText(''); setJsonText(''); }}>{t('clear', '清空')}</Button>
                   </Space>
                 }>
                   {treeInput === 'text' ? (
                     <Input.TextArea
                       value={treeText}
                       onChange={(e) => setTreeText(e.target.value)}
-                      placeholder={'缩进树文本 (每层 2 空格), 例如:\n\nsrc\n  App\n    CodeShot\n      index.tsx\n  lib\n    string.ts'}
+                      placeholder={t('phIndent', '缩进树文本 (每层 2 空格), 例如:\n\nsrc\n  App\n    CodeShot\n      index.tsx\n  lib\n    string.ts')}
                       autoSize={{ minRows: 8, maxRows: 14 }}
                       style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 13 }}
                     />
@@ -185,17 +191,17 @@ const TreePathConvert: React.FC = () => {
                     <Input.TextArea
                       value={jsonText}
                       onChange={(e) => setJsonText(e.target.value)}
-                      placeholder={'嵌套 JSON, 例如:\n{"src":{"App":{"CodeShot":{"index.tsx":null}},"lib":{"string.ts":null}}}'}
+                      placeholder={t('phJson', '嵌套 JSON, 例如:\n{"src":{"App":{"CodeShot":{"index.tsx":null}},"lib":{"string.ts":null}}}')}
                       autoSize={{ minRows: 8, maxRows: 14 }}
                       style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 13 }}
                     />
                   )}
                 </Card>
-                {treeError && <Alert type="error" showIcon message="解析失败" description={treeError} />}
-                <Card size="small" title="路径列表 (每行一条)" extra={
+                {treeError && <Alert type="error" showIcon message={t('parseFail', '解析失败')} description={treeErrText(treeError)} />}
+                <Card size="small" title={t('cardPaths', '路径列表 (每行一条)')} extra={
                   <Space size={8}>
-                    <Button size="small" icon={<CopyOutlined />} disabled={!pathsOutText} onClick={() => copyText(pathsOutText)}>复制</Button>
-                    <Button size="small" icon={<DownloadOutlined />} disabled={!pathsOutText} onClick={() => download(pathsOutText, 'paths.txt')}>下载 .txt</Button>
+                    <Button size="small" icon={<CopyOutlined />} disabled={!pathsOutText} onClick={() => copyText(pathsOutText, t('copied', '已复制'), t('copyFail', '复制失败, 请手动选择复制'))}>{t('copyBtn', '复制')}</Button>
+                    <Button size="small" icon={<DownloadOutlined />} disabled={!pathsOutText} onClick={() => download(pathsOutText, 'paths.txt', tpl('downloadedTpl', { file: 'paths.txt' }, '已下载 paths.txt'))}>{t('dlBtn', '下载 .txt')}</Button>
                   </Space>
                 }>
                   {pathsOutText ? (
@@ -206,10 +212,10 @@ const TreePathConvert: React.FC = () => {
                         autoSize={{ minRows: 6, maxRows: 14 }}
                         style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 13 }}
                       />
-                      <Tag color="green">共 {pathsOut.length} 个节点 (含目录)</Tag>
+                      <Tag color="green">{ tpl('tagNodes', { n: pathsOut.length }, `共 ${pathsOut.length} 个节点 (含目录)`) }</Tag>
                     </Space>
                   ) : (
-                    <Text type="secondary">暂无结果 — 输入树形内容后自动生成完整路径。树也可先由左侧「路径 → 树」生成。</Text>
+                    <Text type="secondary">{t('emptyOut', '暂无结果 — 输入树形内容后自动生成完整路径。树也可先由左侧「路径 → 树」生成。')}</Text>
                   )}
                 </Card>
               </Space>
