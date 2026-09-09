@@ -2,6 +2,8 @@ import { Select, Row, Button, Input, Space, message } from "antd";
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { useState } from "react";
 const { TextArea } = Input;
+import { useLocale } from "../../hook/locale-context";
+import { cr, crT, crErr } from "../crypto-lang";
 import { copyTextToClipboard } from "../../lib"
 import { openFile } from "../../lib/file"
 import { arrayToOptions } from "../../lib/array"
@@ -12,6 +14,9 @@ import type { InputStatus } from "antd/es/_util/statusUtils";
 
 // SM4 加解密 (国密 SM4, 密钥/分组固定 128 位, 与 sm-crypto 兼容)
 const SM4Crypto = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => cr(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => crT(locale, zh, v);
 
   const [ notice, contextHolder ] = message.useMessage();
   const [ encodeValue, setEncodeValue ] = useState(''); // 要加密的内容
@@ -42,7 +47,7 @@ const SM4Crypto = () => {
     try {
       setDecodeValue(sm4Encrypt(encodeValue, passphrase, { mode: mode as 'ECB' | 'CBC', padding: padding as 'Pkcs7' | 'ZeroPadding', code: code as 'HEX' | 'Base64', iv: ivDisabled ? undefined : iv }));
     } catch (error) {
-      notice.error((error as Error).message);
+      notice.error(crErr(locale, (error as Error).message));
     }
   };
 
@@ -52,7 +57,7 @@ const SM4Crypto = () => {
     try {
       setEncodeValue(sm4Decrypt(decodeValue, passphrase, { mode: mode as 'ECB' | 'CBC', padding: padding as 'Pkcs7' | 'ZeroPadding', code: code as 'HEX' | 'Base64', iv: ivDisabled ? undefined : iv }));
     } catch (error) {
-      notice.error((error as Error).message);
+      notice.error(crErr(locale, (error as Error).message));
     }
   };
 
@@ -64,7 +69,7 @@ const SM4Crypto = () => {
 
   const textareaDoubleClick = (e :React.MouseEvent<HTMLElement>) => {
     copyTextToClipboard((e.target as HTMLInputElement).value);
-    notice.success("复制到粘贴板成功！！！");
+    notice.success(t('复制到粘贴板成功！！！'));
   };
 
   // 偏移量 IV 输入处理
@@ -97,21 +102,21 @@ const SM4Crypto = () => {
 
       <Row style = { { marginTop: "5px" }}>
         <Space>
-          <label>模式:</label>
+          {t('模式:')}
           <Select
             value={ mode }
             style={{ width: 120 }}
             onChange={ onModeChange }
             options={ arrayToOptions(modeList) }
           />
-          <label>填充:</label>
+          {t('填充:')}
           <Select
             value={ padding }
             style={{ width: 120 }}
             onChange={ (v :string) => { setPadding(v) } }
             options={ arrayToOptions(paddingList) }
           />
-          <label>偏移量(IV):</label>
+          {t('偏移量(IV):')}
           <Input
             allowClear
             status={ ivStatus }
@@ -121,19 +126,19 @@ const SM4Crypto = () => {
             onChange={ onIVChange }
             value= { iv } />
           { !ivDisabled && (iv.length + " / 16") }
-          { ivDisabled && <span style={{ color: '#999' }}>ECB 模式无需 IV</span> }
+          { ivDisabled && <span style={{ color: '#999' }}>{t('ECB 模式无需 IV')}</span> }
         </Space>
       </Row>
       <Row style = { { marginTop: "5px" }}>
         <Space>
-          <label>编码:</label>
+          {t('编码:')}
           <Select
             value={ code }
             style={{ width: 120 }}
             onChange={ (v :string) => { setCode(v) } }
             options={ arrayToOptions(codeList) }
           />
-          <label>密钥 (128 位):</label>
+          {t('密钥 (128 位):')}
           <Input
             allowClear
             maxLength = { 32 }
@@ -141,16 +146,16 @@ const SM4Crypto = () => {
             style={ { width: 330 } }
             onChange={ onPassphraseChange }
             value= { passphrase } />
-          { passphrase.length + " / 16 字符或 32 位HEX" }
+          { passphrase.length + t(' / 16 字符或 32 位HEX') }
         </Space>
       </Row>
       <TextArea
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setEncodeValue(e.target.value) } }
-        title="双击复制内容到粘贴板"
+        title={t('双击复制内容到粘贴板')}
         value= { encodeValue }
-        placeholder="输入需要进行 SM4 加密的内容  或 拖拽文件到框内打开"
+        placeholder={t('输入需要进行 SM4 加密的内容  或 拖拽文件到框内打开')}
         autoSize={{ minRows: 8, maxRows: 8 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setEncodeValue ); } }
@@ -160,24 +165,24 @@ const SM4Crypto = () => {
         onClick={ encode }
         style={ { "backgroundColor" : "#007bff","color": "#fff" } }
         icon={<ArrowDownOutlined />}
-      >加密</Button>
+      >{t('加密')}</Button>
       <Button
         onClick={ decode }
         style={ { "backgroundColor" : "#28a745","color": "#fff" } }
         icon={<ArrowUpOutlined />}
-      >解密</Button>
+      >{t('解密')}</Button>
       <Button
         onClick={ () => clear() }
         style={ { "backgroundColor" : "#dc3545","color": "#fff" } }
-      >清除</Button>
+      >{t('清除')}</Button>
 
       <TextArea
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setDecodeValue(e.target.value) } }
-        title="双击复制内容到粘贴板"
+        title={t('双击复制内容到粘贴板')}
         value= { decodeValue }
-        placeholder="输入需要进行 SM4 解密的内容  或 拖拽文件到框内打开"
+        placeholder={t('输入需要进行 SM4 解密的内容  或 拖拽文件到框内打开')}
         autoSize={{ minRows: 8, maxRows: 8 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setDecodeValue ); } }
