@@ -1,5 +1,7 @@
 import { Button, Divider, Input, message, Select, Space } from 'antd';
 import { useState } from 'react';
+import { useLocale } from '../../hook/locale-context';
+import { u, uT } from '../ui-lang';
 import { CopyOutlined, SaveOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from '../../lib';
 import { saveTextFile } from '../../lib/tauri';
@@ -13,6 +15,9 @@ import {
 import HtpasswdIntro from './intro';
 
 const HtpasswdGenerator = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => u(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => uT(locale, zh, v);
 
   const [ user, setUser ] = useState('admin'); // 账号
   const [ pass, setPass ] = useState(''); // 密码
@@ -27,10 +32,10 @@ const HtpasswdGenerator = () => {
   const generate = () => {
     try {
       setLine(buildHtpasswdLine(user, pass, { method, rounds: getBcryptRounds() }));
-      notice.success('生成成功, 可双击下方结果复制');
+      notice.success(t('生成成功, 可双击下方结果复制'));
     } catch (err) {
       setLine('');
-      notice.error('生成失败: ' + (err as Error).message);
+      notice.error(tt('生成失败: {m}', { m: (err as Error).message }));
     }
   };
 
@@ -38,14 +43,14 @@ const HtpasswdGenerator = () => {
   const copyLine = () => {
     if (line === '') return;
     copyTextToClipboard(line);
-    notice.success('复制到粘贴板成功!!!');
+    notice.success(t('复制到粘贴板成功!!!'));
   };
 
   // 保存为 .htpasswd 文件
   const saveFile = async () => {
     if (line === '') return;
-    const ok = await saveTextFile('.htpasswd', buildHtpasswdFile([line]), '保存 .htpasswd 文件');
-    if (ok) notice.success('已保存 .htpasswd 文件');
+    const ok = await saveTextFile('.htpasswd', buildHtpasswdFile([line]), t('保存 .htpasswd 文件'));
+    if (ok) notice.success(t('已保存 .htpasswd 文件'));
   };
 
   // 清除
@@ -62,38 +67,38 @@ const HtpasswdGenerator = () => {
       {/* 输入区 */}
       <Space direction="vertical" style={ { width: '100%', maxWidth: 560 } } size={ 12 }>
         <div style={ { display: 'flex', alignItems: 'center', gap: 12 } }>
-          <span style={ { width: 76, textAlign: 'right', color: '#666', whiteSpace: 'nowrap' } }>账号</span>
+          <span style={ { width: 76, textAlign: 'right', color: '#666', whiteSpace: 'nowrap' } }>{t('账号')}</span>
           <Input
             allowClear
             value={ user }
-            placeholder="如 admin"
+            placeholder={t('如 admin')}
             onChange={ (e) => { setUser(e.target.value); } }
             onPressEnter={ generate }
             maxLength={ 64 }
           />
         </div>
         <div style={ { display: 'flex', alignItems: 'center', gap: 12 } }>
-          <span style={ { width: 76, textAlign: 'right', color: '#666', whiteSpace: 'nowrap' } }>密码</span>
+          <span style={ { width: 76, textAlign: 'right', color: '#666', whiteSpace: 'nowrap' } }>{t('密码')}</span>
           <Input.Password
             allowClear
             value={ pass }
-            placeholder="输入密码"
+            placeholder={t('输入密码')}
             onChange={ (e) => { setPass(e.target.value); } }
             onPressEnter={ generate }
           />
         </div>
         <div style={ { display: 'flex', alignItems: 'center', gap: 12 } }>
-          <span style={ { width: 76, textAlign: 'right', color: '#666', whiteSpace: 'nowrap' } }>加密方式</span>
+          <span style={ { width: 76, textAlign: 'right', color: '#666', whiteSpace: 'nowrap' } }>{t('加密方式')}</span>
           <Select
             value={ method }
             style={ { width: 220 } }
             onChange={ (v :HtpasswdMethod) => { setMethod(v); } }
-            options={ HTPASSWD_METHODS.map((v) => ({ value: v.value, label: v.label })) }
+            options={ HTPASSWD_METHODS.map((v) => ({ value: v.value, label: t(v.label) })) }
           />
-          <Button type="primary" onClick={ generate }>生成</Button>
+          <Button type="primary" onClick={ generate }>{t('生成')}</Button>
         </div>
         <div style={ { marginLeft: 88, color: '#999', fontSize: 12, lineHeight: '18px' } }>
-          { methodInfo?.cmd } — { methodInfo?.tip }
+          { methodInfo?.cmd } — { methodInfo ? t(methodInfo.tip) : '' }
         </div>
       </Space>
 
@@ -104,8 +109,8 @@ const HtpasswdGenerator = () => {
         <Input
           readOnly
           value={ line }
-          placeholder="生成结果: 用户名:密码哈希"
-          title="双击复制内容到粘贴板"
+          placeholder={t('生成结果: 用户名:密码哈希')}
+          title={t('双击复制内容到粘贴板')}
           onDoubleClick={ (e) => {
             if ((e.target as HTMLInputElement).value.trim() !== '') {
               copyLine();
@@ -118,21 +123,21 @@ const HtpasswdGenerator = () => {
             disabled={ line === '' }
             icon={ <CopyOutlined /> }
             onClick={ copyLine }
-          >复制</Button>
+          >{t('复制')}</Button>
           <Button
             disabled={ line === '' }
             style={ { backgroundColor: '#28a745', color: '#fff' } }
             icon={ <SaveOutlined /> }
             onClick={ saveFile }
-          >保存为 .htpasswd 文件</Button>
+          >{t('保存为 .htpasswd 文件')}</Button>
           <Button
             style={ { backgroundColor: '#dc3545', color: '#fff' } }
             onClick={ clearAll }
-          >清除</Button>
+          >{t('清除')}</Button>
         </Space>
       </div>
 
-      <Divider>htpasswd 生成说明</Divider>
+      <Divider>{t('htpasswd 生成说明')}</Divider>
 
       <HtpasswdIntro />
     </div>

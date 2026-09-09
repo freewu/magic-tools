@@ -6,6 +6,8 @@ import {
   DownloadOutlined, CopyOutlined, ThunderboltOutlined, ClearOutlined,
 } from '@ant-design/icons';
 import { copyTextToClipboard } from '../../lib';
+import { useLocale } from '../../hook/locale-context';
+import { u, uT } from '../ui-lang';
 import { saveTextFile } from '../../lib/tauri';
 import {
   SPECS, specLabel, sampleGlyph, rowsToBytes, formatCArray, matrixToText,
@@ -53,6 +55,9 @@ const MatrixCanvas = ({ m, w, h, invert }: { m: Uint8Array; w: number; h: number
 };
 
 const DotMatrixFont = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => u(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => uT(locale, zh, v);
   const [ specIdx, setSpecIdx ] = useState(5); // 默认 16x16
   const [ text, setText ] = useState('你好');
   const [ mode, setMode ] = useState<ExtractMode>('row');
@@ -67,14 +72,14 @@ const DotMatrixFont = () => {
   const generate = () => {
     const chars = Array.from(new Set(text.replace(/\s+/g, '')));
     if (chars.length === 0) {
-      notice.warning('请输入需要取模的字符 (可多个, 自动去重)');
+      notice.warning(t('请输入需要取模的字符 (可多个, 自动去重)'));
       return;
     }
     const items: ResultItem[] = [];
     for (const ch of chars) {
       const matrix = sampleGlyph(ch, spec, { threshold, invert });
       if (!matrix) {
-        notice.error('当前环境不支持 Canvas 字形采样');
+        notice.error(t('当前环境不支持 Canvas 字形采样'));
         return;
       }
       const bytes = rowsToBytes(matrix, spec.w, spec.h, mode, order);
@@ -88,22 +93,22 @@ const DotMatrixFont = () => {
       order,
     });
     setResult({ code, items, specLabel: specLabel(spec) });
-    notice.success(`已为 ${items.length} 个字符生成取模代码`);
+    notice.success(tt('已为 {n} 个字符生成取模代码', { n: items.length }));
   };
 
   const copyCode = async () => {
     if (!result) return;
     await copyTextToClipboard(result.code);
-    notice.success('取模代码已复制到粘贴板');
+    notice.success(t('取模代码已复制到粘贴板'));
   };
 
   const saveH = async () => {
     if (!result) return;
     try {
-      const ok = await saveTextFile(`font_${result.specLabel.replace('x', 'x')}.h`, result.code, '保存字库头文件', { filterName: 'C 头文件', extensions: ['h'] });
-      if (ok) notice.success('已保存 .h 文件');
+      const ok = await saveTextFile(`font_${result.specLabel.replace('x', 'x')}.h`, result.code, t('保存字库头文件'), { filterName: t('C 头文件'), extensions: ['h'] });
+      if (ok) notice.success(t('已保存 .h 文件'));
     } catch (err) {
-      notice.error('保存失败: ' + (err as Error).message);
+      notice.error(tt('保存失败: {m}', { m: (err as Error).message }));
     }
   };
 
@@ -115,7 +120,7 @@ const DotMatrixFont = () => {
       {contextHolder}
 
       <Space wrap style={ { marginBottom: 8 } }>
-        <span className="dot-label">规格</span>
+        <span className="dot-label">{t('规格')}</span>
         <Select
           size="middle"
           style={ { width: 110 } }
@@ -123,41 +128,41 @@ const DotMatrixFont = () => {
           onChange={ setSpecIdx }
           options={ SPECS.map((s, i) => ({ value: i, label: `${s.w}×${s.h}` })) }
         />
-        <span className="dot-label">字符</span>
+        <span className="dot-label">{t('字符')}</span>
         <Input
           style={ { width: 240 } }
           value={ text }
           onChange={ (e) => setText(e.target.value) }
-          placeholder="输入字符, 多个自动去重, 如: 中A8"
+          placeholder={t('输入字符, 多个自动去重, 如: 中A8')}
           maxLength={ 60 }
         />
       </Space>
 
       <Space wrap style={ { marginBottom: 8 } }>
-        <span className="dot-label">取模方式</span>
+        <span className="dot-label">{t('取模方式')}</span>
         <Radio.Group
           value={ mode }
           onChange={ (e) => setMode(e.target.value) }
           options={ [
-            { value: 'row', label: '逐行式' },
-            { value: 'col', label: '逐列式' },
+            { value: 'row', label: t('逐行式') },
+            { value: 'col', label: t('逐列式') },
           ] }
           optionType="button"
           size="small"
         />
-        <span className="dot-label">位序</span>
+        <span className="dot-label">{t('位序')}</span>
         <Radio.Group
           value={ order }
           onChange={ (e) => setOrder(e.target.value) }
           options={ [
-            { value: 'msb', label: '高位在前' },
-            { value: 'lsb', label: '低位在前' },
+            { value: 'msb', label: t('高位在前') },
+            { value: 'lsb', label: t('低位在前') },
           ] }
           optionType="button"
           size="small"
         />
-        <Checkbox checked={ invert } onChange={ (e) => setInvert(e.target.checked) }>反色 (取白)</Checkbox>
-        <span className="dot-label">阈值</span>
+        <Checkbox checked={ invert } onChange={ (e) => setInvert(e.target.checked) }>{t('反色 (取白)')}</Checkbox>
+        <span className="dot-label">{t('阈值')}</span>
         <Slider
           style={ { width: 160, display: 'inline-block', margin: '0 6px' } }
           min={ 0 }
@@ -169,34 +174,34 @@ const DotMatrixFont = () => {
       </Space>
 
       <Space wrap style={ { marginBottom: 10 } }>
-        <Button type="primary" icon={ <ThunderboltOutlined /> } onClick={ generate }>生成取模代码</Button>
-        <Button icon={ <CopyOutlined /> } onClick={ () => void copyCode() } disabled={ !result }>复制代码</Button>
-        <Button icon={ <DownloadOutlined /> } onClick={ () => void saveH() } disabled={ !result }>下载 .h</Button>
-        <Button icon={ <ClearOutlined /> } onClick={ () => setResult(null) } disabled={ !result }>清除结果</Button>
+        <Button type="primary" icon={ <ThunderboltOutlined /> } onClick={ generate }>{t('生成取模代码')}</Button>
+        <Button icon={ <CopyOutlined /> } onClick={ () => void copyCode() } disabled={ !result }>{t('复制代码')}</Button>
+        <Button icon={ <DownloadOutlined /> } onClick={ () => void saveH() } disabled={ !result }>{t('下载 .h')}</Button>
+        <Button icon={ <ClearOutlined /> } onClick={ () => setResult(null) } disabled={ !result }>{t('清除结果')}</Button>
       </Space>
 
       <Text type="secondary" style={ { fontSize: 12, display: 'block', marginBottom: 10 } }>
-        字形按系统字体渲染后以 { spec.w }×{ spec.h } 网格采样 (取每格中心判定), 与所选系统字体相关, 与标准字库字形可能有差异; 如需精确标准点阵字库请用字库文件/专业取模软件。
+        {tt('字形按系统字体渲染后以 {w}×{h} 网格采样 (取每格中心判定), 与所选系统字体相关, 与标准字库字形可能有差异; 如需精确标准点阵字库请用字库文件/专业取模软件。', { w: spec.w, h: spec.h })}
       </Text>
 
       { result && firstItem && (
         <div className="dot-result">
           <div className="dot-preview-col">
-            <div className="dot-preview-title">预览 (仅第一个字符 “{firstItem.ch}”)</div>
+            <div className="dot-preview-title">{tt('预览 (仅第一个字符 “{c}”)', { c: firstItem.ch })}</div>
             <div className="dot-preview-cell">
               <MatrixCanvas m={ firstItem.matrix } w={ spec.w } h={ spec.h } invert={ invert } />
             </div>
             <pre className="dot-bin">{ firstText }</pre>
           </div>
           <div className="dot-code-col">
-            <div className="dot-preview-title">取模结果 ({ result.items.length } 字符 · { spec.w }×{ spec.h } · { mode === 'row' ? '逐行式' : '逐列式' } · { order === 'msb' ? '高位在前' : '低位在前' })</div>
+            <div className="dot-preview-title">{tt('取模结果 ({n} 字符 · {w}×{h} · {m} · {b})', { n: result.items.length, w: spec.w, h: spec.h, m: mode === 'row' ? t('逐行式') : t('逐列式'), b: order === 'msb' ? t('高位在前') : t('低位在前') })}</div>
             <pre className="dot-code">{ result.code }</pre>
           </div>
         </div>
       ) }
 
       { result && !firstItem && (
-        <Text type="secondary">请在输入框中输入字符后点击「生成取模代码」</Text>
+        <Text type="secondary">{t('请在输入框中输入字符后点击「生成取模代码」')}</Text>
       ) }
     </div>
   );
