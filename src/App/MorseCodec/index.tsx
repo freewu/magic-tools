@@ -7,6 +7,9 @@ import { openFile } from "../../lib/file"
 import { saveBytesFile } from "../../lib/tauri"
 import { encodeMorse, decodeMorse, isMorseText, buildMorsePlaySchedule, renderMorseWav, MORSE_PHRASE_GROUPS, listCustomMorsePhrases, type MorsePlayToken } from "./lib"
 import MorseIntro from "./intro"
+import { useLocale } from "../../hook/locale-context";
+import { tr, trTpl } from "../../i18n/lang";
+import morseLang from "./lang";
 
 // 播放速度: 点的时长 (ms)
 const MORSE_SPEEDS = [
@@ -26,7 +29,15 @@ const TONE_OPTIONS = [
 
 const MorseCodec = () => {
 
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(morseLang, locale, key, fallback);
+  const tpl = (key: string, vars: Record<string, string | number>, fallback: string) => trTpl(morseLang, locale, key, vars, fallback);
+
   const { token } = theme.useToken();
+
+  // 速度/音效下拉选项: 值/波形取自模块常量, 文案按当前语言取词
+  const speedOpts = MORSE_SPEEDS.map((o) => ({ ...o, label: t('speed_' + o.value, o.label) }));
+  const toneOpts = TONE_OPTIONS.map((o) => ({ ...o, label: t('tone_' + o.value, o.label) }));
 
   const [ text, setText ] = useState('');   // 明文
   const [ morse, setMorse ] = useState(''); // 摩斯码
@@ -51,7 +62,7 @@ const MorseCodec = () => {
     const txt = (e.target as HTMLTextAreaElement).value.trim();
     if(txt !== '') {
       copyTextToClipboard(txt);
-      notice.success("复制到粘贴板成功！！！");
+      notice.success(t('copyOk', '复制到粘贴板成功！！！'));
     }
   };
 
@@ -59,7 +70,7 @@ const MorseCodec = () => {
     try {
       setMorse( encodeMorse(text) );
     } catch(err) {
-      notice.error("编码失败: " + (err as Error).message);
+      notice.error(tpl('encodeFail', { msg: (err as Error).message }, '编码失败: ' + (err as Error).message));
     }
   }
 
@@ -67,7 +78,7 @@ const MorseCodec = () => {
     try {
       setText( decodeMorse(morse) );
     } catch(err) {
-      notice.error("解码失败: " + (err as Error).message);
+      notice.error(tpl('decodeFail', { msg: (err as Error).message }, '解码失败: ' + (err as Error).message));
     }
   }
 
@@ -83,10 +94,10 @@ const MorseCodec = () => {
     setText(t);
     try {
       setMorse(encodeMorse(t));
-      notice.success(`已快速填充: ${t} (${item.desc})`);
+      notice.success(tpl('fillOk', { text: t, desc: item.desc }, `已快速填充: ${t} (${item.desc})`));
     } catch {
       setMorse('');
-      notice.warning(`已填入文本「${t}」, 但含无法编码的字符`);
+      notice.warning(tpl('fillWarn', { text: t }, `已填入文本「${t}」, 但含无法编码的字符`));
     }
   }
 
@@ -106,7 +117,7 @@ const MorseCodec = () => {
     }
     if (phrases.length > 0) {
       groups.push({
-        label: '自定义',
+        label: t('custom', '自定义'),
         options: phrases.map((it) => {
           const value = `custom:${it.id}`;
           phraseMap.current.set(value, { text: it.text, desc: it.desc });
@@ -142,12 +153,12 @@ const MorseCodec = () => {
   const play = async () => {
     const morseStr = pickMorse();
     if (morseStr === null) {
-      notice.warning('请先输入要播放的摩斯码 (或明文后先编码)');
+      notice.warning(t('playNeed', '请先输入要播放的摩斯码 (或明文后先编码)'));
       return;
     }
     const sched = buildMorsePlaySchedule(morseStr, dotMs);
     if (sched.events.length === 0) {
-      notice.warning('没有可播放的摩斯符号');
+      notice.warning(t('playNone', '没有可播放的摩斯符号'));
       return;
     }
 
@@ -196,7 +207,7 @@ const MorseCodec = () => {
         if (runRef.current === runId) stop();
       }, sched.totalMs + baseMs + 150));
     } catch (err) {
-      notice.error('播放失败: ' + (err as Error).message);
+      notice.error(tpl('playFail', { msg: (err as Error).message }, '播放失败: ' + (err as Error).message));
       setPlaying(false);
       setPlayTokens(null);
       setActiveIdx(-1);
@@ -206,12 +217,12 @@ const MorseCodec = () => {
   const saveWav = async () => {
     const morseStr = pickMorse();
     if (morseStr === null) {
-      notice.warning('请先输入要导出的摩斯码 (或明文后先编码)');
+      notice.warning(t('exportNeed', '请先输入要导出的摩斯码 (或明文后先编码)'));
       return;
     }
     const sched = buildMorsePlaySchedule(morseStr, dotMs);
     if (sched.events.length === 0) {
-      notice.warning('没有可导出的摩斯符号');
+      notice.warning(t('exportNone', '没有可导出的摩斯符号'));
       return;
     }
     try {
@@ -220,15 +231,15 @@ const MorseCodec = () => {
       const base = morseStr.replace(/[^\w.-]/g, '_').replace(/_+/g, '_').slice(0, 20) || 'morse';
       const defaultName = `morse_${base}_${dotMs}ms.wav`;
       const saved = await saveBytesFile(defaultName, bytes, {
-        title: '保存摩斯音频',
-        filterName: 'WAV 音频',
+        title: t('saveTitle', '保存摩斯音频'),
+        filterName: t('saveFilter', 'WAV 音频'),
         extensions: ['wav'],
       });
       if (saved) {
-        notice.success(`已保存 WAV 音频 (时长约 ${(sched.totalMs / 1000).toFixed(1)}s, ${toneDef.label})`);
+        notice.success(tpl('savedWav', { secs: (sched.totalMs / 1000).toFixed(1), tone: t('tone_' + tone, toneDef.label) }, `已保存 WAV 音频 (时长约 ${(sched.totalMs / 1000).toFixed(1)}s, ${toneDef.label})`));
       }
     } catch (err) {
-      notice.error('保存失败: ' + (err as Error).message);
+      notice.error(tpl('saveFail', { msg: (err as Error).message }, '保存失败: ' + (err as Error).message));
     }
   };
 
@@ -237,10 +248,10 @@ const MorseCodec = () => {
       {contextHolder}
 
       <div style={ { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', margin: '4px 0' } }>
-        <span>常用编码</span>
+        <span>{ t('phraseLabel', '常用编码') }</span>
         <Select
           style={ { minWidth: 260 } }
-          placeholder="选择常用编码快速填充 (CQ / SOS / Q简语 / 73 等, 自定义见设置)"
+          placeholder={ t('phrasePh', '选择常用编码快速填充 (CQ / SOS / Q简语 / 73 等, 自定义见设置)') }
           showSearch
           value={ undefined }
           options={ phraseOptions() }
@@ -258,9 +269,9 @@ const MorseCodec = () => {
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setText(e.target.value) ;} }
-        title="双击复制内容到粘贴板"
+        title={ t('copyTitle', '双击复制内容到粘贴板') }
         value= { text }
-        placeholder="输入需要编码的文本 (字母 / 数字 / 常用标点), 或解码结果的回填区"
+        placeholder={ t('textPh', '输入需要编码的文本 (字母 / 数字 / 常用标点), 或解码结果的回填区') }
         autoSize={{ minRows: 4, maxRows: 6 }}
         onDragOver={ (e) => { e.preventDefault(); } }
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setText ); } }
@@ -271,43 +282,43 @@ const MorseCodec = () => {
           onClick={ encode }
           style={ { backgroundColor: "#007bff", color: "#fff" } }
           icon={<ArrowDownOutlined />}
-        >文本 → 摩斯码</Button>
+        >{ t('toMorse', '文本 → 摩斯码') }</Button>
         <Button
           onClick={ decode }
           style={ { backgroundColor: "#28a745", color: "#fff" } }
           icon={<ArrowUpOutlined />}
-        >摩斯码 → 文本</Button>
+        >{ t('toText', '摩斯码 → 文本') }</Button>
         <Button
           onClick={ play }
           disabled={ playing }
           style={ { backgroundColor: "#17a2b8", color: "#fff" } }
           icon={<CaretRightOutlined />}
-        >播放摩斯码</Button>
+        >{ t('playBtn', '播放摩斯码') }</Button>
         <Button
           onClick={ saveWav }
           disabled={ playing }
           style={ { backgroundColor: "#6f42c1", color: "#fff" } }
           icon={<DownloadOutlined />}
-        >保存音频 (WAV)</Button>
+        >{ t('saveBtn', '保存音频 (WAV)') }</Button>
         <Button
           onClick={ stop }
           disabled={ !playing }
           danger
           icon={<StopOutlined />}
-        >停止</Button>
+        >{ t('stopBtn', '停止') }</Button>
         <Button
           onClick={ () => { setText(''); setMorse(''); } }
           style={ { backgroundColor: "#dc3545", color: "#fff" } }
-        >清除</Button>
+        >{ t('clear', '清除') }</Button>
       </Space>
 
       <TextArea
         style={ { margin: "8px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setMorse(e.target.value) ;} }
-        title="双击复制内容到粘贴板"
+        title={ t('copyTitle', '双击复制内容到粘贴板') }
         value= { morse }
-        placeholder="摩斯码结果区: 字母间空格, 单词间使用 / 分隔, 例如 ... --- ... (SOS)"
+        placeholder={ t('morsePh', '摩斯码结果区: 字母间空格, 单词间使用 / 分隔, 例如 ... --- ... (SOS)') }
         autoSize={{ minRows: 4, maxRows: 6 }}
         onDragOver={ (e) => { e.preventDefault(); } }
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setMorse ); } }
@@ -324,7 +335,7 @@ const MorseCodec = () => {
             display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
           } }
         >
-          <span style={ { color: token.colorError, fontWeight: 600, fontSize: 13, flex: 'none' } }>● 正在播放</span>
+          <span style={ { color: token.colorError, fontWeight: 600, fontSize: 13, flex: 'none' } }>{ t('playing', '● 正在播放') }</span>
           <span style={ { fontFamily: 'Consolas, Monaco, monospace', fontSize: 17, letterSpacing: 2, lineHeight: '28px' } }>
             { playTokens.map((t, i) => t.word ? (
               <span key={ i } style={ { color: token.colorTextTertiary, margin: '0 8px' } }>/</span>
@@ -347,14 +358,14 @@ const MorseCodec = () => {
       ) }
 
       <Space style={ { marginTop: 4 } } wrap>
-        <span>播放速度</span>
+        <span>{ t('speedLabel', '播放速度') }</span>
         <Select
           value={ dotMs }
           style={ { width: 160 } }
           onChange={ setDotMs }
-          options={ MORSE_SPEEDS }
+          options={ speedOpts }
         />
-        <span>频率</span>
+        <span>{ t('freqLabel', '频率') }</span>
         <div style={ { width: 200, display: 'inline-block' } }>
           <Slider
             min={ 200 }
@@ -365,17 +376,17 @@ const MorseCodec = () => {
           />
         </div>
         <span>{ freq } Hz</span>
-        <span>音效</span>
+        <span>{ t('toneLabel', '音效') }</span>
         <Select
           value={ tone }
           style={ { width: 150 } }
           onChange={ setTone }
-          options={ TONE_OPTIONS }
+          options={ toneOpts }
         />
-        { playing && <span style={ { color: '#28a745' } }>正在播放…</span> }
+        { playing && <span style={ { color: '#28a745' } }>{ t('playingDots', '正在播放…') }</span> }
       </Space>
 
-      <Divider> 摩斯码编解码说明 </Divider>
+      <Divider>{ t('divider', '摩斯码编解码说明') }</Divider>
 
       <MorseIntro />
     </div>
