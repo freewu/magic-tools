@@ -25,16 +25,16 @@ import { getLastWeek, getNextWeek, getLastMonth, getNextMonth,formatDateTime } f
 import { getMonthBegin, getMonthEnd, getLastMonthBegin, getLastMonthEnd,getNextMonthBegin, getNextMonthEnd } from "./lib"
 
 export const timeList = [
-  { lable: "当前时间戳",value: (new Date()).getTime() + "" },
-  { lable: "当前时间",value: formatDateTime(new Date()) },
-  { lable: "上周",value: formatDateTime(getLastWeek()) },
-  { lable: "下周",value: formatDateTime(getNextWeek()) },
-  { lable: "上月",value: formatDateTime(getLastMonth()) },
-  { lable: "下月",value: formatDateTime(getNextMonth()) },
-  { lable: "本月初",value: formatDateTime(getMonthBegin()) },
-  { lable: "本月末",value: formatDateTime(getMonthEnd()) },
-  { lable: "上月初",value: formatDateTime(getLastMonthBegin()) },
-  { lable: "上月末",value: formatDateTime(getLastMonthEnd()) },
-  { lable: "下月初",value: formatDateTime(getNextMonthBegin()) },
-  { lable: "下月末",value: formatDateTime(getNextMonthEnd()) },
+  { key: 'nowTs', lable: "当前时间戳", value: (new Date()).getTime() + "" },
+  { key: 'now', lable: "当前时间", value: formatDateTime(new Date()) },
+  { key: 'lastW', lable: "上周", value: formatDateTime(getLastWeek()) },
+  { key: 'nextW', lable: "下周", value: formatDateTime(getNextWeek()) },
+  { key: 'lastM', lable: "上月", value: formatDateTime(getLastMonth()) },
+  { key: 'nextM', lable: "下月", value: formatDateTime(getNextMonth()) },
+  { key: 'mBegin', lable: "本月初", value: formatDateTime(getMonthBegin()) },
+  { key: 'mEnd', lable: "本月末", value: formatDateTime(getMonthEnd()) },
+  { key: 'lmBegin', lable: "上月初", value: formatDateTime(getLastMonthBegin()) },
+  { key: 'lmEnd', lable: "上月末", value: formatDateTime(getLastMonthEnd()) },
+  { key: 'nmBegin', lable: "下月初", value: formatDateTime(getNextMonthBegin()) },
+  { key: 'nmEnd', lable: "下月末", value: formatDateTime(getNextMonthEnd()) },
 ]

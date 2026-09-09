@@ -6,12 +6,18 @@ import { genColorString, transalte2Hex, calcColorSchemes } from "./lib"
 import { colorTypeList, emptyResult } from "./data"
 import type { RadioChangeEvent } from 'antd';
 import type { Color } from 'antd/es/color-picker';
+import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
+import colorLang from "./lang";
 
 const ColorConvert = () => {
 
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(colorLang, locale, key, fallback);
+
   const [ value, setValue ] = useState(''); // 需要转换的颜色值 
   const [ colorType, setColorType ] = useState('HEX'); // 输入值的颜色类型,
-  const [ placeholder, setPlaceholder ] = useState(colorTypeList[0]["placeholder"]); // 颜色类型的输入提示
+  const [ placeholder, setPlaceholder ] = useState(tr(colorLang, locale, 'ph_HEX', colorTypeList[0]["placeholder"])); // 颜色类型的输入提示
   const [ checked, setChecked ] = useState(false); // 输出大小写
   const [ colorData, setColorData ] = useState(emptyResult); // 转换的结果
   const [ notice, contextHolder] = message.useMessage();
@@ -27,7 +33,7 @@ const ColorConvert = () => {
     setColorData(emptyResult);
     // 更新输入提示信息
     const tips = colorTypeList.find(item => item.label === value)?.placeholder;
-    setPlaceholder(tips + "");
+    setPlaceholder(t('ph_' + value, (tips ?? '') + ''));
   };
 
   // 点击结果框,把结果复制到粘贴板
@@ -35,7 +41,7 @@ const ColorConvert = () => {
     const txt = (e.target as HTMLInputElement).value.trim();
     if(txt != "") {
       copyTextToClipboard(txt);
-      notice.success("复制到粘贴板成功！！！");
+      notice.success(t('copyOk', '复制到粘贴板成功！！！'));
     }
   };
 
@@ -122,10 +128,10 @@ const ColorConvert = () => {
 
   const copyHex = (hex :string) => {
     copyTextToClipboard(hex);
-    notice.success(upperLowerTranslate(hex) + ' 已复制');
+    notice.success(upperLowerTranslate(hex) + t('copiedSfx', ' 已复制'));
   };
 
-  const offsetText = (o :number) => o === 0 ? '主色' : ((o > 0 ? '+' : '') + o + '°');
+  const offsetText = (o :number) => o === 0 ? t('schemeMain', '主色') : ((o > 0 ? '+' : '') + o + '°');
 
   // 格式页: 输入与结果区 (结果行包含全部格式, 首行"颜色"大色卡跟随所选输入格式)
   const formatPane = (
@@ -137,7 +143,7 @@ const ColorConvert = () => {
           onChange={ onColorTypeChange } 
           value={ colorType } 
         />
-        <Checkbox onChange={ handleCheckboxChange } checked={ checked }>大写字符显示</Checkbox>
+        <Checkbox onChange={ handleCheckboxChange } checked={ checked }>{t('ckUpper', '大写字符显示')}</Checkbox>
         {/* <Checkbox onChange={ handleShowPercentChange } value={ showPercent }>显示 %</Checkbox> */}
 
         <ColorPicker
@@ -149,7 +155,7 @@ const ColorConvert = () => {
         <Button 
           onClick={ () => { setValue(''); setColorData(emptyResult); } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-        >清除</Button>
+        >{t('clear', '清除')}</Button>
       </Space>
       <TextArea
         style={ { margin: "5px 0 5px 0" }}
@@ -162,7 +168,7 @@ const ColorConvert = () => {
       <Row wrap>
         <Col span={12}>
           <Form name="basic1" labelCol={{ span: 4 }} autoComplete="off">
-            <Form.Item label="颜色">
+            <Form.Item label={t('lblColor', '颜色')}>
               <Input readOnly onClick={ inputClick }  
                 style={ { cursor: "pointer", backgroundColor: colorData.hex, color: colorData.complementaryColor } } 
                 value= { colorData.hex ? fmtText(colorData.hex) : '' }/>
@@ -186,7 +192,7 @@ const ColorConvert = () => {
         </Col>
         <Col span={12}>
           <Form name="basic2" labelCol={{ span: 4 }} autoComplete="off">
-            <Form.Item label="互补色">
+            <Form.Item label={t('lblComp', '互补色')}>
               <Input 
                 readOnly onClick={ inputClick } 
                 style={ { cursor: "pointer", backgroundColor: colorData.complementaryColor, color: colorData.hex } } 
@@ -216,24 +222,23 @@ const ColorConvert = () => {
     <>
       <div style={ { marginBottom: 12 } }>
         <span style={ { fontSize: 12, color: '#999' } }>
-          基于主色 { colorData.hex ? <b>{ upperLowerTranslate(colorData.hex) }</b> : '…' } 的色相旋转生成, 点击色块复制 HEX;
-          若主色为灰色 (无彩色) 各方案颜色相同属正常现象
+          { t('si_a', '基于主色') } { colorData.hex ? <b>{ upperLowerTranslate(colorData.hex) }</b> : '…' } { t('si_b', ' 的色相旋转生成, 点击色块复制 HEX; ') }{ t('si_gray', '若主色为灰色 (无彩色) 各方案颜色相同属正常现象') }
         </span>
       </div>
       { schemes.length === 0 ? (
-        <div style={ { fontSize: 13, color: '#999' } }>在「格式」页输入有效颜色后, 自动生成相似 / 分离 / 三角 / 四角 / 方形 / 复合 / 双分离配色</div>
+        <div style={ { fontSize: 13, color: '#999' } }>{t('schemeHint', '在「格式」页输入有效颜色后, 自动生成相似 / 分离 / 三角 / 四角 / 方形 / 复合 / 双分离配色')}</div>
       ) : (
         <div style={ { display: 'flex', flexDirection: 'column', gap: 18 } }>
           { schemes.map((s) => (
             <div key={ s.key }>
-              <div style={ { fontWeight: 600, fontSize: 13, marginBottom: 2 } }>{ s.label }</div>
-              <div style={ { marginBottom: 8, fontSize: 12, color: '#999' } }>{ s.desc }</div>
+              <div style={ { fontWeight: 600, fontSize: 13, marginBottom: 2 } }>{ t('sl_' + s.key, s.label) }</div>
+              <div style={ { marginBottom: 8, fontSize: 12, color: '#999' } }>{ t('sd_' + s.key, s.desc) }</div>
               <div style={ { display: 'flex', gap: 8, flexWrap: 'wrap' } }>
                 { s.colors.map((c) => (
                   <div
                     key={ c.hex + c.offset }
                     onClick={ () => copyHex(c.hex) }
-                    title={ upperLowerTranslate(c.hex) + (c.isMain ? ' (主色)' : c.isComplement ? ' (互补)' : '') + ' · 点击复制 HEX' }
+                    title={ upperLowerTranslate(c.hex) + (c.isMain ? t('titleMain', '(主色)') : c.isComplement ? t('titleComp', '(互补)') : '') + t('clickHex', ' · 点击复制 HEX') }
                     style={ {
                       flex: 1, minWidth: 96, height: 64, borderRadius: 6, background: c.hex,
                       cursor: 'pointer', padding: '6px 8px', boxSizing: 'border-box',
@@ -242,7 +247,7 @@ const ColorConvert = () => {
                       boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.06)',
                     } }
                   >
-                    <span>{ upperLowerTranslate(c.hex) }{ c.isMain ? ' (主)' : (c.isComplement ? ' (补)' : '') }</span>
+                    <span>{ upperLowerTranslate(c.hex) }{ c.isMain ? t('mkM', '(主)') : (c.isComplement ? t('mkC', '(补)') : '') }</span>
                     <span>{ offsetText(c.offset) }</span>
                   </div>
                 )) }
@@ -260,8 +265,8 @@ const ColorConvert = () => {
       <Tabs
         defaultActiveKey="format"
         items={ [
-          { key: 'format', label: '格式', children: formatPane },
-          { key: 'scheme', label: '配色方案', children: schemePane },
+          { key: 'format', label: t('tabFmt', '格式'), children: formatPane },
+          { key: 'scheme', label: t('tabScheme', '配色方案'), children: schemePane },
         ] }
       />
     </div>

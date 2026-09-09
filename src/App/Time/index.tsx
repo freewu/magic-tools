@@ -5,8 +5,14 @@ import { copyTextToClipboard } from "./../../lib";
 import { emptyResult, timeList } from "./data";
 import { formatDateTime, gpsTimeOf, bdtTimeOf, gstTimeOf, glonassTimeText, julianDayOf } from "./lib";
 import { InputStatus } from "antd/es/_util/statusUtils";
+import { useLocale } from "../../hook/locale-context";
+import { tr, trTpl } from "../../i18n/lang";
+import timeLang from "./lang";
 
 const Time = () => {
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(timeLang, locale, key, fallback);
+  const tpl = (key: string, vars: Record<string, string | number>, fallback: string) => trTpl(timeLang, locale, key, vars, fallback);
 
   const [ status, setStatus ] = useState('');
   const [ value, setValue ] = useState('');
@@ -18,7 +24,7 @@ const Time = () => {
     const txt = (e.target as HTMLInputElement).value.trim();
     if(txt != "") {
       copyTextToClipboard(txt);
-      notice.success("复制到粘贴板成功！！！");
+      notice.success(t('copyOk', '复制到粘贴板成功！！！'));
     }
   };
 
@@ -41,13 +47,13 @@ const Time = () => {
     const b = bdtTimeOf(ms);
     const s = gstTimeOf(ms);
     const jd = julianDayOf(ms);
-    r["gps"] = `${g.week} 周 + ${g.tow} 秒`;
+    r["gps"] = tpl('wkSec', { wk: g.week, sec: g.tow }, `${g.week} 周 + ${g.tow} 秒`);
     r["gpsWeekTow"] = `${g.week}, ${g.tow}`;
     r["gpsTotal"] = `${g.total}`;
-    r["bdt"] = `${b.week} 周 + ${b.tow} 秒`;
+    r["bdt"] = tpl('wkSec', { wk: b.week, sec: b.tow }, `${b.week} 周 + ${b.tow} 秒`);
     r["bdtWeekTow"] = `${b.week}, ${b.tow}`;
     r["bdtTotal"] = `${b.total}`;
-    r["gst"] = `${s.week} 周 + ${s.tow} 秒`;
+    r["gst"] = tpl('wkSec', { wk: s.week, sec: s.tow }, `${s.week} 周 + ${s.tow} 秒`);
     r["gstWeekTow"] = `${s.week}, ${s.tow}`;
     r["gstTotal"] = `${s.total}`;
     r["glonass"] = glonassTimeText(ms);
@@ -94,20 +100,20 @@ const Time = () => {
       {contextHolder}
       <Space size={[0, 8]} wrap>
         {
-          timeList?.map((t, index) => {
+          timeList?.map((item, index) => {
             // 只展示 15 个
             if(index < 15) {
               return (
                 <Tag 
-                  key={ t.lable }
+                  key={ item.key }
                   color={ calcTagColor(index) } style={ inputStyle } 
                   onClick={ () => { 
-                      const v = t.value;
+                      const v = item.value;
                       setValue( v ); 
                       updateDate(new Date(/^\d+$/.test(v)? parseInt(v) : v)); 
                     } 
                   } 
-                >{ t.lable }</Tag>
+                >{ t('tl_' + item.key, item.lable) }</Tag>
               )
             }
           })
@@ -118,7 +124,7 @@ const Time = () => {
         style={ { margin: "5px 0 5px 0" }}
         value= { value }
         onChange={  textAreaChange }
-        placeholder="输入 10位时间戳 / 13位时间戳 / UTC 格式字符串 / YYYY-MM-DD HH:ii:ss 格式字符串"
+        placeholder={t('ph', '输入 10位时间戳 / 13位时间戳 / UTC 格式字符串 / YYYY-MM-DD HH:ii:ss 格式字符串')}
         autoSize={{ minRows: 3, maxRows: 3 }}
       />
       <Space>
@@ -129,7 +135,7 @@ const Time = () => {
         <Button 
           onClick={ () => { setValue(''); setData(emptyResult); } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-        >清除</Button>
+        >{t('clear', '清除')}</Button>
       </Space>
 
       <Divider dashed />
@@ -137,10 +143,10 @@ const Time = () => {
       {/* 结果分两排展示: 两列网格 (每列内部保持表单 label+输入行式布局) */}
       <Form name="basic" labelCol={{ span: 9 }} autoComplete="off">
         <div style={ { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', columnGap: 16 } }>
-        <Form.Item label="时间戳(10位)">
+        <Form.Item label={t('lb_ts10', '时间戳(10位)')}>
           <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.ts10 } />
         </Form.Item>
-        <Form.Item label="时间戳(13位)">
+        <Form.Item label={t('lb_ts13', '时间戳(13位)')}>
           <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.ts13 } />
         </Form.Item>
         <Form.Item label="ISO 8601">
@@ -166,40 +172,40 @@ const Time = () => {
             data.custom? data.custom.split(" ")["0"] : '' 
           }/>
         </Form.Item>
-        <Form.Item label="GPS 时间">
+        <Form.Item label={t('lb_gps', 'GPS 时间')}>
           <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gps }/>
         </Form.Item>
-        <Form.Item label="GPS 时间 (周,秒)">
+        <Form.Item label={t('lb_gps_ws', 'GPS 时间 (周,秒)')}>
           <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gpsWeekTow }/>
         </Form.Item>
-        <Form.Item label="GPS 时间 (总秒)">
+        <Form.Item label={t('lb_gps_ts', 'GPS 时间 (总秒)')}>
           <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gpsTotal }/>
         </Form.Item>
-        <Form.Item label="北斗时间">
+        <Form.Item label={t('lb_bdt', '北斗时间')}>
           <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.bdt }/>
         </Form.Item>
-        <Form.Item label="北斗时间 (周,秒)">
+        <Form.Item label={t('lb_bdt_ws', '北斗时间 (周,秒)')}>
           <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.bdtWeekTow }/>
         </Form.Item>
-        <Form.Item label="北斗时间 (总秒)">
+        <Form.Item label={t('lb_bdt_ts', '北斗时间 (总秒)')}>
           <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.bdtTotal }/>
         </Form.Item>
-        <Form.Item label="伽利略时间">
+        <Form.Item label={t('lb_gst', '伽利略时间')}>
           <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gst }/>
         </Form.Item>
-        <Form.Item label="伽利略时间 (周,秒)">
+        <Form.Item label={t('lb_gst_ws', '伽利略时间 (周,秒)')}>
           <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gstWeekTow }/>
         </Form.Item>
-        <Form.Item label="伽利略时间 (总秒)">
+        <Form.Item label={t('lb_gst_ts', '伽利略时间 (总秒)')}>
           <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gstTotal }/>
         </Form.Item>
-        <Form.Item label="格洛纳斯时间 (UTC+3)">
+        <Form.Item label={t('lb_glonass', '格洛纳斯时间 (UTC+3)')}>
           <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.glonass }/>
         </Form.Item>
-        <Form.Item label="儒略日 (JD)">
+        <Form.Item label={t('lb_jd', '儒略日 (JD)')}>
           <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.jd }/>
         </Form.Item>
-        <Form.Item label="简化儒略日 (MJD)">
+        <Form.Item label={t('lb_mjd', '简化儒略日 (MJD)')}>
           <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.mjd }/>
         </Form.Item>
         </div>
