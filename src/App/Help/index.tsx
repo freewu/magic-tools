@@ -1,13 +1,19 @@
-// 帮助页面
+// Help 页面
 import { Layout,Card, Avatar, Space,Row, Col,Timeline } from 'antd';
 import { GithubOutlined, BugOutlined } from '@ant-design/icons';
 import { compomentList, developerList, eventList } from "./data"
+import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
+import helpLang from "./lang";
 import "./help.css";
 
 const Help = () => {
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(helpLang, locale, key, fallback);
+
   return (
     <Layout style={ { height: '100%', overflowY: "auto" } } >
-      <Card title="开发者" className='help-card'>
+      <Card title={ t('dev', '开发者') } className='help-card'>
         <Space>
         {
           developerList.map((item, index) => {
@@ -23,7 +29,7 @@ const Help = () => {
 
       <Row>
         <Col span={ 8 }>
-          <Card title="使用组件" className='help-card'>
+          <Card title={ t('comp', '使用组件') } className='help-card'>
           {
             compomentList.map((item, index) => {
               return (
@@ -34,19 +40,19 @@ const Help = () => {
             })
           }
           </Card>
-          <Card title="项目" className='help-card'>
+          <Card title={ t('proj', '项目') } className='help-card'>
             <p>
               <GithubOutlined style={ { marginRight: 6 } } />
               <a target="_blank" href="https://github.com/freewu/magic-tools">https://github.com/freewu/magic-tools</a>
             </p>
             <p>
               <BugOutlined style={ { marginRight: 6 } } />
-              <a target="_blank" href="https://github.com/freewu/magic-tools/issues/new">提交 Issue / 功能建议</a>
+              <a target="_blank" href="https://github.com/freewu/magic-tools/issues/new">{ t('issue', '提交 Issue / 功能建议') }</a>
             </p>
           </Card>
         </Col>
         <Col span={ 16 }>
-          <Card title="开发时间线" className='help-card'>
+          <Card title={ t('timeline', '开发时间线') } className='help-card'>
             <Timeline
               mode={ "left"}
               items={ eventList }

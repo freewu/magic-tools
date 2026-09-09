@@ -6,8 +6,14 @@ import { copyTextToClipboard } from "./../../lib"
 import { openFile } from "../../lib/file"
 import { Base64 as B64 } from 'js-base64';
 import { default as Base64Intro } from "./intro"
+import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
+import base64Lang from "./lang";
 
 const Base64 = () => {
+
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(base64Lang, locale, key, fallback);
 
   const tips = `
 Base64编码后的字符串中可能包含"+/="之类的字符，而"/"，"="等是URL的保留字符或不安全字符，因此如果直接在URL中传输Base64编码，保留字符和不安全字符会被替换为%XX的形式，对后端来说解码不方便。如果不替换，就会造成URL注入漏洞。
@@ -28,7 +34,7 @@ Base64编码后的字符串中可能包含"+/="之类的字符，而"/"，"="等
     const txt = (e.target as HTMLInputElement).value.trim();
     if(txt !== '') {
       copyTextToClipboard(txt);
-      notice.success("复制到粘贴板成功！！！");
+      notice.success(t('copyOk', '复制到粘贴板成功！！！'));
     }
   };
 
@@ -44,7 +50,7 @@ Base64编码后的字符串中可能包含"+/="之类的字符，而"/"，"="等
       try {
         r = B64.decode( decodeValue)
       } catch(err) {
-        notice.error("解码失败！！！");
+        notice.error(t('decodeFailed', '解码失败！！！'));
       }
       setEncodeValue(r);
     }
@@ -58,9 +64,9 @@ Base64编码后的字符串中可能包含"+/="之类的字符，而"/"，"="等
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setEncodeValue(e.target.value) ;} }
-        title="双击复制内容到粘贴板"
+        title={ t('copyTitle', '双击复制内容到粘贴板') }
         value= { encodeValue }
-        placeholder="输入需要进行 Base64 编码的内容  或 拖拽文件到框内打开"
+        placeholder={ t('encodePh', '输入需要进行 Base64 编码的内容  或 拖拽文件到框内打开') }
         autoSize={{ minRows: 5, maxRows: 5 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setEncodeValue ); } }
@@ -70,33 +76,33 @@ Base64编码后的字符串中可能包含"+/="之类的字符，而"/"，"="等
         onClick={ encode }
         style={ {"backgroundColor" : "#007bff","color": "#fff" }} 
         icon={<ArrowDownOutlined />}
-      >Base64 编码</Button>
+      >{ t('encode', 'Base64 编码') }</Button>
       <Button 
         onClick={ decode }
         style={ {"backgroundColor" : "#28a745","color": "#fff" }} 
         icon={<ArrowUpOutlined />}
-      >Base64 解码</Button>&nbsp;
+      >{ t('decode', 'Base64 解码') }</Button>&nbsp;
       <Tooltip placement="bottomRight" title={ tips }>
-        <Checkbox onChange={ (e) => { setSafe(e.target.checked); } } checked={ safe }>安全</Checkbox>
+        <Checkbox onChange={ (e) => { setSafe(e.target.checked); } } checked={ safe }>{ t('safe', '安全') }</Checkbox>
       </Tooltip>&nbsp;
       <Button 
         onClick={ () => { setEncodeValue(''); setDecodeValue(''); } }
         style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-      >清除</Button>
+      >{ t('clear', '清除') }</Button>
       
       <TextArea
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setDecodeValue(e.target.value) ;} }
-        title="双击复制内容到粘贴板"
+        title={ t('copyTitle', '双击复制内容到粘贴板') }
         value= { decodeValue }
-        placeholder="输入需要进行 Base64 解码的内容  或 拖拽文件到框内打开"
+        placeholder={ t('decodePh', '输入需要进行 Base64 解码的内容  或 拖拽文件到框内打开') }
         autoSize={{ minRows: 5, maxRows: 5 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setDecodeValue ); } }
       />
       
-      <Divider> Base64 编码说明 </Divider>
+      <Divider>{ t('divider', 'Base64 编码说明') }</Divider>
 
       <Base64Intro />
     </div>
