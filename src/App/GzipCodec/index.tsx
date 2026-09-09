@@ -133,10 +133,10 @@ const GzipCodec = () => {
 
       <Divider plain orientation="left">{ t('divider', 'Gzip 编解码说明') }</Divider>
       <ul style={ { color: '#888', fontSize: 13, lineHeight: 1.9, paddingLeft: 18, marginTop: 0 } }>
-        <li>Gzip 是广泛使用的数据压缩格式: 压缩(编码)把文本变为二进制 gzip 流, 解压(解码)还原原文, 压缩率取决于内容重复度。</li>
-        <li>结果为二进制, 本工具用 <b>Base64</b>(更紧凑) 或 <b>Hex</b>(可读/便于调试) 两种文本格式展示, 可在「设置 → 编解码」里修改默认格式。</li>
-        <li>解压输入 Base64 / Hex 均可自动识别; 输入必须带 Gzip 文件头 (1F 8B), 普通 Base64 文本(非 gzip 数据)会提示无效。</li>
-        <li>压缩解压在本地浏览器/WebView 完成 (CompressionStream API), 内容不出本机, 无需网络。</li>
+        <li>{t('intro1', '')}</li>
+        <li>{t('intro2a', '')} <b>Base64</b>{t('intro2b', '')} <b>Hex</b>{t('intro2c', '')}</li>
+        <li>{t('intro3', '')}</li>
+        <li>{t('intro4', '')}</li>
       </ul>
     </div>
   );
