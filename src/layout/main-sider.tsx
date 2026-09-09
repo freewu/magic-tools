@@ -110,7 +110,7 @@ const MainSider: React.FC = () => {
       </div>
 
       {/* 底部区: 展开时左侧版本号 (有新版本时右上角呼吸角标, 点击进帮助; 角标点击直达更新页),
-          右侧语言切换 + 设置图标; 折叠时仅两图标居中 */}
+          右侧紧贴的语言切换 + 设置图标; 折叠时两图标紧贴靠左下角 */}
       <div style={ {
         flexShrink: 0,
         background: '#001529',
@@ -118,7 +118,7 @@ const MainSider: React.FC = () => {
         padding: '4px 8px',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: collapsed ? 'center' : 'space-between',
+        justifyContent: collapsed ? 'flex-start' : 'space-between',
         gap: 0,
       } }>
         { !collapsed && (
