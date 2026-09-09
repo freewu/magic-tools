@@ -4,6 +4,8 @@ const { TextArea } = Input;
 const { Text } = Typography;
 import { ClearOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from "./../../lib"
+import { useLocale } from "./../../hook/locale-context"
+import { u, uT } from "./../ui-lang"
 import { default as CRCIntro } from "./intro"
 import { parseInput } from "../../lib/byte"
 import { CRC_ALGOS, findAlgo, computeCrc, formatCrc, polyFormula, getDefaultInputMode, getDefaultAlgo } from "./lib"
@@ -13,6 +15,10 @@ import "./../../lib/check.css"
 type InputMode = 'hex' | 'ascii';
 
 const CRCCheck = () => {
+
+  const { locale } = useLocale();
+  const t = (zh: string) => u(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => uT(locale, zh, v);
 
   const { token } = theme.useToken();
   const [ mode, setMode ] = useState<InputMode>(getDefaultInputMode());
@@ -38,11 +44,11 @@ const CRCCheck = () => {
   const fmt = raw === null ? null : formatCrc(raw, param.width);
 
   const resultRows = [
-    { label: 'HEX', value: fmt?.hex ?? '', title: '十六进制' },
-    { label: 'DEC', value: fmt?.dec ?? '', title: '十进制' },
-    { label: 'OCT', value: fmt?.oct ?? '', title: '八进制' },
-    { label: 'BIN', value: fmt?.bin ?? '', title: '二进制' },
-    { label: '数据长度', value: bytes.length > 0 ? bytes.length + ' 字节' : '', title: '参与计算的字节数' },
+    { label: 'HEX', value: fmt?.hex ?? '', title: t('十六进制') },
+    { label: 'DEC', value: fmt?.dec ?? '', title: t('十进制') },
+    { label: 'OCT', value: fmt?.oct ?? '', title: t('八进制') },
+    { label: 'BIN', value: fmt?.bin ?? '', title: t('二进制') },
+    { label: t('数据长度'), value: bytes.length > 0 ? tt('{n} 字节', { n: bytes.length }) : '', title: t('参与计算的字节数') },
   ];
 
   // 点击复制输入框内容 (参考 Hash 值计算交互)
@@ -51,7 +57,7 @@ const CRCCheck = () => {
     const txt = e.target.value.trim();
     if (txt !== '') {
       copyTextToClipboard(txt);
-      notice.success("已复制: " + txt);
+      notice.success(tt("已复制: {t}", { t: txt }));
     }
   };
 
@@ -67,16 +73,16 @@ const CRCCheck = () => {
       {contextHolder}
 
       <Space size={ [0, 8] } wrap style={ { margin: '5px 0' } }>
-        <span>输入格式:</span>
+        <span>{t('输入格式:')}</span>
         <Segmented
           value={ mode }
           onChange={ (v) => { setMode(v as InputMode); } }
           options={ [
-            { label: 'HEX', value: 'hex', title: '十六进制字节 (支持 空格/逗号/0x 等分隔)' },
-            { label: 'ASCII / 文本', value: 'ascii', title: '文本按 UTF-8 编码为字节' },
+            { label: 'HEX', value: 'hex', title: t('十六进制字节 (支持 空格/逗号/0x 等分隔)') },
+            { label: t('ASCII / 文本'), value: 'ascii', title: t('文本按 UTF-8 编码为字节') },
           ] }
         />
-        <span style={ { marginLeft: 16 } }>校验算法:</span>
+        <span style={ { marginLeft: 16 } }>{t('校验算法:')}</span>
         <Select
           showSearch
           style={ { width: 520 } }
@@ -108,7 +114,7 @@ const CRCCheck = () => {
           }) }
           filterOption={ (input, option) =>
             ((option as { searchText?: string } | undefined)?.searchText ?? '').toLowerCase().includes(input.toLowerCase()) }
-          placeholder="选择 CRC 算法"
+          placeholder={t('选择 CRC 算法')}
         />
       </Space>
 
@@ -118,7 +124,7 @@ const CRCCheck = () => {
             addonBefore="Width"
             readOnly
             style={ { width: 180 } }
-            title="CRC 位数"
+            title={t('CRC 位数')}
             value={ String(param.width) }
             onClick={ fieldClick }
           />
@@ -126,7 +132,7 @@ const CRCCheck = () => {
             addonBefore="Poly"
             readOnly
             style={ { width: 230 } }
-            title="生成多项式 (已省略隐含最高位)"
+            title={t('生成多项式 (已省略隐含最高位)')}
             value={ '0x' + param.poly.toUpperCase() }
             onClick={ fieldClick }
           />
@@ -134,7 +140,7 @@ const CRCCheck = () => {
             addonBefore="Init"
             readOnly
             style={ { width: 220 } }
-            title="寄存器初始值"
+            title={t('寄存器初始值')}
             value={ '0x' + param.init.toUpperCase() }
             onClick={ fieldClick }
           />
@@ -142,7 +148,7 @@ const CRCCheck = () => {
             addonBefore="XorOut"
             readOnly
             style={ { width: 220 } }
-            title="最终结果异或值"
+            title={t('最终结果异或值')}
             value={ '0x' + param.xorout.toUpperCase() }
             onClick={ fieldClick }
           />
@@ -151,13 +157,13 @@ const CRCCheck = () => {
           <Checkbox
             disabled
             checked={ param.refin }
-            title="输入比特反转 (LSB first)"
-          >输入数据反转 (RefIn)</Checkbox>
+            title={t('输入比特反转 (LSB first)')}
+          >{t('输入数据反转 (RefIn)')}</Checkbox>
           <Checkbox
             disabled
             checked={ param.refout }
-            title="输出比特反转"
-          >输出数据反转 (RefOut)</Checkbox>
+            title={t('输出比特反转')}
+          >{t('输出数据反转 (RefOut)')}</Checkbox>
         </Space>
       </div>
 
@@ -167,8 +173,8 @@ const CRCCheck = () => {
         onChange={ (e) => { setHexInput(e.target.value); } }
         value= { hexInput }
         placeholder={ mode === 'hex'
-          ? '输入需要计算 CRC 校验值的数据 (十六进制字节, 如: 01 03 04 02 00 01 00) 或 拖拽文件到框内打开'
-          : '输入文本 (按 UTF-8 编码为字节参与计算, 如: 123456789 -> CRC-16/MODBUS = 4B37) 或 拖拽文件到框内打开' }
+          ? t('输入需要计算 CRC 校验值的数据 (十六进制字节, 如: 01 03 04 02 00 01 00) 或 拖拽文件到框内打开')
+          : t('输入文本 (按 UTF-8 编码为字节参与计算, 如: 123456789 -> CRC-16/MODBUS = 4B37) 或 拖拽文件到框内打开') }
         autoSize={{ minRows: 5, maxRows: 5 }}
       />
 
@@ -178,7 +184,7 @@ const CRCCheck = () => {
           icon={ <ClearOutlined /> }
           disabled={ hexInput === '' }
           onClick={ clear }
-        >清除</Button>
+        >{t('清除')}</Button>
       </Space>
 
       <Divider dashed style={ { margin: '8px 0' } } />
@@ -195,7 +201,7 @@ const CRCCheck = () => {
               <Form.Item key={ row.label } label={ row.label }>
                 <Input
                   readOnly
-                  title={ row.value !== '' ? `点击复制 ${row.label} 值` : '' }
+                  title={ row.value !== '' ? tt('点击复制 {l} 值', { l: row.label }) : '' }
                   onClick={ inputClick }
                   value= { row.value }
                   placeholder={ row.value === '' ? '—' : '' }
