@@ -17,6 +17,8 @@ import {
 } from './lib'
 import CronIntro from './intro'
 import CronParsePanel from './parse'
+import { useLocale } from '../../hook/locale-context';
+import { u, uT } from '../ui-lang';
 
 const MODE_OPTIONS = [
   { value: 'any',   label: '任意 (*)' },
@@ -27,6 +29,9 @@ const MODE_OPTIONS = [
 
 const CronRules = () => {
 
+  const { locale } = useLocale();
+  const t = (zh: string) => u(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => uT(locale, zh, v);
   const { token } = theme.useToken();
 
   const [ format, setFormat ] = useState<CronFormatValue>('standard');
@@ -55,7 +60,7 @@ const CronRules = () => {
 
   const usePreset = (p :CronPreset) => {
     if (p.onlyStandard && format === 'linux') {
-      notice.info('该预设需要「秒」字段, 请先切换到标准格式');
+      notice.info(t('该预设需要「秒」字段, 请先切换到标准格式'));
       return;
     }
     setValues(applyPreset(format, p));
@@ -70,29 +75,29 @@ const CronRules = () => {
         items={ [
           {
             key: 'gen',
-            label: '生成',
+            label: t('生成'),
             children: (
               <div>
       <Space wrap style={ { marginBottom: 10 } }>
-        <span>表达式格式</span>
+        <span>{t('表达式格式')}</span>
         <Select
           style={ { width: 300 } }
           value={ format }
           onChange={ setFormat }
-          options={ CRON_FORMAT_LIST.map((f) => ({ value: f.value, label: f.label })) }
+          options={ CRON_FORMAT_LIST.map((f) => ({ value: f.value, label: t(f.label) })) }
         />
-        { format === 'linux' && <Tag color="orange">Linux cron 无「秒 / 年」字段, 已隐藏对应配置行</Tag> }
+        { format === 'linux' && <Tag color="orange">{t('Linux cron 无「秒 / 年」字段, 已隐藏对应配置行')}</Tag> }
       </Space>
 
       <div style={ { display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 6 } }>
-        <span style={ { lineHeight: '24px' } }>快速预设</span>
+        <span style={ { lineHeight: '24px' } }>{t('快速预设')}</span>
         { CRON_PRESETS.map((p) => (
           <Button
             key={ p.label }
             size="small"
             onClick={ () => usePreset(p) }
-            title={ p.note }
-          >{ p.label }</Button>
+            title={ p.note ? t(p.note) : undefined }
+          >{ t(p.label) }</Button>
         )) }
       </div>
 
@@ -106,8 +111,8 @@ const CronRules = () => {
             style={ { display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 8, padding: '6px 0', borderBottom: `1px dashed ${token.colorSplit}` } }
           >
             <Space size={ 4 }>
-              <Tag style={ { width: 34, textAlign: 'center', margin: 0 } }>{ meta.label }</Tag>
-              <span style={ { color: token.colorTextTertiary, fontSize: 12 } }>{ meta.tip }</span>
+              <Tag style={ { width: 34, textAlign: 'center', margin: 0 } }>{ t(meta.label) }</Tag>
+              <span style={ { color: token.colorTextTertiary, fontSize: 12 } }>{ t(meta.tip) }</span>
             </Space>
 
             <Select
@@ -115,7 +120,7 @@ const CronRules = () => {
               size="small"
               value={ fv.mode }
               onChange={ (m) => switchMode(key, m) }
-              options={ MODE_OPTIONS }
+              options={ MODE_OPTIONS.map((o) => ({ ...o, label: t(o.label) })) }
             />
 
             { fv.mode === 'range' && (
@@ -127,7 +132,7 @@ const CronRules = () => {
                   value={ fv.from }
                   onChange={ (n) => updateField(key, { from: n ?? undefined }) }
                 />
-                <span>至</span>
+                <span>{t('至')}</span>
                 <InputNumber
                   size="small"
                   style={ { width: 84 } }
@@ -140,7 +145,7 @@ const CronRules = () => {
 
             { fv.mode === 'step' && (
               <Space size={ 4 }>
-                <span>每</span>
+                <span>{t('每')}</span>
                 <InputNumber
                   size="small"
                   style={ { width: 76 } }
@@ -148,7 +153,7 @@ const CronRules = () => {
                   value={ fv.step }
                   onChange={ (n) => updateField(key, { step: n ?? 1 }) }
                 />
-                <span>{ meta.label }执行 (即 */N)</span>
+                <span>{t(meta.label)}{t('执行 (即 */N)')}</span>
               </Space>
             ) }
 
@@ -157,17 +162,17 @@ const CronRules = () => {
                 mode="multiple"
                 size="small"
                 style={ { minWidth: 260, maxWidth: 420 } }
-                placeholder={ `选择 ${meta.tip} 中的若干值` }
+                placeholder={ tt('选择 {x} 中的若干值', { x: t(meta.tip) }) }
                 value={ fv.list ?? [] }
                 onChange={ (list) => updateField(key, { list: list as number[] }) }
-                options={ options }
+                options={ options.map((o) => ({ ...o, label: t(o.label) })) }
                 maxTagCount="responsive"
                 showSearch
                 optionFilterProp="label"
               />
             ) }
 
-            { fv.mode === 'any' && <span style={ { color: token.colorTextTertiary } }>不限制</span> }
+            { fv.mode === 'any' && <span style={ { color: token.colorTextTertiary } }>{t('不限制')}</span> }
           </div>
         );
       }) }
@@ -182,7 +187,7 @@ const CronRules = () => {
           display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
         } }
       >
-        <Tag color={ format === 'linux' ? 'orange' : 'blue' }>{ format === 'linux' ? 'Linux (5 段)' : '标准 (7 段)' }</Tag>
+        <Tag color={ format === 'linux' ? 'orange' : 'blue' }>{ format === 'linux' ? t('Linux (5 段)') : t('标准 (7 段)') }</Tag>
         <code
           style={ { fontSize: 16, fontWeight: 600, color: token.colorText, fontFamily: 'Consolas, Monaco, monospace' } }
         >{ expr }</code>
@@ -190,11 +195,11 @@ const CronRules = () => {
           size="small"
           type="primary"
           icon={ <CopyOutlined /> }
-          onClick={ () => { copyTextToClipboard(expr); notice.success('复制到粘贴板成功！！！'); } }
-        >复制</Button>
+          onClick={ () => { copyTextToClipboard(expr); notice.success(t('复制到粘贴板成功！！！')); } }
+        >{t('复制')}</Button>
       </div>
       <div style={ { color: token.colorTextTertiary, fontSize: 12, marginTop: 4 } }>
-        标准格式 = 秒 分 时 日 月 周 年; Linux 格式 = 分 时 日 月 周 (crontab 不支持秒/年)
+        {t('标准格式 = 秒 分 时 日 月 周 年; Linux 格式 = 分 时 日 月 周 (crontab 不支持秒/年)')}
       </div>
 
               </div>
@@ -202,13 +207,13 @@ const CronRules = () => {
           },
           {
             key: 'parse',
-            label: '解析',
+            label: t('解析'),
             children: <CronParsePanel />,
           },
         ] }
       />
 
-      <Divider> Cron 规则说明 </Divider>
+      <Divider> {t('Cron 规则说明')} </Divider>
 
       <CronIntro />
     </div>
