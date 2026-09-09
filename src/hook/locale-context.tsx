@@ -18,6 +18,13 @@ export const LOCALE_LABELS: Record<LocaleId, string> = {
   en: 'English',
 };
 
+/** 语言旗标 emoji (仅作视觉标识, 与标签顺序一致) */
+export const LOCALE_EMOJI: Record<LocaleId, string> = {
+  'zh-CN': '🇨🇳',
+  'zh-TW': '🇭🇰',
+  en: '🇺🇸',
+};
+
 const isLocale = (v: string | null): v is LocaleId =>
   v === 'zh-CN' || v === 'zh-TW' || v === 'en';
 

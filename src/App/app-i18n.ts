@@ -14,8 +14,11 @@ const packs = langPacks as unknown as Record<string, LangPack | undefined>;
  * @param key    应用 key (define 注册名, 也即 lang.ts 所在目录名)
  * @param fallback zh-CN 兜底名 (通常是 define.tsx AppName)
  */
-export const appNameOf = (locale: LocaleId, key: string, fallback = ''): string =>
-  tr(packs[key], locale, 'appName', fallback);
+export const appNameOf = (locale: LocaleId, key: string, fallback = ''): string => {
+  const name = tr(packs[key], locale, 'appName', fallback);
+  // 英文界面下 App 名字里的 / 一律显示为 & (如 "AES Encrypt / Decrypt" → "AES Encrypt & Decrypt")
+  return locale === 'en' ? name.replace(/\//g, '&') : name;
+};
 
 /** 取固定页 zh-CN 兜底名: 与 AppStoreSetting 内置列表保持一致的短名 */
 export const FIXED_PAGE_ZH: Record<string, string> = {

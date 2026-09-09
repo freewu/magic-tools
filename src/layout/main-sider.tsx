@@ -1,9 +1,9 @@
 import { AppContext } from "../hook/app-context";
-import { useLocale, LOCALE_IDS, LOCALE_LABELS } from "../hook/locale-context";
+import { useLocale, LOCALE_IDS, LOCALE_LABELS, LOCALE_EMOJI } from "../hook/locale-context";
 import type { LocaleId } from "../i18n/lang";
 import { tr, trTpl } from "../i18n/lang";
 import shell from "../i18n/shell";
-import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, SettingOutlined, GlobalOutlined, CheckOutlined } from '@ant-design/icons';
+import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, SettingOutlined, CheckOutlined } from '@ant-design/icons';
 import { Badge, Button, Dropdown, Layout, Menu, Space } from "antd";
 import React, { useMemo, useState, useContext } from "react";
 const { Sider } = Layout;
@@ -30,11 +30,11 @@ const MainSider: React.FC = () => {
     navigate(e.key, { replace: true });
   }
 
-  // 语言切换下拉 (托盘「语言」同构): 简 / 繁 / EN
+  // 语言切换下拉 (托盘「语言」同构): 简 / 繁 / EN, 选项带语言旗标 emoji
   const langMenu = {
     items: LOCALE_IDS.map((id) => ({
       key: id,
-      label: LOCALE_LABELS[id],
+      label: `${LOCALE_LABELS[id]} ${LOCALE_EMOJI[id]}`,
       icon: id === locale ? <CheckOutlined /> : undefined,
     })),
     onClick: ({ key }: { key: string }) => setLocale(key as LocaleId),
@@ -154,7 +154,6 @@ const MainSider: React.FC = () => {
           <Button
             title={ tr(shell, locale, 'lang', '界面语言') }
             type="text"
-            icon={ <GlobalOutlined /> }
             style={ {
               color: 'rgba(255,255,255,0.85)',
               fontSize: '15px',
@@ -165,7 +164,9 @@ const MainSider: React.FC = () => {
               alignItems: 'center',
               justifyContent: 'center',
             } }
-          />
+          >
+            <span style={ { fontSize: 17, lineHeight: 1 } }>{ LOCALE_EMOJI[locale] }</span>
+          </Button>
         </Dropdown>
         <Button
             title={ appNameOf(locale, 'Setting', '设置') }
