@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { CopyOutlined, DeleteOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from '../../lib';
 import { saveTextFile } from '../../lib/tauri';
+import { useLocale } from '../../hook/locale-context';
+import { wm } from '../webmaster-lang';
 import {
   buildRobotsTxt,
   newRuleId,
@@ -15,6 +17,8 @@ import RobotsIntro from './intro';
 const { TextArea } = Input;
 
 const RobotsTxtGenerator = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => wm(locale, zh);
 
   const [ userAgent, setUserAgent ] = useState('*'); // 爬虫
   const [ rules, setRules ] = useState<Array<RobotsRule>>([
@@ -61,14 +65,14 @@ const RobotsTxtGenerator = () => {
   const copyPreview = () => {
     if (preview === '') return;
     copyTextToClipboard(preview);
-    notice.success('复制到粘贴板成功!!!');
+    notice.success(t('复制到粘贴板成功!!!'));
   };
 
   // 保存 robots.txt
   const saveFile = async () => {
     if (preview === '') return;
-    const ok = await saveTextFile('robots.txt', preview, '保存 robots.txt 文件');
-    if (ok) notice.success('已保存 robots.txt 文件');
+    const ok = await saveTextFile('robots.txt', preview, t('保存 robots.txt 文件'));
+    if (ok) notice.success(t('保存 robots.txt 文件'));
   };
 
   return (
@@ -79,23 +83,23 @@ const RobotsTxtGenerator = () => {
 
         {/* 爬虫 */}
         <div style={ { display: 'flex', alignItems: 'center', gap: 12 } }>
-          <span style={ { width: 110, textAlign: 'right', color: '#666' } }>爬虫 User-agent</span>
+          <span style={ { width: 110, textAlign: 'right', color: '#666' } }>{t('爬虫 User-agent')}</span>
           <Select
             style={ { width: 240 } }
             value={ userAgent }
             onChange={ setUserAgent }
-            options={ ROBOTS_USER_AGENTS.map((v) => ({ value: v.value, label: v.label })) }
+            options={ ROBOTS_USER_AGENTS.map((v) => ({ value: v.value, label: t(v.label) })) }
           />
-          <span style={ { color: '#999', fontSize: 12 } }>为不同爬虫分组时, 请按此页生成多次再合并</span>
+          <span style={ { color: '#999', fontSize: 12 } }>{t('为不同爬虫分组时, 请按此页生成多次再合并')}</span>
         </div>
 
         {/* 规则行 */}
         <div>
           <div style={ { display: 'flex', alignItems: 'center', gap: 12 } }>
-            <span style={ { width: 110, textAlign: 'right', color: '#666' } }>抓取规则</span>
-            <Button icon={ <PlusOutlined /> } onClick={ () => { addRule('disallow'); } }>禁止 (Disallow)</Button>
-            <Button icon={ <PlusOutlined /> } onClick={ () => { addRule('allow'); } }>允许 (Allow)</Button>
-            <Button size="small" type="link" onClick={ () => { setRules([]); } }>清空规则</Button>
+            <span style={ { width: 110, textAlign: 'right', color: '#666' } }>{t('抓取规则')}</span>
+            <Button icon={ <PlusOutlined /> } onClick={ () => { addRule('disallow'); } }>{t('禁止 (Disallow)')}</Button>
+            <Button icon={ <PlusOutlined /> } onClick={ () => { addRule('allow'); } }>{t('允许 (Allow)')}</Button>
+            <Button size="small" type="link" onClick={ () => { setRules([]); } }>{t('清空规则')}</Button>
           </div>
           <div style={ { marginTop: 6, marginLeft: 122 } }>
             { rules.map((r) => (
@@ -105,13 +109,13 @@ const RobotsTxtGenerator = () => {
                   value={ r.kind }
                   onChange={ (v) => { updateRule(r.id, { kind: v }); } }
                   options={ [
-                    { value: 'disallow', label: '禁止' },
-                    { value: 'allow', label: '允许' },
+                    { value: 'disallow', label: t('禁止') },
+                    { value: 'allow', label: t('允许') },
                   ] }
                 />
                 <Input
                   value={ r.path }
-                  placeholder="路径, 如 /admin/"
+                  placeholder={t('路径, 如 /admin/')}
                   onChange={ (e) => { updateRule(r.id, { path: e.target.value }); } }
                 />
                 <Button
@@ -123,7 +127,7 @@ const RobotsTxtGenerator = () => {
               </Space.Compact>
             )) }
             { rules.length === 0 && (
-              <div style={ { color: '#999' } }>当前无规则 = 允许爬虫抓取全部页面 (等效放行)</div>
+              <div style={ { color: '#999' } }>{t('当前无规则 = 允许爬虫抓取全部页面 (等效放行)')}</div>
             ) }
           </div>
         </div>
@@ -136,16 +140,16 @@ const RobotsTxtGenerator = () => {
             max={ 3600 }
             precision={ 0 }
             value={ crawlDelay }
-            placeholder="秒"
+            placeholder={t('秒')}
             onChange={ (v) => { setCrawlDelay(v); } }
           />
-          <span style={ { color: '#999', fontSize: 12 } }>抓取间隔秒数 (留空不输出; 部分爬虫不支持)</span>
+          <span style={ { color: '#999', fontSize: 12 } }>{t('抓取间隔秒数 (留空不输出; 部分爬虫不支持)')}</span>
         </div>
         <div style={ { display: 'flex', alignItems: 'center', gap: 12 } }>
           <span style={ { width: 110, textAlign: 'right', color: '#666' } }>Sitemap</span>
           <TextArea
             value={ sitemaps }
-            placeholder="每行一个 Sitemap 地址, 如 https://example.com/sitemap.xml"
+            placeholder={t('每行一个 Sitemap 地址, 如 https://example.com/sitemap.xml')}
             autoSize={ { minRows: 1, maxRows: 3 } }
             onChange={ (e) => { setSitemaps(e.target.value); } }
           />
@@ -153,21 +157,21 @@ const RobotsTxtGenerator = () => {
 
         {/* 预设 */}
         <div style={ { display: 'flex', alignItems: 'center', gap: 12 } }>
-          <span style={ { width: 110, textAlign: 'right', color: '#666' } }>快捷模板</span>
+          <span style={ { width: 110, textAlign: 'right', color: '#666' } }>{t('快捷模板')}</span>
           { ROBOTS_PRESETS.map((p, i) => (
-            <Button key={ p.name } size="small" onClick={ () => { applyPreset(i); } }>{ p.name }</Button>
+            <Button key={ p.name } size="small" onClick={ () => { applyPreset(i); } }>{ t(p.name) }</Button>
           )) }
         </div>
 
         {/* 预览 */}
         <div>
-          <div style={ { color: '#666', marginBottom: 4 } }>预览</div>
+          <div style={ { color: '#666', marginBottom: 4 } }>{t('预览')}</div>
           <TextArea
             readOnly
             value={ preview }
             autoSize={ { minRows: 5, maxRows: 12 } }
             style={ { fontFamily: 'Consolas, Menlo, monospace', fontSize: 13 } }
-            title="双击复制内容到粘贴板"
+            title={t('双击复制内容到粘贴板')}
             onDoubleClick={ (e) => {
               if ((e.target as HTMLTextAreaElement).value.trim() !== '') copyPreview();
             } }
@@ -181,17 +185,17 @@ const RobotsTxtGenerator = () => {
             disabled={ preview === '' }
             icon={ <CopyOutlined /> }
             onClick={ copyPreview }
-          >复制</Button>
+          >{t('复制')}</Button>
           <Button
             disabled={ preview === '' }
             style={ { backgroundColor: '#28a745', color: '#fff' } }
             icon={ <SaveOutlined /> }
             onClick={ saveFile }
-          >保存为 robots.txt</Button>
+          >{t('保存为 robots.txt')}</Button>
         </Space>
       </Space>
 
-      <Divider>robots.txt 生成说明</Divider>
+      <Divider>{t('robots.txt 生成说明')}</Divider>
 
       <RobotsIntro />
     </div>
