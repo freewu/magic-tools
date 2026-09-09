@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Divider, Button, Table, message, Tag } from "antd";
 import { keyLabel, locationNameOf, modsText, formatDuration, clockText } from "./lib";
 import "./keyboard.css";
+import { useLocale } from "../../hook/locale-context";
+import { u, uT } from "../ui-lang";
 
 type PressInfo = {
   key :string;
@@ -27,6 +29,9 @@ type HistoryRow = {
 };
 
 const KeyboardKeyInfo = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => u(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => uT(locale, zh, v);
   const [ press, setPress ] = useState<PressInfo | null>(null);
   const [ locks, setLocks ] = useState<LockState>({ caps: false, num: false, scroll: false });
   const [ history, setHistory ] = useState<Array<HistoryRow>>([]);
@@ -103,30 +108,30 @@ const KeyboardKeyInfo = () => {
   ];
 
   const columns = [
-    { title: '时间', dataIndex: 'ts', width: 84, render: (v :number) => clockText(v) },
-    { title: '按键', dataIndex: 'key', width: 150 },
+    { title: t('时间'), dataIndex: 'ts', width: 84, render: (v :number) => clockText(v) },
+    { title: t('按键'), dataIndex: 'key', width: 150, render: (v :string) => t(v) },
     { title: 'Code', dataIndex: 'code', width: 130 },
     { title: 'keyCode', dataIndex: 'keyCode', width: 84 },
-    { title: '位置', dataIndex: 'locationName', width: 84 },
-    { title: '修饰键', dataIndex: 'mods', width: 110 },
-    { title: '时长', dataIndex: 'duration', width: 96 },
+    { title: t('位置'), dataIndex: 'locationName', width: 84, render: (v :string) => t(v) },
+    { title: t('修饰键'), dataIndex: 'mods', width: 110 },
+    { title: t('时长'), dataIndex: 'duration', width: 96 },
   ];
 
   return (
     <div>
       <div className="kb-hint">
-        按键信息会实时捕获: 无需聚焦本页面, 在应用任意位置按下/松开键盘即可看到结果。
+        {t('按键信息会实时捕获: 无需聚焦本页面, 在应用任意位置按下/松开键盘即可看到结果。')}
       </div>
 
       <div className="kb-stage">
-        <div className="kb-key">{ press ? keyLabel(press.key) : '?' }</div>
-        <div className="kb-sub">{ press ? `${press.code} · keyCode ${press.keyCode}` : '按任意键查看按键信息…' }</div>
+        <div className="kb-key">{ press ? t(keyLabel(press.key)) : '?' }</div>
+        <div className="kb-sub">{ press ? `${press.code} · keyCode ${press.keyCode}` : t('按任意键查看按键信息…') }</div>
         { press && (
           <div className="kb-chips">
-            <Tag color="blue">位置: { press.locationName }</Tag>
-            <Tag color="geekblue">修饰键: { press.mods }</Tag>
-            <Tag color="purple">按住: { formatDuration(pressDuration) }</Tag>
-            { press.repeat > 0 && <Tag color="orange">自动重复 ×{ press.repeat }</Tag> }
+            <Tag color="blue">{tt('位置: {l}', { l: t(press.locationName) })}</Tag>
+            <Tag color="geekblue">{tt('修饰键: {m}', { m: press.mods })}</Tag>
+            <Tag color="purple">{tt('按住: {d}', { d: formatDuration(pressDuration) })}</Tag>
+            { press.repeat > 0 && <Tag color="orange">{tt('自动重复 ×{n}', { n: press.repeat })}</Tag> }
           </div>
         ) }
       </div>
@@ -137,15 +142,15 @@ const KeyboardKeyInfo = () => {
             <i className={ `kb-dot${ item.on ? ' on' : '' }` } />{ item.label }
           </span>
         )) }
-        <span className="kb-lock-tip">(按键时同步刷新; 修饰键组合见上方 Tag)</span>
+        <span className="kb-lock-tip">{t('(按键时同步刷新; 修饰键组合见上方 Tag)')}</span>
       </div>
 
-      <Divider dashed>最近按键记录</Divider>
+      <Divider dashed>{t('最近按键记录')}</Divider>
 
       <Button
         style={ { marginBottom: 8, backgroundColor: '#dc3545', color: '#fff' } }
         onClick={ () => setHistory([]) }
-      >清空记录</Button>
+      >{t('清空记录')}</Button>
 
       <Table
         rowKey="id"

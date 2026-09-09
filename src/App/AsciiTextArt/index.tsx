@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { copyTextToClipboard } from "../../lib";
 import { saveBytesFile } from "../../lib/tauri";
 import { FONT_NAMES, getDefaultFont, renderText } from "./lib";
+import { useLocale } from "../../hook/locale-context";
+import { u, uT } from "../ui-lang";
 
 const SAMPLE = 'Hello ASCII!';
 /** 预览字号 (仅 CSS 缩放, 不影响复制的文本) */
@@ -11,6 +13,9 @@ const FONT_SIZE_MIN = 4;
 const FONT_SIZE_MAX = 32;
 
 const AsciiTextArt: React.FC = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => u(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => uT(locale, zh, v);
   const [ text, setText ] = useState(SAMPLE);
   const [ font, setFont ] = useState<string>(() => getDefaultFont());
   const [ fontSize, setFontSize ] = useState(12);
@@ -29,9 +34,9 @@ const AsciiTextArt: React.FC = () => {
     if (!art) return;
     try {
       await copyTextToClipboard(art);
-      message.success('已复制 ' + art.length + ' 字符到剪贴板');
+      message.success(tt('已复制 {n} 字符到剪贴板', { n: art.length }));
     } catch (err) {
-      message.error('复制失败, 请手动选中文本复制');
+      message.error(t('复制失败, 请手动选中文本复制'));
     }
   };
 
@@ -40,11 +45,11 @@ const AsciiTextArt: React.FC = () => {
     const word = (text.split(/\s+/)[0] || 'ascii-art').replace(/[\\/:*?"<>|]/g, '') || 'ascii-art';
     const name = word + '.txt';
     const ok = await saveBytesFile(name, new TextEncoder().encode(art), {
-      title: '保存 ' + name,
-      filterName: '文本文件',
+      title: tt('保存 {n}', { n: name }),
+      filterName: t('文本文件'),
       extensions: [ 'txt' ],
     });
-    if (ok) message.success('已保存 ' + name);
+    if (ok) message.success(tt('已保存 {n}', { n: name }));
   };
 
   const row = { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 10 } as const;
@@ -53,43 +58,43 @@ const AsciiTextArt: React.FC = () => {
   return (
     <div style={ { maxWidth: 1080 } }>
       <div style={ row }>
-        <span style={ labelStyle }>文字</span>
+        <span style={ labelStyle }>{t('文字')}</span>
         <Input.TextArea
           value={ text } onChange={ (e) => setText(e.target.value) }
-          placeholder="输入要生成大字的内容 (支持多行, 每行独立排版)"
+          placeholder={t('输入要生成大字的内容 (支持多行, 每行独立排版)')}
           autoSize={ { minRows: 2, maxRows: 8 } } style={ { width: 400, maxWidth: '100%' } }
         />
       </div>
       <div style={ row }>
-        <span style={ labelStyle }>字体</span>
+        <span style={ labelStyle }>{t('字体')}</span>
         <Select
           value={ font }
           style={ { width: 340, maxWidth: '100%' } }
           showSearch
           onChange={ setFont }
-          placeholder="选择 figlet 字体"
+          placeholder={t('选择 figlet 字体')}
           options={ FONT_NAMES.map((v) => ({ value: v, label: v })) }
           filterOption={ (kw, opt) => String(opt?.label ?? '').toLowerCase().includes(kw.toLowerCase()) }
         />
-        <span style={ { color: '#bbb', fontSize: 12 } }>共 { FONT_NAMES.length } 款 figlet 字体</span>
+        <span style={ { color: '#bbb', fontSize: 12 } }>{tt('共 {n} 款 figlet 字体', { n: FONT_NAMES.length })}</span>
       </div>
       <div style={ row }>
-        <span style={ labelStyle }>预览字号</span>
+        <span style={ labelStyle }>{t('预览字号')}</span>
         <InputNumber
           min={ FONT_SIZE_MIN } max={ FONT_SIZE_MAX } value={ fontSize }
           onChange={ (v) => { if (v != null) setFontSize(v); } } style={ { width: 80 } }
         />
-        <span style={ { color: '#bbb', fontSize: 12 } }>仅缩放预览显示, 复制的文本不受影响</span>
+        <span style={ { color: '#bbb', fontSize: 12 } }>{t('仅缩放预览显示, 复制的文本不受影响')}</span>
       </div>
       <div style={ { color: '#bbb', fontSize: 12, marginBottom: 10 } }>
-        字体来自 figlet 经典字体集; 支持英文字母 / 数字 / 常用标点, 中文等未收录字符按字体回退显示 · 默认字体可在「设置 → 其它」中调整
+        {t('字体来自 figlet 经典字体集; 支持英文字母 / 数字 / 常用标点, 中文等未收录字符按字体回退显示 · 默认字体可在「设置 → 其它」中调整')}
       </div>
 
       <div style={ { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 } }>
-        <span style={ { color: '#666' } }>结果 ({ artRows.length } 行 · { art.length } 字符):</span>
+        <span style={ { color: '#666' } }>{tt('结果 ({r} 行 · {c} 字符):', { r: artRows.length, c: art.length })}</span>
         <Space>
-          <Button size="small" icon={ <CopyOutlined /> } disabled={ !art } onClick={ doCopy }>复制文本</Button>
-          <Button size="small" icon={ <DownloadOutlined /> } disabled={ !art } onClick={ doSave }>下载 .txt</Button>
+          <Button size="small" icon={ <CopyOutlined /> } disabled={ !art } onClick={ doCopy }>{t('复制文本')}</Button>
+          <Button size="small" icon={ <DownloadOutlined /> } disabled={ !art } onClick={ doSave }>{t('下载 .txt')}</Button>
         </Space>
       </div>
       <pre style={ {
@@ -99,7 +104,7 @@ const AsciiTextArt: React.FC = () => {
         fontFamily: 'Consolas, "Courier New", monospace',
       } }>{ art }</pre>
       <div style={ { color: '#bbb', fontSize: 12, marginTop: 6 } }>
-        提示: 预览按等宽字体近似比例示意, 复制到 Markdown 代码块或等宽字体编辑器效果最佳
+        {t('提示: 预览按等宽字体近似比例示意, 复制到 Markdown 代码块或等宽字体编辑器效果最佳')}
       </div>
     </div>
   );
