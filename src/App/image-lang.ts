@@ -4,6 +4,7 @@
 type WmRec = Record<string, [string, string]>;
 const D: WmRec = {
   '复制到粘贴板成功！！！': ['複製到剪貼簿成功！！！', 'Copied to clipboard!!!'],
+  'IMG 标签': ['IMG 標籤', 'IMG tag'],
   '拖拽要生成 Base64 编码的图片文件到框内': ['拖曳要產生 Base64 編碼的圖片檔案到框內', 'Drag an image file into the box to Base64-encode it'],
   '点击复制内容到粘贴板': ['點擊複製內容到剪貼簿', 'Click to copy to clipboard'],
   '清除': ['清除', 'Clear'],

@@ -102,7 +102,7 @@ const Base64Image = () => {
         <Space>
           <Radio.Group 
             optionType="button" buttonStyle="solid"
-            options={ typeList } 
+            options={ typeList.map((i) => ({ ...i, label: t(i.label) })) } 
             onChange={ (e) => { 
               setType(e.target.value);
               genResult(value,e.target.value,width,height,alt,showData);
