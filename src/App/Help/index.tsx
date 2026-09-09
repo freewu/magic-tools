@@ -2,6 +2,7 @@
 import { Layout,Card, Avatar, Space,Row, Col,Timeline } from 'antd';
 import { GithubOutlined, BugOutlined } from '@ant-design/icons';
 import { compomentList, developerList, eventList } from "./data"
+import type { LKey } from "./data"
 import { useLocale } from "../../hook/locale-context";
 import { tr } from "../../i18n/lang";
 import helpLang from "./lang";
@@ -10,6 +11,7 @@ import "./help.css";
 const Help = () => {
   const { locale } = useLocale();
   const t = (key: string, fallback: string) => tr(helpLang, locale, key, fallback);
+  const lk: LKey = locale === 'zh-TW' || locale === 'en' ? locale : 'zh-CN';
 
   return (
     <Layout style={ { height: '100%', overflowY: "auto" } } >
@@ -55,7 +57,17 @@ const Help = () => {
           <Card title={ t('timeline', '开发时间线') } className='help-card'>
             <Timeline
               mode={ "left"}
-              items={ eventList }
+              items={ eventList.map((ev) => ({
+                color: ev.color,
+                children: (
+                  <>
+                    <p>{ ev.title[lk] }</p>
+                    <ul style={ { listStyle: "none" } }>
+                      { ev.items[lk].map((s, i) => <li key={ i }>{ s }</li>) }
+                    </ul>
+                  </>
+                ),
+              })) }
             />
           </Card>
         </Col>
