@@ -48,8 +48,8 @@ QR code · Barcode (CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · Base64 image �
 ### 🌐 Webmaster Tools *(9)*
 HTML stripper · Browser fingerprint · URL extractor · Cookie analyzer · User-Agent parser · Sitemap checker · Keyword density · TDK checker · robots.txt generator
 
-### 🧩 Utilities *(13)*
-CSS colors · Line counter · htpasswd generator · Regex tester (17 presets) · File diff · Dot-matrix font · Keyboard key info · Chmod calculator · OTP generator · ASCII text art · Cron rules (parse + next runs) · CIDR calculator · Password generator (strength analysis)
+### 🧩 Utilities *(14)*
+CSS colors · Line counter · htpasswd generator · Regex tester (17 presets) · File diff · Dot-matrix font · Keyboard key info · Chmod calculator · OTP generator · ASCII text art · Cron rules (parse + next runs) · CIDR calculator · Password generator (strength analysis) · Image color palette
 
 > Plus built-in app pages: **App Center**, **Help & changelog**, **Settings**.
 
@@ -83,7 +83,20 @@ Other components: CryptoJS, js-base64, color-convert, SQL Formatter, highlight.j
 magic-tools
 ├── src-tauri/            # Tauri 2 main process (Rust): window, tray, links, config
 ├── src/                  # React frontend
-│   ├── App/              # one folder per tool (auto-registered)
+│   ├── App/              # auto-registered tools + shell: drop in a folder → a new tool appears
+│   │   ├── index.tsx         # app shell: sidebar menu (genMenuList) + content area
+│   │   ├── app-modules.ts    # build-time collection via import.meta.glob (replaces webpack context)
+│   │   ├── app-i18n.ts       # app registry: appNameOf() trilingual names for tools & fixed pages
+│   │   ├── lang-packs.ts     # aggregates every tool's default language pack (lang.ts default export)
+│   │   └── <Tool>/           # one folder per tool — auto-registered (110, grouped list below)
+│   │       ├── define.tsx    # registration metadata: AppName (zh-CN default) / Icon / Type (category)
+│   │       ├── index.tsx     # tool page component (default export; lazy-loaded)
+│   │       ├── lang.ts       # default language pack + rows (zh phrase = key → [zh-TW, en]) + lookup helpers
+│   │       ├── lib.ts        # pure logic shared by the page and its unit tests (most tools)
+│   │       ├── lib.test.ts   # jest unit tests (78 tools)
+│   │       ├── data.ts       # option tables / constants / types (45 tools)
+│   │       ├── setting.tsx   # this tool's panel inside the Settings center (56 tools)
+│   │       └── intro.tsx     # About / instructions content, trilingual (29 tools)
 │   ├── layout/           # main frame: sidebar / content
 │   ├── hook/             # global state: theme / app context
 │   └── lib/              # shared utilities
@@ -91,6 +104,28 @@ magic-tools
 ├── dist/                 # Web build output (deployed to GitHub Pages)
 └── justfile              # build / release / publish recipes
 ```
+
+### Existing tools under `src/App/`
+
+110 tool folders live under [`src/App/`](src/App/) and are registered automatically (a folder = one tool, from its `define.tsx`). Grouped below by the `Type` registered in `define.tsx` (same categories as the sidebar / [feature overview](#-feature-overview)). Some tools add tool-specific files besides the common ones (e.g. `AESCrypto/gcm.ts`, `Hash/sm3.ts`+`keccak.ts`, `CronRules/parse.tsx`, `Setting/setting-*.tsx`):
+
+**🔐 Cryptography *(21)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
+
+**🧮 Hash, MAC & Value Calculators *(16)*** — `BCCCheck` · `BcryptCalc` · `CMACCalc` · `CRCCheck` · `ComplementCalc` · `HKDFCalc` · `Hash` · `HmacHash` · `IPConvert` · `KMACCalc` · `KeccakHash` · `LRCCheck` · `PBKDF2Calc` · `PPICalc` · `SHA3Hash` · `ScryptCalc`
+
+**🔄 Codecs & Encoders *(13)*** — `BCDCodec` · `Base58Codec` · `Base64` · `BaseXCodec` · `BasicAuthCodec` · `GzipCodec` · `JWTDecoder` · `MorseCodec` · `Punycode` · `URL` · `UUencode` · `Unicode` · `XXencode`
+
+**⚖️ Converters *(17)*** — `AreaConvert` · `ByteConvert` · `ColorConvert` · `ConfigConvert` · `DistanceConvert` · `DownloadLinkConvert` · `GPSConvert` · `NumberConvert` · `PinyinConvert` · `RMBConvert` · `SpeedConvert` · `SubtitleConvert` · `TemperatureConvert` · `Time` · `TreePathConvert` · `VolumeConvert` · `WeightConvert`
+
+**🛠️ Formatters & Editors *(8)*** — `CnEnSpacing` · `HtmlFormat` · `JSON5Formatter` · `JsonFormatter` · `MarkdownEditor` · `SQLFormatter` · `SvgFormat` · `XmlFormatter`
+
+**🖼️ Image Generators *(9)*** — `AppIconGenerator` · `AsciiImageGenerator` · `BarcodeGenerator` · `Base64Image` · `CodeShot` · `IcoGenerator` · `PlaceholderImage` · `QRCodeGenerator` · `ShieldBadgeGenerator`
+
+**🌐 Webmaster Tools *(9)*** — `BrowserFingerprint` · `CookieAnalyzer` · `HtmlStripText` · `KeywordDensity` · `RobotsTxtGenerator` · `SitemapCheck` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck`
+
+**🧩 Utilities *(14)*** — `AsciiTextArt` · `CIDRCalc` · `Chmod` · `Color` · `CronRules` · `DotMatrixFont` · `FileDiff` · `HtpasswdGenerator` · `ImageColor` · `KeyboardKeyInfo` · `LineCount` · `OTPGenerator` · `PasswordGenerator` · `RegexTester`
+
+> Built-in pages `AppStore`（App Center）/ `Help` / `Setting` also live in `src/App/` (registered with `Type = 'misc'`), but are fixed pages rather than tools.
 
 ## 🚀 Development
 

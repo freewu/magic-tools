@@ -48,8 +48,8 @@ Markdown 编辑器 · JSON 格式化 · JSON5 格式化 · SQL 格式化 · XML 
 ### 🌐 站长工具 *(9)*
 HTML 标签去除 · 浏览器指纹 · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 检查 · 关键词密度 · 网页TDK信息检测 · robots.txt 生成
 
-### 🧩 其它 *(13)*
-CSS 配色 · 行数统计 · htpasswd 生成 · 正则表达式 · 文件比较 · 点阵字生成器 · 键盘按键信息 · Chmod 权限 · OTP 密码生成器 · ASCII 文字 · Cron 规则生成 · CIDR 计算器 · 密码生成
+### 🧩 其它 *(14)*
+CSS 配色 · 行数统计 · htpasswd 生成 · 正则表达式 · 文件比较 · 点阵字生成器 · 键盘按键信息 · Chmod 权限 · OTP 密码生成器 · ASCII 文字 · Cron 规则生成 · CIDR 计算器 · 密码生成 · 图片主题色
 
 > 另有内置页面：**应用中心**、**帮助与更新日志**、**设置**。
 
@@ -83,7 +83,20 @@ CSS 配色 · 行数统计 · htpasswd 生成 · 正则表达式 · 文件比较
 magic-tools
 ├── src-tauri/            # Tauri 2 主进程 (Rust): 窗口/托盘/外链/配置
 ├── src/                  # React 前端
-│   ├── App/              # 每个工具一个目录 (自动注册)
+│   ├── App/              # 工具集合 + 应用壳: 每工具一个目录, 新增目录即自动注册
+│   │   ├── index.tsx         # 应用壳: 侧边栏菜单生成 (genMenuList) + 内容区
+│   │   ├── app-modules.ts    # 构建期用 import.meta.glob 静态收集 (替代 webpack context 动态导入)
+│   │   ├── app-i18n.ts       # 应用注册表: appNameOf() 等取各工具/固定页三语名称
+│   │   ├── lang-packs.ts     # 汇总各工具 lang.ts 的默认语言包 (default 导出)
+│   │   └── <工具>/           # 每工具一个目录 = 自动注册 (当前 110 个, 清单见下)
+│   │       ├── define.tsx    # 注册元数据: AppName(zh-CN 默认名) / Icon / Type(分组)
+│   │       ├── index.tsx     # 工具页面组件 (默认导出, 懒加载)
+│   │       ├── lang.ts       # 默认语言包 + 三语词条 (zh 短语即 key, 值=[zh-TW, en]) + 本地取词函数
+│   │       ├── lib.ts        # 纯函数逻辑, 页面与单测共用 (绝大多数工具)
+│   │       ├── lib.test.ts   # jest 单测 (78 个工具)
+│   │       ├── data.ts       # 选项/常量表与类型 (45 个工具)
+│   │       ├── setting.tsx   # 设置中心内本工具的设置面板 (56 个工具)
+│   │       └── intro.tsx     # About/说明 三语内容 (29 个工具)
 │   ├── layout/           # 主框架: 侧边栏/内容区
 │   ├── hook/             # 全局状态: 主题/应用上下文
 │   └── lib/              # 通用工具库
@@ -91,6 +104,28 @@ magic-tools
 ├── dist/                 # Web 构建产物 (部署到 GitHub Pages)
 └── justfile              # 构建/打包/发布脚本
 ```
+
+### `src/App/` 现有工具清单
+
+[`src/App/`](src/App/) 下现有 **110** 个工具目录, 新增目录即自动注册 (一个目录 = 一个工具, 由其中 `define.tsx` 声明)。按下表 `Type` 分组列出 (与侧边栏/上方功能总览一致), 括号内为目录数。除下列公共文件外, 个别工具另有私有文件 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
+
+**🔐 加解密 *(21)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
+
+**🧮 值计算 *(16)*** — `BCCCheck` · `BcryptCalc` · `CMACCalc` · `CRCCheck` · `ComplementCalc` · `HKDFCalc` · `Hash` · `HmacHash` · `IPConvert` · `KMACCalc` · `KeccakHash` · `LRCCheck` · `PBKDF2Calc` · `PPICalc` · `SHA3Hash` · `ScryptCalc`
+
+**🔄 编解码 *(13)*** — `BCDCodec` · `Base58Codec` · `Base64` · `BaseXCodec` · `BasicAuthCodec` · `GzipCodec` · `JWTDecoder` · `MorseCodec` · `Punycode` · `URL` · `UUencode` · `Unicode` · `XXencode`
+
+**⚖️ 类型转换 *(17)*** — `AreaConvert` · `ByteConvert` · `ColorConvert` · `ConfigConvert` · `DistanceConvert` · `DownloadLinkConvert` · `GPSConvert` · `NumberConvert` · `PinyinConvert` · `RMBConvert` · `SpeedConvert` · `SubtitleConvert` · `TemperatureConvert` · `Time` · `TreePathConvert` · `VolumeConvert` · `WeightConvert`
+
+**🛠️ 格式化 *(8)*** — `CnEnSpacing` · `HtmlFormat` · `JSON5Formatter` · `JsonFormatter` · `MarkdownEditor` · `SQLFormatter` · `SvgFormat` · `XmlFormatter`
+
+**🖼️ 图片 *(9)*** — `AppIconGenerator` · `AsciiImageGenerator` · `BarcodeGenerator` · `Base64Image` · `CodeShot` · `IcoGenerator` · `PlaceholderImage` · `QRCodeGenerator` · `ShieldBadgeGenerator`
+
+**🌐 站长工具 *(9)*** — `BrowserFingerprint` · `CookieAnalyzer` · `HtmlStripText` · `KeywordDensity` · `RobotsTxtGenerator` · `SitemapCheck` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck`
+
+**🧩 其它 *(14)*** — `AsciiTextArt` · `CIDRCalc` · `Chmod` · `Color` · `CronRules` · `DotMatrixFont` · `FileDiff` · `HtpasswdGenerator` · `ImageColor` · `KeyboardKeyInfo` · `LineCount` · `OTPGenerator` · `PasswordGenerator` · `RegexTester`
+
+> 内置页面 `AppStore`(应用中心) / `Help` / `Setting` 也位于 `src/App/` 下 (注册 `Type = 'misc'`), 但属固定页面而非工具。
 
 ## 🚀 开发与运行
 
