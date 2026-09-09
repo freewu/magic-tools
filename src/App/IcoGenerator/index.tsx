@@ -3,6 +3,8 @@ import { Button, Modal, Select, message } from "antd";
 import { saveBytesFile } from "../../lib/tauri";
 import { dataUrlToBytes, getDefaultSize, pngToIco } from "./lib";
 import { ICO_SIZES, type IcoSize } from "./data";
+import { useLocale } from "../../hook/locale-context";
+import { im, imT } from "../image-lang";
 
 // 透明棋盘背景 (便于观察透明图标)
 const checkerBg = {
@@ -13,6 +15,9 @@ const checkerBg = {
 } as const;
 
 const IcoGenerator: React.FC = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => im(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => imT(locale, zh, v);
   const [ size, setSize ] = useState<IcoSize>(getDefaultSize());
   const [ srcName, setSrcName ] = useState('');
   const [ preview, setPreview ] = useState('');       // 生成的 PNG dataURL
@@ -38,12 +43,12 @@ const IcoGenerator: React.FC = () => {
     const ico = pngToIco(dataUrlToBytes(dataUrl), sz);
     setPreview(dataUrl);
     setIcoBytes(ico);
-    setInfo(sz + '×' + sz + ' · ICO 文件 ' + ico.length + ' 字节');
+    setInfo(tt('{s}×{s} · ICO 文件 {n} 字节', { s: sz, n: ico.length }));
   };
 
   const loadFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
-      message.error('请选择图片文件 (PNG/JPG/WebP 等)');
+      message.error(t('请选择图片文件 (PNG/JPG/WebP 等)'));
       return;
     }
     const reader = new FileReader();
@@ -55,7 +60,7 @@ const IcoGenerator: React.FC = () => {
         setSrcName(file.name);
         generate(img, size);
       };
-      img.onerror = () => { message.error('图片加载失败'); };
+      img.onerror = () => { message.error(t('图片加载失败')); };
       img.src = dataUrl;
     };
     reader.readAsDataURL(file);
@@ -77,12 +82,12 @@ const IcoGenerator: React.FC = () => {
     setSaving(true);
     try {
       const ok = await saveBytesFile('icon-' + size + 'x' + size + '.ico', icoBytes, {
-        title: '保存 ICO 图标',
-        filterName: 'ICO 图标',
+        title: t('保存 ICO 图标'),
+        filterName: t('ICO 图标'),
         extensions: ['ico'],
       });
       if (ok) {
-        message.success('已保存 icon-' + size + 'x' + size + '.ico');
+        message.success(tt('已保存 icon-{s}x{s}.ico', { s: size }));
         setModalOpen(false);
       }
     } finally {
@@ -111,8 +116,8 @@ const IcoGenerator: React.FC = () => {
               background: '#fafafa',
             } }
           >
-            <div style={ { fontSize: 15, marginBottom: 6 } }>点击或拖拽图片到此处</div>
-            <div style={ { fontSize: 12 } }>支持 PNG / JPG / WebP / GIF, 建议使用方形图标素材{ srcName ? ' · 当前: ' + srcName : '' }</div>
+            <div style={ { fontSize: 15, marginBottom: 6 } }>{t('点击或拖拽图片到此处')}</div>
+            <div style={ { fontSize: 12 } }>{t('支持 PNG / JPG / WebP / GIF, 建议使用方形图标素材')}{ srcName ? tt(' · 当前: {name}', { name: srcName }) : '' }</div>
           </div>
           <input
             ref={ fileRef }
@@ -122,7 +127,7 @@ const IcoGenerator: React.FC = () => {
             onChange={ (e) => { const f = e.target.files?.[0]; if (f) loadFile(f); e.target.value = ''; } }
           />
           <div style={ { display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 } }>
-            <span>生成尺寸</span>
+            <span>{t('生成尺寸')}</span>
             <Select
               style={ { width: 120 } }
               value={ size }
@@ -136,7 +141,7 @@ const IcoGenerator: React.FC = () => {
 
         {/* 右: 图标预览 (点击弹窗保存) */}
         <div style={ { textAlign: 'center' } }>
-          <div style={ { color: '#888', marginBottom: 8, fontSize: 12 } }>生成预览 ({ size }×{ size } 放大展示)</div>
+          <div style={ { color: '#888', marginBottom: 8, fontSize: 12 } }>{ tt('生成预览 ({s}×{s} 放大展示)', { s: size }) }</div>
           { preview ? (
             <>
               <img
@@ -146,13 +151,13 @@ const IcoGenerator: React.FC = () => {
                 height={ 128 }
                 style={ { ...checkerBg, cursor: 'zoom-in', padding: 8, imageRendering: 'pixelated' } }
                 onClick={ () => setModalOpen(true) }
-                title="点击查看并保存"
+                title={t('点击查看并保存')}
               />
-              <div style={ { color: '#aaa', marginTop: 6, fontSize: 12 } }>点击图标查看并保存 .ico</div>
+              <div style={ { color: '#aaa', marginTop: 6, fontSize: 12 } }>{t('点击图标查看并保存 .ico')}</div>
             </>
           ) : (
             <div style={ { ...checkerBg, width: 128, height: 128, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ccc' } }>
-              暂无图标
+              {t('暂无图标')}
             </div>
           ) }
         </div>
@@ -161,12 +166,12 @@ const IcoGenerator: React.FC = () => {
       {/* 保存弹窗 */}
       <Modal
         open={ modalOpen }
-        title={ '保存 ICO 图标 · ' + size + '×' + size }
+        title={ tt('保存 ICO 图标 · {s}×{s}', { s: size }) }
         onCancel={ () => setModalOpen(false) }
         width={ 360 }
         footer={ [
-          <Button key="cancel" onClick={ () => setModalOpen(false) }>取消</Button>,
-          <Button key="save" type="primary" loading={ saving } onClick={ save }>保存为 { iconName }</Button>,
+          <Button key="cancel" onClick={ () => setModalOpen(false) }>{t('取消')}</Button>,
+          <Button key="save" type="primary" loading={ saving } onClick={ save }>{ tt('保存为 {name}', { name: iconName }) }</Button>,
         ] }
       >
         <div style={ { textAlign: 'center', padding: '8px 0' } }>
@@ -180,7 +185,7 @@ const IcoGenerator: React.FC = () => {
             />
           ) }
           <div style={ { color: '#888', marginTop: 10, fontSize: 12 } }>
-            将导出单尺寸 { size }×{ size } ICO (32 位带透明通道), 可直接用作网站 favicon 或程序图标
+            { tt('将导出单尺寸 {s}×{s} ICO (32 位带透明通道), 可直接用作网站 favicon 或程序图标', { s: size }) }
           </div>
         </div>
       </Modal>

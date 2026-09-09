@@ -3,6 +3,8 @@ import { CopyOutlined, DownloadOutlined, UploadOutlined } from '@ant-design/icon
 import { useMemo, useRef, useState } from "react";
 import { copyTextToClipboard } from "../../lib";
 import { saveBytesFile } from "../../lib/tauri";
+import { useLocale } from "../../hook/locale-context";
+import { im, imT } from "../image-lang";
 import {
   GRAY_PALETTES, OUT_W_DEFAULT, OUT_W_MAX, OUT_W_MIN,
   STD_CHARS, renderAscii, toGray,
@@ -43,6 +45,9 @@ const decodeToGray = async (file: File): Promise<Source> => {
 };
 
 const AsciiImageGenerator: React.FC = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => im(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => imT(locale, zh, v);
   const [ src, setSrc ] = useState<Source | null>(null);
   const [ outW, setOutW ] = useState(OUT_W_DEFAULT);
   const [ palette, setPalette ] = useState('std');
@@ -59,9 +64,9 @@ const AsciiImageGenerator: React.FC = () => {
     try {
       const s = await decodeToGray(file);
       setSrc(s);
-      message.success('已载入 ' + file.name + ` (${s.w}×${s.h}px)`);
+      message.success(tt('已载入 {name} ({w}×{h}px)', { name: file.name, w: s.w, h: s.h }));
     } catch (err) {
-      message.error(err instanceof Error ? err.message : '载入失败');
+      message.error(err instanceof Error ? t(err.message) : t('载入失败'));
     }
   };
 
@@ -79,9 +84,9 @@ const AsciiImageGenerator: React.FC = () => {
     if (!text) return;
     try {
       await copyTextToClipboard(text);
-      message.success('已复制 ' + text.length + ' 字符到剪贴板');
+      message.success(tt('已复制 {n} 字符到剪贴板', { n: text.length }));
     } catch (err) {
-      message.error('复制失败, 请手动选中文本复制');
+      message.error(t('复制失败, 请手动选中文本复制'));
     }
   };
 
@@ -89,11 +94,11 @@ const AsciiImageGenerator: React.FC = () => {
     if (!text || !src) return;
     const name = src.name + '-ascii.txt';
     const ok = await saveBytesFile(name, new TextEncoder().encode(text), {
-      title: '保存 ' + name,
-      filterName: '文本文件',
+      title: tt('保存 {name}', { name }),
+      filterName: t('文本文件'),
       extensions: [ 'txt' ],
     });
-    if (ok) message.success('已保存 ' + name);
+    if (ok) message.success(tt('已保存 {name}', { name }));
   };
 
   const row = { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 10 } as const;
@@ -119,15 +124,15 @@ const AsciiImageGenerator: React.FC = () => {
         } }
       >
         <UploadOutlined style={ { fontSize: 26, marginBottom: 6 } } />
-        <div>点击或拖拽图片到此处载入</div>
+        <div>{t('点击或拖拽图片到此处载入')}</div>
         <div style={ { fontSize: 12, color: '#bbb', marginTop: 4 } }>
-          支持 png / jpg / webp / gif (首帧), 自动按最长边 600px 缩小处理
+          {t('支持 png / jpg / webp / gif (首帧), 自动按最长边 600px 缩小处理')}
         </div>
       </div>
 
       { !src && (
         <div style={ { color: '#ccc', padding: '14px 0', fontSize: 13 } }>
-          载入图片后自动生成 ASCII 图: 灰度字符按亮度映射, 可用下方参数实时调整
+          {t('载入图片后自动生成 ASCII 图: 灰度字符按亮度映射, 可用下方参数实时调整')}
         </div>
       ) }
 
@@ -136,27 +141,27 @@ const AsciiImageGenerator: React.FC = () => {
           {/* 参数 */}
           <div style={ { marginTop: 12 } }>
             <div style={ row }>
-              <span style={ labelStyle }>输出宽</span>
+              <span style={ labelStyle }>{t('输出宽')}</span>
               <InputNumber min={ OUT_W_MIN } max={ OUT_W_MAX } value={ outW } onChange={ (v) => { if (v != null) setOutW(v); } } style={ { width: 90 } } />
-              <span style={ { color: '#bbb', fontSize: 12 } }>字符</span>
-              <span style={ labelStyle }>字符集</span>
+              <span style={ { color: '#bbb', fontSize: 12 } }>{t('字符')}</span>
+              <span style={ labelStyle }>{t('字符集')}</span>
               <Select value={ palette } onChange={ (k) => { setPalette(k); if (k !== 'custom') setCustomChars(''); } } style={ { width: 210 } }
                 options={ [
-                  ...GRAY_PALETTES.map((p) => ({ value: p.key, label: p.label })),
-                  { value: 'custom', label: '自定义…' },
+                  ...GRAY_PALETTES.map((p) => ({ value: p.key, label: t(p.label) })),
+                  { value: 'custom', label: t('自定义…') },
                 ] } />
               { palette === 'custom' && (
-                <Input value={ customChars } onChange={ (e) => setCustomChars(e.target.value) } placeholder="按暗->亮输入字符, 如 @%# "
+                <Input value={ customChars } onChange={ (e) => setCustomChars(e.target.value) } placeholder={t('按暗->亮输入字符, 如 @%# ')}
                   style={ { width: 200, fontFamily: 'monospace' } } maxLength={ 64 } allowClear />
               ) }
-              <span style={ labelStyle }>反色</span>
+              <span style={ labelStyle }>{t('反色')}</span>
               <Switch checked={ invert } onChange={ setInvert } />
             </div>
             <div style={ row }>
-              <span style={ labelStyle }>亮度</span>
+              <span style={ labelStyle }>{t('亮度')}</span>
               <Slider style={ { width: 160 } } min={ -100 } max={ 100 } value={ brightness } onChange={ setBrightness } />
               <span style={ { color: '#999', width: 30, fontSize: 12 } }>{ brightness > 0 ? '+' : '' }{ brightness }</span>
-              <span style={ labelStyle }>对比度</span>
+              <span style={ labelStyle }>{t('对比度')}</span>
               <Slider style={ { width: 160 } } min={ -100 } max={ 100 } value={ contrast } onChange={ setContrast } />
               <span style={ { color: '#999', width: 30, fontSize: 12 } }>{ contrast > 0 ? '+' : '' }{ contrast }</span>
             </div>
@@ -165,11 +170,11 @@ const AsciiImageGenerator: React.FC = () => {
           {/* 结果 */}
           <div style={ { display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '4px 0 8px' } }>
             <span style={ { color: '#666' } }>
-              结果预览 ({ text.split('\n').length } 行 · { text.length } 字符 · 点击复制):
+              { tt('结果预览 ({l} 行 · {c} 字符 · 点击复制):', { l: text.split('\n').length, c: text.length }) }
             </span>
             <Space>
-              <Button size="small" icon={ <CopyOutlined /> } onClick={ doCopy }>复制文本</Button>
-              <Button size="small" icon={ <DownloadOutlined /> } onClick={ doSave }>下载 .txt</Button>
+              <Button size="small" icon={ <CopyOutlined /> } onClick={ doCopy }>{t('复制文本')}</Button>
+              <Button size="small" icon={ <DownloadOutlined /> } onClick={ doSave }>{t('下载 .txt')}</Button>
             </Space>
           </div>
           <pre style={ {
@@ -179,7 +184,7 @@ const AsciiImageGenerator: React.FC = () => {
             fontFamily: 'Consolas, "Courier New", monospace',
           } }>{ text }</pre>
           <div style={ { color: '#bbb', fontSize: 12, marginTop: 6 } }>
-            提示: 预览按等宽字体 2:1 比例示意, 复制到 Markdown 代码块 / 等宽字体编辑器查看效果最佳
+            {t('提示: 预览按等宽字体 2:1 比例示意, 复制到 Markdown 代码块 / 等宽字体编辑器查看效果最佳')}
           </div>
         </>
       ) }

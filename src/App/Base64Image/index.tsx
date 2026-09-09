@@ -5,9 +5,13 @@ import type { RadioChangeEvent } from 'antd';
 import { typeList } from "./data"
 import { openFile } from "../../lib/file"
 import { copyTextToClipboard, debounce } from "./../../lib"
+import { useLocale } from "../../hook/locale-context";
+import { im } from "../image-lang";
 import "./base64-image.css"
 
 const Base64Image = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => im(locale, zh);
 
   // 预览页面大小
   const genPreviewHeight = () => {
@@ -38,7 +42,7 @@ const Base64Image = () => {
   const resultClick = (e :React.MouseEvent<HTMLElement>) => {
     if(result != "") {
       copyTextToClipboard(result);
-      notice.success("复制到粘贴板成功！！！");
+      notice.success(t("复制到粘贴板成功！！！"));
     }
   };
 
@@ -68,7 +72,7 @@ const Base64Image = () => {
         showCount
         onChange={ (e) => { setValue(e.target.value); } }
         value= { result }
-        placeholder="拖拽要生成 Base64 编码的图片文件到框内"
+        placeholder={t('拖拽要生成 Base64 编码的图片文件到框内')}
         autoSize={{ minRows: 8, maxRows: 8 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { 
@@ -91,7 +95,7 @@ const Base64Image = () => {
           }
           reader.readAsDataURL(files[0]);
         } }
-        title="点击复制内容到粘贴板"
+        title={t('点击复制内容到粘贴板')}
         onClick={ resultClick }
       />
       <Row style = { { marginTop: 5 }}>
@@ -117,13 +121,13 @@ const Base64Image = () => {
           <Button 
             onClick={ () => { setValue(''); setResult(''); } }
             style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-          >清除</Button>
+          >{t('清除')}</Button>
         </Space>
       </Row>
 
       <Row style = { { marginTop: 12 }}>
         <Space>
-          <label>宽度:</label>
+          <label>{t('宽度:')}</label>
           <Input 
             disabled= { type !== 'img'}
             placeholder="width"
@@ -138,7 +142,7 @@ const Base64Image = () => {
               }
             } }
             value= { width } />
-          <label>高度:</label>
+          <label>{t('高度:')}</label>
           <Input 
             disabled= { type !== 'img'}
             placeholder="height"
@@ -153,7 +157,7 @@ const Base64Image = () => {
               }
             } }
             value= { height } />
-          <label>说明:</label>
+          <label>{t('说明:')}</label>
           <Input 
             disabled= { type !== 'img'}
             placeholder="alt"
@@ -168,13 +172,13 @@ const Base64Image = () => {
             value= { alt } />
         </Space>
       </Row>
-      <Divider dashed plain>预览</Divider>
+      <Divider dashed plain>{t('预览')}</Divider>
 
       { value.trim() !== ''?
        (
         <div 
           style={ {width: previewWidth , height: previewHeight } }
-          className="preview" onClick = { resultClick } title="点击复制内容到粘贴板">
+          className="preview" onClick = { resultClick } title={t('点击复制内容到粘贴板')}>
           <img src={ value } width={ width } height={ height } alt={ alt } />
         </div>
       ): null}

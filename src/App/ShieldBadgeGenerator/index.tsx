@@ -7,8 +7,13 @@ import {
   badgeFileName, buildBadgeSvg, svgToDataUrl, parseSvgSize,
   BADGE_DEFAULTS,
 } from "./lib";
+import { useLocale } from "../../hook/locale-context";
+import { im, imT } from "../image-lang";
 
 const ShieldBadgeGenerator: React.FC = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => im(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => imT(locale, zh, v);
   const [ label, setLabel ] = useState('php');
   const [ value, setValue ] = useState('8.0');
   const [ fg, setFg ] = useState<string>(BADGE_DEFAULTS.fg);
@@ -33,9 +38,9 @@ const ShieldBadgeGenerator: React.FC = () => {
   const doCopy = async () => {
     try {
       await copyTextToClipboard(svg);
-      message.success('SVG 内容已复制到剪贴板');
+      message.success(t('SVG 内容已复制到剪贴板'));
     } catch (err) {
-      message.error('复制失败, 请手动选中下方代码复制');
+      message.error(t('复制失败, 请手动选中下方代码复制'));
     }
   };
 
@@ -43,13 +48,13 @@ const ShieldBadgeGenerator: React.FC = () => {
     try {
       const name = badgeFileName(label, value);
       const ok = await saveBytesFile(name, new TextEncoder().encode(svg), {
-        title: '保存 ' + name,
-        filterName: 'SVG 图片',
+        title: tt('保存 {name}', { name }),
+        filterName: t('SVG 图片'),
         extensions: [ 'svg' ],
       });
-      if (ok) message.success('已保存 ' + name);
+      if (ok) message.success(tt('已保存 {name}', { name }));
     } catch (err) {
-      message.error('保存失败');
+      message.error(t('保存失败'));
     }
   };
 
@@ -61,14 +66,14 @@ const ShieldBadgeGenerator: React.FC = () => {
       img.src = dataUrl;
       await new Promise<void>((resolve, reject) => {
         img.onload = () => resolve();
-        img.onerror = () => reject(new Error('图片加载失败'));
+        img.onerror = () => reject(new Error(t('图片加载失败')));
       });
       const canvas = document.createElement('canvas');
       canvas.width = outSize.w;
       canvas.height = outSize.h;
       const ctx = canvas.getContext('2d');
       if (!ctx) {
-        message.error('当前环境不支持绘制 PNG');
+        message.error(t('当前环境不支持绘制 PNG'));
         return;
       }
       ctx.imageSmoothingEnabled = true;
@@ -76,9 +81,9 @@ const ShieldBadgeGenerator: React.FC = () => {
       ctx.drawImage(img, 0, 0, outSize.w, outSize.h);
       const name = badgeFileName(label, value).replace(/\.svg$/, '') + '.png';
       const ok = await savePngFile(name, canvas.toDataURL('image/png'));
-      if (ok) message.success(`已保存 ${name} (${outSize.w}×${outSize.h}px)`);
+      if (ok) message.success(tt('已保存 {name} ({w}×{h}px)', { name, w: outSize.w, h: outSize.h }));
     } catch (err) {
-      message.error('PNG 保存失败');
+      message.error(t('PNG 保存失败'));
     }
   };
 
@@ -93,24 +98,24 @@ const ShieldBadgeGenerator: React.FC = () => {
   return (
     <div style={ { maxWidth: 760 } }>
       <div style={ row }>
-        <span style={ labelStyle }>文字</span>
-        <Input value={ label } onChange={ (e) => setLabel(e.target.value) } placeholder="左侧文字 (如 php)"
+        <span style={ labelStyle }>{t('文字')}</span>
+        <Input value={ label } onChange={ (e) => setLabel(e.target.value) } placeholder={t('左侧文字 (如 php)')}
           style={ { width: 150, maxWidth: '100%' } } allowClear />
-        <span style={ labelStyle }>状态</span>
-        <Input value={ value } onChange={ (e) => setValue(e.target.value) } placeholder="右侧状态文字 (如 8.0)"
+        <span style={ labelStyle }>{t('状态')}</span>
+        <Input value={ value } onChange={ (e) => setValue(e.target.value) } placeholder={t('右侧状态文字 (如 8.0)')}
           style={ { width: 150, maxWidth: '100%' } } allowClear />
       </div>
       <div style={ row }>
-        <span style={ labelStyle }>文字颜色</span>
+        <span style={ labelStyle }>{t('文字颜色')}</span>
         <ColorPicker format="hex" value={ fg } onChange={ (c) => setFg(c.toHexString()) } />
         <span style={ hexStyle }>{ fg }</span>
-        <span style={ labelStyle }>状态颜色</span>
+        <span style={ labelStyle }>{t('状态颜色')}</span>
         <ColorPicker format="hex" value={ status } onChange={ (c) => setStatus(c.toHexString()) } />
         <span style={ hexStyle }>{ status }</span>
-        <span style={ { color: token.colorTextTertiary, fontSize: 12 } }>左侧底色固定 #555 (shields 风格)</span>
+        <span style={ { color: token.colorTextTertiary, fontSize: 12 } }>{t('左侧底色固定 #555 (shields 风格)')}</span>
       </div>
       <div style={ row }>
-        <span style={ labelStyle }>图片尺寸</span>
+        <span style={ labelStyle }>{t('图片尺寸')}</span>
         <InputNumber
           min={ 1 }
           max={ 10 }
@@ -119,40 +124,40 @@ const ShieldBadgeGenerator: React.FC = () => {
           onChange={ (v) => setScale(v ?? 1) }
           style={ { width: 90 } }
         />
-        <span style={ labelStyle }>倍率</span>
-        { outSize && <span style={ hexStyle }>导出 PNG 为 { outSize.w }×{ outSize.h }px (badge 高 20, 随文字变宽)</span> }
+        <span style={ labelStyle }>{t('倍率')}</span>
+        { outSize && <span style={ hexStyle }>{ tt('导出 PNG 为 {w}×{h}px (badge 高 20, 随文字变宽)', { w: outSize.w, h: outSize.h }) }</span> }
       </div>
       <div style={ hintStyle }>
-        实时生成 shields.io 风格 SVG; 文字与状态留空时相应段落自动隐藏; SVG 为矢量格式, 放大不模糊
+        {t('实时生成 shields.io 风格 SVG; 文字与状态留空时相应段落自动隐藏; SVG 为矢量格式, 放大不模糊')}
       </div>
 
       {/* 预览 (矢量放大仍清晰, 点击复制) */}
       <div style={ { marginBottom: 12 } }>
-        <div style={ { color: token.colorTextSecondary, marginBottom: 6 } }>预览 (点击复制 SVG):</div>
+        <div style={ { color: token.colorTextSecondary, marginBottom: 6 } }>{t('预览 (点击复制 SVG):')}</div>
         { empty ? (
-          <div style={ { color: token.colorTextTertiary, padding: '14px 0', fontSize: 13 } }>请填写文字或状态后生成预览</div>
+          <div style={ { color: token.colorTextTertiary, padding: '14px 0', fontSize: 13 } }>{t('请填写文字或状态后生成预览')}</div>
         ) : (
           <>
             <img
               src={ dataUrl }
               alt="badge"
-              title="点击复制 SVG 内容"
+              title={t('点击复制 SVG 内容')}
               onClick={ doCopy }
               style={ { height: previewH, width: 'auto', maxWidth: '100%', cursor: 'pointer', userSelect: 'none', imageRendering: 'auto' } }
             />
-            <div style={ { color: token.colorTextTertiary, fontSize: 12, marginTop: 4 } }>{ svg.length } 字符 · { label.trim() || '∅' } | { value.trim() || '∅' }</div>
+            <div style={ { color: token.colorTextTertiary, fontSize: 12, marginTop: 4 } }>{ tt('{n} 字符 · {a} | {b}', { n: svg.length, a: label.trim() || '∅', b: value.trim() || '∅' }) }</div>
           </>
         ) }
       </div>
 
       <Space wrap style={ { marginBottom: 12 } }>
-        <Button type="primary" icon={ <CopyOutlined /> } disabled={ empty } onClick={ doCopy }>复制 SVG 内容</Button>
-        <Button icon={ <DownloadOutlined /> } disabled={ empty } onClick={ doSaveSvg }>保存为 .svg</Button>
-        <Button icon={ <PictureOutlined /> } disabled={ empty } onClick={ doSavePng }>导出 PNG ({ scale }×)</Button>
+        <Button type="primary" icon={ <CopyOutlined /> } disabled={ empty } onClick={ doCopy }>{t('复制 SVG 内容')}</Button>
+        <Button icon={ <DownloadOutlined /> } disabled={ empty } onClick={ doSaveSvg }>{t('保存为 .svg')}</Button>
+        <Button icon={ <PictureOutlined /> } disabled={ empty } onClick={ doSavePng }>{tt('导出 PNG ({s}×)', { s: scale })}</Button>
       </Space>
 
       {/* SVG 源码 (方便整段选择) */}
-      <div style={ { color: token.colorTextSecondary, marginBottom: 4 } }>SVG 源码:</div>
+      <div style={ { color: token.colorTextSecondary, marginBottom: 4 } }>{t('SVG 源码:')}</div>
       <pre style={ {
         background: '#0f1419', color: '#e6edf3', borderRadius: 8, padding: '10px 12px',
         fontSize: 12, overflowX: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-all',

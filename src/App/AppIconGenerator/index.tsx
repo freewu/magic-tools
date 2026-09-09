@@ -3,6 +3,8 @@ import { Button, Card, Checkbox, Collapse, message, theme } from "antd";
 import { saveBytesFile } from "../../lib/tauri";
 import { zipStore } from "./lib";
 import { ALL_PLATFORMS, TOTAL_ICONS } from "./data";
+import { useLocale } from "../../hook/locale-context";
+import { im, imT } from "../image-lang";
 
 const checkerBg = {
   backgroundImage: 'conic-gradient(#d9d9d9 25%, #fff 0 50%, #d9d9d9 0 75%, #fff 0)',
@@ -14,6 +16,9 @@ const checkerBg = {
 interface Rendered { dataUrl: string; bytes: Uint8Array }
 
 const AppIconGenerator: React.FC = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => im(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => imT(locale, zh, v);
   const { token } = theme.useToken();
   const [ srcName, setSrcName ] = useState('');
   const [ master, setMaster ] = useState('');   // 1024 主图标 dataURL (预览)
@@ -39,14 +44,14 @@ const AppIconGenerator: React.FC = () => {
         canvas.width = px;
         canvas.height = px;
         const ctx = canvas.getContext('2d');
-        if (!ctx) { reject(new Error('无法创建画布')); return; }
+        if (!ctx) { reject(new Error(t('无法创建画布'))); return; }
         ctx.clearRect(0, 0, px, px);
         ctx.imageSmoothingEnabled = true;
         (ctx as CanvasRenderingContext2D & { imageSmoothingQuality?: string }).imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, px, px);
         const dataUrl = canvas.toDataURL('image/png');
         canvas.toBlob(async (blob) => {
-          if (!blob) { reject(new Error('PNG 生成失败')); return; }
+          if (!blob) { reject(new Error(t('PNG 生成失败'))); return; }
           const buf = await blob.arrayBuffer();
           resolve({ dataUrl, bytes: new Uint8Array(buf) });
         }, 'image/png');
@@ -58,7 +63,7 @@ const AppIconGenerator: React.FC = () => {
 
   const loadFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
-      message.error('请选择图片文件 (PNG/JPG/WebP 等)');
+      message.error(t('请选择图片文件 (PNG/JPG/WebP 等)'));
       return;
     }
     const reader = new FileReader();
@@ -73,12 +78,12 @@ const AppIconGenerator: React.FC = () => {
           const r = await renderPng(img, 1024);
           setMaster(r.dataUrl);
         } catch (err) {
-          message.error(err instanceof Error ? err.message : '生成失败');
+          message.error(err instanceof Error ? t(err.message) : t('生成失败'));
         } finally {
           setBusy(false);
         }
       };
-      img.onerror = () => { message.error('图片加载失败'); };
+      img.onerror = () => { message.error(t('图片加载失败')); };
       img.src = dataUrl;
     };
     reader.readAsDataURL(file);
@@ -93,7 +98,7 @@ const AppIconGenerator: React.FC = () => {
   // 渲染全部尺寸 -> zip -> 保存/下载
   const downloadAll = async () => {
     const img = imgRef.current;
-    if (!img || !srcName) { message.warning('请先上传一张图片'); return; }
+    if (!img || !srcName) { message.warning(t('请先上传一张图片')); return; }
     setBusy(true);
     try {
       const chosen = ALL_PLATFORMS.filter((p) => selected.has(p.key));
@@ -105,10 +110,10 @@ const AppIconGenerator: React.FC = () => {
         }
       }
       const readme = [
-        'App Icon 生成 · 批量结果 (' + entries.length + ' 张)',
+        tt('App Icon 生成 · 批量结果 ({n} 张)', { n: entries.length }),
         '',
         ...chosen.flatMap((p) => [
-          '【' + p.title + '】' + p.desc + ':',
+          tt('【{t}】{d}:', { t: p.title, d: t(p.desc) }),
           ...p.files.map((f) => '  ' + f.path + ' (' + f.px + 'x' + f.px + ')'),
           '',
         ]),
@@ -116,13 +121,13 @@ const AppIconGenerator: React.FC = () => {
       entries.push({ path: 'README.txt', bytes: new TextEncoder().encode(readme) });
       const zip = zipStore(entries);
       const ok = await saveBytesFile('App-Icons.zip', zip, {
-        title: '批量下载 App 图标',
-        filterName: 'ZIP 压缩包',
+        title: t('批量下载 App 图标'),
+        filterName: t('ZIP 压缩包'),
         extensions: ['zip'],
       });
-      if (ok) message.success('已生成 ' + entries.length + ' 张图标并打包下载');
+      if (ok) message.success(tt('已生成 {n} 张图标并打包下载', { n: entries.length }));
     } catch (err) {
-      message.error(err instanceof Error ? err.message : '打包失败');
+      message.error(err instanceof Error ? t(err.message) : t('打包失败'));
     } finally {
       setBusy(false);
     }
@@ -150,8 +155,8 @@ const AppIconGenerator: React.FC = () => {
               background: '#fafafa',
             } }
           >
-            <div style={ { fontSize: 15, marginBottom: 6 } }>点击或拖拽图片到此处</div>
-            <div style={ { fontSize: 12 } }>建议 1024×1024 方形、无透明底素材{ srcName ? ' · 当前: ' + srcName : '' }</div>
+            <div style={ { fontSize: 15, marginBottom: 6 } }>{t('点击或拖拽图片到此处')}</div>
+            <div style={ { fontSize: 12 } }>{t('建议 1024×1024 方形、无透明底素材')}{ srcName ? tt(' · 当前: {name}', { name: srcName }) : '' }</div>
           </div>
           <input
             ref={ fileRef }
@@ -181,15 +186,15 @@ const AppIconGenerator: React.FC = () => {
                   onClick={ () => togglePlatform(p.key) }
                   title={ <Checkbox checked={ on } onClick={ (e) => { e.stopPropagation(); togglePlatform(p.key); } }>{ p.title }</Checkbox> }
                 >
-                  <div style={ { fontWeight: 600, marginBottom: 2 } }>{ p.files.length } 张</div>
-                  <div style={ { color: token.colorTextTertiary, fontSize: 12, margin: '0 0 6px' } }>{ p.desc }</div>
-                  <div style={ { color: token.colorTextSecondary, fontSize: 12 } }>像素: { pxs.join(' / ') }</div>
+                  <div style={ { fontWeight: 600, marginBottom: 2 } }>{ tt('{n} 张', { n: p.files.length }) }</div>
+                  <div style={ { color: token.colorTextTertiary, fontSize: 12, margin: '0 0 6px' } }>{ t(p.desc) }</div>
+                  <div style={ { color: token.colorTextSecondary, fontSize: 12 } }>{ tt('像素: {p}', { p: pxs.join(' / ') }) }</div>
                 </Card>
               );
             }) }
           </div>
           <div style={ { color: token.colorTextTertiary, fontSize: 12, marginTop: 6 } }>
-            点击卡片可勾选 / 取消平台, 选中的平台才会被打包下载 (当前选中 { selCount } 张)
+            { tt('点击卡片可勾选 / 取消平台, 选中的平台才会被打包下载 (当前选中 {n} 张)', { n: selCount }) }
           </div>
 
           <Button
@@ -201,22 +206,22 @@ const AppIconGenerator: React.FC = () => {
             onClick={ downloadAll }
             style={ { marginTop: 10 } }
           >
-            { busy ? '正在生成…' : '下载所选平台图标 (.zip · ' + selCount + ' 张)' }
+            { busy ? t('正在生成…') : tt('下载所选平台图标 (.zip · {n} 张)', { n: selCount }) }
           </Button>
         </div>
 
         {/* 右: 预览 */}
         <div style={ { textAlign: 'center' } }>
-          <div style={ { color: '#888', marginBottom: 8, fontSize: 12 } }>1024 主图标预览</div>
+          <div style={ { color: '#888', marginBottom: 8, fontSize: 12 } }>{t('1024 主图标预览')}</div>
           { master ? (
             <img src={ master } alt="master" width={ 160 } height={ 160 } style={ { ...checkerBg, padding: 8 } } />
           ) : (
             <div style={ { ...checkerBg, width: 160, height: 160, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ccc' } }>
-              上传后预览
+              {t('上传后预览')}
             </div>
           ) }
           <div style={ { color: '#aaa', marginTop: 6, fontSize: 12 } }>
-            iOS · Android · PhoneGap 三平台同时生成
+            {t('iOS · Android · PhoneGap 三平台同时生成')}
           </div>
         </div>
       </div>
@@ -227,7 +232,7 @@ const AppIconGenerator: React.FC = () => {
         items={ [
           {
             key: 'list',
-            label: '查看输出文件清单 (' + TOTAL_ICONS + ' 个可选, 以下仅列出已选平台)',
+            label: tt('查看输出文件清单 ({n} 个可选, 以下仅列出已选平台)', { n: TOTAL_ICONS }),
             children: (
               <div style={ { fontFamily: 'Consolas, monospace', fontSize: 12, color: '#666', lineHeight: 1.9 } }>
                 { ALL_PLATFORMS.filter((p) => selected.has(p.key)).map((p) => (
