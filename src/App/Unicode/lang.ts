@@ -1,6 +1,47 @@
-// Unicode 语言包: 名称 (zh-CN = define.tsx AppName 默认; 缺省回退 zh-CN)
+// Unicode 语言包 (默认 zh-CN; 缺失词条回退默认语言)
+// 面板交互文案 (按需扩展); 说明性长文 (tips/intro) 暂保留简中, 后续批次再翻
 export default {
   default: 'zh-CN',
-  'zh-TW': { appName: "Unicode 編解碼" },
-  en: { appName: "Unicode Encode / Decode" },
+  'zh-CN': {
+    // appName 缺省回退 define.tsx AppName (= 'Unicode 编解码')
+    encode: '编码',
+    decode: '解码',
+    asciiEncode: 'Ascii 编码',
+    asciiDecode: 'Ascii 解码',
+    clear: '清除',
+    copyOk: '复制到粘贴板成功！！！',
+    copyTitle: '双击复制内容到粘贴板',
+    encodePh: '输入需要进行 Unicode 编码的内容  或 拖拽文件到框内打开',
+    decodePh: '输入需要进行 Unicode 解码的内容  或 拖拽文件到框内打开',
+    decodeFailed: '解码失败！！！',
+    divider: 'Unicode 编码说明',
+  },
+  'zh-TW': {
+    appName: 'Unicode 編解碼',
+    encode: '編碼',
+    decode: '解碼',
+    asciiEncode: 'Ascii 編碼',
+    asciiDecode: 'Ascii 解碼',
+    clear: '清除',
+    copyOk: '複製到剪貼簿成功！！！',
+    copyTitle: '雙擊複製內容到剪貼簿',
+    encodePh: '輸入需要進行 Unicode 編碼的內容，或將檔案拖入框內開啟',
+    decodePh: '輸入需要進行 Unicode 解碼的內容，或將檔案拖入框內開啟',
+    decodeFailed: '解碼失敗！！！',
+    divider: 'Unicode 編碼說明',
+  },
+  en: {
+    appName: 'Unicode Encode / Decode',
+    encode: 'Encode',
+    decode: 'Decode',
+    asciiEncode: 'ASCII Encode',
+    asciiDecode: 'ASCII Decode',
+    clear: 'Clear',
+    copyOk: 'Copied to clipboard!',
+    copyTitle: 'Double-click to copy',
+    encodePh: 'Enter text to encode to Unicode escapes, or drag & drop a file here',
+    decodePh: 'Enter Unicode escapes to decode, or drag & drop a file here',
+    decodeFailed: 'Decode failed!',
+    divider: 'About Unicode Escapes',
+  },
 } as const;
