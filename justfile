@@ -8,6 +8,7 @@
 #
 # Quick start:
 #   just              -> show usage help (default)
+#   just dev-init     -> install/check dev prerequisites (✓ green when already installed)
 #   just dev          -> development mode (Vite dev server + Tauri window)
 #   just release      -> build and copy installers into release/
 #   just publish      -> build and publish to GitHub Releases
@@ -32,6 +33,15 @@ help:
     @echo MagicTools v{{version}} - Build and Release Tool for Tauri 2 + React
     @echo Usage: just COMMAND ARGS - full docs in README.md or run just --dump
     @just --list
+
+# Initialize / check the dev environment (idempotent, safe to re-run)
+# Installs missing components: frontend deps (npm ci/install), Rust stable
+# toolchain (via rustup if cargo is missing) and cargo fetch. Items that are
+# already ready are skipped and shown with a green ✓.
+# Shows a green ✓ for what is already installed; installs what is missing.
+dev-init:
+    @command -v node >/dev/null 2>&1 || { echo "✗ Node.js 未安装: 请先安装 Node.js 18+ (https://nodejs.org/) 再运行 just dev-init"; exit 1; }
+    @node scripts/dev-init.mjs
 
 # Development mode: start Vite dev server (beforeDevCommand) + Tauri window
 dev:

@@ -129,16 +129,33 @@ magic-tools
 
 ## 🚀 开发与运行
 
-前置依赖：Node.js 18+、Rust、[just](https://github.com/casey/just)。
+前置依赖：Node.js 18+、Rust、[just](https://github.com/casey/just)（下面命令都依赖它）。
+
+**先安装 just：**
+
+| 平台 | 安装命令 |
+| --- | --- |
+| Windows | `winget install --id Casey.Just`（或 `scoop install just`、`choco install just`） |
+| macOS | `brew install just` |
+| Linux | 从 [just releases](https://github.com/casey/just/releases) 下载，或 `cargo install just` |
+
+然后克隆仓库并初始化开发环境。`just dev-init` 会逐项检查所需组件，缺失的自动安装（前端依赖 `npm ci` / `npm install`、Rust 工具链 `rustup`、后端依赖 `cargo fetch`）；已就绪的组件会跳过并显示**绿色 ✓**。命令幂等，可随时重复执行：
 
 ```bash
 git clone https://github.com/freewu/magic-tools.git
 cd magic-tools
-npm install
+just dev-init
+```
+
+启动开发：
+
+```bash
+just dev
 ```
 
 | 任务 | 命令 |
 | --- | --- |
+| 初始化 / 检查开发环境（幂等，就绪项显示 ✓） | `just dev-init` |
 | Tauri 窗口开发模式 | `just dev` |
 | 仅浏览器调试 | `just dev-renderer` → http://localhost:1212 |
 | 预览生产构建产物 | `just preview` → http://localhost:4173 |

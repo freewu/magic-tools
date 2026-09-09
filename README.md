@@ -129,16 +129,33 @@ magic-tools
 
 ## 🚀 Development
 
-Prerequisites: Node.js 18+, Rust, [just](https://github.com/casey/just).
+Prerequisites: Node.js 18+, Rust, and the [just](https://github.com/casey/just) command runner (every command below uses it).
+
+**Install `just` first:**
+
+| Platform | Install command |
+| --- | --- |
+| Windows | `winget install --id Casey.Just` (or `scoop install just`, `choco install just`) |
+| macOS | `brew install just` |
+| Linux | download from [just releases](https://github.com/casey/just/releases), or `cargo install just` |
+
+Then clone the repo and initialize the dev environment. `just dev-init` checks every required component and automatically installs whatever is missing (frontend deps via `npm ci` / `npm install`, Rust toolchain via `rustup`, backend deps via `cargo fetch`); components that are already ready are skipped and shown with a **green ✓**. It is idempotent, so you can re-run it any time:
 
 ```bash
 git clone https://github.com/freewu/magic-tools.git
 cd magic-tools
-npm install
+just dev-init
+```
+
+Start developing:
+
+```bash
+just dev
 ```
 
 | Task | Command |
 | --- | --- |
+| Initialize / check dev env (idempotent, ✓ when ready) | `just dev-init` |
 | Run in Tauri window (dev) | `just dev` |
 | Browser dev server | `just dev-renderer` → http://localhost:1212 |
 | Preview production build | `just preview` → http://localhost:4173 |
