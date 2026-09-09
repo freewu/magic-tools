@@ -75,6 +75,51 @@ const D: CrRec = {
   '输入需要进行 TEA 解密的内容 或 拖拽文件到框内打开': ['輸入需要進行 TEA 解密的內容 或 拖曳檔案到框內開啟', 'Enter the content to TEA-decrypt, or drop a file into the box'],
   '输入需要进行 XTEA 加密的内容 或 拖拽文件到框内打开': ['輸入需要進行 XTEA 加密的內容 或 拖曳檔案到框內開啟', 'Enter the content to XTEA-encrypt, or drop a file into the box'],
   '输入需要进行 XTEA 解密的内容 或 拖拽文件到框内打开': ['輸入需要進行 XTEA 解密的內容 或 拖曳檔案到框內開啟', 'Enter the content to XTEA-decrypt, or drop a file into the box'],
+  '模式:': ['模式:', 'Mode:'],
+  '填充:': ['填充:', 'Padding:'],
+  '位数:': ['位數:', 'Key size:'],
+  '偏移量(IV):': ['偏移量(IV):', 'IV (offset):'],
+  'ECB 模式无需 IV': ['ECB 模式無需 IV', 'ECB mode needs no IV'],
+  '非 ECB 模式需要填写偏移量 (IV)': ['非 ECB 模式需要填寫偏移量 (IV)', 'A non-ECB mode requires an IV'],
+  '偏移量需为 {n} 个字符或 {bits} 位 HEX': ['偏移量需為 {n} 個字元或 {bits} 位 HEX', 'The IV must be {n} characters or {bits} HEX digits'],
+  '密钥需为 {need} 个字符 (UTF-8 {need} 字节), 当前 {len} 字节': ['金鑰需為 {need} 個字元 (UTF-8 {need} 位元組), 目前 {len} 位元組', 'The key must be {need} characters (UTF-8: {need} bytes); got {len} bytes'],
+  '密钥口令不能为空': ['金鑰口令不能為空', 'The passphrase must not be empty'],
+  'nonce 格式不正确': ['nonce 格式不正確', 'Invalid nonce format'],
+  '计数器需为 0~2^32-1 的整数': ['計數器需為 0~2^32-1 的整數', 'The counter must be an integer in 0~2^32-1'],
+  '口令经 SHA-256 派生为 32 字节密钥 (恰 32 字符时直接使用)': ['口令經 SHA-256 派生為 32 位元組金鑰 (恰 32 字元時直接使用)', 'The passphrase is derived via SHA-256 into a 32-byte key (a 32-character passphrase is used as-is)'],
+  ' 24 HEX 或 12 字符': [' 24 HEX 或 12 字元', ' 24 HEX or 12 characters'],
+  '密钥口令:': ['金鑰口令:', 'Passphrase:'],
+  '计数器(初始值):': ['計數器(初始值):', 'Counter (initial):'],
+  '输入需要进行 ChaCha20 加密的内容  或 拖拽文件到框内打开': ['輸入需要進行 ChaCha20 加密的內容  或 拖曳檔案到框內開啟', 'Enter the content to ChaCha20-encrypt, or drop a file into the box'],
+  '输入需要进行 ChaCha20 解密的内容  或 拖拽文件到框内打开': ['輸入需要進行 ChaCha20 解密的內容  或 拖曳檔案到框內開啟', 'Enter the content to ChaCha20-decrypt, or drop a file into the box'],
+  '输入需要进行 Rabbit 加密的内容 或 拖拽文件到框内打开': ['輸入需要進行 Rabbit 加密的內容 或 拖曳檔案到框內開啟', 'Enter the content to Rabbit-encrypt, or drop a file into the box'],
+  '输入需要进行 Rabbit 解密的内容 或 拖拽文件到框内打开': ['輸入需要進行 Rabbit 解密的內容 或 拖曳檔案到框內開啟', 'Enter the content to Rabbit-decrypt, or drop a file into the box'],
+  '输入需要进行 Blowfish 加密的内容  或 拖拽文件到框内打开': ['輸入需要進行 Blowfish 加密的內容  或 拖曳檔案到框內開啟', 'Enter the content to Blowfish-encrypt, or drop a file into the box'],
+  '输入需要进行 Blowfish 解密的内容  或 拖拽文件到框内打开': ['輸入需要進行 Blowfish 解密的內容  或 拖曳檔案到框內開啟', 'Enter the content to Blowfish-decrypt, or drop a file into the box'],
+  '输入需要进行 RC2 加密的内容  或 拖拽文件到框内打开': ['輸入需要進行 RC2 加密的內容  或 拖曳檔案到框內開啟', 'Enter the content to RC2-encrypt, or drop a file into the box'],
+  '输入需要进行 RC2 解密的内容  或 拖拽文件到框内打开': ['輸入需要進行 RC2 解密的內容  或 拖曳檔案到框內開啟', 'Enter the content to RC2-decrypt, or drop a file into the box'],
+  '输入需要进行 RC5 加密的内容  或 拖拽文件到框内打开': ['輸入需要進行 RC5 加密的內容  或 拖曳檔案到框內開啟', 'Enter the content to RC5-encrypt, or drop a file into the box'],
+  '输入需要进行 RC5 解密的内容  或 拖拽文件到框内打开': ['輸入需要進行 RC5 解密的內容  或 拖曳檔案到框內開啟', 'Enter the content to RC5-decrypt, or drop a file into the box'],
+  '输入需要进行 RC6 加密的内容  或 拖拽文件到框内打开': ['輸入需要進行 RC6 加密的內容  或 拖曳檔案到框內開啟', 'Enter the content to RC6-encrypt, or drop a file into the box'],
+  '输入需要进行 RC6 解密的内容  或 拖拽文件到框内打开': ['輸入需要進行 RC6 解密的內容  或 拖曳檔案到框內開啟', 'Enter the content to RC6-decrypt, or drop a file into the box'],
+  '输入需要进行 AES 加密的内容  或 拖拽文件到框内打开': ['輸入需要進行 AES 加密的內容  或 拖曳檔案到框內開啟', 'Enter the content to AES-encrypt, or drop a file into the box'],
+  '输入需要进行 AES 解密的内容  或 拖拽文件到框内打开': ['輸入需要進行 AES 解密的內容  或 拖曳檔案到框內開啟', 'Enter the content to AES-decrypt, or drop a file into the box'],
+  '输入需要进行 DES 加密的内容 或 拖拽文件到框内打开': ['輸入需要進行 DES 加密的內容 或 拖曳檔案到框內開啟', 'Enter the content to DES-encrypt, or drop a file into the box'],
+  '输入需要进行 DES 解密的内容 或 拖拽文件到框内打开': ['輸入需要進行 DES 解密的內容 或 拖曳檔案到框內開啟', 'Enter the content to DES-decrypt, or drop a file into the box'],
+  '输入需要进行 3DES 加密的内容 或 拖拽文件到框内打开': ['輸入需要進行 3DES 加密的內容 或 拖曳檔案到框內開啟', 'Enter the content to 3DES-encrypt, or drop a file into the box'],
+  '输入需要进行 3DES 解密的内容 或 拖拽文件到框内打开': ['輸入需要進行 3DES 解密的內容 或 拖曳檔案到框內開啟', 'Enter the content to 3DES-decrypt, or drop a file into the box'],
+  'GCM 为认证加密模式, 无需填充; 输出 / 输入格式为 密文 + 16 字节认证标签': ['GCM 為認證加密模式, 無需填充; 輸出 / 輸入格式為 密文 + 16 位元組認證標籤', 'GCM is an authenticated-encryption mode and needs no padding; the output / input format is ciphertext + a 16-byte auth tag'],
+  '输出为 密文+16字节认证标签, IV 建议 12 字节': ['輸出為 密文+16 位元組認證標籤, IV 建議 12 位元組', 'Output is ciphertext + a 16-byte auth tag; an IV of 12 bytes is recommended'],
+  'ChaCha20 密钥必须为 32 字节': ['ChaCha20 金鑰必須為 32 位元組', 'A ChaCha20 key must be 32 bytes'],
+  'ChaCha20 nonce 必须为 12 字节': ['ChaCha20 nonce 必須為 12 位元組', 'A ChaCha20 nonce must be 12 bytes'],
+  'nonce 需为 24 位 HEX 或 12 个字符 (UTF-8)': ['nonce 需為 24 位 HEX 或 12 個字元 (UTF-8)', 'The nonce must be 24 HEX digits or 12 characters (UTF-8)'],
+  'HEX 长度必须为偶数': ['HEX 長度必須為偶數', 'HEX length must be even'],
+  'HEX 包含非法字符': ['HEX 包含非法字元', 'HEX contains invalid characters'],
+  'Base64 内容解析失败': ['Base64 內容解析失敗', 'Failed to parse Base64 content'],
+  '密钥字节长度必须为 16 / 24 / 32 (AES-128/192/256)': ['金鑰位元組長度必須為 16 / 24 / 32 (AES-128/192/256)', 'The key length in bytes must be 16 / 24 / 32 (AES-128/192/256)'],
+  'GCM IV 不能为空': ['GCM IV 不能為空', 'The GCM IV must not be empty'],
+  'GCM 密文长度过短 (缺少认证标签)': ['GCM 密文長度過短 (缺少認證標籤)', 'GCM ciphertext too short (missing auth tag)'],
+  'GCM 认证失败: 密文可能被篡改或密钥 / IV 不正确': ['GCM 認證失敗: 密文可能被竄改或金鑰 / IV 不正確', 'GCM authentication failed: the ciphertext may be tampered with, or the key / IV is wrong'],
 };
 export const cr = (locale: string, zh: string): string => {
   const e = D[zh];
@@ -85,4 +130,17 @@ export const crT = (locale: string, zh: string, v?: Record<string, string | numb
   let s = cr(locale, zh);
   if (v) for (const [k, val] of Object.entries(v)) s = s.split('{'+k+'}').join(String(val));
   return s;
+};
+
+
+// lib 抛出的动态中文错误统一翻译: 固定消息走字典, 数值模板走正则解析
+export const crErr = (locale: string, m: string): string => {
+  let mm: RegExpExecArray | null;
+  if ((mm = /^密钥需为 (\d+) 个字符 \(UTF-8 \d+ 字节\), 当前 (\d+) 字节$/.exec(m)))
+    return crT(locale, '密钥需为 {need} 个字符 (UTF-8 {need} 字节), 当前 {len} 字节', { need: +mm[1], len: +mm[2] });
+  if ((mm = /^偏移量需为 (\d+) 个字符或 (\d+) 位 HEX$/.exec(m)))
+    return crT(locale, '偏移量需为 {n} 个字符或 {bits} 位 HEX', { n: +mm[1], bits: +mm[2] });
+  if ((mm = /^Type 7 第 (\d+) 位起含非十六进制字符$/.exec(m)))
+    return crT(locale, 'Type 7 第 {pos} 位起含非十六进制字符', { pos: +mm[1] });
+  return cr(locale, m);
 };

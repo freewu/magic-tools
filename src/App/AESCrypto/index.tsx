@@ -2,6 +2,8 @@ import { Select, Divider, Button,Input, Space, message,Row, Tooltip } from "antd
 import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { useState } from "react";
 const { TextArea } = Input;
+import { useLocale } from "../../hook/locale-context";
+import { cr, crT, crErr } from "../crypto-lang";
 import { copyTextToClipboard } from "../../lib"
 import { openFile } from "../../lib/file"
 import { arrayToOptions } from "../../lib/array"
@@ -19,6 +21,9 @@ const ivRequiredLen = (m :string) => (m === 'GCM' ? 12 : 16);
 const utf8Bytes = (s :string) :Uint8Array => new TextEncoder().encode(s);
 
 const AESCrypto = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => cr(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => crT(locale, zh, v);
 
   const genDefaultPassphraseStatus = () :InputStatus => {
     const p = getDefaultPassphrase();
@@ -102,13 +107,13 @@ const AESCrypto = () => {
       );
       const result = value.toString(CryptoJS.enc.Utf8);
       if("" === result) {
-        notice.error("解密失败");
+        notice.error(t('解密失败'));
       }
       return setEncodeValue(result);
     } catch (error) {
       // GCM 的认证失败等异常需要给出明确提示
       if(mode === 'GCM' && error instanceof Error) {
-        notice.error(error.message);
+        notice.error(crErr(locale, error.message));
       } else {
         console.log(error);
       }
@@ -123,7 +128,7 @@ const AESCrypto = () => {
 
   const textareaDoubleClick = (e :React.MouseEvent<HTMLElement>) => {
     copyTextToClipboard((e.target as HTMLInputElement).value);
-    notice.success("复制到粘贴板成功！！！");
+    notice.success(t('复制到粘贴板成功！！！'));
   };
 
   // 偏移量 IV 输入处理
@@ -165,18 +170,18 @@ const AESCrypto = () => {
 
       <Row style = { { marginTop: "5px" }}>
         <Space>
-          <label>模式:</label>
+          {t('模式:')}
           <Select
             value={ mode }
             style={{ width: 120 }}
             onChange={ onModeChange }
             options={ arrayToOptions(modeList) }
           />
-          <label>填充:</label>
+          {t('填充:')}
           {
             (mode === 'GCM')
               ? (
-                <Tooltip title="GCM 为认证加密模式, 无需填充; 输出 / 输入格式为 密文 + 16 字节认证标签">
+                <Tooltip title={t('GCM 为认证加密模式, 无需填充; 输出 / 输入格式为 密文 + 16 字节认证标签')}>
                   <Select
                     value={ padding }
                     style={{ width: 120 }}
@@ -194,7 +199,7 @@ const AESCrypto = () => {
                 />
               )
           }
-          <label>偏移量(IV):</label>
+          {t('偏移量(IV):')}
           <Input 
             allowClear
             status={ ivStatus }
@@ -204,26 +209,26 @@ const AESCrypto = () => {
             onChange={ onIVChange }
             value= { iv } />
           { iv.length } / { ivRequiredLen(mode) }
-          { (mode === 'GCM') && <span style={ { color: "#999", fontSize: 12 }}>输出为 密文+16字节认证标签, IV 建议 12 字节</span> }
+          { (mode === 'GCM') && <span style={ { color: "#999", fontSize: 12 }}>{t('输出为 密文+16字节认证标签, IV 建议 12 字节')}</span> }
         </Space>
       </Row>
       <Row style = { { marginTop: "5px" }}>
         <Space>
-          <label>编码:</label>
+          {t('编码:')}
           <Select
             value={ code }
             style={{ width: 120 }}
             onChange={ (v :string) => { setCode(v) } }
             options={ arrayToOptions(codeList) }
           />
-          <label>位数:</label>
+          {t('位数:')}
           <Select
             value={ capacity }
             style={{ width: 120 }}
             onChange={ onCapacityChange }
             options={ arrayToOptions(capacityList) }
           />
-          <label>密钥:</label>
+          {t('密钥:')}
           <Input
             allowClear
             maxLength = { 32 }
@@ -238,9 +243,9 @@ const AESCrypto = () => {
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setEncodeValue(e.target.value) } }
-        title="双击复制内容到粘贴板"
+        title={t('双击复制内容到粘贴板')}
         value= { encodeValue }
-        placeholder="输入需要进行 AES 加密的内容  或 拖拽文件到框内打开"
+        placeholder={t('输入需要进行 AES 加密的内容  或 拖拽文件到框内打开')}
         autoSize={{ minRows: 8, maxRows: 8 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setEncodeValue ); } }
@@ -250,24 +255,24 @@ const AESCrypto = () => {
         onClick={ encode }
         style={ {"backgroundColor" : "#007bff","color": "#fff" }} 
         icon={<ArrowDownOutlined />}
-      >加密</Button>
+      >{t('加密')}</Button>
       <Button 
         onClick={ decode }
         style={ {"backgroundColor" : "#28a745","color": "#fff" }} 
         icon={<ArrowUpOutlined />}
-      >解密</Button>
+      >{t('解密')}</Button>
       <Button 
         onClick={ () =>clear() }
         style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-      >清除</Button>
+      >{t('清除')}</Button>
 
       <TextArea
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setDecodeValue(e.target.value) } }
-        title="双击复制内容到粘贴板"
+        title={t('双击复制内容到粘贴板')}
         value= { decodeValue }
-        placeholder="输入需要进行 AES 解密的内容  或 拖拽文件到框内打开"
+        placeholder={t('输入需要进行 AES 解密的内容  或 拖拽文件到框内打开')}
         autoSize={{ minRows: 8, maxRows: 8 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setDecodeValue ); } }
