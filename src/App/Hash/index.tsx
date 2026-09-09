@@ -142,10 +142,10 @@ const Hash = () => {
 
       <div className="hash-form" style={ { flex: 1, minHeight: 0, overflowY: "auto", paddingRight: 12 } } >
         <Form name="basic"labelCol={{ span: 3 }}autoComplete="off" >
-          <Form.Item label="MD5 (16位)">
+          <Form.Item label={ t('md516','MD5 (16位)') }>
             <Input readOnly showCount onClick={ inputClick } value= { hash.md516 } />
           </Form.Item>
-          <Form.Item label="MD5 (32位)">
+          <Form.Item label={ t('md532','MD5 (32位)') }>
             <Input readOnly showCount onClick={ inputClick } value= { hash.md5 } />
           </Form.Item>
           <Form.Item label="RipeMD-160">
