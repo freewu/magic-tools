@@ -2,6 +2,8 @@ import { Alert, Button, Card, Input, Radio, Space, Typography } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 import { useMemo, useState } from 'react';
 import { formatHtml, getHtmlIndent } from './lib';
+import { useLocale } from '../../hook/locale-context';
+import { u, uT } from '../ui-lang';
 
 const { Text } = Typography;
 
@@ -13,6 +15,10 @@ const SAMPLE = `<!DOCTYPE html>
 <footer><p>© 2024 MagicTools</p></footer></body></html>`;
 
 const HtmlFormat: React.FC = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => u(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => uT(locale, zh, v);
+
   const [raw, setRaw] = useState('');
   const [indent, setIndent] = useState<number>(() => getHtmlIndent());
   const result = useMemo(() => {
@@ -34,10 +40,10 @@ const HtmlFormat: React.FC = () => {
       <Alert
         type="info"
         showIcon
-        message="HTML 格式化"
-        description="美化格式化 HTML 代码: 块级元素缩进换行、行内元素保留在一行、文本空白自动折叠。script / style / pre / textarea 内容原样保留。缩进空格数可在右侧或「设置 → 格式化」中切换 2 / 4 空格。"
+        message={t('HTML 格式化')}
+        description={t('美化格式化 HTML 代码: 块级元素缩进换行、行内元素保留在一行、文本空白自动折叠。script / style / pre / textarea 内容原样保留。缩进空格数可在右侧或「设置 → 格式化」中切换 2 / 4 空格。')}
       />
-      <Card size="small" title="HTML 源码" extra={
+      <Card size="small" title={t('HTML 源码')} extra={
         <Space size={8}>
           <Radio.Group
             size="small"
@@ -45,24 +51,24 @@ const HtmlFormat: React.FC = () => {
             onChange={(e) => setIndent(e.target.value)}
             optionType="button"
             buttonStyle="solid"
-            options={[{ label: '2 空格', value: 2 }, { label: '4 空格', value: 4 }]}
+            options={[{ label: t('2 空格'), value: 2 }, { label: t('4 空格'), value: 4 }]}
           />
-          <Button size="small" onClick={() => { setRaw(SAMPLE); }}>载入示例</Button>
-          <Button size="small" danger disabled={!raw} onClick={() => setRaw('')}>清空</Button>
+          <Button size="small" onClick={() => { setRaw(SAMPLE); }}>{t('载入示例')}</Button>
+          <Button size="small" danger disabled={!raw} onClick={() => setRaw('')}>{t('清空')}</Button>
         </Space>
       }>
         <Input.TextArea
           value={raw}
           onChange={(e) => setRaw(e.target.value)}
-          placeholder={'粘贴 HTML 代码…\n如: <div><p>你好</p></div>'}
+          placeholder={t('粘贴 HTML 代码…') + '\n' + t('如: <div><p>你好</p></div>')}
           autoSize={{ minRows: 8, maxRows: 16 }}
           style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 13 }}
         />
       </Card>
-      <Card size="small" title="格式化结果" extra={
+      <Card size="small" title={t('格式化结果')} extra={
         <Space size={8}>
-          <Text type="secondary" style={{ fontSize: 12 }}>{result.length} 字符</Text>
-          <Button size="small" icon={<CopyOutlined />} disabled={!result} onClick={copy}>复制</Button>
+          <Text type="secondary" style={{ fontSize: 12 }}>{tt('{n} 字符', { n: result.length })}</Text>
+          <Button size="small" icon={<CopyOutlined />} disabled={!result} onClick={copy}>{t('复制')}</Button>
         </Space>
       }>
         {result ? (
@@ -73,7 +79,7 @@ const HtmlFormat: React.FC = () => {
             style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 13 }}
           />
         ) : (
-          <Text type="secondary">暂无结果 — 输入 HTML 后自动格式化。</Text>
+          t('暂无结果 — 输入 HTML 后自动格式化。')
         )}
       </Card>
     </Space>

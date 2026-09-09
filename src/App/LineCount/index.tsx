@@ -6,8 +6,12 @@ import { copyTextToClipboard } from "../../lib"
 import { openFile } from "../../lib/file"
 import { InputStatus } from "antd/es/_util/statusUtils";
 import { calcLineCount, removeEmptyLine } from "./lib"
+import { useLocale } from "../../hook/locale-context";
+import { u } from "../ui-lang";
 
 const LineCount = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => u(locale, zh);
 
   let inputElement :HTMLInputElement;
   const [ value, setValue ] = useState(''); // 输入的文本
@@ -20,7 +24,7 @@ const LineCount = () => {
 
   const copyContent = (value :string) => {
     copyTextToClipboard(value);
-    notice.success("选取内容已复制到粘贴板!!!");
+    notice.success(t('选取内容已复制到粘贴板!!!'));
   }
 
   const onStartChange = (e :React.ChangeEvent<HTMLInputElement>) => {
@@ -86,12 +90,12 @@ const LineCount = () => {
         <Button
           onClick={ () => { setLineCount(0); setValue('') } }
           style={ { backgroundColor: "#dc3545", color: "#fff" } } 
-        >清除</Button>
+        >{t('清除')}</Button>
         |
         <Button 
           onClick={ () => { let v = removeEmptyLine(value); setValue(v); setLineCount(calcLineCount(v)); } }
           style={ { backgroundColor: "#28a745", color: "#fff" } } 
-        >去除空行</Button>
+        >{t('去除空行')}</Button>
         |
         {/* <Button 
           onClick={ () => { setValue(removeEmptyLine(value)) } }
@@ -101,35 +105,35 @@ const LineCount = () => {
         <Input
           status={ startStatus as InputStatus }
           style={ { width: "80px" }}
-          placeholder="开始行数"
+          placeholder={t('开始行数')}
           value={ start } 
           onChange={ onStartChange } /> 
         ~ 
         <Input
           status={ endStatus as InputStatus }
           style={ { width: "80px" }}
-          placeholder="结束行数"
+          placeholder={t('结束行数')}
           value={ end } 
           onChange={ onEndChange } />
         <Button 
           onClick={ pickContent }
           style={ { backgroundColor: "#007bff", color: "#fff" } } 
-        >提取内容</Button>
+        >{t('提取内容')}</Button>
         | 
         <Button 
           onClick={ ()=> { inputElement?.click() } }
           style={ { backgroundColor: "#007bff", color: "#fff" } } 
-        >打开文件</Button>
+        >{t('打开文件')}</Button>
         <input 
           onChange={ fileChange }
           ref={ input => inputElement = input as HTMLInputElement }
           type="file" id="fileInput" style={ { display: 'none'}} />
         |
         <span>
-          <label>行数:</label> { lineCount }
+          <label>{t('行数:')}</label> { lineCount }
         </span>
         <span>
-          <label>字符数:</label> { value.length }
+          <label>{t('字符数:')}</label> { value.length }
         </span>
       </Space>
 
@@ -137,7 +141,7 @@ const LineCount = () => {
         style={ { margin: "12px 0 5px 0" }}
         onChange={ (e) => { changeContent(e.target.value); } }
         value= { value }
-        placeholder="输入需要统计的内容 或 拖拽文件到框内"
+        placeholder={t('输入需要统计的内容 或 拖拽文件到框内')}
         autoSize={{ minRows: 26,maxRows:26 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, changeContent ); } }
