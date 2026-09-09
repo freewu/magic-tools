@@ -4,15 +4,20 @@ import { arrayToOptions } from "../../lib/array"
 import { hashAlgoList } from "./data";
 import { getDefaultAlgo, setDefaultAlgo, getDefaultLength, setDefaultLength } from "./lib";
 
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
+
 export const HKDFCalcSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
 
   const [ algo, setAlgo ] = useState(getDefaultAlgo());
   const [ length, setLength ] = useState(getDefaultLength());
 
   return (
     <>
-      <Divider orientation="left" plain>HKDF 计算</Divider>
-      <Form.Item label="默认散列算法">
+      <Divider orientation="left" plain>{ st('HKDF 计算') }</Divider>
+      <Form.Item label={ st('默认散列算法') }>
         <Select
           value={ algo }
           style={{ width: 240 }}
@@ -20,7 +25,7 @@ export const HKDFCalcSetting = () => {
           options={ arrayToOptions(hashAlgoList) }
         />
       </Form.Item>
-      <Form.Item label="默认输出长度">
+      <Form.Item label={ st('默认输出长度') }>
         <InputNumber
           addonAfter="字节"
           min={ 1 }

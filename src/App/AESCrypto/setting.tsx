@@ -9,10 +9,15 @@ import { getDefaultIV, setDefaultIV } from "./lib";
 import { getDefaultPassphrase, setDefaultPassphrase, genPassphraseLimitLength } from "./lib";
 import type { InputStatus } from "antd/es/_util/statusUtils";
 
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
+
 // 偏移量长度要求: GCM 建议 12 字节 (96-bit), 其它块模式 16 字节
 const ivRequiredLen = (m :string) => (m === 'GCM' ? 12 : 16);
 
 export const AESCryptoSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
 
   const [ mode, setMode ] = useState(getDefaultMode()); // 默认 mode
   const [ padding, setPadding ] = useState(getDefaultPadding()); // 默认填充
@@ -59,8 +64,8 @@ export const AESCryptoSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>AES 加解密</Divider>
-      <Form.Item label="默认模式">
+      <Divider orientation="left" plain>{ st('AES 加解密') }</Divider>
+      <Form.Item label={ st('默认模式') }>
         <Select
           value={ mode }
           style={{ width: 240 }}
@@ -68,7 +73,7 @@ export const AESCryptoSetting = () => {
           options={ arrayToOptions(modeList) }
         />
       </Form.Item>
-      <Form.Item label="默认填充">
+      <Form.Item label={ st('默认填充') }>
         <Select
           value={ padding }
           style={{ width: 240 }}
@@ -76,7 +81,7 @@ export const AESCryptoSetting = () => {
           options={ arrayToOptions(paddingList) }
         />
       </Form.Item>
-      <Form.Item label="默认编码">
+      <Form.Item label={ st('默认编码') }>
         <Select
           value={ code }
           style={{ width: 240 }}
@@ -84,7 +89,7 @@ export const AESCryptoSetting = () => {
           options={ arrayToOptions(codeList) }
         />
       </Form.Item>
-      <Form.Item label="默认偏移量(IV)">
+      <Form.Item label={ st('默认偏移量(IV)') }>
         <Space style={{ width: "100%" }}>
           <Input 
             status= { ivStatus }
@@ -94,10 +99,10 @@ export const AESCryptoSetting = () => {
             onChange={ onIVChange }
             value= { iv } />
           { iv.length? iv.length + " / " + ivRequiredLen(mode) : null }
-          { (mode === 'GCM') && <span style={ { color: "#999", fontSize: 12 }}>GCM 建议 12 字节 (96-bit) IV</span> }
+          { (mode === 'GCM') && <span style={ { color: "#999", fontSize: 12 }}>{ st('GCM 建议 12 字节 (96-bit) IV') }</span> }
         </Space>
       </Form.Item>
-      <Form.Item label="默认密钥">
+      <Form.Item label={ st('默认密钥') }>
         <Space style={{ width: "100%" }}>
           <Input 
             status= { passphraseStatus }

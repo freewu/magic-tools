@@ -8,7 +8,12 @@ import { getDefaultNonce, setDefaultNonce } from "./lib";
 import { getDefaultCounter, setDefaultCounter } from "./lib";
 import type { InputStatus } from "antd/es/_util/statusUtils";
 
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
+
 export const ChaCha20CryptoSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
 
   const [ code, setCode ] = useState(getDefaultCode()); // 默认编码
   const [ passphrase, setPassphrase ] = useState(getDefaultPassphrase()); // 默认密钥口令
@@ -19,8 +24,8 @@ export const ChaCha20CryptoSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>ChaCha20 加解密</Divider>
-      <Form.Item label="默认编码">
+      <Divider orientation="left" plain>{ st('ChaCha20 加解密') }</Divider>
+      <Form.Item label={ st('默认编码') }>
         <Space>
           <Select
             value={ code }
@@ -30,7 +35,7 @@ export const ChaCha20CryptoSetting = () => {
           />
         </Space>
       </Form.Item>
-      <Form.Item label="默认密钥口令">
+      <Form.Item label={ st('默认密钥口令') }>
         <Space>
           <Input
             allowClear
@@ -43,11 +48,11 @@ export const ChaCha20CryptoSetting = () => {
               setDefaultPassphrase(v);
             } }
             value={ passphrase }
-            placeholder="口令经 SHA-256 派生为 32 字节密钥"
+            placeholder={ st('口令经 SHA-256 派生为 32 字节密钥') }
           />
         </Space>
       </Form.Item>
-      <Form.Item label="默认 Nonce">
+      <Form.Item label={ st('默认 Nonce') }>
         <Space>
           <Input
             allowClear
@@ -61,12 +66,12 @@ export const ChaCha20CryptoSetting = () => {
               setDefaultNonce(v);
             } }
             value={ nonce }
-            placeholder="24 位 HEX (12 字节)"
+            placeholder={ st('24 位 HEX (12 字节)') }
           />
-          <span style={{ color: '#999' }}>24 位 HEX 或 12 字符</span>
+          <span style={{ color: '#999' }}>{ st('24 位 HEX 或 12 字符') }</span>
         </Space>
       </Form.Item>
-      <Form.Item label="默认计数器">
+      <Form.Item label={ st('默认计数器') }>
         <InputNumber
           min={ 0 }
           max={ COUNTER_MAX }

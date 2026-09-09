@@ -6,7 +6,12 @@ import { getDefaultCode, getDefaultRound, setDefaultCode, setDefaultRound } from
 import { getDefaultPassphrase, setDefaultPassphrase } from "./lib";
 import type { InputStatus } from "antd/es/_util/statusUtils";
 
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
+
 export const TEACryptoSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
 
   const [ code, setCode ] = useState(getDefaultCode()); // 默认编码
   const [ round, setRound ] = useState(getDefaultRound()); // 默认循环次数
@@ -40,8 +45,8 @@ export const TEACryptoSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>TEA 加解密</Divider>
-      <Form.Item label="默认编码">
+      <Divider orientation="left" plain>{ st('TEA 加解密') }</Divider>
+      <Form.Item label={ st('默认编码') }>
         <Select
           value={ code }
           style={{ width: 240 }}
@@ -49,7 +54,7 @@ export const TEACryptoSetting = () => {
           options={ arrayToOptions(codeList) }
         />
       </Form.Item>
-      <Form.Item label="默认循环次数">
+      <Form.Item label={ st('默认循环次数') }>
         <Input
           status={ roundStatus }
           maxLength={ 3 }
@@ -58,7 +63,7 @@ export const TEACryptoSetting = () => {
           onChange={ onRoundChange }
         />
       </Form.Item>
-      <Form.Item label="默认密钥">
+      <Form.Item label={ st('默认密钥') }>
         <Space style={{ width: "100%" }}>
           <Input
             status={ passphraseStatus }

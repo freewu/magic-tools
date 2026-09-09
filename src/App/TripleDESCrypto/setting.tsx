@@ -9,7 +9,12 @@ import { getDefaultIV, setDefaultIV } from "./lib";
 import { getDefaultPassphrase, setDefaultPassphrase, genPassphraseLimitLength } from "./lib";
 import type { InputStatus } from "antd/es/_util/statusUtils";
 
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
+
 export const TripleDESCryptoSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
 
   const [ mode, setMode ] = useState(getDefaultMode()); // 默认 mode
   const [ padding, setPadding ] = useState(getDefaultPadding()); // 默认填充
@@ -50,8 +55,8 @@ export const TripleDESCryptoSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>3DES 加解密</Divider>
-      <Form.Item label="默认模式">
+      <Divider orientation="left" plain>{ st('3DES 加解密') }</Divider>
+      <Form.Item label={ st('默认模式') }>
         <Select
           value={ mode }
           style={{ width: 240 }}
@@ -59,7 +64,7 @@ export const TripleDESCryptoSetting = () => {
           options={ arrayToOptions(modeList) }
         />
       </Form.Item>
-      <Form.Item label="默认填充">
+      <Form.Item label={ st('默认填充') }>
         <Select
           value={ padding }
           style={{ width: 240 }}
@@ -67,7 +72,7 @@ export const TripleDESCryptoSetting = () => {
           options={ arrayToOptions(paddingList) }
         />
       </Form.Item>
-      <Form.Item label="默认编码">
+      <Form.Item label={ st('默认编码') }>
         <Select
           value={ code }
           style={{ width: 240 }}
@@ -75,7 +80,7 @@ export const TripleDESCryptoSetting = () => {
           options={ arrayToOptions(codeList) }
         />
       </Form.Item>
-      <Form.Item label="默认偏移量(IV)">
+      <Form.Item label={ st('默认偏移量(IV)') }>
         <Space style={{ width: "100%" }}>
           <Input 
             status= { ivStatus }
@@ -87,7 +92,7 @@ export const TripleDESCryptoSetting = () => {
           { iv.length? iv.length + " / 8" : null }
         </Space>
       </Form.Item>
-      <Form.Item label="默认密钥">
+      <Form.Item label={ st('默认密钥') }>
         <Space style={{ width: "100%" }}>
           <Input 
             status= { passphraseStatus }

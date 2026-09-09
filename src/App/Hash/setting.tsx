@@ -3,7 +3,12 @@ const { TextArea } = Input;
 import { useState } from "react";
 import { getPasswordList,setPasswordList } from "./lib"
 
+
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
 export const HashSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
   const [ value, setValue ] = useState(getPasswordList().join("\n"));
 
   const onTextAreaChange = (e :React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -22,12 +27,12 @@ export const HashSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>Hash 值计算</Divider>
-      <Form.Item label="展示默认字符串">
+      <Divider orientation="left" plain>{ st('Hash 值计算') }</Divider>
+      <Form.Item label={ st('展示默认字符串') }>
         <TextArea
           value= { value }
           onChange={ onTextAreaChange }
-          placeholder="每行一条数据"
+          placeholder={ st('每行一条数据') }
           autoSize={{ minRows: 3, maxRows: 5 }}
         />
       </Form.Item>

@@ -9,7 +9,12 @@ import { getDefaultIV, setDefaultIV } from "./lib";
 import { getDefaultPassphrase, setDefaultPassphrase, sm4KeyValid, sm4IvValid } from "./lib";
 import type { InputStatus } from "antd/es/_util/statusUtils";
 
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
+
 export const SM4CryptoSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
 
   const [ mode, setMode ] = useState(getDefaultMode()); // 默认 mode
   const [ padding, setPadding ] = useState(getDefaultPadding()); // 默认填充
@@ -45,8 +50,8 @@ export const SM4CryptoSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>SM4 加解密</Divider>
-      <Form.Item label="默认模式">
+      <Divider orientation="left" plain>{ st('SM4 加解密') }</Divider>
+      <Form.Item label={ st('默认模式') }>
         <Select
           value={ mode }
           style={{ width: 240 }}
@@ -54,7 +59,7 @@ export const SM4CryptoSetting = () => {
           options={ arrayToOptions(modeList) }
         />
       </Form.Item>
-      <Form.Item label="默认填充">
+      <Form.Item label={ st('默认填充') }>
         <Select
           value={ padding }
           style={{ width: 240 }}
@@ -62,7 +67,7 @@ export const SM4CryptoSetting = () => {
           options={ arrayToOptions(paddingList) }
         />
       </Form.Item>
-      <Form.Item label="默认编码">
+      <Form.Item label={ st('默认编码') }>
         <Select
           value={ code }
           style={{ width: 240 }}
@@ -70,7 +75,7 @@ export const SM4CryptoSetting = () => {
           options={ arrayToOptions(codeList) }
         />
       </Form.Item>
-      <Form.Item label="默认偏移量(IV)">
+      <Form.Item label={ st('默认偏移量(IV)') }>
         <Space style={{ width: "100%" }}>
           <Input
             status= { ivStatus }
@@ -82,7 +87,7 @@ export const SM4CryptoSetting = () => {
           { iv.length? iv.length + " / 16" : null }
         </Space>
       </Form.Item>
-      <Form.Item label="默认密钥 (16 字符或 32 位 HEX)">
+      <Form.Item label={ st('默认密钥 (16 字符或 32 位 HEX)') }>
         <Space style={{ width: "100%" }}>
           <Input
             status= { passphraseStatus }

@@ -4,8 +4,13 @@ import { getDefaultPublicKey, setDefaultPublicKey, isPublicPem } from "./lib";
 import { getDefaultPrivateKey, setDefaultPrivateKey, isPrivatePem } from "./lib";
 import type { InputStatus } from "antd/es/_util/statusUtils";
 
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
+
 // RSA 默认密钥设置 (与 RSA 页「密钥管理」共用 localStorage, 生成/保存会覆盖此处)
 export const RSACryptoSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
 
   const [ publicPem, setPublicPem ] = useState(getDefaultPublicKey()); // 默认公钥
   const [ privatePem, setPrivatePem ] = useState(getDefaultPrivateKey()); // 默认私钥
@@ -43,31 +48,31 @@ export const RSACryptoSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>RSA 加解密</Divider>
-      <Form.Item label="默认公钥 (SPKI PEM)">
+      <Divider orientation="left" plain>{ st('RSA 加解密') }</Divider>
+      <Form.Item label={ st('默认公钥 (SPKI PEM)') }>
         <Input.TextArea
           status={ pubStatus }
           rows={ 5 }
           style={ { fontFamily: "monospace", fontSize: 12, width: "100%", maxWidth: 520 } }
           onChange={ onPublicChange }
-          placeholder="-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----\n留空表示不配置; 用于「RSA 加解密」页加密"
+          placeholder={ st('-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----\n留空表示不配置; 用于「RSA 加解密」页加密') }
           value={ publicPem }
         />
       </Form.Item>
-      <Form.Item label="默认私钥 (PKCS#8 PEM)">
+      <Form.Item label={ st('默认私钥 (PKCS#8 PEM)') }>
         <Input.TextArea
           status={ priStatus }
           rows={ 7 }
           style={ { fontFamily: "monospace", fontSize: 12, width: "100%", maxWidth: 520 } }
           onChange={ onPrivateChange }
-          placeholder="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n留空表示不配置; 用于解密, 请妥善保管"
+          placeholder={ st('-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n留空表示不配置; 用于解密, 请妥善保管') }
           value={ privatePem }
         />
       </Form.Item>
       <Form.Item label=" ">
         <Space style={{ width: "100%" }}>
-          <Button size="small" danger onClick={ clear }>清空默认密钥</Button>
-          <span style={ { color: "#999" } }>公钥 + 私钥均配置后, 打开 RSA 页将自动进入「加解密」</span>
+          <Button size="small" danger onClick={ clear }>{ st('清空默认密钥') }</Button>
+          <span style={ { color: "#999" } }>{ st('公钥 + 私钥均配置后, 打开 RSA 页将自动进入「加解密」') }</span>
         </Space>
       </Form.Item>
     </>

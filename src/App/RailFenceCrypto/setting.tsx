@@ -2,8 +2,13 @@ import { Form, Divider, InputNumber, Space, Button } from "antd";
 import React, { useState } from "react";
 import { getDefaultRails, setDefaultRails } from "./lib";
 
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
+
 // 栅栏密码默认栏数设置
 export const RailFenceCryptoSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
 
   const [ rails, setRails ] = useState<number | null>(getDefaultRails()); // 默认栏数
 
@@ -21,8 +26,8 @@ export const RailFenceCryptoSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>栅栏加解密</Divider>
-      <Form.Item label="默认栏数">
+      <Divider orientation="left" plain>{ st('栅栏加解密') }</Divider>
+      <Form.Item label={ st('默认栏数') }>
         <Space>
           <InputNumber
             value={ rails }
@@ -31,7 +36,7 @@ export const RailFenceCryptoSetting = () => {
             onChange={ onChange }
             style={ { width: 140 } }
           />
-          <Button size="small" onClick={ reset }>恢复默认 (3)</Button>
+          <Button size="small" onClick={ reset }>{ st('恢复默认 (3)') }</Button>
         </Space>
       </Form.Item>
     </>

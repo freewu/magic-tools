@@ -7,7 +7,12 @@ import { getDefaultIUType,setDefaultIUType } from "./lib";
 import { getDefaultCNType,setDefaultCNType } from "./lib";
 import { getDefaultUSType,setDefaultUSType } from "./lib";
 
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
+
 export const VolumeConvertSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
   
   const [ type, setType ] = useState(getDefaultUnitType()); // 默认制式
   const [ msType, setMSType ] = useState(getDefaultMSType()); // 默认公制单位
@@ -17,8 +22,8 @@ export const VolumeConvertSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>容积转换</Divider>
-      <Form.Item label="默认制式">
+      <Divider orientation="left" plain>{ st('容积转换') }</Divider>
+      <Form.Item label={ st('默认制式') }>
         <Select
           value={ type }
           style={{ width: 240 }}
@@ -26,7 +31,7 @@ export const VolumeConvertSetting = () => {
           options={ unitTypeList }
         />
       </Form.Item>
-      <Form.Item label="默认公制单位">
+      <Form.Item label={ st('默认公制单位') }>
         <Select
           value={ msType }
           style={{ width: 240 }}
@@ -34,7 +39,7 @@ export const VolumeConvertSetting = () => {
           options={ getTypeList('ms') }
         />
       </Form.Item>
-      <Form.Item label="默认英制单位">
+      <Form.Item label={ st('默认英制单位') }>
         <Select
           value={ iuType }
           style={{ width: 240 }}
@@ -42,7 +47,7 @@ export const VolumeConvertSetting = () => {
           options={ getTypeList('iu') }
         />
       </Form.Item>
-      <Form.Item label="默认美制单位">
+      <Form.Item label={ st('默认美制单位') }>
         <Select
           value={ usType }
           style={{ width: 240 }}
@@ -50,7 +55,7 @@ export const VolumeConvertSetting = () => {
           options={ getTypeList('us') }
         />
       </Form.Item>
-      <Form.Item label="默认市制单位">
+      <Form.Item label={ st('默认市制单位') }>
         <Select
           value={ cnType }
           style={{ width: 240 }}

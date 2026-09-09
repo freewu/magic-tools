@@ -7,7 +7,12 @@ import { getDefaultIV, setDefaultIV } from "./lib";
 import { getDefaultPassphrase, setDefaultPassphrase, genPassphraseLimitLength } from "./lib";
 import type { InputStatus } from "antd/es/_util/statusUtils";
 
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
+
 export const RabbitCryptoSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
 
   const [ code, setCode ] = useState(getDefaultCode()); // 默认编码
   const [ iv, setIV ] = useState(getDefaultIV()); // 默认偏移量
@@ -45,8 +50,8 @@ export const RabbitCryptoSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>Rabbit 加解密</Divider>
-      <Form.Item label="默认编码">
+      <Divider orientation="left" plain>{ st('Rabbit 加解密') }</Divider>
+      <Form.Item label={ st('默认编码') }>
         <Select
           value={ code }
           style={{ width: 240 }}
@@ -54,7 +59,7 @@ export const RabbitCryptoSetting = () => {
           options={ arrayToOptions(codeList) }
         />
       </Form.Item>
-      <Form.Item label="默认偏移量(IV)">
+      <Form.Item label={ st('默认偏移量(IV)') }>
         <Space style={{ width: "100%" }}>
           <Input 
             status= { ivStatus }
@@ -66,7 +71,7 @@ export const RabbitCryptoSetting = () => {
           { iv.length? iv.length + " / 8" : null }
         </Space>
       </Form.Item>
-      <Form.Item label="默认密钥">
+      <Form.Item label={ st('默认密钥') }>
         <Space style={{ width: "100%" }}>
           <Input 
             status= { passphraseStatus }

@@ -5,7 +5,12 @@ import { codeList } from "./data";
 import { getDefaultCode, setDefaultCode } from "./lib";
 import { getDefaultPassphrase, setDefaultPassphrase } from "./lib";
 
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
+
 export const RC4CryptoSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
 
   const [ code, setCode ] = useState(getDefaultCode()); // 默认编码
   const [ passphrase, setPassphrase ] = useState(getDefaultPassphrase()); // 默认密钥
@@ -19,8 +24,8 @@ export const RC4CryptoSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>RC4 加解密</Divider>
-      <Form.Item label="默认编码">
+      <Divider orientation="left" plain>{ st('RC4 加解密') }</Divider>
+      <Form.Item label={ st('默认编码') }>
         <Select
           value={ code }
           style={{ width: 240 }}
@@ -28,7 +33,7 @@ export const RC4CryptoSetting = () => {
           options={ arrayToOptions(codeList) }
         />
       </Form.Item>
-      <Form.Item label="默认密钥">
+      <Form.Item label={ st('默认密钥') }>
         <Space style={{ width: "100%" }}>
           <Input
             showCount

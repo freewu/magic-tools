@@ -3,14 +3,19 @@ import React, { useState } from "react";
 import { bitLenList } from "./data";
 import { getDefaultBits, setDefaultBits } from "./lib";
 
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
+
 export const CMACCalcSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
 
   const [ bits, setBits ] = useState<128 | 192 | 256>(getDefaultBits());
 
   return (
     <>
-      <Divider orientation="left" plain>CMAC 计算</Divider>
-      <Form.Item label="默认密钥长度">
+      <Divider orientation="left" plain>{ st('CMAC 计算') }</Divider>
+      <Form.Item label={ st('默认密钥长度') }>
         <Select
           value={ bits }
           style={{ width: 240 }}

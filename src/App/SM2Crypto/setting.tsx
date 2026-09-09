@@ -4,8 +4,13 @@ import { getDefaultPublicKey, setDefaultPublicKey } from "./lib";
 import { getDefaultPrivateKey, setDefaultPrivateKey } from "./lib";
 import type { InputStatus } from "antd/es/_util/statusUtils";
 
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
+
 // SM2 默认密钥设置 (与 SM2 页「密钥管理」共用 localStorage, 生成/保存会覆盖此处)
 export const SM2CryptoSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
 
   const [ publicKey, setPublicKey ] = useState(getDefaultPublicKey()); // 默认公钥
   const [ privateKey, setPrivateKey ] = useState(getDefaultPrivateKey()); // 默认私钥
@@ -48,31 +53,31 @@ export const SM2CryptoSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>SM2 加解密</Divider>
-      <Form.Item label="默认公钥 (04‖X‖Y HEX)">
+      <Divider orientation="left" plain>{ st('SM2 加解密') }</Divider>
+      <Form.Item label={ st('默认公钥 (04‖X‖Y HEX)') }>
         <Input.TextArea
           status={ pubStatus }
           rows={ 2 }
           style={ { fontFamily: "monospace", fontSize: 12, width: "100%", maxWidth: 520 } }
           onChange={ onPublicChange }
-          placeholder="04 开头共 130 位 HEX, 由生成或「从私钥推导公钥」得到; 留空表示不配置"
+          placeholder={ st('04 开头共 130 位 HEX, 由生成或「从私钥推导公钥」得到; 留空表示不配置') }
           value={ publicKey }
         />
       </Form.Item>
-      <Form.Item label="默认私钥 (64 位 HEX)">
+      <Form.Item label={ st('默认私钥 (64 位 HEX)') }>
         <Input.TextArea
           status={ priStatus }
           rows={ 2 }
           style={ { fontFamily: "monospace", fontSize: 12, width: "100%", maxWidth: 520 } }
           onChange={ onPrivateChange }
-          placeholder="64 位 HEX; 留空表示不配置; 用于解密, 请妥善保管"
+          placeholder={ st('64 位 HEX; 留空表示不配置; 用于解密, 请妥善保管') }
           value={ privateKey }
         />
       </Form.Item>
       <Form.Item label=" ">
         <Space style={{ width: "100%" }}>
-          <Button size="small" danger onClick={ clear }>清空默认密钥</Button>
-          <span style={ { color: "#999" } }>公钥 + 私钥均配置后, 打开 SM2 页将自动进入「加解密」</span>
+          <Button size="small" danger onClick={ clear }>{ st('清空默认密钥') }</Button>
+          <span style={ { color: "#999" } }>{ st('公钥 + 私钥均配置后, 打开 SM2 页将自动进入「加解密」') }</span>
         </Space>
       </Form.Item>
     </>

@@ -9,10 +9,15 @@ import { getDefaultIV, setDefaultIV } from "./lib";
 import { getDefaultPassphrase, setDefaultPassphrase, genCapacity } from "./lib";
 import type { InputStatus } from "antd/es/_util/statusUtils";
 
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
+
 // 偏移量(IV) 格式: 块长个字符 (UTF-8) 或 2*块长位 HEX
 const ivRequiredLen = () :number => BLOCK_BYTES;
 
 export const RC6CryptoSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
 
   const [ mode, setMode ] = useState(getDefaultMode()); // 默认 mode
   const [ padding, setPadding ] = useState(getDefaultPadding()); // 默认填充
@@ -59,8 +64,8 @@ export const RC6CryptoSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>RC6 加解密</Divider>
-      <Form.Item label="默认模式">
+      <Divider orientation="left" plain>{ st('RC6 加解密') }</Divider>
+      <Form.Item label={ st('默认模式') }>
         <Select
           value={ mode }
           style={{ width: 240 }}
@@ -68,7 +73,7 @@ export const RC6CryptoSetting = () => {
           options={ arrayToOptions(modeList) }
         />
       </Form.Item>
-      <Form.Item label="默认填充">
+      <Form.Item label={ st('默认填充') }>
         <Select
           value={ padding }
           style={{ width: 240 }}
@@ -76,7 +81,7 @@ export const RC6CryptoSetting = () => {
           options={ arrayToOptions(paddingList) }
         />
       </Form.Item>
-      <Form.Item label="默认编码">
+      <Form.Item label={ st('默认编码') }>
         <Select
           value={ code }
           style={{ width: 240 }}
@@ -84,7 +89,7 @@ export const RC6CryptoSetting = () => {
           options={ arrayToOptions(codeList) }
         />
       </Form.Item>
-      <Form.Item label="默认偏移量(IV)">
+      <Form.Item label={ st('默认偏移量(IV)') }>
         <Space style={{ width: "100%" }}>
           <Input
             status= { ivStatus }
@@ -93,10 +98,10 @@ export const RC6CryptoSetting = () => {
             style={ { width: "100%", maxWidth: 520 } }
             onChange={ onIVChange }
             value= { iv } />
-          <span style={ { color: "#999", fontSize: 12 }}>块长 {BLOCK_BYTES} 字节: {ivRequiredLen()} 个字符 或 {BLOCK_BYTES * 2} 位 HEX (ECB 无需)</span>
+          <span style={ { color: "#999", fontSize: 12 }}>{ rowT(locale, '块长 ${b} 字节: ${l} 个字符 或 ${h} 位 HEX (ECB 无需)', { b: BLOCK_BYTES, l: ivRequiredLen(), h: BLOCK_BYTES * 2 }) }</span>
         </Space>
       </Form.Item>
-      <Form.Item label="默认密钥">
+      <Form.Item label={ st('默认密钥') }>
         <Space style={{ width: "100%" }}>
           <Input
             status= { passphraseStatus }

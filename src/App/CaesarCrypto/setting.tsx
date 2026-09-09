@@ -2,8 +2,13 @@ import { Form, Divider, InputNumber, Space, Button } from "antd";
 import React, { useState } from "react";
 import { getDefaultShift, setDefaultShift } from "./lib";
 
+import { useLocale } from "../../hook/locale-context";
+import { row as _r, rowT } from "../Setting/rows-lang";
+
 // 凯撒密码默认位移量设置
 export const CaesarCryptoSetting = () => {
+  const { locale } = useLocale();
+  const st = (zh: string) => _r(locale, zh);
 
   const [ shift, setShift ] = useState<number | null>(getDefaultShift()); // 默认位移量
 
@@ -21,8 +26,8 @@ export const CaesarCryptoSetting = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>凯撒加解密</Divider>
-      <Form.Item label="默认位移量">
+      <Divider orientation="left" plain>{ st('凯撒加解密') }</Divider>
+      <Form.Item label={ st('默认位移量') }>
         <Space>
           <InputNumber
             value={ shift }
@@ -31,7 +36,7 @@ export const CaesarCryptoSetting = () => {
             onChange={ onChange }
             style={ { width: 140 } }
           />
-          <Button size="small" onClick={ reset }>恢复默认 (3)</Button>
+          <Button size="small" onClick={ reset }>{ st('恢复默认 (3)') }</Button>
         </Space>
       </Form.Item>
     </>
