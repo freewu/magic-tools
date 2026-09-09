@@ -8,9 +8,13 @@ import { InputStatus } from "antd/es/_util/statusUtils";
 import { genColorMap, getTopArray } from "./lib"
 import "./image-color.css";
 import { default as LevitationBox } from "./levitation-box"
+import { useLocale } from "../../hook/locale-context";
+import { u } from "../ui-lang";
 
 const ImageColor = () => {
 
+  const { locale } = useLocale();
+  const t = (zh: string) => u(locale, zh);
   // image-color-container 容器的宽度
   const genWidth = () :number => {
     return window.innerWidth - 300;
@@ -35,7 +39,7 @@ const ImageColor = () => {
             setImgWidth('');setImgHeight(''); 
           } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-        >清除</Button>
+        >{t('清除')}</Button>
       </Space>
       <Divider dashed />
       { value === '' && loading == false? 
@@ -44,7 +48,7 @@ const ImageColor = () => {
           style={ { margin: "5px 0 5px 0" }}
           onChange={ (e) => { setValue(e.target.value); } }
           value= { value }
-          placeholder="拖拽要提取主体色的图片文件到框内"
+          placeholder={t('拖拽要提取主体色的图片文件到框内')}
           autoSize={{ minRows: 8, maxRows: 8 }}
           onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
           onDrop={ (e) => {
@@ -112,8 +116,8 @@ const ImageColor = () => {
       {loading?
         <Spin tip="Loading...">
           <Alert
-            message="主题色提取中"
-            description="提取计算需要时间"
+            message={t('主题色提取中')}
+            description={t('提取计算需要时间')}
             type="info"
           />
         </Spin>
