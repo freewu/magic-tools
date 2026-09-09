@@ -2,6 +2,8 @@ import { Alert, Button, Card, Input, Segmented, Space, Tag, Typography, message 
 import { CopyOutlined, DownloadOutlined, FileTextOutlined } from '@ant-design/icons';
 import { useMemo, useState } from 'react';
 import { formatXml, getXmlIndent, setXmlIndent } from './lib';
+import { useLocale } from '../../hook/locale-context';
+import { u, uT } from '../ui-lang';
 
 const { Text, Paragraph } = Typography;
 
@@ -33,6 +35,9 @@ const SAMPLE_XML = [
 ].join('\n');
 
 const XmlFormatter: React.FC = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => u(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => uT(locale, zh, v);
   const [raw, setRaw] = useState('');
   const [indent, setIndent] = useState<number>(() => getXmlIndent());
   const [error, setError] = useState('');
@@ -52,9 +57,9 @@ const XmlFormatter: React.FC = () => {
   const copyOut = async () => {
     try {
       await navigator.clipboard.writeText(result);
-      message.success('已复制格式化结果');
+      message.success(t('已复制格式化结果'));
     } catch {
-      message.error('复制失败, 请手动全选复制');
+      message.error(t('复制失败, 请手动全选复制'));
     }
   };
 
@@ -67,7 +72,7 @@ const XmlFormatter: React.FC = () => {
     a.download = 'formatted.xml';
     a.click();
     URL.revokeObjectURL(url);
-    message.success('已下载 formatted.xml');
+    message.success(t('已下载 formatted.xml'));
   };
 
   const rawLines = raw ? raw.split('\n').length : 0;
@@ -78,44 +83,44 @@ const XmlFormatter: React.FC = () => {
       <Alert
         type="info"
         showIcon
-        message="XML 格式化"
-        description="XML / XAML / SVG / plist / 配置文件美化缩进，支持 XML 声明、注释、CDATA 与处理指令的保留。标签未闭合、交叉嵌套或多余闭合会给出带行号的错误提示。"
+        message={t('XML 格式化')}
+        description={t('XML / XAML / SVG / plist / 配置文件美化缩进，支持 XML 声明、注释、CDATA 与处理指令的保留。标签未闭合、交叉嵌套或多余闭合会给出带行号的错误提示。')}
       />
-      <Card size="small" title={<Space><FileTextOutlined /> 原始 XML</Space>} extra={
+      <Card size="small" title={<Space><FileTextOutlined /> {t('原始 XML')}</Space>} extra={
         <Space size={8}>
           <Segmented
             size="small"
             value={indent}
             onChange={(v) => { setIndent(v as number); setXmlIndent(v as number); }}
-            options={[{ label: '2 空格', value: 2 }, { label: '4 空格', value: 4 }]}
+            options={[{ label: t('2 空格'), value: 2 }, { label: t('4 空格'), value: 4 }]}
           />
-          <Button size="small" onClick={() => { setRaw(SAMPLE_XML); message.info('已载入示例 XML'); }}>载入示例</Button>
-          <Button size="small" danger disabled={!raw} onClick={() => setRaw('')}>清空</Button>
+          <Button size="small" onClick={() => { setRaw(SAMPLE_XML); message.info(t('已载入示例 XML')); }}>{t('载入示例')}</Button>
+          <Button size="small" danger disabled={!raw} onClick={() => setRaw('')}>{t('清空')}</Button>
         </Space>
       }>
         <Space direction="vertical" size={8} style={{ width: '100%' }}>
           <Input.TextArea
             value={raw}
             onChange={(e) => setRaw(e.target.value)}
-            placeholder={'在此粘贴 XML 源码…\n\n例如: <config><server host="127.0.0.1"/></config>'}
+            placeholder={t('在此粘贴 XML 源码…') + '\n\n' + t('例如: <config><server host="127.0.0.1"/></config>')}
             autoSize={{ minRows: 8, maxRows: 16 }}
             style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 12 }}
           />
           {raw && !error && (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              原始 {raw.length.toLocaleString()} 字符 / {rawLines} 行
+              {tt('原始 {c} 字符 / {n} 行', { c: raw.length.toLocaleString(), n: rawLines })}
             </Text>
           )}
         </Space>
       </Card>
 
       {error ? (
-        <Alert type="error" showIcon message="XML 语法错误" description={error} />
+        <Alert type="error" showIcon message={t('XML 语法错误')} description={error} />
       ) : (
-        <Card size="small" title="格式化结果" extra={
+        <Card size="small" title={t('格式化结果')} extra={
           <Space size={8}>
-            <Button size="small" icon={<CopyOutlined />} disabled={!result} onClick={copyOut}>复制</Button>
-            <Button size="small" icon={<DownloadOutlined />} disabled={!result} onClick={downloadOut}>下载 .xml</Button>
+            <Button size="small" icon={<CopyOutlined />} disabled={!result} onClick={copyOut}>{t('复制')}</Button>
+            <Button size="small" icon={<DownloadOutlined />} disabled={!result} onClick={downloadOut}>{t('下载 .xml')}</Button>
           </Space>
         }>
           {result ? (
@@ -127,12 +132,12 @@ const XmlFormatter: React.FC = () => {
                 style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 12 }}
               />
               <Space size={8} wrap>
-                <Tag color="green">格式化后 {result.length.toLocaleString()} 字符</Tag>
-                <Tag>{outLines} 行</Tag>
+                <Tag color="green">{tt('格式化后 {c} 字符', { c: result.length.toLocaleString() })}</Tag>
+                <Tag>{tt('{n} 行', { n: outLines })}</Tag>
               </Space>
             </Space>
           ) : (
-            <Paragraph type="secondary" style={{ margin: 0 }}>暂无结果 — 在上方粘贴 XML 后自动格式化。</Paragraph>
+            <Paragraph type="secondary" style={{ margin: 0 }}>{t('暂无结果 — 在上方粘贴 XML 后自动格式化。')}</Paragraph>
           )}
         </Card>
       )}
