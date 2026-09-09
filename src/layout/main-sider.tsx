@@ -106,11 +106,11 @@ const MainSider: React.FC = () => {
         flexShrink: 0,
         background: '#001529',
         borderTop: '1px solid rgba(255,255,255,0.12)',
-        padding: '6px 8px',
+        padding: '4px 8px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: collapsed ? 'center' : 'space-between',
-        gap: 8,
+        gap: 0,
       } }>
         { !collapsed && (
           <div
@@ -160,6 +160,7 @@ const MainSider: React.FC = () => {
               height: 34,
               width: 34,
               padding: 0,
+              margin: 0,
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -177,8 +178,9 @@ const MainSider: React.FC = () => {
               color: 'rgba(255,255,255,0.85)',
               fontSize: '15px',
               height: 34,
-              width: collapsed ? '100%' : 34,
+              width: 34,
               padding: 0,
+              margin: 0,
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
