@@ -9,6 +9,8 @@ import { saveTextFile } from "../../lib/tauri";
 import { jsonPretty, jsonCompact, jsonToTree } from "./lib";
 import type { JsonTreeNode } from "./lib";
 import type { TreeDataNode } from "antd";
+import { useLocale } from '../../hook/locale-context';
+import { u, uT } from '../ui-lang';
 
 // 代码高亮 (按需注册 JSON 语言)
 import 'highlight.js/styles/monokai-sublime.css';
@@ -21,10 +23,10 @@ const MAX_STR = 120; // 树中字符串值最长展示长度
 const MAX_AUTO_EXPAND = 300; // 自动展开节点数上限
 
 // JsonTreeNode -> antd Tree 节点
-const toTreeData = (node: JsonTreeNode, isRoot = false): TreeDataNode => {
+const toTreeData = (node: JsonTreeNode, t: (zh: string) => string, isRoot = false): TreeDataNode => {
   const isLeaf = node.meta === 'val';
   const head = isRoot
-    ? (node.meta === 'arr' ? '数组' : '对象')
+    ? (node.meta === 'arr' ? t('数组') : t('对象'))
     : node.label;
   const count = !isLeaf ? ` (${node.size})` : '';
   const valText = isLeaf ? node.text : '';
@@ -38,13 +40,16 @@ const toTreeData = (node: JsonTreeNode, isRoot = false): TreeDataNode => {
   return {
     key: node.key,
     title,
-    children: node.children.length ? node.children.map((c) => toTreeData(c)) : undefined,
+    children: node.children.length ? node.children.map((c) => toTreeData(c, t)) : undefined,
   };
 };
 
 const truncate = (s: string): string => (s.length > MAX_STR ? s.slice(0, MAX_STR) + '…' : s);
 
 const JsonFormatter = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => u(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => uT(locale, zh, v);
 
   const [ input, setInput ] = useState('');
   const [ jsonText, setJsonText ] = useState(''); // 格式化后的展示文本
@@ -59,14 +64,14 @@ const JsonFormatter = () => {
     const txt = (e.target as HTMLElement).textContent ?? '';
     if (txt.trim() === '') return;
     copyTextToClipboard(txt);
-    notice.success('复制到粘贴板成功！！！');
+    notice.success(t('复制到粘贴板成功！！！'));
   };
 
   // 解析并设置展示内容 (pretty | compact)
   const doFormat = (mode: 'pretty' | 'compact') => {
     const src = input.trim();
     if (src === '') {
-      notice.warning('请先输入 JSON 字符串');
+      notice.warning(t('请先输入 JSON 字符串'));
       return;
     }
     try {
@@ -91,21 +96,21 @@ const JsonFormatter = () => {
       setExpandedKeys(keys);
       setView('text');
     } catch (err) {
-      notice.error('JSON 解析失败: ' + (err as Error).message);
+      notice.error(tt('JSON 解析失败: {m}', { m: (err as Error).message }));
     }
   };
 
   // 保存为 .json
   const saveJson = async () => {
     if (jsonText.trim() === '') {
-      notice.warning('请先格式化 JSON 再保存');
+      notice.warning(t('请先格式化 JSON 再保存'));
       return;
     }
     try {
-      const saved = await saveTextFile('formatted.json', jsonText, '保存 JSON 文件', { filterName: 'JSON 文件', extensions: ['json'] });
-      if (saved) notice.success('已保存 JSON 文件');
+      const saved = await saveTextFile('formatted.json', jsonText, t('保存 JSON 文件'), { filterName: t('JSON 文件'), extensions: ['json'] });
+      if (saved) notice.success(t('已保存 JSON 文件'));
     } catch (err) {
-      notice.error('保存失败: ' + (err as Error).message);
+      notice.error(tt('保存失败: {m}', { m: (err as Error).message }));
     }
   };
 
@@ -113,7 +118,7 @@ const JsonFormatter = () => {
     const files = e.target.files || [];
     if (files.length === 0) return;
     if (!/.*\.json$/i.test(files[0].name)) {
-      notice.error('请选择 .json 文件');
+      notice.error(t('请选择 .json 文件'));
       return;
     }
     openFile(files, (txt: string) => setInput(txt));
@@ -137,13 +142,13 @@ const JsonFormatter = () => {
   const textTab = (
     <div className="json-out" style={ { height: outputHeight, minHeight: 200 } }>
       { jsonText === '' ? (
-        <div className="json-empty">格式化后的 JSON 将显示在这里（每行左侧带行号，点击结果可复制）</div>
+        <div className="json-empty">{t('格式化后的 JSON 将显示在这里（每行左侧带行号，点击结果可复制）')}</div>
       ) : (
         <div className="json-inner">
-          <div className="json-lines" title="行号">{ lines.map((_, i) => i + 1).join('\n') }</div>
+          <div className="json-lines" title={t('行号')}>{ lines.map((_, i) => i + 1).join('\n') }</div>
           <pre
             className="hljs"
-            title="点击复制内容到粘贴板"
+            title={t('点击复制内容到粘贴板')}
             onClick={ textareaDoubleClick }
             dangerouslySetInnerHTML={ { __html: highlighted } }
           />
@@ -158,13 +163,13 @@ const JsonFormatter = () => {
         showLine
         defaultExpandParent={ false }
         expandedKeys={ expandedKeys }
-        onExpand={ (keys) => setExpandedKeys(keys) }treeData={ [ toTreeData(treeRoot, true) ] }
+        onExpand={ (keys) => setExpandedKeys(keys) }treeData={ [ toTreeData(treeRoot, t, true) ] }
         selectable={ false }
       />
     </div>
   ) : (
     <div className="json-out" style={ { height: outputHeight, minHeight: 200 } }>
-      <div className="json-empty">先在上方输入 JSON 并点击「格式化」，即可在此折叠/展开查看结构</div>
+      <div className="json-empty">{t('先在上方输入 JSON 并点击「格式化」，即可在此折叠/展开查看结构')}</div>
     </div>
   );
 
@@ -179,21 +184,21 @@ const JsonFormatter = () => {
           onClick={ () => doFormat('pretty') }
           style={ { backgroundColor: "#007bff", color: "#fff" } }
           icon={<ArrowDownOutlined />}
-        >格式化</Button>
+        >{t('格式化')}</Button>
         <Button
           onClick={ () => doFormat('compact') }
           style={ { backgroundColor: "#6610f2", color: "#fff" } }
           icon={<ColumnWidthOutlined />}
-        >转一行</Button>
+        >{t('转一行')}</Button>
         <Button
           onClick={ saveJson }
           style={ { backgroundColor: "#17a2b8", color: "#fff" } }
           icon={<SaveOutlined />}
-        >保存为 .json</Button>
+        >{t('保存为 .json')}</Button>
         <Button
           onClick={ () => inputRef?.click() }
           style={ { backgroundColor: "#6c757d", color: "#fff" } }
-        >打开 .json</Button>
+        >{t('打开 .json')}</Button>
         <input
           onChange={ fileChange }
           ref={ (el) => { inputRef = el; } }
@@ -202,14 +207,14 @@ const JsonFormatter = () => {
           onClick={ clearAll }
           style={ { backgroundColor: "#dc3545", color: "#fff" } }
           icon={<DeleteOutlined />}
-        >清除</Button>
+        >{t('清除')}</Button>
       </Space>
 
       <TextArea
         style={ { margin: "12px 0 5px 0" }}
         onChange={ (e) => { setInput(e.target.value); } }
         value={ input }
-        placeholder="输入需要格式化的 JSON 字符串  或 拖拽 .json 文件到框内打开"
+        placeholder={t('输入需要格式化的 JSON 字符串  或 拖拽 .json 文件到框内打开')}
         autoSize={ { minRows: 7, maxRows: 7 } }
         onDragOver={ (e) => { e.preventDefault(); } }
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, (txt: string) => setInput(txt)); } }
@@ -222,8 +227,8 @@ const JsonFormatter = () => {
         activeKey={ view }
         onChange={ (k) => setView(k) }
         items={ [
-          { key: 'text', label: <Text style={ { fontSize: 13 } }>文本（行号）</Text>, children: textTab },
-          { key: 'tree', label: <Text style={ { fontSize: 13 } }>树形折叠</Text>, children: treeTab },
+          { key: 'text', label: <Text style={ { fontSize: 13 } }>{t('文本（行号）')}</Text>, children: textTab },
+          { key: 'tree', label: <Text style={ { fontSize: 13 } }>{t('树形折叠')}</Text>, children: treeTab },
         ] }
       />
     </div>
