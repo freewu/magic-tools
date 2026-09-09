@@ -9,6 +9,60 @@
     <link rel="icon" type="image/png" href="/logo.png" />
     <title>Magic Tools</title>
     <style>
+      /* 启动加载页: 页面/模块就绪前展示, React 首帧渲染后淡出 (Main.tsx 控制移除) */
+      #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        background: #f6f8fb;
+        transition: opacity 0.38s ease;
+      }
+      @media (prefers-color-scheme: dark) {
+        #splash { background: #0b1526; }
+      }
+      #splash img {
+        width: 72px;
+        height: 72px;
+        border-radius: 18px;
+        animation: splash-pop 0.5s ease both, splash-breathe 1.7s ease-in-out 0.55s infinite;
+      }
+      #splash .sname {
+        font: 600 17px/1 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+        color: #1f2937;
+        letter-spacing: 0.3px;
+      }
+      @media (prefers-color-scheme: dark) {
+        #splash .sname { color: #e5e7eb; }
+      }
+      #splash .dots { display: flex; gap: 6px; }
+      #splash .dots i {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #1677ff;
+        animation: splash-dot 1s ease-in-out infinite;
+      }
+      #splash .dots i:nth-child(2) { animation-delay: 0.18s; }
+      #splash .dots i:nth-child(3) { animation-delay: 0.36s; }
+      #splash.splash-hide { opacity: 0; pointer-events: none; }
+      @keyframes splash-pop {
+        from { transform: scale(0.72); opacity: 0; }
+        to   { transform: scale(1);   opacity: 1; }
+      }
+      @keyframes splash-breathe {
+        0%, 100% { transform: scale(1); }
+        50%      { transform: scale(1.06); }
+      }
+      @keyframes splash-dot {
+        0%, 100% { opacity: 0.25; transform: translateY(0); }
+        50%      { opacity: 1;   transform: translateY(-4px); }
+      }
+
       /* file:// 直接打开产物时的引导提示样式 (http/dev/Tauri 下不显示) */
       .file-hint {
         font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
@@ -31,11 +85,19 @@
     </style>
   </head>
   <body>
+    <div id="splash">
+      <img src="/logo.png" alt="Magic Tools" />
+      <div class="sname">Magic Tools</div>
+      <div class="dots"><i></i><i></i><i></i></div>
+    </div>
     <div id="root"></div>
     <script>
       // Vite 产物使用 ES Module 加载 (含按需懒加载分包), 浏览器出于安全限制
       // 不允许 file:// 页面加载 module 子资源, 直接双击 dist/index.html 会黑屏。
       // 这里给 file:// 场景一个可操作的引导提示 (替代无声黑屏)。
+      if (window.location.protocol === 'file:') {
+        var spl = document.getElementById('splash');
+        if (spl) spl.remove();
       if (window.location.protocol === 'file:') {
         var el = document.getElementById('root');
         if (el) {

@@ -2,8 +2,22 @@
   width: 100%;
   display: flex;
   flex-wrap: wrap;
-  overflow-y: auto;
   align-content: flex-start; /* 处理数据太少 行间问题 */
+}
+
+/* 顶部工具栏: 左=分类筛选下拉, 右=筛选后应用总数 */
+.appstore-toolbar {
+  flex: 0 0 auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 2px 12px 2px;
+}
+
+.appstore-toolbar-count {
+  font-size: 13px;
 }
 
 /* 每个分类占满整行 (分割线 + 卡片); 内部 flex 排列使卡片一行展示多个 */
