@@ -1,5 +1,5 @@
 import { AppContext } from "../hook/app-context";
-import { useLocale, LOCALE_IDS, LOCALE_LABELS, LOCALE_EMOJI } from "../hook/locale-context";
+import { useLocale, LOCALE_IDS, LOCALE_LABELS, LOCALE_FLAG } from "../hook/locale-context";
 import type { LocaleId } from "../i18n/lang";
 import { tr, trTpl } from "../i18n/lang";
 import shell from "../i18n/shell";
@@ -30,11 +30,20 @@ const MainSider: React.FC = () => {
     navigate(e.key, { replace: true });
   }
 
-  // 语言切换下拉 (托盘「语言」同构): 简 / 繁 / EN, 选项带语言旗标 emoji
+  // 语言切换下拉 (托盘「语言」同构): 简 / 繁 / EN, 选项为「文字 + 旗标图片 (assets/lang)」
   const langMenu = {
     items: LOCALE_IDS.map((id) => ({
       key: id,
-      label: `${LOCALE_LABELS[id]} ${LOCALE_EMOJI[id]}`,
+      label: (
+        <span style={ { display: 'inline-flex', alignItems: 'center', gap: 6 } }>
+          <span>{ LOCALE_LABELS[id] }</span>
+          <img
+            src={ LOCALE_FLAG[id] }
+            alt={ LOCALE_LABELS[id] }
+            style={ { width: 18, height: 14, objectFit: 'cover', borderRadius: 2, verticalAlign: 'middle' } }
+          />
+        </span>
+      ),
       icon: id === locale ? <CheckOutlined /> : undefined,
     })),
     onClick: ({ key }: { key: string }) => setLocale(key as LocaleId),
@@ -166,7 +175,11 @@ const MainSider: React.FC = () => {
               justifyContent: 'center',
             } }
           >
-            <span style={ { fontSize: 17, lineHeight: 1 } }>{ LOCALE_EMOJI[locale] }</span>
+            <img
+              src={ LOCALE_FLAG[locale] }
+              alt=""
+              style={ { width: 20, height: 15, objectFit: 'cover', borderRadius: 2 } }
+            />
           </Button>
         </Dropdown>
         <Button

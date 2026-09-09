@@ -5,6 +5,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { emitLocale, listenLocale } from '../lib/tauri';
 import type { LocaleId } from '../i18n/lang';
+// 语言旗标图片 (assets/lang/*.png, 桌面端与 Web 端均需随包携带)
+import cnFlag from '../../assets/lang/cn.png';
+import hkFlag from '../../assets/lang/hk.png';
+import enFlag from '../../assets/lang/en.png';
 
 export type { LocaleId };
 
@@ -18,11 +22,11 @@ export const LOCALE_LABELS: Record<LocaleId, string> = {
   en: 'English',
 };
 
-/** 语言旗标 emoji (仅作视觉标识, 与标签顺序一致) */
-export const LOCALE_EMOJI: Record<LocaleId, string> = {
-  'zh-CN': '🇨🇳',
-  'zh-TW': '🇭🇰',
-  en: '🇺🇸',
+/** 语言旗标图片 (assets/lang/*.png 打包进产物, 仅作视觉标识, 与标签顺序一致) */
+export const LOCALE_FLAG: Record<LocaleId, string> = {
+  'zh-CN': cnFlag,
+  'zh-TW': hkFlag,
+  en: enFlag,
 };
 
 const isLocale = (v: string | null): v is LocaleId =>
