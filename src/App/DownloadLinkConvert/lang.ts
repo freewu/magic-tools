@@ -22,6 +22,7 @@ export default {
     e_UNKNOWN: '未知错误',
   },
   'zh-TW': {
+    appName: '下載連結轉換',
     tab_single: '單個轉換', tab_batch: '批量轉換',
     fmt_real: '真實網址', fmt_thunder: '迅雷網址', fmt_qqdl: '快車網址', fmt_qdl: '旋風網址',
     phSingle: '在此貼上下載網址, 自動辨識並轉換。支援:\n- 真實網址 http(s):// 或 ftp://\n- 迅雷網址 thunder://\n- 快車網址 qqdl://\n- 旋風網址 qdl://',
@@ -43,6 +44,7 @@ export default {
     e_UNKNOWN: '未知錯誤',
   },
   en: {
+    appName: 'Download Link Converter',
     tab_single: 'Single', tab_batch: 'Batch',
     fmt_real: 'Real URL', fmt_thunder: 'Thunder', fmt_qqdl: 'QQDL', fmt_qdl: 'QDL',
     phSingle: 'Paste a download link here — auto-detected and converted. Supported:\n- Real URL http(s):// or ftp://\n- Thunder link thunder://\n- QQDL link qqdl://\n- QDL link qdl://',

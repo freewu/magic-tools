@@ -26,6 +26,7 @@ export default {
     errRoot: 'JSON 根应为对象',
   },
   'zh-TW': {
+    appName: '樹形與路徑轉換',
     title: '樹形與路徑轉換',
     d1: '在「路徑清單 ↔ 樹形」之間互轉: 每行一條路徑(支援 ', d2: ' 與 ', d3: ' 分隔), 樹形文字約定每層 2 空格縮排, 也相容 ', d4: ' 目錄樹輸出; 亦可與巢狀 JSON 互轉。',
     tabToTree: '路徑 → 樹', tabToPaths: '樹 → 路徑',
@@ -50,6 +51,7 @@ export default {
     errRoot: 'JSON 根應為物件',
   },
   en: {
+    appName: 'Tree & Path Converter',
     title: 'Tree & Path Convert',
     d1: 'Convert between a path list ↔ a tree. One path per line, separated by ', d2: ' or ', d3: '); indented tree text uses two spaces per level and also accepts ', d4: ' directory-tree output; nested JSON is supported too.',
     tabToTree: 'Paths → Tree', tabToPaths: 'Tree → Paths',

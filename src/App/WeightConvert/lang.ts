@@ -27,6 +27,7 @@ export default {
     p_shortton: '美吨（短吨short ton）是2000磅（907千克）',
   },
   'zh-TW': {
+    appName: '重量轉換',
     clear: '清除',
     copyOk: '複製到剪貼簿成功！！！',
     ut_ms: '公制',
@@ -52,6 +53,7 @@ export default {
     p_shortton: '美噸（短噸 short ton）是 2000 磅（907 公斤）',
   },
   en: {
+    appName: 'Weight Converter',
     clear: 'Clear',
     copyOk: 'Copied to clipboard!!!',
     ut_ms: 'Metric',

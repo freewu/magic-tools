@@ -10,6 +10,7 @@ export default {
     phResult: '点击复制内容到粘贴板',
   },
   'zh-TW': {
+    appName: '中文拼音',
     clear: '清除',
     copyOk: '複製到剪貼簿成功！！！',
     tipDbl: '雙擊複製內容到剪貼簿',
@@ -19,6 +20,7 @@ export default {
     phResult: '點擊複製內容到剪貼簿',
   },
   en: {
+    appName: 'Chinese Pinyin',
     clear: 'Clear',
     copyOk: 'Copied to clipboard!!!',
     tipDbl: 'Double-click to copy the content to clipboard',

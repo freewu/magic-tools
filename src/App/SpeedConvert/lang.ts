@@ -14,6 +14,7 @@ export default {
     p_knot: '指 海里 / 小时，节是航海中代表速度的单位',
   },
   'zh-TW': {
+    appName: '速度轉換',
     clear: '清除',
     copyOk: '複製到剪貼簿成功！！！',
     ut_ms: '公制',
@@ -26,6 +27,7 @@ export default {
     p_knot: '指海浬 / 小時，節是航海中代表速度的單位',
   },
   en: {
+    appName: 'Speed Converter',
     clear: 'Clear',
     copyOk: 'Copied to clipboard!!!',
     ut_ms: 'Metric',

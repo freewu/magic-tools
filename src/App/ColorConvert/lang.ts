@@ -33,6 +33,7 @@ export default {
     sd_doubleSplit: '主色两侧相似色与其互补两侧的组合 (5 色)',
   },
   'zh-TW': {
+    appName: '顏色格式轉換',
     copyOk: '複製到剪貼簿成功！！！',
     copiedSfx: ' 已複製',
     clear: '清除',
@@ -64,6 +65,7 @@ export default {
     sd_doubleSplit: '主色兩側相似色與其互補兩側的組合 (5 色)',
   },
   en: {
+    appName: 'Color Format Converter',
     copyOk: 'Copied to clipboard!!!',
     copiedSfx: ' copied',
     clear: 'Clear',

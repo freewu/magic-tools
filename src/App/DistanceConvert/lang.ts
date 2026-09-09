@@ -18,6 +18,7 @@ export default {
     p_furlong: '一单位长度等于660呎(英尺)或220码或10链，约等于公制的201.168米。8化朗等于1哩，5化朗等于1005.84米，约等于1千米',
   },
   'zh-TW': {
+    appName: '距離轉換',
     clear: '清除',
     copyOk: '複製到剪貼簿成功！！！',
     ut_ms: '公制',
@@ -34,6 +35,7 @@ export default {
     p_furlong: '一單位長度等於 660 呎(英尺)或 220 碼或 10 鏈，約等於公制的 201.168 公尺。8 化朗等於 1 哩，5 化朗等於 1005.84 公尺，約等於 1 公里',
   },
   en: {
+    appName: 'Distance Converter',
     clear: 'Clear',
     copyOk: 'Copied to clipboard!!!',
     ut_ms: 'Metric',

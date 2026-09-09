@@ -16,6 +16,7 @@ export default {
     tl_lmBegin: '上月初', tl_lmEnd: '上月末', tl_nmBegin: '下月初', tl_nmEnd: '下月末',
   },
   'zh-TW': {
+    appName: '時間戳轉換',
     copyOk: '複製到剪貼簿成功！！！',
     clear: '清除',
     ph: '輸入 10 位時間戳 / 13 位時間戳 / UTC 格式字串 / YYYY-MM-DD HH:ii:ss 格式字串',
@@ -31,6 +32,7 @@ export default {
     tl_lmBegin: '上月初', tl_lmEnd: '上月末', tl_nmBegin: '下月初', tl_nmEnd: '下月末',
   },
   en: {
+    appName: 'Timestamp Converter',
     copyOk: 'Copied to clipboard!!!',
     clear: 'Clear',
     ph: 'Enter a 10-digit timestamp / 13-digit timestamp / UTC string / YYYY-MM-DD HH:ii:ss string',

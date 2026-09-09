@@ -50,6 +50,7 @@ export default {
     p_cuo: '0.00001市石 = 0.0001市斗 = 0.001市升 = 0.01市合 = 0.1勺 = 1撮 = 0.001升',
   },
   'zh-TW': {
+    appName: '容量轉換',
     clear: '清除',
     copyOk: '複製到剪貼簿成功！！！',
     ut_ms: '公制',
@@ -98,6 +99,7 @@ export default {
     p_cuo: '0.00001 市石 = 0.0001 市斗 = 0.001 市升 = 0.01 市合 = 0.1 勺 = 1 撮 = 0.001 升',
   },
   en: {
+    appName: 'Volume Converter',
     clear: 'Clear',
     copyOk: 'Copied to clipboard!!!',
     ut_ms: 'Metric',

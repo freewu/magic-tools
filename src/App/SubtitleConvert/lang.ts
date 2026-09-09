@@ -35,6 +35,7 @@ export default {
     e_jsonMiss: 'JSON 第 {n} 项缺 start/end 时间 (毫秒)',
   },
   'zh-TW': {
+    appName: '字幕格式轉換',
     alertTitle: '字幕格式轉換',
     alertDesc: '在瀏覽器本機完成 SRT / VTT / SBV / SUB / SSA / ASS / SMI / LRC / JSON 九種字幕格式互相轉換，內容不會上傳到任何伺服器。各格式的樣式指令（如 ASS {\\pos}、SRT <i>、MicroDVD {y:..}）在轉換時會剝除，僅保留文字與時間軸。',
     cardIn: '輸入', cardOut: '輸出',
@@ -68,6 +69,7 @@ export default {
     e_jsonMiss: 'JSON 第 {n} 項缺少 start/end 時間 (毫秒)',
   },
   en: {
+    appName: 'Subtitle Format Converter',
     alertTitle: 'Subtitle Format Convert',
     alertDesc: 'Convert between nine subtitle formats — SRT / VTT / SBV / SUB / SSA / ASS / SMI / LRC / JSON — entirely in your browser; nothing is uploaded to any server. Formatting tags (e.g. ASS {\\pos}, SRT <i>, MicroDVD {y:..}) are stripped during conversion, leaving only text and the timeline.',
     cardIn: 'Input', cardOut: 'Output',

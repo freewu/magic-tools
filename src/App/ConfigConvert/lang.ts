@@ -20,6 +20,7 @@ export default {
     filterTpl: '{label} 配置文件',
   },
   'zh-TW': {
+    appName: '設定轉換',
     copyOk: '複製到剪貼簿成功！！！',
     errParse: '解析輸入內容出錯',
     parsedTpl: '已按 {fmt} 解析 {name}',
@@ -39,6 +40,7 @@ export default {
     filterTpl: '{label} 設定檔',
   },
   en: {
+    appName: 'Config Converter',
     copyOk: 'Copied to clipboard!!!',
     errParse: 'Failed to parse the input content',
     parsedTpl: 'Parsed as {fmt}: {name}',

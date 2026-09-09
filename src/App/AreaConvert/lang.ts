@@ -41,6 +41,7 @@ export default {
     p_cun2: '1平方寸 = 0.01平方尺 = 0.001111平方米',
   },
   'zh-TW': {
+    appName: '面積轉換',
     clear: '清除',
     copyOk: '複製到剪貼簿成功！！！',
     ut_ms: '公制',
@@ -80,6 +81,7 @@ export default {
     p_cun2: '1 平方寸 = 0.01 平方尺 = 0.001111 平方公尺',
   },
   en: {
+    appName: 'Area Converter',
     clear: 'Clear',
     copyOk: 'Copied to clipboard!!!',
     ut_ms: 'Metric',
