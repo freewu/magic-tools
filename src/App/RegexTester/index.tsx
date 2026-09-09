@@ -3,6 +3,8 @@ import { useMemo, useState } from 'react';
 const { TextArea } = Input;
 import { ClearOutlined, CopyOutlined, ReloadOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from './../../lib'
+import { useLocale } from './../../hook/locale-context'
+import { u, uT } from './../ui-lang'
 import {
   listRegexPresets,
   compileRegex,
@@ -38,6 +40,10 @@ const FLAG_OPTIONS = [
 ];
 
 const RegexTester = () => {
+
+  const { locale } = useLocale();
+  const t = (zh: string) => u(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => uT(locale, zh, v);
 
   const { token } = theme.useToken();
 
@@ -79,21 +85,21 @@ const RegexTester = () => {
   // 一键复制某条预设的正则规则 (点击图标只复制不套用)
   const copyPresetRule = (p :RegexPreset) => {
     copyTextToClipboard(p.pattern);
-    notice.success('复制到粘贴板成功！！！');
+    notice.success(t('复制到粘贴板成功！！！'));
   };
 
   // 一键复制当前正在使用的正则规则
   const copyCurrentRule = () => {
-    if (pattern === '') { notice.warning('请先输入正则表达式'); return; }
+    if (pattern === '') { notice.warning(t('请先输入正则表达式')); return; }
     copyTextToClipboard(pattern);
-    notice.success('复制到粘贴板成功！！！');
+    notice.success(t('复制到粘贴板成功！！！'));
   };
 
   const copyMatchedLines = () => {
     const matched = lines.filter((_, i) => results[i] === true).join('\n');
-    if (matched === '') { notice.warning('没有匹配的行'); return; }
+    if (matched === '') { notice.warning(t('没有匹配的行')); return; }
     copyTextToClipboard(matched);
-    notice.success('复制到粘贴板成功！！！');
+    notice.success(t('复制到粘贴板成功！！！'));
   };
 
   const renderLine = (line :string, idx :number) => {
@@ -130,7 +136,7 @@ const RegexTester = () => {
 
       <Space wrap style={ { width: '100%' } }>
         <Select
-          placeholder="常用正则 (在 设置 → 其它 中管理)"
+          placeholder={t('常用正则 (在 设置 → 其它 中管理)')}
           style={ { minWidth: 220 } }
           options={ presets.map((p) => ({ value: p.id, label: `${p.name}  (${p.pattern})` })) }
           onSelect={ applyPreset }
@@ -147,7 +153,7 @@ const RegexTester = () => {
                     type="text"
                     size="small"
                     icon={ <CopyOutlined /> }
-                    title={ `一键复制规则: ${p.pattern}` }
+                    title={ tt('一键复制规则: {p}', { p: p.pattern }) }
                     onMouseDown={ (e) => e.stopPropagation() }
                     onClick={ (e) => { e.stopPropagation(); copyPresetRule(p); } }
                   />
@@ -160,40 +166,40 @@ const RegexTester = () => {
         <Button
           size="small"
           icon={ <CopyOutlined /> }
-          title="一键复制当前正则规则"
+          title={t('一键复制当前正则规则')}
           onClick={ copyCurrentRule }
-        >复制规则</Button>
+        >{t('复制规则')}</Button>
         <Button
           size="small"
           icon={ <ReloadOutlined /> }
-          title="重新读取设置中的常用正则"
+          title={t('重新读取设置中的常用正则')}
           onClick={ () => setPresets(listRegexPresets()) }
-        >刷新</Button>
+        >{t('刷新')}</Button>
       </Space>
 
       <div style={ { display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 10, alignItems: 'center' } }>
-        <span>正则</span>
+        <span>{t('正则')}</span>
         <Input
           allowClear
           value={ pattern }
-          placeholder="输入正则表达式, 例如 ^1[3-9]\d{9}$"
+          placeholder={t('输入正则表达式, 例如 ^1[3-9]\d{9}$')}
           onChange={ (e) => setPattern(e.target.value) }
           style={ { flex: '1 1 320px', minWidth: 280 } }
         />
         <Checkbox.Group
-          options={ FLAG_OPTIONS }
+          options={ FLAG_OPTIONS.map((o) => ({ ...o, label: t(o.label) })) }
           value={ flags }
           onChange={ (v) => setFlags(v as string[]) }
         />
       </div>
       { invalidMsg !== '' && (
-        <div style={ { color: token.colorError, fontSize: 12, marginTop: 4 } }>正则表达式无效: { invalidMsg }</div>
+        <div style={ { color: token.colorError, fontSize: 12, marginTop: 4 } }>{t('正则表达式无效:')} { invalidMsg }</div>
       ) }
 
       <TextArea
         style={ { margin: "12px 0 5px 0" } }
         value={ content }
-        placeholder="在此输入多行内容, 逐行与正则匹配: 匹配行显示为绿色, 不匹配行显示为红色"
+        placeholder={t('在此输入多行内容, 逐行与正则匹配: 匹配行显示为绿色, 不匹配行显示为红色')}
         autoSize={{ minRows: 8, maxRows: 14 }}
         onChange={ (e) => setContent(e.target.value) }
       />
@@ -203,21 +209,21 @@ const RegexTester = () => {
           size="small"
           icon={ <CopyOutlined /> }
           onClick={ copyMatchedLines }
-        >复制匹配行</Button>
+        >{t('复制匹配行')}</Button>
         <Button
           size="small"
           icon={ <ClearOutlined /> }
           onClick={ () => setContent(SAMPLE_TEXT) }
-        >填入示例</Button>
+        >{t('填入示例')}</Button>
         <Button
           size="small"
           danger
           type="text"
           onClick={ () => { setPattern(''); setFlags([]); } }
-        >清空正则</Button>
+        >{t('清空正则')}</Button>
         { regex !== null && content !== '' && (
           <Tag color={ matchedCount > 0 ? 'success' : 'error' }>
-            匹配 { matchedCount } / { lines.length } 行{ matchTimes !== null ? `, 共 ${matchTimes} 处` : '' }
+            { tt('匹配 {a} / {b} 行', { a: matchedCount, b: lines.length }) }{ matchTimes !== null ? tt(', 共 {n} 处', { n: matchTimes }) : '' }
           </Tag>
         ) }
       </Space>
@@ -236,7 +242,7 @@ const RegexTester = () => {
         </div>
       ) }
 
-      <Divider> 正则表达式说明 </Divider>
+      <Divider>{t(' 正则表达式说明 ')}</Divider>
 
       <RegexIntro />
     </div>
