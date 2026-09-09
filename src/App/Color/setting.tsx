@@ -6,11 +6,14 @@ import { getDefaultPickMax, setDefaultPickMax } from "./lib";
 import { colorDataList } from "./data";
 import { useState } from "react";
 import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
+import colorLang from "./lang";
 import { row as _r, rowT } from "../Setting/rows-lang";
 
 export const ColorSetting = () => {
   const { locale } = useLocale();
   const st = (zh: string) => _r(locale, zh);
+  const t = (key: string, fallback: string) => tr(colorLang, locale, key, fallback);
   const [ colorPad, setColorPad ] = useState(getDefaultColorPad()); // 默认展示的 颜色板
   const [ batchSwitch, setBatchSwitch ] = useState(getDefaultBatchSwitch()); // 默认是否开启批量取色
   const [ opacity, setOpacity ] = useState(getDefaultOpacity()); // 默认 opacity
@@ -20,7 +23,7 @@ export const ColorSetting = () => {
   const getColorPadList = () => {
     const result:Array<any> = [];
     colorDataList.forEach((v) => {
-      result.push({ value: v.key, label:  v.label });
+      result.push({ value: v.key, label: t('c_' + v.key.replace(/-/g, '_'), v.label) });
     });
     return result;
   };

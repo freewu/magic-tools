@@ -104,7 +104,7 @@ const Color = () => {
   const items = colorDataList.map ((item) => {
     return {
       key : item.key,
-      label : item.label,
+      label : t('c_' + item.key.replace(/-/g, '_'), item.label),
       children: <ColorPad colorList={ item.data } height = { height } colorClickEvent={ cardClick } />,
     }
   });
@@ -116,7 +116,7 @@ const Color = () => {
       <Tooltip placement="top" title={ t('clickTip','单击色块复制到粘贴板的内容') }>
         <Radio.Group 
           optionType = "button" buttonStyle="solid"
-          options = { typeList } 
+          options = { typeList.map((i) => ({ ...i, label: t('t_' + i.value, i.label) })) } 
           onChange={ onColorTypeChange } 
           value={ colorType } 
         />
