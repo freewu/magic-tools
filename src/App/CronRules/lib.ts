@@ -155,27 +155,88 @@ const nameValue = (meta :CronFieldMeta, raw :string) :number | undefined => {
   return undefined;
 };
 
+// ---- 本地化 (默认 zh-CN; 省略参数时行为与旧版一致) ----
+export type CronLocale = 'zh-CN' | 'zh-TW' | 'en';
+
+const FIELD_NAME: Record<CronLocale, Record<CronFieldKey, string>> = {
+  'zh-CN': { second: '秒', minute: '分', hour: '时', day: '日', month: '月', week: '周', year: '年' },
+  'zh-TW': { second: '秒', minute: '分', hour: '時', day: '日', month: '月', week: '週', year: '年' },
+  en: { second: 's', minute: 'm', hour: 'h', day: 'd', month: 'mo', week: 'w', year: 'y' },
+};
+
+const WEEK_NAME: Record<CronLocale, string[]> = {
+  'zh-CN': [ '周日', '周一', '周二', '周三', '周四', '周五', '周六' ],
+  'zh-TW': [ '週日', '週一', '週二', '週三', '週四', '週五', '週六' ],
+  en: [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ],
+};
+
+export const weekOptionLabel = (loc: CronLocale, v: number): string =>
+  v === 0 || v === 7
+    ? `${WEEK_NAME[loc][0]} (${v})`
+    : `${WEEK_NAME[loc][v]} (${v})`;
+
+export const cronWeekName = (loc: CronLocale, d: number): string => WEEK_NAME[loc][d] ?? '';
+
+type TplSet = Record<string, string>;
+const TPL: Record<CronLocale, TplSet> = {
+  'zh-CN': {
+    anyTag: '任意 (*)', fragAny: '任意', fragStep: '每 {n} 个',
+    fragRangeStep: '{a}-{b} 内每 {n}', fragRange: '{a}-{b}', join: '、',
+    errRange: '字段「{f}」取值 {v} 超出范围 {min}-{max}',
+    errEmpty: '字段「{f}」存在空项', errStep: '字段「{f}」步长无效: {s}',
+    errRange2: '字段「{f}」范围无效: {p}', errValue: '字段「{f}」无法识别的取值: {v}',
+    errNone: '字段「{f}」没有可取值',
+    errCount: '字段数量应为 {n} 个 ({list}), 实际输入 {got} 个',
+  },
+  'zh-TW': {
+    anyTag: '任意 (*)', fragAny: '任意', fragStep: '每 {n} 個',
+    fragRangeStep: '{a}-{b} 內每 {n}', fragRange: '{a}-{b}', join: '、',
+    errRange: '欄位「{f}」取值 {v} 超出範圍 {min}-{max}',
+    errEmpty: '欄位「{f}」存在空白項目', errStep: '欄位「{f}」步長無效: {s}',
+    errRange2: '欄位「{f}」範圍無效: {p}', errValue: '欄位「{f}」無法辨識的取值: {v}',
+    errNone: '欄位「{f}」沒有可取值',
+    errCount: '欄位數量應為 {n} 個 ({list}), 實際輸入 {got} 個',
+  },
+  en: {
+    anyTag: 'Any (*)', fragAny: 'any', fragStep: 'every {n}',
+    fragRangeStep: '{a}-{b} every {n}', fragRange: '{a}-{b}', join: ', ',
+    errRange: 'Field \u201c{f}\u201d: value {v} out of range {min}-{max}',
+    errEmpty: 'Field \u201c{f}\u201d: contains an empty item',
+    errStep: 'Field \u201c{f}\u201d: invalid step \u201c{s}\u201d',
+    errRange2: 'Field \u201c{f}\u201d: invalid range \u201c{p}\u201d',
+    errValue: 'Field \u201c{f}\u201d: unrecognized value \u201c{v}\u201d',
+    errNone: 'Field \u201c{f}\u201d: no usable value',
+    errCount: 'Expected {n} fields ({list}), got {got}',
+  },
+};
+
+const fmt = (tpl: string, vars: Record<string, string | number>): string =>
+  tpl.replace(/\{(\w+)\}/g, (_, k) => String((vars as Record<string, string | number>)[k]));
+
 // 解析一个字段片段: 支持 *, */n, a, a-b, a-b/n, 以及逗号列表与月份/星期英文名
-const parseFieldSegment = (expr :string, meta :CronFieldMeta) :ParsedCronField => {
+const parseFieldSegment = (expr :string, meta :CronFieldMeta, loc :CronLocale = 'zh-CN') :ParsedCronField => {
   const seg = expr.trim();
   const allow = new Set<number>();
   const frags :string[] = [];
+  const L = TPL[loc];
+  const field = FIELD_NAME[loc][meta.key];
 
   const pushRange = (a :number, b :number, step :number) => {
     const lo = Math.min(a, b), hi = Math.max(a, b);
     if (lo < meta.min || hi > meta.max) {
-      throw new Error(`字段「${meta.label}」取值 ${lo < meta.min ? lo : hi} 超出范围 ${meta.min}-${meta.max}`);
+      const v = lo < meta.min ? lo : hi;
+      throw new Error(fmt(L.errRange, { f: field, v, min: meta.min, max: meta.max }));
     }
     for (let v = lo; v <= hi; v += step) allow.add(v);
   };
 
   if (seg === '*') {
-    return { key: meta.key, raw: seg, any: true, allow: [], desc: '任意 (*)' };
+    return { key: meta.key, raw: seg, any: true, allow: [], desc: L.anyTag };
   }
 
   for (const part of seg.split(',')) {
     const p = part.trim();
-    if (p === '') throw new Error(`字段「${meta.label}」存在空项`);
+    if (p === '') throw new Error(fmt(L.errEmpty, { f: field }));
     let body = p;
     let step = 1;
     const slashIdx = p.indexOf('/');
@@ -183,11 +244,11 @@ const parseFieldSegment = (expr :string, meta :CronFieldMeta) :ParsedCronField =
       body = p.slice(0, slashIdx);
       const sRaw = p.slice(slashIdx + 1).trim();
       step = parseInt(sRaw, 10);
-      if (!Number.isFinite(step) || step < 1) throw new Error(`字段「${meta.label}」步长无效: ${sRaw}`);
+      if (!Number.isFinite(step) || step < 1) throw new Error(fmt(L.errStep, { f: field, s: sRaw }));
     }
     if (body === '*') {
       pushRange(meta.min, meta.max, step);
-      frags.push(step > 1 ? `每 ${step} 个` : '任意');
+      frags.push(step > 1 ? fmt(L.fragStep, { n: step }) : L.fragAny);
     } else {
       const dashIdx = body.indexOf('-');
       if (dashIdx >= 0) {
@@ -197,34 +258,36 @@ const parseFieldSegment = (expr :string, meta :CronFieldMeta) :ParsedCronField =
         let b = parseInt(bRaw, 10);
         if (!Number.isFinite(a)) a = nameValue(meta, aRaw) as number;
         if (!Number.isFinite(b)) b = nameValue(meta, bRaw) as number;
-        if (!Number.isFinite(a) || !Number.isFinite(b)) throw new Error(`字段「${meta.label}」范围无效: ${p}`);
+        if (!Number.isFinite(a) || !Number.isFinite(b)) throw new Error(fmt(L.errRange2, { f: field, p }));
         pushRange(a, b, step);
-        frags.push(step > 1 ? `${Math.min(a, b)}-${Math.max(a, b)} 内每 ${step}` : `${Math.min(a, b)}-${Math.max(a, b)}`);
+        const lo = Math.min(a, b), hi = Math.max(a, b);
+        frags.push(step > 1 ? fmt(L.fragRangeStep, { a: lo, b: hi, n: step }) : fmt(L.fragRange, { a: lo, b: hi }));
       } else {
         let v = parseInt(body, 10);
         if (!Number.isFinite(v)) v = nameValue(meta, body) as number;
-        if (!Number.isFinite(v)) throw new Error(`字段「${meta.label}」无法识别的取值: ${body}`);
+        if (!Number.isFinite(v)) throw new Error(fmt(L.errValue, { f: field, v: body }));
         pushRange(v, v, 1);
-        const label = meta.optionsLabel && meta.key === 'week' ? meta.optionsLabel(v) : String(v);
+        const label = meta.optionsLabel && meta.key === 'week' ? weekOptionLabel(loc, v) : String(v);
         frags.push(label);
       }
     }
   }
 
   const arr = [ ...allow ].sort((x, y) => x - y);
-  if (arr.length === 0) throw new Error(`字段「${meta.label}」没有可取值`);
-  return { key: meta.key, raw: seg, any: false, allow: arr, desc: frags.join('、') };
+  if (arr.length === 0) throw new Error(fmt(L.errNone, { f: field }));
+  return { key: meta.key, raw: seg, any: false, allow: arr, desc: frags.join(L.join) };
 };
 
 // 解析完整 cron 表达式 (字段数须与所选格式一致), 非法时抛错
-export const parseCronExpr = (expr :string, format :CronFormatValue) :ParsedCronRule => {
+export const parseCronExpr = (expr :string, format :CronFormatValue, loc :CronLocale = 'zh-CN') :ParsedCronRule => {
   const def = CRON_FORMAT_LIST.find((f) => f.value === format) ?? CRON_FORMAT_LIST[0];
   const segs = expr.trim().split(/\s+/).filter(Boolean);
+  const L = TPL[loc];
   if (segs.length !== def.keys.length) {
-    const expect = def.keys.map((k) => CRON_FIELD_META[k].label).join(' ');
-    throw new Error(`字段数量应为 ${def.keys.length} 个 (${expect}), 实际输入 ${segs.length} 个`);
+    const expect = def.keys.map((k) => FIELD_NAME[loc][k]).join(' ');
+    throw new Error(fmt(L.errCount, { n: def.keys.length, list: expect, got: segs.length }));
   }
-  const fields = def.keys.map((k, i) => parseFieldSegment(segs[i], CRON_FIELD_META[k]));
+  const fields = def.keys.map((k, i) => parseFieldSegment(segs[i], CRON_FIELD_META[k], loc));
   return { format, keys: def.keys, fields };
 };
 
