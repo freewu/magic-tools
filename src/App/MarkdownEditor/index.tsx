@@ -2,6 +2,8 @@ import { Alert, Button, Card, Input, Segmented, Space, Tooltip, Typography, mess
 import { CopyOutlined, DownloadOutlined, EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { useMemo, useRef, useState } from 'react';
 import { renderMarkdown, wrapExportHtml, MD_EXPORT_CSS } from './lib';
+import { useLocale } from '../../hook/locale-context';
+import { u, uT } from '../ui-lang';
 
 const { Text } = Typography;
 
@@ -73,27 +75,30 @@ const TOOLS: Tool[] = [
   { label: '$$', title: '块级公式', type: 'block', block: '$$\n\\frac{}{}\n$$\n' },
 ];
 
-const copyText = async (text: string, tip = '已复制') => {
-  try {
-    await navigator.clipboard.writeText(text);
-    message.success(tip);
-  } catch {
-    message.error('复制失败, 请手动选择复制');
-  }
-};
-
-const download = (text: string, filename: string) => {
-  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-  message.success(`已下载 ${filename}`);
-};
+const markdown = (text: string) => new Blob([text], { type: 'text/plain;charset=utf-8' });
 
 const MarkdownEditor: React.FC = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => u(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => uT(locale, zh, v);
+  const copy = async (text: string, tip?: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      message.success(tip ?? t('已复制'));
+    } catch {
+      message.error(t('复制失败, 请手动选择复制'));
+    }
+  };
+  const download = (text: string, filename: string) => {
+    const blob = markdown(text);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+    message.success(tt('已下载 {file}', { file: filename }));
+  };
   const [md, setMd] = useState(SAMPLE);
   const [view, setView] = useState<'preview' | 'html'>('preview');
   const [showPreview, setShowPreview] = useState(true); // 是否显示右侧预览/HTML 面板
@@ -137,28 +142,27 @@ const MarkdownEditor: React.FC = () => {
       <Alert
         type="info"
         showIcon
-        message="Markdown 编辑器"
+        message={t('Markdown 编辑器')}
         description={
           <>
-            左侧编写 <Text code>Markdown</Text>, 右侧实时预览(支持常用语法与行内 / 块级 LaTeX 公式子集);
-            可导出 <Text code>.md</Text> 源文件或自带样式的独立 <Text code>.html</Text> 文档。
+            {t('左侧编写')} <Text code>Markdown</Text>{t(', 右侧实时预览(支持常用语法与行内 / 块级 LaTeX 公式子集); 可导出')} <Text code>.md</Text>{t(' 源文件或自带样式的独立 ')} <Text code>.html</Text>{t(' 文档。')}
           </>
         }
       />
       <Card
         size="small"
-        title="工具栏 (光标处插入)"
+        title={t('工具栏 (光标处插入)')}
         extra={
           <Space size={8}>
-            <Button size="small" onClick={() => { setMd(SAMPLE); message.info('已载入示例'); }}>载入示例</Button>
-            <Button size="small" danger disabled={!md} onClick={() => setMd('')}>清空</Button>
+            <Button size="small" onClick={() => { setMd(SAMPLE); message.info(t('已载入示例')); }}>{t('载入示例')}</Button>
+            <Button size="small" danger disabled={!md} onClick={() => setMd('')}>{t('清空')}</Button>
           </Space>
         }
       >
         <Space size={4} wrap>
-          {TOOLS.map((t) => (
-            <Tooltip key={t.label + t.title} title={t.title}>
-              <Button size="small" type="text" style={{ fontSize: 13 }} onClick={() => applyTool(t)}>{t.label}</Button>
+          {TOOLS.map((tool) => (
+            <Tooltip key={tool.label + tool.title} title={t(tool.title)}>
+              <Button size="small" type="text" style={{ fontSize: 13 }} onClick={() => applyTool(tool)}>{tool.label}</Button>
             </Tooltip>
           ))}
         </Space>
@@ -166,18 +170,18 @@ const MarkdownEditor: React.FC = () => {
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
         <Card
           size="small"
-          title="Markdown 源码"
+          title={t('Markdown 源码')}
           style={{ flex: '1 1 360px', minWidth: 300 }}
           extra={
             <Space size={8}>
-              <Tooltip title={showPreview ? '收起右侧预览, 专注编辑' : '恢复右侧预览面板'}>
+              <Tooltip title={t(showPreview ? '收起右侧预览, 专注编辑' : '恢复右侧预览面板')}>
                 <Button
                   size="small"
                   icon={showPreview ? <EyeInvisibleOutlined /> : <EyeOutlined />}
                   onClick={() => setShowPreview(!showPreview)}
-                >{showPreview ? '隐藏预览' : '显示预览'}</Button>
+                >{t(showPreview ? '隐藏预览' : '显示预览')}</Button>
               </Tooltip>
-              <Text type="secondary" style={{ fontSize: 12 }}>{statLines} 行 / {statChars} 字符</Text>
+              <Text type="secondary" style={{ fontSize: 12 }}>{tt('{l} 行 / {c} 字符', { l: statLines, c: statChars })}</Text>
             </Space>
           }
         >
@@ -187,13 +191,13 @@ const MarkdownEditor: React.FC = () => {
             onChange={(e) => setMd(e.target.value)}
             autoSize={false}
             style={{ minHeight: 460, fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 13, lineHeight: 1.7, resize: 'vertical' }}
-            placeholder="在此输入 Markdown…"
+            placeholder={t('在此输入 Markdown…')}
           />
         </Card>
         {showPreview && (
           <Card
             size="small"
-            title="预览"
+            title={t('预览')}
             style={{ flex: '1 1 380px', minWidth: 300 }}
             extra={
               <Space size={8}>
@@ -201,11 +205,11 @@ const MarkdownEditor: React.FC = () => {
                   size="small"
                   value={view}
                   onChange={(v) => setView(v as typeof view)}
-                  options={[{ label: '预览', value: 'preview' }, { label: 'HTML 源码', value: 'html' }]}
+                  options={[{ label: t('预览'), value: 'preview' }, { label: t('HTML 源码'), value: 'html' }]}
                 />
-                <Button size="small" icon={<CopyOutlined />} onClick={() => copyText(view === 'preview' ? html : md, '已复制预览 HTML')}>复制{view === 'preview' ? ' HTML' : ' 源文件'}</Button>
+                <Button size="small" icon={<CopyOutlined />} onClick={() => copy(view === 'preview' ? html : md, t('已复制预览 HTML'))}>{t('复制')}{view === 'preview' ? ' HTML' : ' ' + t('源文件')}</Button>
                 <Button size="small" icon={<DownloadOutlined />} onClick={() => download(md, 'markdown.md')}>.md</Button>
-                <Button size="small" type="primary" icon={<DownloadOutlined />} onClick={() => download(wrapExportHtml(html, 'Markdown 预览'), 'markdown.html')}>导出 HTML</Button>
+                <Button size="small" type="primary" icon={<DownloadOutlined />} onClick={() => download(wrapExportHtml(html, `Markdown ${t('预览')}`), 'markdown.html')}>{t('导出 HTML')}</Button>
               </Space>
             }
           >
