@@ -133,8 +133,8 @@ const ColorConvert = () => {
 
   const offsetText = (o :number) => o === 0 ? t('schemeMain', '主色') : ((o > 0 ? '+' : '') + o + '°');
 
-  // 格式页: 输入与结果区 (结果行包含全部格式, 首行"颜色"大色卡跟随所选输入格式)
-  const formatPane = (
+  // 输入区: 类型选择 + 颜色输入框 (常驻 Tabs 上方)
+  const inputPane = (
     <>
       <Space>
         <Radio.Group 
@@ -164,6 +164,12 @@ const ColorConvert = () => {
         placeholder={ placeholder }
         autoSize={{ minRows: 3, maxRows: 3 }}
       />
+    </>
+  );
+
+  // 格式页: 结果区 (结果行包含全部格式, 首行"颜色"大色卡跟随所选输入格式)
+  const formatPane = (
+    <>
       <Divider dashed />
       <Row wrap>
         <Col span={12}>
@@ -226,7 +232,7 @@ const ColorConvert = () => {
         </span>
       </div>
       { schemes.length === 0 ? (
-        <div style={ { fontSize: 13, color: '#999' } }>{t('schemeHint', '在「格式」页输入有效颜色后, 自动生成相似 / 分离 / 三角 / 四角 / 方形 / 复合 / 双分离配色')}</div>
+        <div style={ { fontSize: 13, color: '#999' } }>{t('schemeHint', '输入有效颜色后, 自动生成相似 / 分离 / 三角 / 四角 / 方形 / 复合 / 双分离配色')}</div>
       ) : (
         <div style={ { display: 'flex', flexDirection: 'column', gap: 18 } }>
           { schemes.map((s) => (
@@ -262,6 +268,7 @@ const ColorConvert = () => {
   return (
     <div>
       {contextHolder}
+      {inputPane}
       <Tabs
         defaultActiveKey="format"
         items={ [
