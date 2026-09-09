@@ -15,7 +15,7 @@ const Base64 = () => {
   const { locale } = useLocale();
   const t = (key: string, fallback: string) => tr(base64Lang, locale, key, fallback);
 
-  const tips = `
+  const tipsZh = `
 Base64编码后的字符串中可能包含"+/="之类的字符，而"/"，"="等是URL的保留字符或不安全字符，因此如果直接在URL中传输Base64编码，保留字符和不安全字符会被替换为%XX的形式，对后端来说解码不方便。如果不替换，就会造成URL注入漏洞。
 因此，有一种URL安全的Base64编码，可以解决这个问题。 URL安全的Base64编码特点：
 
@@ -24,6 +24,23 @@ Base64编码后的字符串中可能包含"+/="之类的字符，而"/"，"="等
 
 安全的Base64编码也有好多种，有些编码不会去掉等号，有些编码替换的符号不同
 `;
+  const tipsTw = `Base64 編碼後的字串中可能含有 "+/=" 之類的字元, 而 "/"、"=" 等是 URL 的保留字元或不安全字元, 因此若直接在 URL 中傳輸 Base64 編碼, 保留字元與不安全字元會被替換成 %XX 的形式, 對後端來說解碼不方便。若不替換, 就會造成 URL 注入漏洞。
+因此, 有一種 URL 安全的 Base64 編碼可以解決這個問題。URL 安全 Base64 編碼的特點:
+
+  1 無法被 3 整除時, 不補 = 符號。
+  2 產生的 Base64 編碼中, "+" 與 "/" 被替換成其他非 URL 保留字元, 使其可以直接放入 URL 中傳輸。例如 "+" 與 "/" 被替換成 "-" 與 "_"。
+
+安全的 Base64 編碼也有好多種, 有些編碼不會去掉等號, 有些編碼替換的符號不同
+`;
+  const tipsEn = `Encoded Base64 output may contain characters such as "+/=", while "/", "=" and friends are reserved or unsafe characters in URLs. If Base64 is placed directly into a URL, those reserved/unsafe characters get percent-encoded as %XX, which is inconvenient for the server to decode. Without escaping, it can also lead to URL injection.
+URL-safe Base64 solves this. Its characteristics:
+
+  1 It never appends '=' padding when the input is not divisible by 3.
+  2 "+" and "/" in the output are replaced with non-reserved URL characters ("-" and "_"), so the result can be put straight into a URL.
+
+There are several URL-safe variants: some keep the padding, some replace different characters.
+`;
+  const tips = locale === 'zh-TW' ? tipsTw : locale === 'en' ? tipsEn : tipsZh;
 
   const [ encodeValue, setEncodeValue ] = useState('');
   const [ decodeValue, setDecodeValue ] = useState('');

@@ -1,4 +1,6 @@
-const intro = `
+import { useLocale } from "../../hook/locale-context";
+// 文档: zh-CN 为默认; TW / EN 为对应翻译
+const introZh = `
 <h2>编码方式</h2>
 <blockquote><p>base64编码是一种常见的编码方式，主要用于对8bit的字节进行编码</p>
 </blockquote>
@@ -64,11 +66,140 @@ const intro = `
 
 </ul>
 `;
-const Base64Intro = () => {
+const introTw = `<h2>編碼方式</h2>
+<blockquote><p>base64 編碼是一種常見的編碼方式, 主要用於對 8bit 的位元組進行編碼</p>
+</blockquote>
+<ul>
+<li><p>把三個位元組作為一組, 轉化為二進位形式, 一共 3*8=24 個二進位元。例如: abc 三個字元用 ASCII 編碼, 轉換為二進位: </p>
+<pre><code>a b c   =&gt;  01100001 01100010 01100011
+</code></pre>
+</li>
+<li><p>把 24 個二進位數字每 6 個一組, 分為 4 組 </p>
+<pre><code>011000 010110 001001 100011
+</code></pre>
+</li>
+<li><p>依下方表格, 把每組二進位串轉為對應字元 </p>
+<pre><code>011000 010110 001001 100011 =&gt; Y W J j
+</code></pre>
+</li>
 
+</ul>
+<h2>編碼表</h2>
+<figure><table>
+<thead>
+<tr><th>码值</th><th>BIN</th><th>字符</th><th>码值</th><th>BIN</th><th>字符</th><th>码值</th><th>BIN</th><th>字符</th><th>码值</th><th>Bin</th><th>字符</th></tr></thead>
+<tbody><tr><td>0</td><td>0000 0000</td><td>A</td><td>16</td><td>0001 0000</td><td>Q</td><td>32</td><td>0010 0000</td><td>g</td><td>48</td><td>0011 0000</td><td>w</td></tr><tr><td>1</td><td>0000 0001</td><td>B</td><td>17</td><td>0001 0001</td><td>R</td><td>33</td><td>0010 0001</td><td>h</td><td>49</td><td>0011 0001</td><td>x</td></tr><tr><td>2</td><td>0000 0010</td><td>C</td><td>18</td><td>0001 0010</td><td>S</td><td>34</td><td>0010 0010</td><td>i</td><td>50</td><td>0011 0010</td><td>y</td></tr><tr><td>3</td><td>0000 0011</td><td>D</td><td>19</td><td>0001 0011</td><td>T</td><td>35</td><td>0010 0011</td><td>j</td><td>51</td><td>0011 0011</td><td>z</td></tr><tr><td>4</td><td>0000 0100</td><td>E</td><td>20</td><td>0001 0100</td><td>U</td><td>36</td><td>0010 0100</td><td>k</td><td>52</td><td>0011 0100</td><td>0</td></tr><tr><td>5</td><td>0000 0101</td><td>F</td><td>21</td><td>0001 0101</td><td>V</td><td>37</td><td>0010 0101</td><td>l</td><td>53</td><td>0011 0101</td><td>1</td></tr><tr><td>6</td><td>0000 0110</td><td>G</td><td>22</td><td>0001 0110</td><td>W</td><td>38</td><td>0010 0110</td><td>m</td><td>54</td><td>0011 0110</td><td>2</td></tr><tr><td>7</td><td>0000 0111</td><td>H</td><td>23</td><td>0001 0111</td><td>X</td><td>39</td><td>0010 0111</td><td>n</td><td>55</td><td>0011 0111</td><td>3</td></tr><tr><td>8</td><td>0000 1000</td><td>I</td><td>24</td><td>0001 1000</td><td>Y</td><td>40</td><td>0010 1000</td><td>o</td><td>56</td><td>0011 1000</td><td>4</td></tr><tr><td>9</td><td>0000 1001</td><td>J</td><td>25</td><td>0001 1001</td><td>Z</td><td>41</td><td>0010 1001</td><td>p</td><td>57</td><td>0011 1001</td><td>5</td></tr><tr><td>10</td><td>0000 1010</td><td>K</td><td>26</td><td>0001 1010</td><td>a</td><td>42</td><td>0010 1010</td><td>q</td><td>58</td><td>0011 1010</td><td>6</td></tr><tr><td>11</td><td>0000 1011</td><td>L</td><td>27</td><td>0001 1011</td><td>b</td><td>43</td><td>0010 1011</td><td>r</td><td>59</td><td>0011 1011</td><td>7</td></tr><tr><td>12</td><td>0000 1100</td><td>M</td><td>28</td><td>0001 1100</td><td>c</td><td>44</td><td>0010 1100</td><td>s</td><td>60</td><td>0011 1100</td><td>8</td></tr><tr><td>13</td><td>000 1101</td><td>N</td><td>29</td><td>0001 1101</td><td>d</td><td>45</td><td>0010 1101</td><td>t</td><td>61</td><td>0011 1101</td><td>9</td></tr><tr><td>14</td><td>0000 1110</td><td>O</td><td>30</td><td>0001 1110</td><td>e</td><td>46</td><td>0010 1110</td><td>u</td><td>62</td><td>0011 1110</td><td>+</td></tr><tr><td>15</td><td>0000 1111</td><td>P</td><td>31</td><td>0001 1111</td><td>f</td><td>47</td><td>0010 1111</td><td>v</td><td>63</td><td>0011 1111</td><td>/</td></tr></tbody>
+</table></figure>
+<h2>特殊處理 (位元組數無法被 3 整除時)</h2>
+<blockquote><p>如果需要編碼的位元組無法被 3 整除怎麼辦? 例如最後剩下單一位元組 (如: a), 或雙位元組 (如: ab)。此時需要特殊處理</p>
+</blockquote>
+<ol>
+<li>不足 6 個二進位元的補 0</li>
+<li>不足 4 組的, 最後補字串 (=)</li>
+
+</ol>
+<h3>單位元組處理 </h3>
+<ul>
+<li><p>1 拆解二進位</p>
+<pre><code>a  =&gt; 01100001 =&gt; 011000 01
+</code></pre>
+</li>
+<li><p>2 補0</p>
+<pre><code>011000 01  =&gt; 011000 010000 =&gt; 24 16
+</code></pre>
+</li>
+<li><p>3 不足4組,補=符號</p>
+<pre><code>24 16 =&gt; YQ  =&gt; YQ==
+</code></pre>
+</li>
+
+</ul>
+<h3>雙位元組處理 </h3>
+<ul>
+<li><p>1 拆解二進位</p>
+<pre><code>ab =&gt; 01100001 01100010 =&gt; 011000 010110 0010
+</code></pre>
+</li>
+<li><p>2 補0</p>
+<pre><code>011000 010110 0010  =&gt; 011000 010110 001000 =&gt; 24 22 8
+</code></pre>
+</li>
+<li><p>3 不足4組,補=符號</p>
+<pre><code>24 22 8 =&gt; YWI  =&gt; YWI=
+</code></pre>
+</li>
+
+</ul>`;
+const introEn = `<h2>How it works</h2>
+<blockquote><p>Base64 is a common encoding mainly used to encode 8-bit bytes.</p>
+</blockquote>
+<ul>
+<li><p>Take three bytes as a group and convert them to binary: 3*8 = 24 bits total. For example, the ASCII bytes of <code>abc</code> become: </p>
+<pre><code>a b c   =&gt;  01100001 01100010 01100011
+</code></pre>
+</li>
+<li><p>Split the 24 bits into 4 groups of 6 bits each </p>
+<pre><code>011000 010110 001001 100011
+</code></pre>
+</li>
+<li><p>Map each 6-bit group to its character using the table below </p>
+<pre><code>011000 010110 001001 100011 =&gt; Y W J j
+</code></pre>
+</li>
+
+</ul>
+<h2>Encoding table</h2>
+<figure><table>
+<thead>
+<tr><th>码值</th><th>BIN</th><th>字符</th><th>码值</th><th>BIN</th><th>字符</th><th>码值</th><th>BIN</th><th>字符</th><th>码值</th><th>Bin</th><th>字符</th></tr></thead>
+<tbody><tr><td>0</td><td>0000 0000</td><td>A</td><td>16</td><td>0001 0000</td><td>Q</td><td>32</td><td>0010 0000</td><td>g</td><td>48</td><td>0011 0000</td><td>w</td></tr><tr><td>1</td><td>0000 0001</td><td>B</td><td>17</td><td>0001 0001</td><td>R</td><td>33</td><td>0010 0001</td><td>h</td><td>49</td><td>0011 0001</td><td>x</td></tr><tr><td>2</td><td>0000 0010</td><td>C</td><td>18</td><td>0001 0010</td><td>S</td><td>34</td><td>0010 0010</td><td>i</td><td>50</td><td>0011 0010</td><td>y</td></tr><tr><td>3</td><td>0000 0011</td><td>D</td><td>19</td><td>0001 0011</td><td>T</td><td>35</td><td>0010 0011</td><td>j</td><td>51</td><td>0011 0011</td><td>z</td></tr><tr><td>4</td><td>0000 0100</td><td>E</td><td>20</td><td>0001 0100</td><td>U</td><td>36</td><td>0010 0100</td><td>k</td><td>52</td><td>0011 0100</td><td>0</td></tr><tr><td>5</td><td>0000 0101</td><td>F</td><td>21</td><td>0001 0101</td><td>V</td><td>37</td><td>0010 0101</td><td>l</td><td>53</td><td>0011 0101</td><td>1</td></tr><tr><td>6</td><td>0000 0110</td><td>G</td><td>22</td><td>0001 0110</td><td>W</td><td>38</td><td>0010 0110</td><td>m</td><td>54</td><td>0011 0110</td><td>2</td></tr><tr><td>7</td><td>0000 0111</td><td>H</td><td>23</td><td>0001 0111</td><td>X</td><td>39</td><td>0010 0111</td><td>n</td><td>55</td><td>0011 0111</td><td>3</td></tr><tr><td>8</td><td>0000 1000</td><td>I</td><td>24</td><td>0001 1000</td><td>Y</td><td>40</td><td>0010 1000</td><td>o</td><td>56</td><td>0011 1000</td><td>4</td></tr><tr><td>9</td><td>0000 1001</td><td>J</td><td>25</td><td>0001 1001</td><td>Z</td><td>41</td><td>0010 1001</td><td>p</td><td>57</td><td>0011 1001</td><td>5</td></tr><tr><td>10</td><td>0000 1010</td><td>K</td><td>26</td><td>0001 1010</td><td>a</td><td>42</td><td>0010 1010</td><td>q</td><td>58</td><td>0011 1010</td><td>6</td></tr><tr><td>11</td><td>0000 1011</td><td>L</td><td>27</td><td>0001 1011</td><td>b</td><td>43</td><td>0010 1011</td><td>r</td><td>59</td><td>0011 1011</td><td>7</td></tr><tr><td>12</td><td>0000 1100</td><td>M</td><td>28</td><td>0001 1100</td><td>c</td><td>44</td><td>0010 1100</td><td>s</td><td>60</td><td>0011 1100</td><td>8</td></tr><tr><td>13</td><td>000 1101</td><td>N</td><td>29</td><td>0001 1101</td><td>d</td><td>45</td><td>0010 1101</td><td>t</td><td>61</td><td>0011 1101</td><td>9</td></tr><tr><td>14</td><td>0000 1110</td><td>O</td><td>30</td><td>0001 1110</td><td>e</td><td>46</td><td>0010 1110</td><td>u</td><td>62</td><td>0011 1110</td><td>+</td></tr><tr><td>15</td><td>0000 1111</td><td>P</td><td>31</td><td>0001 1111</td><td>f</td><td>47</td><td>0010 1111</td><td>v</td><td>63</td><td>0011 1111</td><td>/</td></tr></tbody>
+</table></figure>
+<h2>Padding (when bytes are not divisible by 3)</h2>
+<blockquote><p>What if the bytes to encode are not divisible by 3? For example the last group holds a single byte (like <code>a</code>) or two bytes (like <code>ab</code>). Special handling is needed.</p>
+</blockquote>
+<ol>
+<li>Pad with 0 when fewer than 6 bits remain</li>
+<li>Append '=' characters when fewer than 4 output characters are produced</li>
+
+</ol>
+<h3>Single byte</h3>
+<ul>
+<li><p>1 split into bits</p>
+<pre><code>a  =&gt; 01100001 =&gt; 011000 01
+</code></pre>
+</li>
+<li><p>2 pad with zeros</p>
+<pre><code>011000 01  =&gt; 011000 010000 =&gt; 24 16
+</code></pre>
+</li>
+<li><p>3 pad with '='</p>
+<pre><code>24 16 =&gt; YQ  =&gt; YQ==
+</code></pre>
+</li>
+
+</ul>
+<h3>Two bytes</h3>
+<ul>
+<li><p>1 split into bits</p>
+<pre><code>ab =&gt; 01100001 01100010 =&gt; 011000 010110 0010
+</code></pre>
+</li>
+<li><p>2 pad with zeros</p>
+<pre><code>011000 010110 0010  =&gt; 011000 010110 001000 =&gt; 24 22 8
+</code></pre>
+</li>
+<li><p>3 pad with '='</p>
+<pre><code>24 22 8 =&gt; YWI  =&gt; YWI=
+</code></pre>
+</li>
+
+</ul>`;
+const Base64Intro = () => {
+  const { locale } = useLocale();
+  const html = locale === 'zh-TW' ? introTw : locale === 'en' ? introEn : introZh;
   return (
     <div 
-      dangerouslySetInnerHTML={{ __html: intro }}
+      dangerouslySetInnerHTML={{ __html: html }}
       style={ { "overflowY": "scroll","height": "300px" }}>
     </div>
   );
