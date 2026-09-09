@@ -3,6 +3,8 @@ import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "../../lib"
+import { useLocale } from "../../hook/locale-context";
+import { cr, crT } from "../crypto-lang";
 import { openFile } from "../../lib/file"
 import { arrayToOptions } from "../../lib/array"
 import { codeList } from "./data";
@@ -11,6 +13,9 @@ import { utf8ToBytes, bytesToUtf8, bytesToHex, hexToBytes, bytesToBase64, base64
 import type { InputStatus } from "antd/es/_util/statusUtils";
 
 const XXTEACrypto = () => {
+  const { locale } = useLocale();
+  const t = (zh: string) => cr(locale, zh);
+  const tt = (zh: string, v?: Record<string, string | number>) => crT(locale, zh, v);
 
   const genDefaultPassphraseStatus = () :InputStatus => {
     const p = getDefaultPassphrase();
@@ -44,7 +49,7 @@ const XXTEACrypto = () => {
       }
     } catch (error) {
       console.log(error);
-      notice.error("加密失败");
+      notice.error(t('加密失败'));
     }
   };
 
@@ -59,7 +64,7 @@ const XXTEACrypto = () => {
       return setEncodeValue(result);
     } catch (error) {
       console.log(error);
-      notice.error("解密失败");
+      notice.error(t('解密失败'));
     }
   };
 
@@ -73,7 +78,7 @@ const XXTEACrypto = () => {
     const txt = (e.target as HTMLInputElement).value.trim();
     if(txt !== '') {
       copyTextToClipboard(txt);
-      notice.success("复制到粘贴板成功！！！");
+      notice.success(t('复制到粘贴板成功！！！'));
     }
   };
 
@@ -94,14 +99,14 @@ const XXTEACrypto = () => {
 
       <Row style = { { marginTop: "5px" }}>
         <Space>
-          <label>编码:</label>
+          {t('编码:')}
           <Select
             value={ code }
             style={{ width: 120 }}
             onChange={ (v :string) => { setCode(v) } }
             options={ arrayToOptions(codeList) }
           />
-          <label>密钥:</label>
+          {t('密钥:')}
           <Input
             showCount
             allowClear
@@ -118,9 +123,9 @@ const XXTEACrypto = () => {
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setEncodeValue(e.target.value) } }
-        title="双击复制内容到粘贴板"
+        title={t('双击复制内容到粘贴板')}
         value= { encodeValue }
-        placeholder="输入需要进行 XXTEA 加密的内容 或 拖拽文件到框内打开"
+        placeholder={t('输入需要进行 XXTEA 加密的内容 或 拖拽文件到框内打开')}
         autoSize={{ minRows: 8, maxRows: 8 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setEncodeValue ); } }
@@ -130,25 +135,25 @@ const XXTEACrypto = () => {
         onClick={ encode }
         style={ { "backgroundColor" : "#007bff","color": "#fff" } }
         icon={<ArrowDownOutlined />}
-      >加密</Button>
+      >{t('加密')}</Button>
       <Button
         onClick={ decode }
         style={ { "backgroundColor" : "#28a745","color": "#fff" } }
         icon={<ArrowUpOutlined />}
-      >解密</Button>
+      >{t('解密')}</Button>
       <Button
         onClick={ () =>clear() }
         style={ { "backgroundColor" : "#dc3545","color": "#fff" } }
-      >清除</Button>
+      >{t('清除')}</Button>
 
       <TextArea
         showCount
         style={ { margin: "5px 0 5px 0" }}
         onDoubleClick={ textareaDoubleClick }
         onChange={ (e) => { setDecodeValue(e.target.value) } }
-        title="双击复制内容到粘贴板"
+        title={t('双击复制内容到粘贴板')}
         value= { decodeValue }
-        placeholder="输入需要进行 XXTEA 解密的内容 或 拖拽文件到框内打开"
+        placeholder={t('输入需要进行 XXTEA 解密的内容 或 拖拽文件到框内打开')}
         autoSize={{ minRows: 8, maxRows: 8 }}
         onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setDecodeValue ); } }

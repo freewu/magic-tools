@@ -63,6 +63,18 @@ const D: CrRec = {
   '输入需要加密的明文 (只保留字母), 例如 ACT / SHORT  或 拖拽文件到框内打开': ['輸入需要加密的明文 (只保留字母), 例如 ACT / SHORT  或 拖曳檔案到框內開啟', 'Enter the plaintext to encrypt (letters only), e.g. ACT / SHORT, or drop a file into the box'],
   '加密结果自动显示在此 (大写字母); 也可粘贴外部密文后点「解密」  或 拖拽文件到框内打开': ['加密結果自動顯示在此 (大寫字母); 也可貼上外部密文後點「解密」  或 拖曳檔案到框內開啟', 'The result (uppercase letters) appears here; you can also paste external ciphertext and click Decrypt, or drop a file into the box'],
   ' 希尔密码说明 ': [' 希爾密碼說明 ', ' Hill cipher notes '],
+  '编码:': ['編碼:', 'Encoding:'],
+  '循环次数:': ['循環次數:', 'Rounds:'],
+  '加密失败': ['加密失敗', 'Encryption failed'],
+  '解密失败': ['解密失敗', 'Decryption failed'],
+  '输入需要进行 RC4 加密的内容  或 拖拽文件到框内打开': ['輸入需要進行 RC4 加密的內容  或 拖曳檔案到框內開啟', 'Enter the content to RC4-encrypt, or drop a file into the box'],
+  '输入需要进行 CR4 解密的内容  或 拖拽文件到框内打开': ['輸入需要進行 RC4 解密的內容  或 拖曳檔案到框內開啟', 'Enter the content to RC4-decrypt, or drop a file into the box'],
+  '输入需要进行 XXTEA 加密的内容 或 拖拽文件到框内打开': ['輸入需要進行 XXTEA 加密的內容 或 拖曳檔案到框內開啟', 'Enter the content to XXTEA-encrypt, or drop a file into the box'],
+  '输入需要进行 XXTEA 解密的内容 或 拖拽文件到框内打开': ['輸入需要進行 XXTEA 解密的內容 或 拖曳檔案到框內開啟', 'Enter the content to XXTEA-decrypt, or drop a file into the box'],
+  '输入需要进行 TEA 加密的内容 或 拖拽文件到框内打开': ['輸入需要進行 TEA 加密的內容 或 拖曳檔案到框內開啟', 'Enter the content to TEA-encrypt, or drop a file into the box'],
+  '输入需要进行 TEA 解密的内容 或 拖拽文件到框内打开': ['輸入需要進行 TEA 解密的內容 或 拖曳檔案到框內開啟', 'Enter the content to TEA-decrypt, or drop a file into the box'],
+  '输入需要进行 XTEA 加密的内容 或 拖拽文件到框内打开': ['輸入需要進行 XTEA 加密的內容 或 拖曳檔案到框內開啟', 'Enter the content to XTEA-encrypt, or drop a file into the box'],
+  '输入需要进行 XTEA 解密的内容 或 拖拽文件到框内打开': ['輸入需要進行 XTEA 解密的內容 或 拖曳檔案到框內開啟', 'Enter the content to XTEA-decrypt, or drop a file into the box'],
 };
 export const cr = (locale: string, zh: string): string => {
   const e = D[zh];
