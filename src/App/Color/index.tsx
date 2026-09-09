@@ -9,8 +9,13 @@ import { getDefaultColorPad, getDefaultBatchSwitch, getDefaultOpacity, getDefaul
 import "./color.css"
 import { colorDataList } from "./data"
 import type { PickColorEntity } from "./interface"
+import colorLang from "./lang";
+import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
 
 const Color = () => {
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(colorLang, locale, key, fallback);
   // 颜色板的调度,窗口调整,颜色板高度也需要调整
   const genColorPadHeight = () => {
     return (window.innerHeight - 180) + "px";
@@ -63,7 +68,7 @@ const Color = () => {
       addPickColor({color: color,label:label});
     } else {
       copyTextToClipboard(getColorString(color, label, colorType, opacity ));
-      notice.success("复制到粘贴板成功！！！");
+      notice.success(t('copyOk','复制到粘贴板成功！！！'));
     }
   };
 
@@ -108,7 +113,7 @@ const Color = () => {
     <>
     { contextHolder }
     <Space>
-      <Tooltip placement="top" title={ "单击色块复制到粘贴板的内容" }>
+      <Tooltip placement="top" title={ t('clickTip','单击色块复制到粘贴板的内容') }>
         <Radio.Group 
           optionType = "button" buttonStyle="solid"
           options = { typeList } 

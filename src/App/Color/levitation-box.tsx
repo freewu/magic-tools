@@ -1,8 +1,13 @@
 import { Checkbox, Tooltip, Badge } from "antd";
 import type { BatchPickColorProps } from "./interface"
+import colorLang from "./lang";
+import { useLocale } from "../../hook/locale-context";
+import { tr } from "../../i18n/lang";
 
 // 悬浮框
 const LevitationBox = ({ colorList, flag, flagChangeEvent, colorListChange } :BatchPickColorProps ) => {
+  const { locale } = useLocale();
+  const t = (key: string, fallback: string) => tr(colorLang, locale, key, fallback);
 
   const switchBatchPick = () => {
     flagChangeEvent(!flag);
@@ -21,8 +26,10 @@ const LevitationBox = ({ colorList, flag, flagChangeEvent, colorListChange } :Ba
     <div className="levitation-box">
       <Badge count={ colorList?.length }>
         <div className="levitation-box-content">
-          <Tooltip placement="left" title={ "双击剔除不需要的颜色" }>
-            <Checkbox defaultChecked= { flag } onChange={ switchBatchPick }>批量取色</Checkbox>
+          <Tooltip placement="left" title={ t('removeTip','双击剔除不需要的颜色') }>
+            <Checkbox defaultChecked= { flag } onChange={ switchBatchPick }>
+            { t('batchPick','批量取色') }
+          </Checkbox>
           </Tooltip>
         <ul>
           {
