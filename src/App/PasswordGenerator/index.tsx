@@ -147,7 +147,7 @@ const PasswordGenerator = () => {
               <Space wrap>
                 <span style={ { width: 72, textAlign: 'right' } }>{t('选项:')}</span>
                 <Checkbox checked={ excludeAmbiguous } onChange={ (e) => setExcludeAmbiguous(e.target.checked) }>
-                  排除易混淆字符 (IOlo01)
+                  {t('排除易混淆字符 (IOlo01)')}
                 </Checkbox>
               </Space>
               <Button type="primary" icon={ <ReloadOutlined /> } onClick={ generate }>{t('生成密码')}</Button>
@@ -159,7 +159,7 @@ const PasswordGenerator = () => {
               />
               <Space>
                 <Button icon={ <CopyOutlined /> } onClick={ copy } disabled={ !pw }>{t('复制')}</Button>
-                <Button onClick={ () => setPw('') } disabled={ !pw }>清空</Button>
+                <Button onClick={ () => setPw('') } disabled={ !pw }>{t('清空')}</Button>
               </Space>
               { strengthHint && (
                 <div>
