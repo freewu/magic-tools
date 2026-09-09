@@ -56,6 +56,95 @@ fn set_locale_check(
     let _ = en.set_checked(locale == "en");
 }
 
+/// 托盘菜单三语文案 (zh-CN 与构建时默认字符串保持一致)
+struct TrayTexts {
+    show: &'static str,
+    setting: &'static str,
+    help: &'static str,
+    appstore: &'static str,
+    theme: &'static str,
+    light: &'static str,
+    dark: &'static str,
+    system: &'static str,
+    locale: &'static str,
+    quit: &'static str,
+}
+
+impl TrayTexts {
+    fn for_locale(locale: &str) -> Self {
+        match locale {
+            "zh-TW" => Self {
+                show: "顯示視窗",
+                setting: "設定",
+                help: "說明",
+                appstore: "應用列表",
+                theme: "顯示模式",
+                light: "淺色",
+                dark: "深色",
+                system: "跟隨系統",
+                locale: "語言",
+                quit: "退出",
+            },
+            "en" => Self {
+                show: "Show Window",
+                setting: "Settings",
+                help: "Help",
+                appstore: "App List",
+                theme: "Theme",
+                light: "Light",
+                dark: "Dark",
+                system: "System",
+                locale: "Language",
+                quit: "Quit",
+            },
+            _ => Self {
+                show: "展示窗口",
+                setting: "设置",
+                help: "帮助",
+                appstore: "应用列表",
+                theme: "显示模式",
+                light: "浅色",
+                dark: "深色",
+                system: "系统跟随",
+                locale: "语言",
+                quit: "退出",
+            },
+        }
+    }
+}
+
+/// 按当前界面语言重设托盘菜单全部文案, 并同步「语言」子菜单勾选状态
+#[allow(clippy::too_many_arguments)]
+fn apply_tray_locale(
+    locale: &str,
+    show_item: &MenuItem<tauri::Wry>,
+    setting_item: &MenuItem<tauri::Wry>,
+    help_item: &MenuItem<tauri::Wry>,
+    appstore_item: &MenuItem<tauri::Wry>,
+    quit_item: &MenuItem<tauri::Wry>,
+    theme_submenu: &Submenu<tauri::Wry>,
+    light_item: &CheckMenuItem<tauri::Wry>,
+    dark_item: &CheckMenuItem<tauri::Wry>,
+    system_item: &CheckMenuItem<tauri::Wry>,
+    locale_submenu: &Submenu<tauri::Wry>,
+    zh_cn_item: &CheckMenuItem<tauri::Wry>,
+    zh_tw_item: &CheckMenuItem<tauri::Wry>,
+    en_item: &CheckMenuItem<tauri::Wry>,
+) {
+    let texts = TrayTexts::for_locale(locale);
+    let _ = show_item.set_text(texts.show);
+    let _ = setting_item.set_text(texts.setting);
+    let _ = help_item.set_text(texts.help);
+    let _ = appstore_item.set_text(texts.appstore);
+    let _ = quit_item.set_text(texts.quit);
+    let _ = theme_submenu.set_text(texts.theme);
+    let _ = light_item.set_text(texts.light);
+    let _ = dark_item.set_text(texts.dark);
+    let _ = system_item.set_text(texts.system);
+    let _ = locale_submenu.set_text(texts.locale);
+    set_locale_check(zh_cn_item, zh_tw_item, en_item, locale);
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -249,13 +338,40 @@ pub fn run() {
                 }
             });
 
-            // 监听前端(设置页/左下角)切换界面语言, 同步托盘「语言」菜单勾选状态
-            let zh_cn_handle = zh_cn_item.clone();
-            let zh_tw_handle = zh_tw_item.clone();
-            let en_handle = en_item.clone();
+            // 监听前端(设置页/左下角)切换界面语言:
+            // 按 locale 重设托盘菜单全部文案 + 同步「语言」菜单勾选状态
+            // (前端 LocaleProvider 挂载后也会立即广播一次已保存语言, 启动即按保存语言显示)
+            let locale_show_handle = show_item.clone();
+            let locale_setting_handle = open_setting_item.clone();
+            let locale_help_handle = open_help_item.clone();
+            let locale_appstore_handle = open_appstore_item.clone();
+            let locale_quit_handle = quit_item.clone();
+            let locale_theme_handle = theme_submenu.clone();
+            let locale_light_handle = light_item.clone();
+            let locale_dark_handle = dark_item.clone();
+            let locale_system_handle = system_item.clone();
+            let locale_menu_handle = locale_submenu.clone();
+            let locale_zh_cn_handle = zh_cn_item.clone();
+            let locale_zh_tw_handle = zh_tw_item.clone();
+            let locale_en_handle = en_item.clone();
             app.listen("locale-changed", move |event| {
                 if let Ok(locale) = serde_json::from_str::<String>(event.payload()) {
-                    set_locale_check(&zh_cn_handle, &zh_tw_handle, &en_handle, &locale);
+                    apply_tray_locale(
+                        locale.as_str(),
+                        &locale_show_handle,
+                        &locale_setting_handle,
+                        &locale_help_handle,
+                        &locale_appstore_handle,
+                        &locale_quit_handle,
+                        &locale_theme_handle,
+                        &locale_light_handle,
+                        &locale_dark_handle,
+                        &locale_system_handle,
+                        &locale_menu_handle,
+                        &locale_zh_cn_handle,
+                        &locale_zh_tw_handle,
+                        &locale_en_handle,
+                    );
                 }
             });
 
