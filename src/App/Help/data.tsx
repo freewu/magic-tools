@@ -31,6 +31,30 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-09-10 V2.7.3 Release", "2026-09-10 V2.7.3 Release", "2026-09-10 V2.7.3 Release"),
+    items: trio(
+      [
+        "颜色格式转换: 新增「自动识别」输入格式 (按格式前缀或 (a,b,c) 元组自动判定 HEX/RGB/HSL/HSV/CMYK/LAB/LCH/XYZ), 取色器选色默认按 HEX; 「自动识别」位于类型选项首位且为默认",
+        "颜色格式转换: 设置中心 → 类型转换 可配置默认选中类型 (默认「自动识别」)",
+        "新增 just dev-init: 一键检查/安装开发环境组件 (Node.js >=18 / 前端依赖 / Rust 工具链 / 后端依赖), 已就绪的组件打绿色 ✓ 并跳过, 可重复执行",
+        "README: 三个语言版补充 just 安装说明与 dev-init 初始化流程 (git clone -> cd -> just dev-init -> just dev), 项目结构展开 src/App/ 子结构与 110 个工具清单",
+      ],
+      [
+        "顏色格式轉換: 新增「自動識別」輸入格式 (依格式前綴或 (a,b,c) 元組自動判定 HEX/RGB/HSL/HSV/CMYK/LAB/LCH/XYZ), 取色器選色預設按 HEX; 「自動識別」位於類型選項首位且為預設",
+        "顏色格式轉換: 設定中心 → 類型轉換 可設定預設選中類型 (預設「自動識別」)",
+        "新增 just dev-init: 一鍵檢查/安裝開發環境元件 (Node.js >=18 / 前端依賴 / Rust 工具鏈 / 後端依賴), 已就緒的元件顯示綠色 ✓ 並跳過, 可重複執行",
+        "README: 三個語言版本補充 just 安裝說明與 dev-init 初始化流程 (git clone -> cd -> just dev-init -> just dev), 專案結構展開 src/App/ 子結構與 110 個工具清單",
+      ],
+      [
+        "Color Convert: added an Auto-detect input type (infers HEX/RGB/HSL/HSV/CMYK/LAB/LCH/XYZ from a format prefix or an (a,b,c) tuple); the color picker defaults to HEX in this mode. Auto is now the first option and the default selection",
+        "Color Convert: Settings → Convert now offers a Color Format Convert panel to set the default selected type (defaults to Auto)",
+        "Added `just dev-init`: checks/installs the dev components in one shot (Node.js >=18 / frontend deps / Rust toolchain / backend deps), skips what is ready with a green ✓ and is safe to re-run",
+        "README: all three languages document installing just and the dev-init flow (git clone -> cd -> just dev-init -> just dev), and the repository layout now expands the src/App/ subtree plus the full 110-tool list",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-09-10 V2.7.2 Release", "2026-09-10 V2.7.2 Release", "2026-09-10 V2.7.2 Release"),
     items: trio(
       [
