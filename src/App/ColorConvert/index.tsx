@@ -2,7 +2,7 @@ import { Checkbox, Form, Input, Divider, message, Space, Radio, Button, ColorPic
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
-import { genColorString, transalte2Hex, detectColorType, calcColorSchemes } from "./lib"
+import { genColorString, transalte2Hex, detectColorType, calcColorSchemes, getDefaultColorType } from "./lib"
 import { colorTypeList, emptyResult } from "./data"
 import type { RadioChangeEvent } from 'antd';
 import type { Color } from 'antd/es/color-picker';
@@ -16,8 +16,13 @@ const ColorConvert = () => {
   const t = (key: string, fallback: string) => tr(colorLang, locale, key, fallback);
 
   const [ value, setValue ] = useState(''); // 需要转换的颜色值 
-  const [ colorType, setColorType ] = useState('AUTO'); // 输入值的颜色类型 (默认自动识别)
-  const [ placeholder, setPlaceholder ] = useState(tr(colorLang, locale, 'ph_AUTO', colorTypeList[0]["placeholder"])); // 颜色类型的输入提示 (默认 AUTO)
+  const [ colorType, setColorType ] = useState(() => getDefaultColorType()); // 输入值的颜色类型 (默认取 设置 → 类型转换 → 颜色格式转换 的默认选中类型, 未设置为 AUTO)
+  const [ placeholder, setPlaceholder ] = useState(() => {
+    // 初始提示跟随默认选中的类型
+    const type = getDefaultColorType();
+    const tips = colorTypeList.find(item => item.value === type)?.placeholder;
+    return tr(colorLang, locale, 'ph_' + type, (tips ?? '') + '');
+  });
   const [ checked, setChecked ] = useState(false); // 输出大小写
   const [ colorData, setColorData ] = useState(emptyResult); // 转换的结果
   const [ notice, contextHolder] = message.useMessage();

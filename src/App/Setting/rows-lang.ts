@@ -9,6 +9,7 @@ type Row = [tw: string, en: string];
 const ROWS: Record<string, Row> = {
   // ---- 通用词 ----
   '默认类型': ['預設類型', 'Default type'],
+  '默认选中类型': ['預設選中類型', 'Default selected type'],
   '默认展示类型': ['預設顯示類型', 'Default display type'],
   '默认码型': ['預設碼型', 'Default code type'],
   '默认编码': ['預設編碼', 'Default encoding'],
@@ -75,6 +76,7 @@ const ROWS: Record<string, Row> = {
   '速度转换': ['速度轉換', 'Speed Convert'],
   '重量转换': ['重量轉換', 'Weight Convert'],
   '面积转换': ['面積轉換', 'Area Convert'],
+  '颜色格式转换': ['顏色格式轉換', 'Color Format Convert'],
   'BCD 编解码': ['BCD 編解碼', 'BCD Codec'],
   'BaseX 编解码': ['BaseX 編解碼', 'BaseX Codec'],
   'Gzip 编解码': ['Gzip 編解碼', 'Gzip Codec'],

@@ -1,4 +1,4 @@
-import { calcColorSchemes, detectColorType, transalte2Hex } from './lib';
+import { calcColorSchemes, detectColorType, getDefaultColorType, setDefaultColorType, transalte2Hex } from './lib';
 
 // 参考色相表 (color-convert hsl.hex, S/L = 100/50):
 //  30=FF8000 60=FFFF00 90=80FF00 120=00FF00 150=00FF80 180=00FFFF
@@ -62,6 +62,24 @@ describe('detectColorType', () => {
     expect(detectColorType('')).toBe('');
     expect(detectColorType('   ')).toBe('');
     expect(detectColorType('hello world')).toBe('');
+  });
+});
+
+describe('默认选中类型 (设置中心读写)', () => {
+  afterEach(() => localStorage.clear());
+
+  it('未设置时默认 AUTO 自动识别', () => {
+    expect(getDefaultColorType()).toBe('AUTO');
+  });
+
+  it('写入后可读到相同值', () => {
+    setDefaultColorType('LAB');
+    expect(getDefaultColorType()).toBe('LAB');
+  });
+
+  it('非法/过期值回退 AUTO', () => {
+    localStorage.setItem('colorconvert:default-type', 'FOO');
+    expect(getDefaultColorType()).toBe('AUTO');
   });
 });
 

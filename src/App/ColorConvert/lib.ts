@@ -1,4 +1,5 @@
 import { hex, rgb, hsl, hsv, lab, xyz, lch, cmyk } from "color-convert"
+import { colorTypeList } from "./data"
 
 // 根据 颜色的 HEX 生成需要出的颜色格式
 const genColorString = (color :string,colorType :string) :string => {
@@ -181,10 +182,27 @@ const calcColorSchemes = (color :string) :ColorScheme[] => {
   }));
 };
 
+// ---- 默认值设置 (设置中心 → 类型转换 使用) ----
+const DEFAULT_TYPE_ITEM = 'colorconvert:default-type';
+
+/** 获取默认选中的颜色类型 (未设置或值非法时返回 AUTO 自动识别) */
+const getDefaultColorType = () :string => {
+  const value = localStorage.getItem(DEFAULT_TYPE_ITEM);
+  // 以 colorTypeList 为可选值唯一来源, 避免与 data.ts 失配
+  return (value !== null && colorTypeList.some((item) => item.value === value)) ? value : 'AUTO';
+};
+
+/** 设置默认选中的颜色类型 */
+const setDefaultColorType = (type :string) :void => {
+  localStorage.setItem(DEFAULT_TYPE_ITEM, type);
+};
+
 export {
   genColorString,
   transalte2Hex,
   detectColorType,
   calcComplementaryColor,
   calcColorSchemes,
+  getDefaultColorType,
+  setDefaultColorType,
 }
