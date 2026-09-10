@@ -9,6 +9,8 @@ const colorTypeList = [
   { label: 'LAB', value: 'LAB', placeholder: '输入 LAB(L,A,B) / (L,A,B) 格式字符串' },
   { label: 'LCH', value: 'LCH', placeholder: '输入 LCH(L,C,H) / (L,C,H) 格式字符串' },
   { label: 'XYZ', value: 'XYZ', placeholder: '输入 XYZ(X,Y,Z) / (X,Y,Z) 格式字符串' },
+  // 自动识别: 按输入文本的格式前缀/(a,b,c) 元组判定, 取色器选色时默认按 HEX 处理
+  { label: '自动识别', value: 'AUTO', placeholder: '自动识别颜色格式: 支持 HEX / RGB / HSL / HSV / CMYK / LAB / LCH / XYZ (带前缀或 (a,b,c) 元组; 取色器默认按 HEX)' },
 ];
 
 const emptyResult = {

@@ -2,7 +2,7 @@ import { Checkbox, Form, Input, Divider, message, Space, Radio, Button, ColorPic
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
-import { genColorString, transalte2Hex, calcColorSchemes } from "./lib"
+import { genColorString, transalte2Hex, detectColorType, calcColorSchemes } from "./lib"
 import { colorTypeList, emptyResult } from "./data"
 import type { RadioChangeEvent } from 'antd';
 import type { Color } from 'antd/es/color-picker';
@@ -22,6 +22,7 @@ const ColorConvert = () => {
   const [ colorData, setColorData ] = useState(emptyResult); // 转换的结果
   const [ notice, contextHolder] = message.useMessage();
   const [ colorPickerHex, setColorPickerHex ] = useState<Color | string>('#1677ff'); // colorPicker 默认颜色
+  const [ autoDetected, setAutoDetected ] = useState(''); // 自动识别模式下识别到的格式 (空为未识别), 仅用于回显
   const [ showPercent, setShowPercent ] = useState(false); // 是否显示 % 
 
   const inputStyle = { cursor: "pointer" };
@@ -31,8 +32,9 @@ const ColorConvert = () => {
     setColorType(value);
     setValue(''); // 需要把内容清空,类型变了输入的内容也没意义了
     setColorData(emptyResult);
+    setAutoDetected(''); // 自动识别的结果同样清空
     // 更新输入提示信息
-    const tips = colorTypeList.find(item => item.label === value)?.placeholder;
+    const tips = colorTypeList.find(item => item.value === value)?.placeholder; // 按 value 匹配 (自动识别的 label 与 value 不同)
     setPlaceholder(t('ph_' + value, (tips ?? '') + ''));
   };
 
@@ -99,11 +101,21 @@ const ColorConvert = () => {
 
   const covertColor = (value :string) => {
     setValue(value);
+    if (colorType === 'AUTO') {
+      // 自动识别: 先探测输入格式 (识别失败按空结果处理, 与其他格式的非法输入一致)
+      const detected = detectColorType(value);
+      setAutoDetected(detected);
+      buildResult(detected === '' ? '' : transalte2Hex(value, detected));
+      return;
+    }
     buildResult(transalte2Hex(value, colorType));
   }
 
-  // 把 hex 转成当前输入格式的文本 (输入格式与对应输出格式保持一致)
-  const fmtText = (hex :string) :string => upperLowerTranslate(genColorString(hex, colorType));
+  // 当前输入格式: 自动识别模式下取识别结果 (未识别/取色器选色时按 HEX 处理)
+  const effectiveType = colorType === 'AUTO' ? (autoDetected || 'HEX') : colorType;
+
+  // 把 hex 转成当前输入格式的文本 (输入格式与对应输出格式保持一致; 自动识别模式用识别到的格式)
+  const fmtText = (hex :string) :string => upperLowerTranslate(genColorString(hex, effectiveType));
 
   // 取色器选择颜色事件: 填入/输出格式跟随当前输入格式 (默认输入 HEX 时仍是 #rrggbb)
   // 注意: antd ColorPicker onChange 第二参是 css 字符串(如 rgb(87,113,150)), 并非 hex,
@@ -113,8 +125,10 @@ const ColorConvert = () => {
     // 带 alpha 时 toHexString() 返回 #rrggbbaa, 截取前 7 位以匹配本页支持的 #rrggbb 解析
     const raw = value.toHexString();
     const hex = raw.length > 7 ? raw.slice(0, 7) : raw;
-    // 输入框按当前输入格式回填 (LAB 等), 结果/配色方案直接用选中色 HEX 生成, 避免舍入漂移
-    setValue(fmtText(hex));
+    if (colorType === 'AUTO') setAutoDetected('HEX'); // 取色器无文本可探测, 自动识别按 HEX 回显
+    // 输入框按当前输入格式回填 (LAB 等); 自动识别模式显式用 HEX (不能依赖 state, 本帧 autoDetected 可能仍是上次识别结果)
+    const fillType = colorType === 'AUTO' ? 'HEX' : effectiveType;
+    setValue(upperLowerTranslate(genColorString(hex, fillType)));
     buildResult(hex);
   }
 
@@ -142,12 +156,14 @@ const ColorConvert = () => {
   const offsetText = (o :number) => o === 0 ? t('schemeMain', '主色') : ((o > 0 ? '+' : '') + o + '°');
 
   // 输入区: 类型选择 + 颜色输入框 (常驻 Tabs 上方)
+  // 选项标签走 i18n: 仅 "自动识别" 需要翻译 (HEX/RGB 等格式名各语言一致, 缺失时回退原文)
+  const typeOptions = colorTypeList.map((item) => ({ ...item, label: t('type_' + item.value, item.label) }));
   const inputPane = (
     <>
       <Space>
         <Radio.Group 
           optionType = "button" buttonStyle="solid"
-          options = { colorTypeList } 
+          options = { typeOptions } 
           onChange={ onColorTypeChange } 
           value={ colorType } 
         />
@@ -161,7 +177,7 @@ const ColorConvert = () => {
         />
           
         <Button 
-          onClick={ () => { setValue(''); setColorData(emptyResult); } }
+          onClick={ () => { setValue(''); setColorData(emptyResult); setAutoDetected(''); } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
         >{t('clear', '清除')}</Button>
       </Space>
@@ -172,6 +188,11 @@ const ColorConvert = () => {
         placeholder={ placeholder }
         autoSize={{ minRows: 3, maxRows: 3 }}
       />
+      { colorType === 'AUTO' && (
+        <div style={ { fontSize: 12, color: '#999', marginBottom: 5 } }>
+          {t('autoTag', '自动识别')}: { autoDetected || '—' }
+        </div>
+      ) }
     </>
   );
 

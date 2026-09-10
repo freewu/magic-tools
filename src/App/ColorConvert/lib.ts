@@ -35,9 +35,39 @@ const genColorString = (color :string,colorType :string) :string => {
   return color;
 };
 
+// 自动识别颜色文本的格式 (供 "自动识别" 模式使用); 无法识别时返回 ''
+// 优先按格式前缀判定; 无前缀的 (a,b,c) / (a,b,c,d) 元组按 % 与通道数启发式判定
+// 注意: 需在去除空格/% 之前调用 (元组中的 % 是区分 HSL 与 RGB 的依据)
+const detectColorType = (color :string) :string => {
+  const s = color.trim();
+  if (s === "") return "";
+  const lower = s.toLowerCase();
+  if (/^rgba?\(/u.test(lower)) return "RGB";
+  if (/^hsla?\(/u.test(lower)) return "HSL";
+  if (/^hsv\(/u.test(lower)) return "HSV";
+  if (/^cmyk\(/u.test(lower)) return "CMYK";
+  if (/^lab\(/u.test(lower)) return "LAB";
+  if (/^lch\(/u.test(lower)) return "LCH";
+  if (/^xyz\(/u.test(lower)) return "XYZ";
+  // 无前缀元组: 3 通道带 % 视为 HSL, 4 通道视为 CMYK (也可为 rgba/hsla), 其余 3 通道视为 RGB
+  if (/^\(?\s*-?\d[^()]*\)?$/u.test(s) && s.includes(",")) {
+    const channels = s.split(",").length;
+    if (channels === 4) return "CMYK";
+    if (channels === 3) return s.includes("%") ? "HSL" : "RGB";
+  }
+  // HEX: #RRGGBB / #RGB / RRGGBB (3 或 6 位十六进制; 以 # 开头的非法值也按 HEX 处理)
+  if (/^#/u.test(s) || /^[0-9a-fA-F]{3}$/u.test(s) || /^[0-9a-fA-F]{6}$/u.test(s)) return "HEX";
+  return "";
+};
+
 // 根据传入的值和颜色类型,转成  颜色的 HEX 值
 // 各通道允许负数 (LAB a/b、LCH c 等通道可为负值) 与小数值, 否则取色器回填的 lab(-23) 等格式无法解析
 const transalte2Hex = (color:string,colorType:string) :string => {
+  // 自动识别: 先探测输入格式再按该格式解析 (识别失败返回空串, 与其他格式非法输入一致)
+  if (colorType === "AUTO") {
+    const detected = detectColorType(color);
+    return detected === "" ? "" : transalte2Hex(color, detected);
+  }
   color = color.replaceAll(" ","");
   color = color.replaceAll("%","");
   const chan = "(-?\\d+(?:\\.\\d+)?)";
@@ -154,6 +184,7 @@ const calcColorSchemes = (color :string) :ColorScheme[] => {
 export {
   genColorString,
   transalte2Hex,
+  detectColorType,
   calcComplementaryColor,
   calcColorSchemes,
 }
