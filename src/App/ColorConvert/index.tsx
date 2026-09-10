@@ -16,8 +16,8 @@ const ColorConvert = () => {
   const t = (key: string, fallback: string) => tr(colorLang, locale, key, fallback);
 
   const [ value, setValue ] = useState(''); // 需要转换的颜色值 
-  const [ colorType, setColorType ] = useState('HEX'); // 输入值的颜色类型,
-  const [ placeholder, setPlaceholder ] = useState(tr(colorLang, locale, 'ph_HEX', colorTypeList[0]["placeholder"])); // 颜色类型的输入提示
+  const [ colorType, setColorType ] = useState('AUTO'); // 输入值的颜色类型 (默认自动识别)
+  const [ placeholder, setPlaceholder ] = useState(tr(colorLang, locale, 'ph_AUTO', colorTypeList[0]["placeholder"])); // 颜色类型的输入提示 (默认 AUTO)
   const [ checked, setChecked ] = useState(false); // 输出大小写
   const [ colorData, setColorData ] = useState(emptyResult); // 转换的结果
   const [ notice, contextHolder] = message.useMessage();
