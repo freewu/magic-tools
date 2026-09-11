@@ -25,7 +25,7 @@ const uilangRows: Record<string, [string, string]> = {
   '共 {n} 款 figlet 字体': ['共 {n} 款 figlet 字體', '{n} figlet fonts'],
   '预览字号': ['預覽字號', 'Preview size'],
   '仅缩放预览显示, 复制的文本不受影响': ['僅縮放預覽顯示, 複製的文字不受影響', 'Only scales the preview — copied text is unaffected'],
-  '字体来自 figlet 经典字体集; 支持英文字母 / 数字 / 常用标点, 中文等未收录字符按字体回退显示 · 默认字体可在「设置 → 其它」中调整': ['字體來自 figlet 經典字體集; 支援英文字母 / 數字 / 常用標點, 中文等未收錄字元依字體回退顯示 · 預設字體可在「設定 → 其他」中調整', 'Fonts come from the classic figlet collection; letters / digits / common punctuation are supported, while unlisted characters (e.g. CJK) fall back per font · the default font can be changed under Settings → Others'],
+  '字体来自 figlet 经典字体集; 支持英文字母 / 数字 / 常用标点, 中文等未收录字符按字体回退显示 · 默认字体与默认文字可在「设置 → 其它」中调整': ['字體來自 figlet 經典字體集; 支援英文字母 / 數字 / 常用標點, 中文等未收錄字元依字體回退顯示 · 預設字體與預設文字可在「設定 → 其他」中調整', 'Fonts come from the classic figlet collection; letters / digits / common punctuation are supported, while unlisted characters (e.g. CJK) fall back per font · the default font and default text can be changed under Settings → Others'],
   '结果 ({r} 行 · {c} 字符):': ['結果 ({r} 行 · {c} 字元):', 'Result ({r} lines · {c} chars):'],
   '复制文本': ['複製文字', 'Copy text'],
   '下载 .txt': ['下載 .txt', 'Download .txt'],

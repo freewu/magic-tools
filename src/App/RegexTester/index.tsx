@@ -219,6 +219,13 @@ const RegexTester = () => {
           size="small"
           danger
           type="text"
+          disabled={ content === '' }
+          onClick={ () => setContent('') }
+        >{t('清空内容')}</Button>
+        <Button
+          size="small"
+          danger
+          type="text"
           onClick={ () => { setPattern(''); setFlags([]); } }
         >{t('清空正则')}</Button>
         { regex !== null && content !== '' && (

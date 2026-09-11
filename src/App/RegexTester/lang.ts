@@ -34,6 +34,7 @@ const uilangRows: Record<string, [string, string]> = {
   '复制匹配行': ['複製符合行', 'Copy matched lines'],
   '填入示例': ['填入範例', 'Load sample'],
   '清空正则': ['清空正則', 'Clear regex'],
+  '清空内容': ['清空內容', 'Clear content'],
   '匹配 {a} / {b} 行': ['符合 {a} / {b} 行', '{a} / {b} lines matched'],
   ', 共 {n} 处': [', 共 {n} 處', ', {n} matches in total'],
   '请先输入正则表达式': ['請先輸入正則表達式', 'Enter a regex first'],

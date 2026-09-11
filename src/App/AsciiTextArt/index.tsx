@@ -3,11 +3,10 @@ import { CopyOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useEffect, useMemo, useState } from "react";
 import { copyTextToClipboard } from "../../lib";
 import { saveBytesFile } from "../../lib/tauri";
-import { FONT_NAMES, getDefaultFont, renderText } from "./lib";
+import { FONT_NAMES, getDefaultFont, getDefaultText, renderText } from "./lib";
 import { useLocale } from "../../hook/locale-context";
 import { u, uT } from './lang';
 
-const SAMPLE = 'Hello ASCII!';
 /** 预览字号 (仅 CSS 缩放, 不影响复制的文本) */
 const FONT_SIZE_MIN = 4;
 const FONT_SIZE_MAX = 32;
@@ -16,7 +15,8 @@ const AsciiTextArt: React.FC = () => {
   const { locale } = useLocale();
   const t = (zh: string) => u(locale, zh);
   const tt = (zh: string, v?: Record<string, string | number>) => uT(locale, zh, v);
-  const [ text, setText ] = useState(SAMPLE);
+  // 初始文字取设置中的默认文字 (默认 bluefrog)
+  const [ text, setText ] = useState(() => getDefaultText());
   const [ font, setFont ] = useState<string>(() => getDefaultFont());
   const [ fontSize, setFontSize ] = useState(12);
   const [ art, setArt ] = useState('');

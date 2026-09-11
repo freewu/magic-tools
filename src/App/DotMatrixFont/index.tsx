@@ -169,7 +169,8 @@ const DotMatrixFont = () => {
           max={ 255 }
           value={ threshold }
           onChange={ setThreshold }
-          tooltip={ { open: true, placement: 'bottom' } }
+          // 阈值提示仅悬停/拖动时显示 (不能固定 open, 否则 keep-alive 页面切走后气泡会残留到其他页面)
+          tooltip={ { placement: 'bottom' } }
         />
       </Space>
 

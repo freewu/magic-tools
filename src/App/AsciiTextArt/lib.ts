@@ -11,8 +11,12 @@ export { FONT_NAMES } from './fontNames';
 /** 字体清单缺失时的兜底字体 (必须存在于 FONT_NAMES) */
 export const DEFAULT_FONT = 'Standard';
 
+/** 默认输入文字 (打开页面时的初始内容) */
+export const DEFAULT_TEXT = 'bluefrog';
+
 // ---- 设置存取 (设置 → 其它 → ASCII 文字) ----
 const KEY_FONT = 'ascii-text-art.default-font';
+const KEY_TEXT = 'ascii-text-art.default-text';
 
 const rawGet = (k: string): string | null => {
   try { return localStorage.getItem(k); } catch { return null; }
@@ -28,6 +32,20 @@ export function getDefaultFont(): string {
 }
 export function setDefaultFont(v: string): void {
   rawSet(KEY_FONT, FONT_NAMES.includes(v) ? v : DEFAULT_FONT);
+}
+
+/** 默认文字 (未设置/清空时回退 bluefrog) */
+export function getDefaultText(): string {
+  const v = rawGet(KEY_TEXT);
+  return v !== null && v.trim() !== '' ? v : DEFAULT_TEXT;
+}
+/** 保存默认文字; 传空串表示清除设置 (回退 bluefrog) */
+export function setDefaultText(v: string): void {
+  if (v.trim() === '') {
+    try { localStorage.removeItem(KEY_TEXT); } catch { /* ignore */ }
+    return;
+  }
+  rawSet(KEY_TEXT, v);
 }
 
 // ---- 渲染 ----

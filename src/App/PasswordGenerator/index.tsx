@@ -90,6 +90,7 @@ const PasswordGenerator = () => {
   const [ symbol, setSymbol ] = useState(true);        // 符号
   const [ excludeAmbiguous, setExcludeAmbiguous ] = useState(true); // 排除易混淆
   const [ pw, setPw ] = useState('');                  // 当前密码 (生成或手工输入)
+  const [ pwVisible, setPwVisible ] = useState(true);  // 密码默认可见 (眼睛图标可切换)
   const [ notice, contextHolder ] = message.useMessage();
 
   const generate = () => {
@@ -156,6 +157,7 @@ const PasswordGenerator = () => {
                 onChange={ (e) => setPw(e.target.value) }
                 placeholder={t('点击上方按钮生成随机密码')}
                 autoComplete="new-password"
+                visibilityToggle={ { visible: pwVisible, onVisibleChange: setPwVisible } }
               />
               <Space>
                 <Button icon={ <CopyOutlined /> } onClick={ copy } disabled={ !pw }>{t('复制')}</Button>
@@ -177,6 +179,7 @@ const PasswordGenerator = () => {
               placeholder={t('在此输入或粘贴要检测的密码')}
               style={ { marginBottom: 12 } }
               autoComplete="new-password"
+              visibilityToggle={ { visible: pwVisible, onVisibleChange: setPwVisible } }
             />
             <StrengthPanel pw={ pw } t={ t } tt={ tt } />
           </Card>
