@@ -189,8 +189,17 @@ const AppIconGenerator: React.FC = () => {
         </div>
       </div>
 
-      {/* 平台选择: 整行三列等高对齐 (iOS / Android / PhoneGap) */}
-      <div style={ { display: 'flex', gap: 10, marginTop: 14, flexWrap: 'wrap', alignItems: 'stretch' } }>
+      {/* 平台选择: 网格布局 + gridAutoRows 1fr (iOS / Android / PhoneGap 三卡高度严格一致, 换行也相同) */}
+      <div
+        style={ {
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+          gridAutoRows: '1fr',
+          gap: 10,
+          marginTop: 14,
+          maxWidth: 880,
+        } }
+      >
         { ALL_PLATFORMS.map((p) => {
           const on = selected.has(p.key);
           const pxs = [...new Set(p.files.map((f) => f.px))].sort((a, b) => a - b);
@@ -199,9 +208,6 @@ const AppIconGenerator: React.FC = () => {
               key={ p.key }
               size="small"
               style={ {
-                flex: '1 1 200px',
-                minWidth: 180,
-                maxWidth: 280,
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
