@@ -20,6 +20,9 @@ const PAGE_NAMES: Record<string,string> = {
   "Help": "帮助页面",
 };
 
+// 内置页面不显示面包屑 (无上级分类层级, 只有 Tabs 标签)
+const NO_CRUMB_PAGES = new Set(Object.keys(PAGE_NAMES));
+
 // 页面组件映射 (懒加载): 固定页面 + appList 中的工具应用
 // 组件实例按 key 固定, 保证切换 Tab 时页面保持挂载 (填写的数据不丢失)
 import { lazyPage } from "../App/app-modules";
@@ -95,10 +98,13 @@ const MainContent :React.FC = () => {
     </Dropdown>
   );
 
+  // 当前页是否需要面包屑 (内置页面 AppStore / Setting / Help 不显示)
+  const hideCrumb = NO_CRUMB_PAGES.has(app);
+
   return (
     <Layout style={ { height: '100%' } }>
-      {/* 顶部: 最近打开应用标签 + 面包屑 */}
-      <div className="page-head">
+      {/* 顶部: 最近打开应用标签 + 面包屑 (内置页面仅保留标签) */}
+      <div className={ hideCrumb ? "page-head page-head--no-crumb" : "page-head" }>
         <Tabs
           className="page-tabs"
           type="editable-card"
@@ -111,7 +117,7 @@ const MainContent :React.FC = () => {
             if(action === 'remove' && typeof targetKey === 'string') closeTab(targetKey);
           } }
         />
-        <Breadcrumb className="page-breadcrumb" items={ crumbItems() } />
+        { !hideCrumb && <Breadcrumb className="page-breadcrumb" items={ crumbItems() } /> }
       </div>
       <Content
         style={{

@@ -84,6 +84,11 @@ select {
   margin: 8px 4px 12px 4px;
 }
 
+/* 无面包屑的内置页面 (应用中心 / 设置 / 帮助): 标签下方补上与面包屑相当的间距 */
+.page-head--no-crumb {
+  margin-bottom: 12px;
+}
+
 /* 多标签保活: 所有已打开标签的页面保持挂载, 仅当前页显示
    (切换 Tab 不销毁页面组件, 填写的数据不丢失) */
 .keep-alive {
