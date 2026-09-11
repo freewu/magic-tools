@@ -64,9 +64,9 @@ describe('ICO 生成', () => {
     expect(ico[24]).toBe(0x4e);
   });
 
-  it('pngToIco: 5 种尺寸均可生成', () => {
+  it('pngToIco: 6 种尺寸均可生成', () => {
     const png = pngBytes();
-    for (const sz of [16, 24, 32, 48, 64]) {
+    for (const sz of [16, 24, 32, 48, 64, 128]) {
       const ico = pngToIco(png, sz);
       expect(ico[6]).toBe(sz);
       expect(ico.length).toBe(22 + png.length);
@@ -75,7 +75,7 @@ describe('ICO 生成', () => {
 
   it('pngToIco: 非法尺寸 / 非 PNG 数据抛错', () => {
     const png = pngBytes();
-    expect(() => pngToIco(png, 128)).toThrow(/尺寸/);
+    expect(() => pngToIco(png, 256)).toThrow(/尺寸/);
     expect(() => pngToIco(png, 0)).toThrow(/尺寸/);
     const fake = new Uint8Array(20); // 全 0, 无 PNG magic
     expect(() => pngToIco(fake, 32)).toThrow(/PNG/);

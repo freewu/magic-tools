@@ -10,6 +10,7 @@ import {
 } from './lib';
 import type { Appearance, EditorId } from './lib';
 import { useLocale } from '../../hook/locale-context';
+import { savePngFile } from '../../lib/tauri';
 import { im, imT } from './lang';
 
 const { Text } = Typography;
@@ -88,11 +89,9 @@ const CodeShot: React.FC = () => {
     setExporting(true);
     try {
       const dataUrl = await toPng(node, { pixelRatio: 2, cacheBust: true });
-      const a = document.createElement('a');
-      a.href = dataUrl;
-      a.download = `code-shot-${lang}-${Date.now()}.png`;
-      a.click();
-      message.success(t('已导出 PNG'));
+      // Tauri 环境弹出系统保存对话框 (可选目录 + 文件名); 浏览器环境回退为下载
+      const ok = await savePngFile(`code-shot-${lang}-${Date.now()}.png`, dataUrl);
+      if (ok) message.success(t('已导出 PNG'));
     } catch (e) {
       message.error(tt('导出失败: {msg}', { msg: e instanceof Error ? e.message : String(e) }));
     } finally {

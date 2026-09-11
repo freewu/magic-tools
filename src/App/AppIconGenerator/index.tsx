@@ -203,18 +203,22 @@ const AppIconGenerator: React.FC = () => {
                 minWidth: 180,
                 maxWidth: 280,
                 height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
                 cursor: 'pointer',
                 borderColor: on ? token.colorPrimary : undefined,
                 boxShadow: on ? `0 0 0 1px ${token.colorPrimary}` : undefined,
                 background: on ? token.colorPrimaryBg : undefined,
                 transition: 'all 0.2s',
               } }
+              styles={ { body: { flex: '1 1 auto', display: 'flex', flexDirection: 'column' } } }
               onClick={ () => togglePlatform(p.key) }
               title={ <Checkbox checked={ on } onClick={ (e) => { e.stopPropagation(); togglePlatform(p.key); } }>{ p.title }</Checkbox> }
             >
               <div style={ { fontWeight: 600, marginBottom: 2 } }>{ tt('{n} 张', { n: p.files.length }) }</div>
               <div style={ { color: token.colorTextTertiary, fontSize: 12, margin: '0 0 6px' } }>{ t(p.desc) }</div>
-              <div style={ { color: token.colorTextSecondary, fontSize: 12 } }>{ tt('像素: {p}', { p: pxs.join(' / ') }) }</div>
+              {/* 末行贴底: 三张卡内容行数不同时像素行仍在同一水平线上 */}
+              <div style={ { color: token.colorTextSecondary, fontSize: 12, marginTop: 'auto' } }>{ tt('像素: {p}', { p: pxs.join(' / ') }) }</div>
             </Card>
           );
         }) }

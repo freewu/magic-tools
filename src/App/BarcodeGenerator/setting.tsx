@@ -1,4 +1,4 @@
-import { Divider, Form, Radio, Select, Slider, Space } from "antd";
+import { Divider, Form, Radio, Select, Slider, Typography } from "antd";
 import { useState } from "react";
 import { barcodeFormatList } from "./data";
 import {
@@ -8,7 +8,9 @@ import {
   getDefaultShowText, setDefaultShowText,
 } from "./lib";
 import { useLocale } from "../../hook/locale-context";
-import { row as _r, rowT } from "../Setting/rows-lang";
+import { row as _r } from "../Setting/rows-lang";
+
+const { Text } = Typography;
 
 export const BarcodeGeneratorSetting = () => {
   const { locale } = useLocale();
@@ -30,31 +32,31 @@ export const BarcodeGeneratorSetting = () => {
         />
       </Form.Item>
       <Form.Item label={ st('默认条宽') }>
-        <Space style={{ width: "100%" }}>
-          <div style={ { width: "100%", maxWidth: 520 } }>
-            <Slider
-              min={ 1 }
-              max={ 5 }
-              step={ 1 }
-              value={ width }
-              onChange={ (value) => { setWidth(value); setDefaultBarWidth(value); } }
-            />
-          </div>
-          { width }px
-        </Space>
+        <div style={ { display: 'flex', alignItems: 'center', gap: 12, maxWidth: 520 } }>
+          <Slider
+            style={ { flex: 1, minWidth: 0 } }
+            min={ 1 }
+            max={ 5 }
+            step={ 1 }
+            value={ width }
+            onChange={ (value) => { setWidth(value); setDefaultBarWidth(value); } }
+            tooltip={ { formatter: (v) => `${v}px` } }
+          />
+          <Text code style={ { fontSize: 12, minWidth: 56, textAlign: 'center' } }>{ width }px</Text>
+        </div>
       </Form.Item>
       <Form.Item label={ st('默认高度') }>
-        <Space style={{ width: "100%" }}>
-          <div style={ { width: "100%", maxWidth: 520 } }>
-            <Slider
-              min={ 30 }
-              max={ 300 }
-              value={ height }
-              onChange={ (value) => { setHeight(value); setDefaultBarHeight(value); } }
-            />
-          </div>
-          { height }px
-        </Space>
+        <div style={ { display: 'flex', alignItems: 'center', gap: 12, maxWidth: 520 } }>
+          <Slider
+            style={ { flex: 1, minWidth: 0 } }
+            min={ 30 }
+            max={ 300 }
+            value={ height }
+            onChange={ (value) => { setHeight(value); setDefaultBarHeight(value); } }
+            tooltip={ { formatter: (v) => `${v}px` } }
+          />
+          <Text code style={ { fontSize: 12, minWidth: 56, textAlign: 'center' } }>{ height }px</Text>
+        </div>
       </Form.Item>
       <Form.Item label={ st('显示内容') }>
         <Radio.Group

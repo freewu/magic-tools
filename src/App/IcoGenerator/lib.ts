@@ -33,7 +33,7 @@ export const dataUrlToBytes = (dataUrl: string): Uint8Array => {
 /**
  * 将单张 PNG 字节封装为单尺寸 ICO 文件字节
  * @param png PNG 图像字节 (透明通道会被保留)
- * @param size 目标尺寸 (16/24/32/48/64)
+ * @param size 目标尺寸 (16/24/32/48/64/128)
  */
 export const pngToIco = (png: Uint8Array, size: number): Uint8Array => {
   if (!(ICO_SIZES as readonly number[]).includes(size)) {
