@@ -4,8 +4,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { toPng } from 'html-to-image';
 import { ALL_LANG_IDS, highlightToHtml, resolveThemeId, themeBackground } from './engine';
 import {
-  APPEARANCES, COMMON_LANGS, EDITORS, PADDING_MAX, PADDING_MIN, langLabel,
-  getDefaultAppearance, getDefaultEditor, getDefaultLang, getDefaultPadding,
+  APPEARANCES, COMMON_LANGS, EDITORS, MIN_WIDTH_MAX, MIN_WIDTH_MIN, PADDING_MAX, PADDING_MIN, langLabel,
+  getDefaultAppearance, getDefaultEditor, getDefaultLang, getDefaultMinWidth, getDefaultPadding,
   getDefaultShowLines, setDefaultShowLines, decorateHtml,
 } from './lib';
 import type { Appearance, EditorId } from './lib';
@@ -38,6 +38,7 @@ const CodeShot: React.FC = () => {
   const [editor, setEditor] = useState<EditorId>(() => getDefaultEditor());
   const [appearance, setAppearance] = useState<Appearance>(() => getDefaultAppearance());
   const [padding, setPadding] = useState<number>(() => getDefaultPadding());
+  const [minWidth, setMinWidth] = useState<number>(() => getDefaultMinWidth());
   const [showLines, setShowLines] = useState<boolean>(() => getDefaultShowLines());
   const [html, setHtml] = useState('');
   const [err, setErr] = useState('');
@@ -105,7 +106,7 @@ const CodeShot: React.FC = () => {
         type="info"
         showIcon
         message={t('代码截图')}
-        description={t('Shiki 语法高亮 + 一键导出 PNG。支持全部内置语言（常用语言置顶），编辑器风格可选 Mac / VSCode / IntelliJ / Sublime / Vim / Emacs，明暗自适应配色，默认值均可在「设置 → 其它」中调整。')}
+        description={t('Shiki 语法高亮 + 一键导出 PNG。支持全部内置语言（常用语言置顶），编辑器风格可选 Mac / VSCode / IntelliJ / Sublime / Vim / Emacs，明暗自适应配色，默认值均可在「设置 → 图片」中调整。')}
       />
       <Row gutter={16} wrap align="stretch" style={{ marginTop: 16 }}>
         <Col xs={24} lg={13} xxl={12}>
@@ -141,23 +142,37 @@ const CodeShot: React.FC = () => {
                   <Segmented size="small" value={appearance} onChange={(v) => setAppearance(v as Appearance)} options={APPEARANCES.map((a) => ({ ...a, label: t(a.label) }))} />
                 </span>
               </Space>
-              <Space align="center" size={12} wrap>
-                <Text type="secondary" style={{ fontSize: 12 }}>{t('内边距')}</Text>
-                <Slider
-                  style={{ width: 220 }}
-                  min={PADDING_MIN}
-                  max={PADDING_MAX}
-                  value={padding}
-                  onChange={setPadding}
-                  tooltip={{ formatter: (v) => `${v}px` }}
-                />
-                <Text code style={{ fontSize: 12 }}>{padding}px</Text>
+              <Space align="center" size={16} wrap>
+                <Space size={6} align="center">
+                  <Text type="secondary" style={{ fontSize: 12 }}>{t('内边距')}</Text>
+                  <Slider
+                    style={{ width: 180 }}
+                    min={PADDING_MIN}
+                    max={PADDING_MAX}
+                    value={padding}
+                    onChange={setPadding}
+                    tooltip={{ formatter: (v) => `${v}px` }}
+                  />
+                  <Text code style={{ fontSize: 12 }}>{padding}px</Text>
+                </Space>
+                <Space size={6} align="center">
+                  <Text type="secondary" style={{ fontSize: 12 }}>{t('最小宽度')}</Text>
+                  <Slider
+                    style={{ width: 180 }}
+                    min={MIN_WIDTH_MIN}
+                    max={MIN_WIDTH_MAX}
+                    value={minWidth}
+                    onChange={setMinWidth}
+                    tooltip={{ formatter: (v) => (v ? `${v}px` : t('自适应')) }}
+                  />
+                  <Text code style={{ fontSize: 12 }}>{ minWidth > 0 ? `${minWidth}px` : t('自适应') }</Text>
+                </Space>
                 <Checkbox
                   checked={showLines}
                   onChange={(e) => { setShowLines(e.target.checked); setDefaultShowLines(e.target.checked); }}
->
-                {t('显示行号')}
-              </Checkbox>
+                >
+                  {t('显示行号')}
+                </Checkbox>
                 <Tag color="blue">{langLabel(lang)} · {themeId}</Tag>
               </Space>
               <Input.TextArea
@@ -188,6 +203,7 @@ const CodeShot: React.FC = () => {
                     ref={shotRef}
                     style={{
                       display: 'inline-block',
+                      minWidth: minWidth > 0 ? minWidth : undefined,
                       borderRadius: radius,
                       background: bg,
                       border: `1px solid ${borderColor}`,
@@ -207,7 +223,7 @@ const CodeShot: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <Text type="secondary" style={{ fontSize: 12 }}>{t('导出尺寸 = 截图内容实际像素 × 2 (pixelRatio); 行号随行对齐并随 PNG 一并导出。若内边距较小时圆角会自动收小, 避免代码压弧产生暗圈。')}</Text>
+                <Text type="secondary" style={{ fontSize: 12 }}>{t('导出尺寸 = 截图内容实际像素 × 2 (pixelRatio); 行号随行对齐并随 PNG 一并导出。最小宽度为 0 时截图宽度按代码长度自适应。若内边距较小时圆角会自动收小, 避免代码压弧产生暗圈。')}</Text>
               </Space>
             ) : (
               <Text type="secondary">{t('输入代码后实时预览，点击「导出 PNG」生成图片。')}</Text>

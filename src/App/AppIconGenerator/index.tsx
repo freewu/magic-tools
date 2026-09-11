@@ -138,14 +138,20 @@ const AppIconGenerator: React.FC = () => {
 
   return (
     <div>
-      <div style={ { display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' } }>
+      {/* 上传区与预览区齐平 (上下对齐, 预览无独立标题行) */}
+      <div style={ { display: 'flex', gap: 24, alignItems: 'stretch', flexWrap: 'wrap' } }>
         {/* 左: 上传 */}
-        <div style={ { flex: '1 1 360px', minWidth: 320, maxWidth: 460 } }>
+        <div style={ { flex: '1 1 360px', minWidth: 320, maxWidth: 460, display: 'flex', flexDirection: 'column' } }>
           <div
             onClick={ () => fileRef.current?.click() }
             onDragOver={ (e) => e.preventDefault() }
             onDrop={ onDrop }
             style={ {
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
               border: '1px dashed #bbb',
               borderRadius: 8,
               padding: '28px 16px',
@@ -165,54 +171,10 @@ const AppIconGenerator: React.FC = () => {
             style={ { display: 'none' } }
             onChange={ (e) => { const f = e.target.files?.[0]; if (f) loadFile(f); e.target.value = ''; } }
           />
-
-          {/* 平台规格: 卡片勾选, 选中边框高亮 */}
-          <div style={ { display: 'flex', gap: 10, marginTop: 14, flexWrap: 'wrap' } }>
-            { ALL_PLATFORMS.map((p) => {
-              const on = selected.has(p.key);
-              const pxs = [...new Set(p.files.map((f) => f.px))].sort((a, b) => a - b);
-              return (
-                <Card
-                  key={ p.key }
-                  size="small"
-                  style={ {
-                    width: 208,
-                    cursor: 'pointer',
-                    borderColor: on ? token.colorPrimary : undefined,
-                    boxShadow: on ? `0 0 0 1px ${token.colorPrimary}` : undefined,
-                    background: on ? token.colorPrimaryBg : undefined,
-                    transition: 'all 0.2s',
-                  } }
-                  onClick={ () => togglePlatform(p.key) }
-                  title={ <Checkbox checked={ on } onClick={ (e) => { e.stopPropagation(); togglePlatform(p.key); } }>{ p.title }</Checkbox> }
-                >
-                  <div style={ { fontWeight: 600, marginBottom: 2 } }>{ tt('{n} 张', { n: p.files.length }) }</div>
-                  <div style={ { color: token.colorTextTertiary, fontSize: 12, margin: '0 0 6px' } }>{ t(p.desc) }</div>
-                  <div style={ { color: token.colorTextSecondary, fontSize: 12 } }>{ tt('像素: {p}', { p: pxs.join(' / ') }) }</div>
-                </Card>
-              );
-            }) }
-          </div>
-          <div style={ { color: token.colorTextTertiary, fontSize: 12, marginTop: 6 } }>
-            { tt('点击卡片可勾选 / 取消平台, 选中的平台才会被打包下载 (当前选中 {n} 张)', { n: selCount }) }
-          </div>
-
-          <Button
-            type="primary"
-            size="large"
-            block
-            loading={ busy }
-            disabled={ !srcName || selCount === 0 }
-            onClick={ downloadAll }
-            style={ { marginTop: 10 } }
-          >
-            { busy ? t('正在生成…') : tt('下载所选平台图标 (.zip · {n} 张)', { n: selCount }) }
-          </Button>
         </div>
 
-        {/* 右: 预览 */}
-        <div style={ { textAlign: 'center' } }>
-          <div style={ { color: '#888', marginBottom: 8, fontSize: 12 } }>{t('1024 主图标预览')}</div>
+        {/* 右: 预览 (标题置于图片下方, 与上传区顶部齐平) */}
+        <div style={ { display: 'flex', flexDirection: 'column', alignItems: 'center' } }>
           { master ? (
             <img src={ master } alt="master" width={ 160 } height={ 160 } style={ { ...checkerBg, padding: 8 } } />
           ) : (
@@ -220,11 +182,58 @@ const AppIconGenerator: React.FC = () => {
               {t('上传后预览')}
             </div>
           ) }
-          <div style={ { color: '#aaa', marginTop: 6, fontSize: 12 } }>
+          <div style={ { color: '#888', marginTop: 6, fontSize: 12 } }>{t('1024 主图标预览')}</div>
+          <div style={ { color: '#aaa', marginTop: 2, fontSize: 12 } }>
             {t('iOS · Android · PhoneGap 三平台同时生成')}
           </div>
         </div>
       </div>
+
+      {/* 平台选择: 整行三列等高对齐 (iOS / Android / PhoneGap) */}
+      <div style={ { display: 'flex', gap: 10, marginTop: 14, flexWrap: 'wrap', alignItems: 'stretch' } }>
+        { ALL_PLATFORMS.map((p) => {
+          const on = selected.has(p.key);
+          const pxs = [...new Set(p.files.map((f) => f.px))].sort((a, b) => a - b);
+          return (
+            <Card
+              key={ p.key }
+              size="small"
+              style={ {
+                flex: '1 1 200px',
+                minWidth: 180,
+                maxWidth: 280,
+                height: '100%',
+                cursor: 'pointer',
+                borderColor: on ? token.colorPrimary : undefined,
+                boxShadow: on ? `0 0 0 1px ${token.colorPrimary}` : undefined,
+                background: on ? token.colorPrimaryBg : undefined,
+                transition: 'all 0.2s',
+              } }
+              onClick={ () => togglePlatform(p.key) }
+              title={ <Checkbox checked={ on } onClick={ (e) => { e.stopPropagation(); togglePlatform(p.key); } }>{ p.title }</Checkbox> }
+            >
+              <div style={ { fontWeight: 600, marginBottom: 2 } }>{ tt('{n} 张', { n: p.files.length }) }</div>
+              <div style={ { color: token.colorTextTertiary, fontSize: 12, margin: '0 0 6px' } }>{ t(p.desc) }</div>
+              <div style={ { color: token.colorTextSecondary, fontSize: 12 } }>{ tt('像素: {p}', { p: pxs.join(' / ') }) }</div>
+            </Card>
+          );
+        }) }
+      </div>
+      <div style={ { color: token.colorTextTertiary, fontSize: 12, marginTop: 6 } }>
+        { tt('点击卡片可勾选 / 取消平台, 选中的平台才会被打包下载 (当前选中 {n} 张)', { n: selCount }) }
+      </div>
+
+      <Button
+        type="primary"
+        size="large"
+        block
+        loading={ busy }
+        disabled={ !srcName || selCount === 0 }
+        onClick={ downloadAll }
+        style={ { marginTop: 10, maxWidth: 460 } }
+      >
+        { busy ? t('正在生成…') : tt('下载所选平台图标 (.zip · {n} 张)', { n: selCount }) }
+      </Button>
 
       <Collapse
         ghost

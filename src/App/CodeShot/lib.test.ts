@@ -2,6 +2,7 @@ import {
   COMMON_LANGS, EDITORS, THEME_MAP, USED_THEME_IDS, langLabel,
   getDefaultLang, setDefaultLang, getDefaultEditor, setDefaultEditor,
   getDefaultAppearance, setDefaultAppearance, getDefaultPadding, setDefaultPadding,
+  getDefaultMinWidth, setDefaultMinWidth, MIN_WIDTH_MAX, DEFAULT_PADDING,
   getDefaultShowLines, setDefaultShowLines, decorateHtml,
 } from './lib';
 
@@ -39,11 +40,13 @@ describe('代码截图 - 常用语言', () => {
 });
 
 describe('代码截图 - 设置默认值与持久化', () => {
-  test('需求默认: vim / 深色 / padding 40 / javascript / 显示行号', () => {
+  test('需求默认: vim / 深色 / padding 8 / 最小宽度 0 / javascript / 显示行号', () => {
     localStorage.clear();
     expect(getDefaultEditor()).toBe('vim');
     expect(getDefaultAppearance()).toBe('dark');
-    expect(getDefaultPadding()).toBe(40);
+    expect(DEFAULT_PADDING).toBe(8);
+    expect(getDefaultPadding()).toBe(8);
+    expect(getDefaultMinWidth()).toBe(0);
     expect(getDefaultLang()).toBe('javascript');
     expect(getDefaultShowLines()).toBe(true);
   });
@@ -52,10 +55,12 @@ describe('代码截图 - 设置默认值与持久化', () => {
     setDefaultEditor('vscode');
     setDefaultAppearance('light');
     setDefaultPadding(48);
+    setDefaultMinWidth(640);
     setDefaultLang('python');
     expect(getDefaultEditor()).toBe('vscode');
     expect(getDefaultAppearance()).toBe('light');
     expect(getDefaultPadding()).toBe(48);
+    expect(getDefaultMinWidth()).toBe(640);
     expect(getDefaultLang()).toBe('python');
   });
   test('padding 越界被钳制', () => {
@@ -65,10 +70,21 @@ describe('代码截图 - 设置默认值与持久化', () => {
     setDefaultPadding(-5);
     expect(getDefaultPadding()).toBe(0);
   });
+  test('最小宽度越界被钳制 (0 = 自适应)', () => {
+    localStorage.clear();
+    setDefaultMinWidth(99999);
+    expect(getDefaultMinWidth()).toBe(MIN_WIDTH_MAX);
+    setDefaultMinWidth(-20);
+    expect(getDefaultMinWidth()).toBe(0);
+    setDefaultMinWidth(0);
+    expect(getDefaultMinWidth()).toBe(0);
+  });
   test('非法持久化值回落默认', () => {
     localStorage.clear();
     localStorage.setItem('code-shot.default-padding', 'abc');
-    expect(getDefaultPadding()).toBe(40);
+    expect(getDefaultPadding()).toBe(8);
+    localStorage.setItem('code-shot.default-min-width', 'abc');
+    expect(getDefaultMinWidth()).toBe(0);
     localStorage.setItem('code-shot.default-editor', 'nope');
     expect(getDefaultEditor()).toBe('vim');
   });

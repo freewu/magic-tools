@@ -105,6 +105,7 @@ const KEYS = {
   editor: 'code-shot.default-editor',
   appearance: 'code-shot.default-appearance',
   padding: 'code-shot.default-padding',
+  minWidth: 'code-shot.default-min-width',
   lines: 'code-shot.default-lines',
 };
 
@@ -130,14 +131,31 @@ export const setDefaultAppearance = (v: Appearance): void => set(KEYS.appearance
 
 export const PADDING_MIN = 0;
 export const PADDING_MAX = 96;
+/** 默认内边距 (需求: 8px) */
+export const DEFAULT_PADDING = 8;
 
+/** 最小宽度上下限 (0 = 按代码宽度自适应, 不限制最小宽度) */
+export const MIN_WIDTH_MIN = 0;
+export const MIN_WIDTH_MAX = 1200;
+
+/** 默认内边距 (需求: 8px) */
 export function getDefaultPadding(): number {
-  const v = Number(get(KEYS.padding, '40'));
-  if (Number.isNaN(v)) return 40;
+  const v = Number(get(KEYS.padding, String(DEFAULT_PADDING)));
+  if (Number.isNaN(v)) return DEFAULT_PADDING;
   return Math.max(PADDING_MIN, Math.min(PADDING_MAX, Math.round(v)));
 }
 export function setDefaultPadding(v: number): void {
   set(KEYS.padding, String(Math.max(PADDING_MIN, Math.min(PADDING_MAX, Math.round(v)))));
+}
+
+/** 默认最小宽度 (0 = 不限制, 截图区域随代码宽度自适应) */
+export function getDefaultMinWidth(): number {
+  const v = Number(get(KEYS.minWidth, '0'));
+  if (Number.isNaN(v)) return 0;
+  return Math.max(MIN_WIDTH_MIN, Math.min(MIN_WIDTH_MAX, Math.round(v)));
+}
+export function setDefaultMinWidth(v: number): void {
+  set(KEYS.minWidth, String(Math.max(MIN_WIDTH_MIN, Math.min(MIN_WIDTH_MAX, Math.round(v)))));
 }
 
 export function getDefaultShowLines(): boolean {

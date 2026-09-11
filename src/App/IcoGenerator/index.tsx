@@ -99,14 +99,32 @@ const IcoGenerator: React.FC = () => {
 
   return (
     <div>
-      <div style={ { display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' } }>
-        {/* 左: 上传 + 尺寸选择 */}
-        <div style={ { flex: '1 1 380px', minWidth: 320, maxWidth: 460 } }>
+      {/* 顶部: 生成尺寸 (置于上传区上方) */}
+      <div style={ { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 12 } }>
+        <span>{t('生成尺寸')}</span>
+        <Select
+          style={ { width: 120 } }
+          value={ size }
+          onChange={ onSizeChange }
+          options={ ICO_SIZES.map((v) => ({ value: v, label: v + ' × ' + v })) }
+        />
+        { info && <span style={ { color: '#999', fontSize: 12 } }>{ info }</span> }
+      </div>
+
+      {/* 上传区与预览区等高对齐 (底部齐平) */}
+      <div style={ { display: 'flex', gap: 24, alignItems: 'stretch', flexWrap: 'wrap' } }>
+        {/* 左: 点击 / 拖拽上传 */}
+        <div style={ { flex: '1 1 380px', minWidth: 320, maxWidth: 460, display: 'flex', flexDirection: 'column' } }>
           <div
             onClick={ () => fileRef.current?.click() }
             onDragOver={ (e) => e.preventDefault() }
             onDrop={ onDrop }
             style={ {
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
               border: '1px dashed #bbb',
               borderRadius: 8,
               padding: '28px 16px',
@@ -126,21 +144,11 @@ const IcoGenerator: React.FC = () => {
             style={ { display: 'none' } }
             onChange={ (e) => { const f = e.target.files?.[0]; if (f) loadFile(f); e.target.value = ''; } }
           />
-          <div style={ { display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 } }>
-            <span>{t('生成尺寸')}</span>
-            <Select
-              style={ { width: 120 } }
-              value={ size }
-              onChange={ onSizeChange }
-              options={ ICO_SIZES.map((v) => ({ value: v, label: v + ' × ' + v })) }
-            />
-            { info && <span style={ { color: '#999', fontSize: 12 } }>{ info }</span> }
-          </div>
           { srcName && !preview && <div style={ { color: '#999', marginTop: 8, fontSize: 12 } }>{t('正在生成…')}</div> }
         </div>
 
         {/* 右: 图标预览 (点击弹窗保存) */}
-        <div style={ { textAlign: 'center' } }>
+        <div style={ { display: 'flex', flexDirection: 'column', alignItems: 'center' } }>
           <div style={ { color: '#888', marginBottom: 8, fontSize: 12 } }>{ tt('生成预览 ({s}×{s} 放大展示)', { s: size }) }</div>
           { preview ? (
             <>

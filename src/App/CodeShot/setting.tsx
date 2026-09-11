@@ -1,17 +1,17 @@
 import { Divider, Form, Select, Slider, Switch } from 'antd';
 import { useState } from 'react';
 import {
-  APPEARANCES, COMMON_LANGS, EDITORS, PADDING_MAX, PADDING_MIN,
-  getDefaultAppearance, getDefaultEditor, getDefaultLang, getDefaultPadding,
+  APPEARANCES, COMMON_LANGS, EDITORS, MIN_WIDTH_MAX, MIN_WIDTH_MIN, PADDING_MAX, PADDING_MIN,
+  getDefaultAppearance, getDefaultEditor, getDefaultLang, getDefaultMinWidth, getDefaultPadding,
   getDefaultShowLines, setDefaultShowLines,
-  setDefaultAppearance, setDefaultEditor, setDefaultLang, setDefaultPadding,
+  setDefaultAppearance, setDefaultEditor, setDefaultLang, setDefaultMinWidth, setDefaultPadding,
 } from './lib';
 import type { Appearance, EditorId } from './lib';
 import { useLocale } from "../../hook/locale-context";
 import { im } from './lang';
 import { row as _r, rowT } from "../Setting/rows-lang";
 
-/** 代码截图默认值设置 (挂载到 设置 → 其它) */
+/** 代码截图默认值设置 (挂载到 设置 → 图片) */
 export const CodeShotSetting: React.FC = () => {
   const { locale } = useLocale();
   const st = (zh: string) => _r(locale, zh);
@@ -19,6 +19,7 @@ export const CodeShotSetting: React.FC = () => {
   const [editor, setEditor] = useState<EditorId>(() => getDefaultEditor());
   const [appearance, setAppearance] = useState<Appearance>(() => getDefaultAppearance());
   const [padding, setPadding] = useState<number>(() => getDefaultPadding());
+  const [minWidth, setMinWidth] = useState<number>(() => getDefaultMinWidth());
   const [showLines, setShowLines] = useState<boolean>(() => getDefaultShowLines());
 
   return (
@@ -48,6 +49,19 @@ export const CodeShotSetting: React.FC = () => {
           value={padding}
           onChange={(v) => { setPadding(v); setDefaultPadding(v); }}
           tooltip={{ formatter: (val) => `${val}px` }}
+        />
+      </Form.Item>
+      <Form.Item
+        label={ st('默认最小宽度') }
+        extra={ rowT(locale, minWidth > 0 ? '当前 ${w}px' : '当前 0 (按代码宽度自适应)', { w: minWidth }) }
+      >
+        <Slider
+          style={{ width: 280 }}
+          min={MIN_WIDTH_MIN}
+          max={MIN_WIDTH_MAX}
+          value={minWidth}
+          onChange={(v) => { setMinWidth(v); setDefaultMinWidth(v); }}
+          tooltip={{ formatter: (val) => (val ? `${val}px` : rowT(locale, '自适应')) }}
         />
       </Form.Item>
       <Form.Item label={ st('默认显示行号') }>
