@@ -31,6 +31,33 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-09-14 V2.8.0 Release", "2026-09-14 V2.8.0 Release", "2026-09-14 V2.8.0 Release"),
+    items: trio(
+      [
+        "新增「数据生成」工具: 按 Mock.js 语法生成测试数据 (JSON / CSV / SQL), 支持模板、区间、自增、枚举、占位符等规则, 可在设置中心配置默认格式 / 表名 / 生成数量",
+        "新增「WebSocket 调试」工具: 浏览器原生 WebSocket 调试台, 支持 ws/wss 连接、心跳保活、JSON 美化、收发日志复制与下载",
+        "图片主题色: 重构为「统计像素 -> 合并相近色 -> 按占比排序」, 可调相似度级别 / 输出颜色数 / 透明阈值, 支持占比条、复制、导出 CSV 与色卡 PNG, 并归入「图片」分类",
+        "图片主题色: 颜色值支持 HEX / RGB / HSL / CMYK / HSV / LAB / LCH / XYZ 共 8 种格式展示与导出 (默认 HEX), 默认值可在 设置中心 → 图片 修改",
+        "新增工具需在 src/App/index.tsx 的工具注册表 list 中登记, 三个 README 已补充该步骤说明; 工具总数 109, 分类计数同步修正",
+      ],
+      [
+        "新增「資料產生」工具: 依 Mock.js 語法產生測試資料 (JSON / CSV / SQL), 支援模板、區間、自增、列舉、佔位符等規則, 可在設定中心設定預設格式 / 表名 / 產生數量",
+        "新增「WebSocket 偵錯」工具: 瀏覽器原生 WebSocket 偵錯台, 支援 ws/wss 連線、心跳保活、JSON 美化、收發日誌複製與下載",
+        "圖片主題色: 重構為「統計像素 -> 合併相近色 -> 依佔比排序」, 可調相似度級別 / 輸出顏色數 / 透明閾值, 支援佔比條、複製、匯出 CSV 與色卡 PNG, 並歸入「圖片」分類",
+        "圖片主題色: 顏色值支援 HEX / RGB / HSL / CMYK / HSV / LAB / LCH / XYZ 共 8 種格式顯示與匯出 (預設 HEX), 預設值可在 設定中心 → 圖片 修改",
+        "新增工具需在 src/App/index.tsx 的工具註冊表 list 中登記, 三個 README 已補充該步驟說明; 工具總數 109, 分類計數同步修正",
+      ],
+      [
+        "New Mock Data tool: generates test data (JSON / CSV / SQL) from Mock.js syntax — templates, ranges, auto-increment, enums and placeholders — with default format / table name / record count configurable in Settings",
+        "New WebSocket Debugger tool: a browser-native WebSocket console with ws/wss connections, heartbeat, JSON pretty-printing, and copy/download of the send & receive log",
+        "Dominant colors: rebuilt around count → merge similar colors → sort by share, with adjustable similarity level, color count and alpha threshold, plus a share bar, copy, CSV and swatch-PNG export; moved into the Image category",
+        "Dominant colors: color values can be shown and exported in 8 formats (HEX / RGB / HSL / CMYK / HSV / LAB / LCH / XYZ), HEX by default and configurable in Settings → Image",
+        "New tools must be registered in the tool registry list of src/App/index.tsx; all three READMEs document this step. Tool count is 109 and the per-category counts were corrected",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-09-10 V2.7.3 Release", "2026-09-10 V2.7.3 Release", "2026-09-10 V2.7.3 Release"),
     items: trio(
       [
