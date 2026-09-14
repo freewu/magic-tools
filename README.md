@@ -48,8 +48,8 @@ QR code · Barcode (CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · Base64 image �
 ### 🌐 Webmaster Tools *(9)*
 HTML stripper · Browser fingerprint · URL extractor · Cookie analyzer · User-Agent parser · Sitemap checker · Keyword density · TDK checker · robots.txt generator
 
-### 🧩 Utilities *(14)*
-CSS colors · Line counter · htpasswd generator · Regex tester (17 presets) · File diff · Dot-matrix font · Keyboard key info · Chmod calculator · OTP generator · ASCII text art · Cron rules (parse + next runs) · CIDR calculator · Password generator (strength analysis) · Image color palette
+### 🧩 Utilities *(16)*
+CSS colors · Line counter · htpasswd generator · Regex tester (17 presets) · File diff · Dot-matrix font · Keyboard key info · Chmod calculator · OTP generator · ASCII text art · Cron rules (parse + next runs) · CIDR calculator · Password generator (strength analysis) · Image color palette · Mock data generator (JSON/CSV/SQL) · WebSocket debugger
 
 > Plus built-in app pages: **App Center**, **Help & changelog**, **Settings**.
 
@@ -88,7 +88,7 @@ magic-tools
 │   │   ├── app-modules.ts    # build-time collection via import.meta.glob (replaces webpack context)
 │   │   ├── app-i18n.ts       # app registry: appNameOf() trilingual names for tools & fixed pages
 │   │   ├── lang-packs.ts     # aggregates every tool's default language pack (lang.ts default export)
-│   │   └── <Tool>/           # one folder per tool — auto-registered (110, grouped list below)
+│   │   └── <Tool>/           # one folder per tool — auto-registered (112, grouped list below)
 │   │       ├── define.tsx    # registration metadata: AppName (zh-CN default) / Icon / Type (category)
 │   │       ├── index.tsx     # tool page component (default export; lazy-loaded)
 │   │       ├── lang.ts       # default language pack + rows (zh phrase = key → [zh-TW, en]) + lookup helpers
@@ -107,7 +107,7 @@ magic-tools
 
 ### Existing tools under `src/App/`
 
-110 tool folders live under [`src/App/`](src/App/) and are registered automatically (a folder = one tool, from its `define.tsx`). Grouped below by the `Type` registered in `define.tsx` (same categories as the sidebar / [feature overview](#-feature-overview)). Some tools add tool-specific files besides the common ones (e.g. `AESCrypto/gcm.ts`, `Hash/sm3.ts`+`keccak.ts`, `CronRules/parse.tsx`, `Setting/setting-*.tsx`):
+112 tool folders live under [`src/App/`](src/App/) and are registered automatically (a folder = one tool, from its `define.tsx`). Grouped below by the `Type` registered in `define.tsx` (same categories as the sidebar / [feature overview](#-feature-overview)). Some tools add tool-specific files besides the common ones (e.g. `AESCrypto/gcm.ts`, `Hash/sm3.ts`+`keccak.ts`, `CronRules/parse.tsx`, `Setting/setting-*.tsx`):
 
 **🔐 Cryptography *(21)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
 
@@ -123,7 +123,7 @@ magic-tools
 
 **🌐 Webmaster Tools *(9)*** — `BrowserFingerprint` · `CookieAnalyzer` · `HtmlStripText` · `KeywordDensity` · `RobotsTxtGenerator` · `SitemapCheck` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck`
 
-**🧩 Utilities *(14)*** — `AsciiTextArt` · `CIDRCalc` · `Chmod` · `Color` · `CronRules` · `DotMatrixFont` · `FileDiff` · `HtpasswdGenerator` · `ImageColor` · `KeyboardKeyInfo` · `LineCount` · `OTPGenerator` · `PasswordGenerator` · `RegexTester`
+**🧩 Utilities *(16)*** — `AsciiTextArt` · `CIDRCalc` · `Chmod` · `Color` · `CronRules` · `DotMatrixFont` · `FileDiff` · `HtpasswdGenerator` · `ImageColor` · `KeyboardKeyInfo` · `LineCount` · `MockData` · `OTPGenerator` · `PasswordGenerator` · `RegexTester` · `WebSocketDebug`
 
 > Built-in pages `AppStore`（App Center）/ `Help` / `Setting` also live in `src/App/` (registered with `Type = 'misc'`), but are fixed pages rather than tools.
 

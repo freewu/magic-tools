@@ -214,6 +214,13 @@ const ROWS: Record<string, Row> = {
 
   '容积转换': ['容積換算', 'Volume Converter'],
 
+  // ---- 数据生成 (Mock Data) ----
+  '数据生成': ['資料產生', 'Mock Data'],
+  '默认表名': ['預設表名', 'Default table name'],
+  '默认生成数量': ['預設產生數量', 'Default record count'],
+  'SQL 输出的默认表名, 仅保留字母 / 数字 / 下划线 / $': ['SQL 輸出的預設表名, 僅保留字母 / 數字 / 底線 / $', 'Default table name for SQL output; letters, digits, underscore and $ only'],
+  '${min} - ${max} 条, 默认 ${d}': ['${min} - ${max} 筆, 預設 ${d}', '${min} - ${max} records, default ${d}'],
+
 };
 
 /**

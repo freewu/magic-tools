@@ -110,6 +110,8 @@ import RobotsTxtGenerator from './RobotsTxtGenerator/lang';
 import AppStore from './AppStore/lang';
 import Setting from './Setting/lang';
 import Help from './Help/lang';
+import MockData from './MockData/lang';
+import WebSocketDebug from './WebSocketDebug/lang';
 
 export const langPacks = {
   Hash: Hash,
@@ -222,4 +224,6 @@ export const langPacks = {
   AppStore,
   Setting,
   Help,
+  MockData,
+  WebSocketDebug,
 };

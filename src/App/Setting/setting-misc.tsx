@@ -4,6 +4,7 @@ import { ColorSetting } from "../Color/setting";
 import { HtpasswdGeneratorSetting } from "../HtpasswdGenerator/setting";
 import { RegexTesterSetting } from "../RegexTester/setting";
 import { AsciiTextArtSetting } from "../AsciiTextArt/setting";
+import { MockDataSetting } from "../MockData/setting";
 
 export const SettingMisc = () => {
 
@@ -13,6 +14,7 @@ export const SettingMisc = () => {
       <HtpasswdGeneratorSetting />
       <RegexTesterSetting />
       <AsciiTextArtSetting />
+      <MockDataSetting />
     </Form>
   )
 }
