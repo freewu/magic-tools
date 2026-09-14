@@ -31,6 +31,36 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-09-15 V2.9.0 Release", "2026-09-15 V2.9.0 Release", "2026-09-15 V2.9.0 Release"),
+    items: trio(
+      [
+        "新增「图片分割」工具: 按 2 / 3 / 4 / 6 / 9 份把图片切成整齐的小图, 支持 8 种分割方向、顺序/行列编号、每块输出宽度与文件名前缀, 一键「保存全部到文件夹」",
+        "新增「图片尺寸调整」工具: 按比例 (1-400%) 或按像素缩放图片, 支持锁定宽高比、不放大图片、PNG / JPEG 输出与 JPEG 质量调节, 缩小超过一半时分多步绘制避免锯齿",
+        "图片分割: 预览紧密拼合为整图并在每块左上角标注序号, 新增「图块间隔」0-12 (默认 2) 画出分割线, 0 为无缝拼合; 移除单张保存, 统一走「保存全部到文件夹」",
+        "设置中心 → 图片: 新增「图片分割」「图片尺寸调整」面板 (默认份数 / 输出格式 / JPEG 质量 / 缩放比例 / 锁定宽高比)",
+        "多语言: 补齐遗漏词条并修复未走 t() 的硬编码文案 (图片主题色、Blowfish ~ RC6、JSON / JSON5、RSA / SM2、WebTDK、ASCII 文字与图片、Markdown 等)",
+        "工具总数 111 (图片分类 12 个), README 三语与官网计数、工具清单同步",
+      ],
+      [
+        "新增「圖片分割」工具: 依 2 / 3 / 4 / 6 / 9 份把圖片切成整齊的小圖, 支援 8 種分割方向、順序/行列編號、每塊輸出寬度與檔名前綴, 一鍵「儲存全部到資料夾」",
+        "新增「圖片尺寸調整」工具: 依比例 (1-400%) 或依像素縮放圖片, 支援鎖定長寬比、不放大圖片、PNG / JPEG 輸出與 JPEG 品質調節, 縮小超過一半時分多步繪製避免鋸齒",
+        "圖片分割: 預覽緊密拼合為整圖並在每塊左上角標註序號, 新增「圖塊間隔」0-12 (預設 2) 畫出分割線, 0 為無縫拼合; 移除單張儲存, 統一走「儲存全部到資料夾」",
+        "設定中心 → 圖片: 新增「圖片分割」「圖片尺寸調整」面板 (預設份數 / 輸出格式 / JPEG 品質 / 縮放比例 / 鎖定長寬比)",
+        "多語言: 補齊遺漏詞條並修復未走 t() 的硬編碼文案 (圖片主題色、Blowfish ~ RC6、JSON / JSON5、RSA / SM2、WebTDK、ASCII 文字與圖片、Markdown 等)",
+        "工具總數 111 (圖片分類 12 個), README 三語與官網計數、工具清單同步",
+      ],
+      [
+        "New tool: Image Splitter — cut one image into 2 / 3 / 4 / 6 / 9 neat tiles with 8 layouts, sequential or row-column numbering, per-tile output width and a file-name prefix, exported at once via \"Save all to folder\"",
+        "New tool: Image Resizer — resize by percentage (1-400%) or by pixels, with aspect-ratio lock, never-enlarge (shrink only), PNG / JPEG output and adjustable JPEG quality; reductions over half are drawn in steps to avoid aliasing",
+        "Image Splitter: the preview is assembled seamlessly into the whole picture with a translucent index on each tile; a new \"Tile gap\" (0-12, default 2) draws the separator lines and 0 joins them seamlessly; per-tile saving was removed in favour of \"Save all to folder\"",
+        "Settings → Image: new Image Splitter and Image Resizer panels (default parts / output format / JPEG quality / scale / aspect-ratio lock)",
+        "i18n: filled in missing entries and fixed hard-coded strings that bypassed t() (dominant color, Blowfish ~ RC6, JSON / JSON5, RSA / SM2, WebTDK, ASCII text and image, Markdown, …)",
+        "Tool count is now 111 (12 in the image category); the three READMEs and the website counts and tool lists were synced",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-09-14 V2.8.0 Release", "2026-09-14 V2.8.0 Release", "2026-09-14 V2.8.0 Release"),
     items: trio(
       [
