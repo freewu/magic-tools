@@ -5,8 +5,9 @@ import { CodeShotSetting } from "../CodeShot/setting";
 import { PlaceholderImageSetting } from "../PlaceholderImage/setting";
 import { IcoGeneratorSetting } from "../IcoGenerator/setting";
 import { ImageColorSetting } from "../ImageColor/setting";
+import { ImageSplitSetting } from "../ImageSplit/setting";
 
-// 图片分类设置: 二维码 / 条形码 / 代码截图 / 占位图片 / ICO 生成 / 图片主题色 (ASCII 图片、App Icon 暂无设置项)
+// 图片分类设置: 二维码 / 条形码 / 代码截图 / 占位图片 / ICO 生成 / 图片主题色 / 图片分割 (ASCII 图片、App Icon 暂无设置项)
 export const SettingImage = () => {
 
   return (
@@ -17,6 +18,7 @@ export const SettingImage = () => {
       <PlaceholderImageSetting />
       <IcoGeneratorSetting />
       <ImageColorSetting />
+      <ImageSplitSetting />
     </Form>
   )
 }

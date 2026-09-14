@@ -93,6 +93,7 @@ const list = [
   'OTPGenerator',
   'AsciiImageGenerator',
   'ImageColor',
+  'ImageSplit',
   'AsciiTextArt',
   'CronRules',
   'HtmlStripText',

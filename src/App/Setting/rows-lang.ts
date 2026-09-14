@@ -229,6 +229,23 @@ const ROWS: Record<string, Row> = {
     'Default color format shown when opening the dominant-color tool (default ${d}); switchable on the tool page',
   ],
 
+  // ---- 图片分割 (Image Splitter) ----
+  '图片分割': ['圖片分割', 'Image Splitter'],
+  '默认分割份数': ['預設分割份數', 'Default split count'],
+  '默认 JPEG 质量': ['預設 JPEG 品質', 'Default JPEG quality'],
+  '打开「图片分割」工具时默认选中的份数, 默认 ${d} 份': [
+    '開啟「圖片分割」工具時預設選取的份數, 預設 ${d} 份',
+    'Default split count when opening the image-splitter tool (default ${d} parts)',
+  ],
+  '打开「图片分割」工具时默认的输出格式, 默认 ${d}': [
+    '開啟「圖片分割」工具時預設的輸出格式, 預設 ${d}',
+    'Default output format when opening the image-splitter tool (default ${d})',
+  ],
+  '仅输出 JPEG 时生效, 默认 ${d}': [
+    '僅輸出 JPEG 時生效, 預設 ${d}',
+    'Applies to JPEG output only, default ${d}',
+  ],
+
 };
 
 /**
