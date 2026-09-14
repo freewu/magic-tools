@@ -111,6 +111,8 @@ const list = [
   'KeywordDensity',
   'WebTDKCheck',
   'RobotsTxtGenerator',
+  'MockData',
+  'WebSocketDebug',
 ];
 
 import { defineLoader } from './app-modules';

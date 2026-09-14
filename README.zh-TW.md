@@ -83,12 +83,12 @@ CSS 配色 · 行數統計 · htpasswd 生成 · 正則表達式 · 檔案比較
 magic-tools
 ├── src-tauri/            # Tauri 2 主程序 (Rust): 視窗/系統匣/外部連結/設定
 ├── src/                  # React 前端
-│   ├── App/              # 工具集合 + 應用殼: 每工具一個目錄, 新增目錄即自動註冊
-│   │   ├── index.tsx         # 應用殼: 側邊欄選單生成 (genMenuList) + 內容區
+│   ├── App/              # 工具集合 + 應用殼: 新增目錄後需登記到 index.tsx 的 list (見下)
+│   │   ├── index.tsx         # 工具註冊表 (list) + 應用殼: 側邊欄選單生成 (genMenuList) + 內容區
 │   │   ├── app-modules.ts    # 建置期用 import.meta.glob 靜態收集 (取代 webpack context 動態匯入)
 │   │   ├── app-i18n.ts       # 應用註冊表: appNameOf() 等取各工具/固定頁三語名稱
 │   │   ├── lang-packs.ts     # 彙總各工具 lang.ts 的預設語言包 (default 匯出)
-│   │   └── <工具>/           # 每工具一個目錄 = 自動註冊 (目前 112 個, 清單見下)
+│   │   └── <工具>/           # 每工具一個目錄 (目前 112 個, 清單見下) — 兩步註冊
 │   │       ├── define.tsx    # 註冊中繼資料: AppName(zh-CN 預設名) / Icon / Type(分組)
 │   │       ├── index.tsx     # 工具頁面元件 (預設匯出, 懶載入)
 │   │       ├── lang.ts       # 預設語言包 + 三語詞條 (zh 短語即 key, 值=[zh-TW, en]) + 本地取詞函式
@@ -107,7 +107,7 @@ magic-tools
 
 ### `src/App/` 現有工具清單
 
-[`src/App/`](src/App/) 下現有 **112** 個工具目錄, 新增目錄即自動註冊 (一個目錄 = 一個工具, 由其中 `define.tsx` 宣告)。按下表 `Type` 分組列出 (與側邊欄/上方功能總覽一致), 括號內為目錄數。除下列公共檔案外, 個別工具另有私有檔案 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
+[`src/App/`](src/App/) 下現有 **112** 個工具目錄, 每個目錄 = 一個工具, 由其中 `define.tsx` 宣告。**新增工具需兩步登記**：(1) 把目錄名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 陣列 (該陣列決定側邊欄/應用中心選單順序與路由; `import.meta.glob` 只負責發現頁面元件, 不決定選單); (2) 把其 `lang.ts` 預設匯出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名稱與介面文案才能隨語言切換。按下表 `Type` 分組列出 (與側邊欄/上方功能總覽一致), 括號內為目錄數。除下列公共檔案外, 個別工具另有私有檔案 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
 
 **🔐 加解密 *(21)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
 
