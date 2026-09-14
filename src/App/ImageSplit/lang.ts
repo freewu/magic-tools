@@ -45,9 +45,7 @@ const rows: Record<string, [string, string]> = {
 
   // 操作
   '保存全部到文件夹': ['儲存全部到資料夾', 'Save all to folder'],
-  '保存': ['儲存', 'Save'],
   '已保存 {n} 个文件': ['已儲存 {n} 個檔案', 'Saved {n} files'],
-  '已保存 {n}': ['已儲存 {n}', 'Saved {n}'],
   '已取消保存': ['已取消儲存', 'Saving cancelled'],
   '没有可保存的分块': ['沒有可儲存的分塊', 'Nothing to save'],
   '保存失败, 请重试': ['儲存失敗, 請重試', 'Saving failed, please retry'],
@@ -61,8 +59,7 @@ const rows: Record<string, [string, string]> = {
   '输出尺寸': ['輸出尺寸', 'Output size'],
   '输出份数': ['輸出份數', 'Output tiles'],
   '共 {n} 份': ['共 {n} 份', '{n} tiles'],
-  '第 {i} 块': ['第 {i} 塊', 'Tile {i}'],
-  '点击缩略图右下角可单独保存该分块': ['點擊縮圖右下角可單獨儲存該分塊', 'Use the button on each thumbnail to save that tile individually'],
+  '每张小图左上角为序号, 点「保存全部到文件夹」一次导出全部': ['每張小圖左上角為序號, 點「儲存全部到資料夾」一次匯出全部', 'Each tile shows its number in the top-left corner; use the "Save all to folder" button to export everything at once'],
   '尺寸过小, 无法按当前份数分割 (每块不足 1 像素)': ['尺寸過小, 無法依目前份數分割 (每塊不足 1 像素)', 'The image is too small to split this way (a tile would be under 1 pixel)'],
 
   '总体积': ['總體積', 'Total size'],

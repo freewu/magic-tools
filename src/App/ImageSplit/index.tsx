@@ -1,8 +1,8 @@
 // 图片分割: 把一张图片按 2/3/4/6/9 份切开, 按编号命名保存到指定目录
-import { Alert, Button, Divider, Input, InputNumber, Radio, Segmented, Slider, Space, Tag, Tooltip, Typography, Upload, message, theme } from 'antd';
+import { Alert, Button, Divider, Input, InputNumber, Radio, Segmented, Slider, Space, Tag, Typography, Upload, message, theme } from 'antd';
 import { useEffect, useRef, useState } from 'react';
-import { FolderOpenOutlined, SaveOutlined, UploadOutlined } from '@ant-design/icons';
-import { saveBytesFile, savePngBatch, savePngFile } from '../../lib/tauri';
+import { FolderOpenOutlined, UploadOutlined } from '@ant-design/icons';
+import { savePngBatch } from '../../lib/tauri';
 import { useLocale } from '../../hook/locale-context';
 import { is, isT } from './lang';
 import {
@@ -11,7 +11,7 @@ import {
 } from './data';
 import {
   NUMBER_MODES, OUTPUT_FORMATS,
-  dataUrlToBytes, findLayout, formatBytes, getDefaultFormat, getDefaultParts, getDefaultQuality,
+  findLayout, formatBytes, getDefaultFormat, getDefaultParts, getDefaultQuality,
   layoutKeyForParts, layoutsFor, sanitizePrefix, scaleTileSize, tileFileName, tileRects,
   type NumberMode, type OutputFormat, type TileRect,
 } from './lib';
@@ -148,28 +148,6 @@ const ImageSplit = () => {
       const n = await savePngBatch(names, tiles.map((i) => i.url));
       if (n === 0) message.info(t('已取消保存'));
       else message.success(tT('已保存 {n} 个文件', { n: n }));
-    } catch {
-      message.error(t('保存失败, 请重试'));
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  /** 保存单块 (按当前格式选择文件类型) */
-  const onSaveOne = async (item: TileItem) => {
-    if (saving) return;
-    setSaving(true);
-    const name = tileFileName(prefix, item.rect, mode, format, tiles.length);
-    try {
-      const ok = format === 'PNG'
-        ? await savePngFile(name, item.url)
-        : await saveBytesFile(name, dataUrlToBytes(item.url), {
-          title: t('保存'),
-          filterName: 'JPEG',
-          extensions: [ 'jpg', 'jpeg' ],
-        });
-      if (ok) message.success(tT('已保存 {n}', { n: name }));
-      else message.info(t('已取消保存'));
     } catch {
       message.error(t('保存失败, 请重试'));
     } finally {
@@ -348,62 +326,55 @@ const ImageSplit = () => {
             <Text type="secondary">{ t('没有可保存的分块') }</Text>
           ) : (
             <div style={ { display: 'flex', flexDirection: 'column', gap: 8 } }>
-              <Text type="secondary" style={ { fontSize: 12 } }>{ t('点击缩略图右下角可单独保存该分块') }</Text>
+              <Text type="secondary" style={ { fontSize: 12 } }>{ t('每张小图左上角为序号, 点「保存全部到文件夹」一次导出全部') }</Text>
+              {/* 缩略图紧密拼合 (无间距), 与原图布局一致; 左上角叠序号 */}
               <div
                 style={ {
                   display: 'grid',
                   gridTemplateColumns: `repeat(${layout.cols}, minmax(0, 1fr))`,
-                  gap: 8,
-                  maxWidth: 900,
+                  width: '100%',
+                  maxWidth: 720,
+                  lineHeight: 0,
+                  border: `1px solid ${token.colorBorderSecondary}`,
+                  borderRadius: token.borderRadius,
+                  overflow: 'hidden',
+                  background: token.colorFillQuaternary,
                 } }
               >
-                { tiles.map((item) => {
-                  const name = tileFileName(prefix, item.rect, mode, format, tiles.length);
-                  return (
+                { tiles.map((item) => (
                   <div
                     key={ item.rect.index }
                     style={ {
-                      border: `1px solid ${token.colorBorderSecondary}`,
-                      borderRadius: token.borderRadius,
-                      padding: 6,
-                      background: token.colorFillQuaternary,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 4,
+                      position: 'relative',
+                      lineHeight: 0,
+                      // 用真实宽高比占位, 各块紧密相邻不出现缝隙
+                      aspectRatio: `${item.width} / ${item.height}`,
                     } }
                   >
-                    <Tooltip title={ `${name} · ${item.width} × ${item.height} · ${formatBytes(item.bytes)}` }>
-                      <img
-                        src={ item.url }
-                        alt={ name }
-                        style={ {
-                          width: '100%',
-                          height: 96,
-                          objectFit: 'contain',
-                          background: token.colorBgContainer,
-                          borderRadius: token.borderRadiusSM,
-                        } }
-                      />
-                    </Tooltip>
-                    <div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4 } }>
-                      <Text type="secondary" style={ { fontSize: 11, fontFamily: MONO } }>
-                        { mode === 'rc'
-                          ? `r${item.rect.row + 1}c${item.rect.col + 1}`
-                          : tT('第 {i} 块', { i: item.rect.index }) }
-                      </Text>
-                      <Button
-                        size="small"
-                        type="text"
-                        icon={ <SaveOutlined /> }
-                        onClick={ () => onSaveOne(item) }
-                        disabled={ saving }
-                      >
-                        { t('保存') }
-                      </Button>
-                    </div>
+                    <img
+                      src={ item.url }
+                      alt=""
+                      style={ { width: '100%', height: '100%', display: 'block', objectFit: 'fill' } }
+                    />
+                    <span
+                      style={ {
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        padding: '0 6px',
+                        fontSize: 11,
+                        lineHeight: '16px',
+                        fontFamily: MONO,
+                        color: '#fff',
+                        background: 'rgba(0, 0, 0, 0.55)',
+                        borderBottomRightRadius: 6,
+                        pointerEvents: 'none',
+                      } }
+                    >
+                      { mode === 'rc' ? `r${item.rect.row + 1}c${item.rect.col + 1}` : item.rect.index }
+                    </span>
                   </div>
-                  );
-                }) }
+                )) }
               </div>
               <Text type="secondary" style={ { fontSize: 12 } }>
                 { t('桌面版 (Tauri) 可选择保存目录, 一次写入全部文件; 浏览器演示版会逐个触发下载') }
