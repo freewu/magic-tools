@@ -1,11 +1,11 @@
 import {
   KEY_FORMAT, KEY_PARTS, KEY_QUALITY,
   axisBounds, extOf, findLayout, formatBytes, getDefaultFormat, getDefaultParts, getDefaultQuality,
-  layoutKeyForParts, layoutsFor, mimeOf, normalizeFormat, normalizeParts, normalizeQuality, padNum,
+  layoutKeyForParts, layoutsFor, mimeOf, normalizeFormat, normalizeGap, normalizeParts, normalizeQuality, padNum,
   sanitizePrefix, scaleTileSize, setDefaultFormat, setDefaultParts, setDefaultQuality,
   tileFileName, tileRects,
 } from './lib';
-import { DEFAULT_PARTS, QUALITY_DEFAULT } from './data';
+import { DEFAULT_PARTS, GAP_DEFAULT, GAP_MAX, GAP_MIN, QUALITY_DEFAULT } from './data';
 
 describe('图片分割', () => {
   describe('份数与布局', () => {
@@ -205,6 +205,21 @@ describe('图片分割', () => {
       expect(normalizeQuality('-')).toBe(QUALITY_DEFAULT);
       expect(normalizeFormat('png')).toBe('PNG');
       expect(normalizeFormat('bmp')).toBe('PNG');
+    });
+
+    it('图块间隔取整并裁剪到 0-12, 非法值回退默认 2', () => {
+      expect(GAP_DEFAULT).toBe(2);
+      expect(GAP_MIN).toBe(0);
+      expect(GAP_MAX).toBe(12);
+      expect(normalizeGap(0)).toBe(0);
+      expect(normalizeGap(2)).toBe(2);
+      expect(normalizeGap(4.6)).toBe(5);
+      expect(normalizeGap(-3)).toBe(0);
+      expect(normalizeGap(99)).toBe(12);
+      expect(normalizeGap('8')).toBe(8);
+      expect(normalizeGap(null)).toBe(2);
+      expect(normalizeGap('')).toBe(2);
+      expect(normalizeGap('abc')).toBe(2);
     });
   });
 

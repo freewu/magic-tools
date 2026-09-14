@@ -21,7 +21,7 @@ const zh = `<h2>这个工具做什么</h2>
 <h2>分割尺寸说明</h2>
 <ul>
 <li><p>宽 / 高不能整除时, 余数像素按四舍五入分配到前几块, <b>各块尺寸最多相差 1 像素, 且拼合后与原图完全一致</b> (不丢像素、不重叠)</p></li>
-<li><p>预览区把各块按原图布局<b>紧密拼合</b>展示, 每块左上角叠一个半透明序号 (顺序编号显示 1/2/3 …, 行列编号显示 r1c1), 便于对照文件名</p></li>
+<li><p>预览区把各块按原图布局拼合展示, <b>「图块间隔」(0-12, 默认 2) 即分割线的粗细</b>, 设为 0 时无缝拼成原图; 每块左上角叠一个半透明序号 (顺序编号显示 1/2/3 …, 行列编号显示 r1c1), 便于对照文件名</p></li>
 <li><p>「每块输出宽度」填 0 时保持原始分辨率; 填正整数时会等比缩放每张小图, 便于控制切片体积</p></li>
 <li><p>输出 PNG 为无损格式并保留透明通道; 输出 JPEG 体积更小, 适合照片 (质量可调, 默认 0.92)</p></li>
 </ul>
@@ -53,7 +53,7 @@ const tw = `<h2>這個工具做什麼</h2>
 <h2>分割尺寸說明</h2>
 <ul>
 <li><p>寬 / 高無法整除時, 餘數像素依四捨五入分配到前幾塊, <b>各塊尺寸最多相差 1 像素, 且拼合後與原圖完全一致</b> (不丟像素、不重疊)</p></li>
-<li><p>預覽區把各塊依原圖佈局<b>緊密拼合</b>顯示, 每塊左上角疊一個半透明序號 (順序編號顯示 1/2/3 …, 行列編號顯示 r1c1), 便於對照檔案名</p></li>
+<li><p>預覽區把各塊依原圖佈局拼合顯示, <b>「圖塊間隔」(0-12, 預設 2) 即分割線的粗細</b>, 設為 0 時無縫拼成原圖; 每塊左上角疊一個半透明序號 (順序編號顯示 1/2/3 …, 行列編號顯示 r1c1), 便於對照檔案名</p></li>
 <li><p>「每塊輸出寬度」填 0 時保持原始解析度; 填正整數時會等比縮放每張小圖, 便於控制切片體積</p></li>
 <li><p>輸出 PNG 為無損格式並保留透明通道; 輸出 JPEG 體積更小, 適合照片 (品質可調, 預設 0.92)</p></li>
 </ul>
@@ -85,7 +85,7 @@ const en = `<h2>What this tool does</h2>
 <h2>About the split sizes</h2>
 <ul>
 <li><p>When the width or height is not evenly divisible, the remaining pixels are rounded into the first tiles, so <b>tiles differ by at most 1 pixel and reassemble into exactly the original image</b> (no pixel lost, no overlap)</p></li>
-<li><p>The preview packs every tile <b>tightly together</b> in the original layout, with a translucent number in each tile's top-left corner (1/2/3 … for sequential numbering, r1c1 for row/column), so you can match it against the file name</p></li>
+<li><p>The preview assembles every tile in the original layout; the <b>tile gap (0-12, 2 by default) is the separator thickness</b>, and 0 joins the tiles seamlessly into the original image. Each tile also shows a translucent number in its top-left corner (1/2/3 … for sequential numbering, r1c1 for row/column) so you can match it against the file name</p></li>
 <li><p>A tile output width of 0 keeps the original resolution; a positive value scales every tile proportionally, which helps keep each slice small</p></li>
 <li><p>PNG output is lossless and keeps transparency; JPEG is smaller and better suited to photos (quality adjustable, 0.92 by default)</p></li>
 </ul>

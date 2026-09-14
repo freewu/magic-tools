@@ -27,6 +27,8 @@ const rows: Record<string, [string, string]> = {
   'JPEG 质量': ['JPEG 品質', 'JPEG quality'],
   'JPEG 体积更小, 适合照片; PNG 无损且保留透明': ['JPEG 體積更小, 適合照片; PNG 無損並保留透明', 'JPEG is smaller and better for photos; PNG is lossless and keeps transparency'],
   '每块输出宽度': ['每塊輸出寬度', 'Tile output width'],
+  '图块间隔': ['圖塊間隔', 'Tile gap'],
+  '0 = 无分割线; 仅影响预览显示, 不影响导出的图片': ['0 = 無分割線; 僅影響預覽顯示, 不影響匯出的圖片', '0 = no separators; preview only — the exported images are unaffected'],
   '0 = 保持原尺寸': ['0 = 保持原尺寸', '0 = keep the original size'],
   '文件名前缀': ['檔案名前綴', 'File name prefix'],
   '编号方式': ['編號方式', 'Numbering'],

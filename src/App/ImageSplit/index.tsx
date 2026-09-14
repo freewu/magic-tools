@@ -6,13 +6,13 @@ import { savePngBatch } from '../../lib/tauri';
 import { useLocale } from '../../hook/locale-context';
 import { is, isT } from './lang';
 import {
-  DEFAULT_PREFIX, LAYOUT_LABEL, PART_OPTIONS, QUALITY_DEFAULT, QUALITY_MAX, QUALITY_MIN,
+  DEFAULT_PREFIX, GAP_DEFAULT, GAP_MAX, GAP_MIN, LAYOUT_LABEL, PART_OPTIONS, QUALITY_DEFAULT, QUALITY_MAX, QUALITY_MIN,
   WIDTH_AUTO, WIDTH_MAX, WIDTH_MIN, type PartCount,
 } from './data';
 import {
   NUMBER_MODES, OUTPUT_FORMATS,
   findLayout, formatBytes, getDefaultFormat, getDefaultParts, getDefaultQuality,
-  layoutKeyForParts, layoutsFor, sanitizePrefix, scaleTileSize, tileFileName, tileRects,
+  layoutKeyForParts, layoutsFor, normalizeGap, sanitizePrefix, scaleTileSize, tileFileName, tileRects,
   type NumberMode, type OutputFormat, type TileRect,
 } from './lib';
 import ImageSplitIntro from './intro';
@@ -37,7 +37,8 @@ const ImageSplit = () => {
   const [ layoutKey, setLayoutKey ] = useState<string>(() => layoutKeyForParts(getDefaultParts())); // 布局 key
   const [ format, setFormat ] = useState<OutputFormat>(() => getDefaultFormat()); // 输出格式
   const [ quality, setQuality ] = useState<number>(() => getDefaultQuality()); // JPEG 质量
-  const [ maxWidth, setMaxWidth ] = useState<number>(WIDTH_AUTO); // 每块输出宽度; 0 = 原尺寸
+  const [ maxWidth, setMaxWidth ] = useState<number>(WIDTH_AUTO);
+  const [ gap, setGap ] = useState<number>(GAP_DEFAULT); // 每块输出宽度; 0 = 原尺寸
   const [ prefix, setPrefix ] = useState<string>(DEFAULT_PREFIX); // 文件名前缀
   const [ mode, setMode ] = useState<NumberMode>('seq'); // 编号方式
   const [ tiles, setTiles ] = useState<TileItem[]>([]); // 分块结果
@@ -300,6 +301,28 @@ const ImageSplit = () => {
         </div>
 
         <div style={ { display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' } }>
+          <Text style={ { width: 96, flex: '0 0 auto' } }>{ t('图块间隔') }</Text>
+          <Slider
+            style={ { flex: 1, minWidth: 180, maxWidth: 320 } }
+            min={ GAP_MIN }
+            max={ GAP_MAX }
+            step={ 1 }
+            value={ gap }
+            onChange={ setGap }
+            marks={ { [GAP_MIN]: String(GAP_MIN), [GAP_MAX]: String(GAP_MAX) } }
+          />
+          <InputNumber
+            min={ GAP_MIN }
+            max={ GAP_MAX }
+            step={ 1 }
+            value={ gap }
+            onChange={ (v) => setGap(normalizeGap(v)) }
+            style={ { width: 80 } }
+          />
+          <Text type="secondary" style={ { fontSize: 12 } }>{ t('0 = 无分割线; 仅影响预览显示, 不影响导出的图片') }</Text>
+        </div>
+
+        <div style={ { display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' } }>
           <Text style={ { width: 96, flex: '0 0 auto' } }>{ t('文件名前缀') }</Text>
           <Input
             value={ prefix }
@@ -327,18 +350,20 @@ const ImageSplit = () => {
           ) : (
             <div style={ { display: 'flex', flexDirection: 'column', gap: 8 } }>
               <Text type="secondary" style={ { fontSize: 12 } }>{ t('每张小图左上角为序号, 点「保存全部到文件夹」一次导出全部') }</Text>
-              {/* 缩略图紧密拼合 (无间距), 与原图布局一致; 左上角叠序号 */}
+              {/* 缩略图紧密拼合 + 用线分隔各块 (间隔即分割线粗细); 左上角叠序号 */}
               <div
                 style={ {
                   display: 'grid',
                   gridTemplateColumns: `repeat(${layout.cols}, minmax(0, 1fr))`,
+                  gap: gap,
+                  padding: gap,
                   width: '100%',
                   maxWidth: 720,
                   lineHeight: 0,
-                  border: `1px solid ${token.colorBorderSecondary}`,
                   borderRadius: token.borderRadius,
                   overflow: 'hidden',
-                  background: token.colorFillQuaternary,
+                  // 背景色透过 gap / padding 显示, 形成包住每块的分割线
+                  background: token.colorBorderSecondary,
                 } }
               >
                 { tiles.map((item) => (
@@ -347,8 +372,9 @@ const ImageSplit = () => {
                     style={ {
                       position: 'relative',
                       lineHeight: 0,
-                      // 用真实宽高比占位, 各块紧密相邻不出现缝隙
+                      // 用真实宽高比占位, 各块尺寸一致不出现错位
                       aspectRatio: `${item.width} / ${item.height}`,
+                      background: token.colorBgContainer,
                     } }
                   >
                     <img

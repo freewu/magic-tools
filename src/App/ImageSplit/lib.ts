@@ -2,6 +2,7 @@
 // 说明: 与 DOM / Canvas 无关, 便于单测; 页面只负责把矩形画到 canvas 上
 import {
   DEFAULT_LAYOUT_KEY, DEFAULT_PARTS, DEFAULT_PREFIX,
+  GAP_DEFAULT, GAP_MAX, GAP_MIN,
   PART_OPTIONS, QUALITY_DEFAULT, QUALITY_MAX, QUALITY_MIN, SPLIT_LAYOUTS,
   type PartCount, type SplitLayout,
 } from './data';
@@ -34,6 +35,13 @@ export const normalizeQuality = (v: unknown): number => {
   const n = typeof v === 'number' ? v : typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN;
   if (!Number.isFinite(n)) return QUALITY_DEFAULT;
   return Math.min(QUALITY_MAX, Math.max(QUALITY_MIN, n));
+};
+
+/** 预览图块间隔取整并裁剪到 [GAP_MIN, GAP_MAX], 非法值回退默认 */
+export const normalizeGap = (v: unknown): number => {
+  const n = typeof v === 'number' ? v : typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN;
+  if (!Number.isFinite(n)) return GAP_DEFAULT;
+  return Math.min(GAP_MAX, Math.max(GAP_MIN, Math.round(n)));
 };
 
 /** 某份数支持的布局列表 (横向在前) */

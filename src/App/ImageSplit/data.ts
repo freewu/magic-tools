@@ -44,3 +44,7 @@ export const QUALITY_MAX = 1;
 export const WIDTH_AUTO = 0;
 export const WIDTH_MIN = 0;
 export const WIDTH_MAX = 10000;
+/** 预览图块间隔 (px): 0 = 无分割线, 仅影响预览, 不影响导出的图片 */
+export const GAP_DEFAULT = 2;
+export const GAP_MIN = 0;
+export const GAP_MAX = 12;
