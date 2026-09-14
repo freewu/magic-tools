@@ -87,7 +87,7 @@ const AsciiTextArt: React.FC = () => {
         <span style={ { color: '#bbb', fontSize: 12 } }>{t('仅缩放预览显示, 复制的文本不受影响')}</span>
       </div>
       <div style={ { color: '#bbb', fontSize: 12, marginBottom: 10 } }>
-        {t('字体来自 figlet 经典字体集; 支持英文字母 / 数字 / 常用标点, 中文等未收录字符按字体回退显示 · 默认字体可在「设置 → 其它」中调整')}
+        {t('字体来自 figlet 经典字体集; 支持英文字母 / 数字 / 常用标点, 中文等未收录字符按字体回退显示 · 默认字体与默认文字可在「设置 → 其它」中调整')}
       </div>
 
       <div style={ { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 } }>

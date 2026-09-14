@@ -69,6 +69,7 @@ const uilangRows: Record<string, [string, string]> = {
   '分': ['分', 'm'],
   '时': ['時', 'h'],
   '或': ['或', 'OR'],
+  '(空内容)': ['(空內容)', '(empty)'],
 };
 
 // 取词: 无命中回退 zh 原文 (与共享 ui-lang 行为一致)

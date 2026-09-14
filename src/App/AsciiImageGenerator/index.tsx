@@ -60,7 +60,7 @@ const AsciiImageGenerator: React.FC = () => {
 
   const load = async (file?: File) => {
     if (!file) return;
-    if (!file.type.startsWith('image/')) { message.warning('请选择图片文件'); return; }
+    if (!file.type.startsWith('image/')) { message.warning(t('请选择图片文件')); return; }
     try {
       const s = await decodeToGray(file);
       setSrc(s);

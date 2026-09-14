@@ -156,8 +156,7 @@ const WebTDKCheck = () => {
       {/* 未检测时的占位提示 */}
       { tdk === null && !loading && (
         <div style={ { color: token.colorTextTertiary, margin: '16px 0' } }>
-          {t('输入网址后点击「检测」, 将解析网页 &lt;title&gt; 与')}
-          {t('keywords / description 两个 meta 标签并给出长度建议')}
+          {t('输入网址后点击「检测」, 将解析网页 <title> 与 keywords / description 两个 meta 标签并给出长度建议')}
         </div>
       ) }
 

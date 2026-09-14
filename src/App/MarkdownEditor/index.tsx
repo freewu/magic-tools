@@ -216,7 +216,7 @@ const MarkdownEditor: React.FC = () => {
             {view === 'preview' ? (
               <div style={{ maxHeight: 520, overflow: 'auto' }}>
                 <style>{MD_EXPORT_CSS}</style>
-                <div className="md-preview" dangerouslySetInnerHTML={{ __html: html || '<p style="color:#999">(空内容)</p>' }} />
+                <div className="md-preview" dangerouslySetInnerHTML={{ __html: html || `<p style="color:#999">${t('(空内容)')}</p>` }} />
               </div>
             ) : (
               <Input.TextArea

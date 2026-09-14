@@ -73,6 +73,7 @@ const cryptolangRows: Record<string, [string, string]> = {
   '校验失败: C3 不匹配 (密钥错误或密文被篡改)': ['校驗失敗: C3 不匹配 (金鑰錯誤或密文被竄改)', 'Verification failed: C3 mismatch (wrong key or tampered ciphertext)'],
   '生成失败': ['產生失敗', 'Generation failed'],
   '推导失败': ['推導失敗', 'Derivation failed'],
+  '保存密钥文件': ['儲存金鑰檔案', 'Save key file'],
 };
 
 // 取词: 无命中回退 zh 原文 (与共享 crypto-lang 行为一致)

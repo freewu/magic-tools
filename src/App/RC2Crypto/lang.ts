@@ -30,6 +30,7 @@ const cryptolangRows: Record<string, [string, string]> = {
   '加解密': ['加解密', 'Encrypt / Decrypt'],
   '密文长度 ({len} 字节) 与私钥模长 ({mod} 字节) 不匹配': ['密文長度 ({len} 位元組) 與私鑰模長 ({mod} 位元組) 不匹配', 'Ciphertext length ({len} bytes) does not match the private-key modulus ({mod} bytes)'],
   '解密失败: 私钥与密文不匹配或密文已损坏 (块 {blk})': ['解密失敗: 私鑰與密文不匹配或密文已損壞 (區塊 {blk})', 'Decryption failed: private key does not match the ciphertext, or the ciphertext is corrupted (block {blk})'],
+  ' {n} 字符或 {m} HEX': [' {n} 字元或 {m} HEX', ' {n} chars or {m} HEX'],
 };
 
 // 取词: 无命中回退 zh 原文 (与共享 crypto-lang 行为一致)

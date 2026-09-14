@@ -42,6 +42,7 @@ const uilangRows: Record<string, [string, string]> = {
   '每': ['每', 'Every'],
   '解析失败': ['解析失敗', 'Parse failed'],
   '或': ['或', 'OR'],
+  '保存 JSON 文件': ['儲存 JSON 檔案', 'Save JSON file'],
 };
 
 // 取词: 无命中回退 zh 原文 (与共享 ui-lang 行为一致)

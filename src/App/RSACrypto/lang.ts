@@ -65,6 +65,8 @@ const cryptolangRows: Record<string, [string, string]> = {
   '密文长度 ({len} 字节) 与私钥模长 ({mod} 字节) 不匹配': ['密文長度 ({len} 位元組) 與私鑰模長 ({mod} 位元組) 不匹配', 'Ciphertext length ({len} bytes) does not match the private-key modulus ({mod} bytes)'],
   '解密失败: 私钥与密文不匹配或密文已损坏 (块 {blk})': ['解密失敗: 私鑰與密文不匹配或密文已損壞 (區塊 {blk})', 'Decryption failed: private key does not match the ciphertext, or the ciphertext is corrupted (block {blk})'],
   '生成失败': ['產生失敗', 'Generation failed'],
+  '保存密钥文件': ['儲存金鑰檔案', 'Save key file'],
+  '生成失败: {m}': ['產生失敗: {m}', 'Generation failed: {m}'],
 };
 
 // 取词: 无命中回退 zh 原文 (与共享 crypto-lang 行为一致)

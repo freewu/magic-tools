@@ -38,7 +38,7 @@ const webmasterlangRows: Record<string, [string, string]> = {
   '请先输入要检测的网址': ['請先輸入要檢測的網址', 'Enter a URL to check first'],
   '检测失败: {msg}': ['檢測失敗: {msg}', 'Check failed: {msg}'],
   '网页 TDK 信息检测说明': ['網頁 TDK 資訊檢測說明', 'About TDK checking'],
-  'keywords / description 两个 meta 标签并给出长度建议': ['keywords / description 兩個 meta 標籤並給出長度建議', 'the keywords / description meta tags and gives length suggestions'],
+  '输入网址后点击「检测」, 将解析网页 <title> 与 keywords / description 两个 meta 标签并给出长度建议': ['輸入網址後點擊「檢測」, 將解析網頁 <title> 與 keywords / description 兩個 meta 標籤並給出長度建議', 'Enter a URL and click "Check": the page <title> and the keywords / description meta tags are parsed and length suggestions are given'],
 };
 
 // 取词: 无命中回退 zh 原文 (与共享 webmaster-lang 行为一致)

@@ -216,7 +216,7 @@ const ImageColor = () => {
       { !merge ? (
         <Text type="secondary" style={ { fontSize: 12 } }>{ t('未合并相似颜色, 仅列出占比最高的颜色') }</Text>
       ) : null }
-      <Text type="secondary" style={ { fontSize: 12 } }>{ t('点击色块可复制对应 HEX 色值') }</Text>
+      <Text type="secondary" style={ { fontSize: 12 } }>{ t('点击色块可复制对应色值') }</Text>
 
       {/* 颜色列表 */}
       <div style={ { display: 'flex', flexDirection: 'column', gap: 6 } }>
