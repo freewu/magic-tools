@@ -7,8 +7,16 @@ const zh = `<h2>这个工具做什么</h2>
 <ul>
 <li><p>点击「选择图片」, 或把图片直接拖到虚线框内 (图片只在浏览器本地解析, 不会上传)</p></li>
 <li><p>用「相似度级别」调整合并力度, 用「输出颜色数」控制列表长度, 结果会立即重算</p></li>
-<li><p>点击色块复制单个 HEX, 或「复制全部」拿到 HEX + rgb + 占比 + 像素数的清单</p></li>
+<li><p>点击色块复制该颜色的色值 (按当前颜色格式), 或「复制全部」拿到色值 + 占比 + 像素数的清单</p></li>
 <li><p>「下载 CSV」导出表格数据, 「下载色卡 PNG」导出色卡图 (带占比条与色值标注)</p></li>
+</ul>
+
+<h2>颜色格式</h2>
+<ul>
+<li><p>列表与导出支持 8 种颜色格式: <b>HEX / RGB / HSL / CMYK / HSV / LAB / LCH / XYZ</b>, 默认为 HEX</p></li>
+<li><p>在「颜色格式」下拉框中随时切换, 切换后列表色值、复制内容与色卡 PNG 同步变化</p></li>
+<li><p>默认值可在 <b>设置 → 图片 → 图片主题色</b> 中修改, 下次打开工具即按该格式展示</p></li>
+<li><p>非 HEX 格式的复制 / 导出文本会额外带上 HEX 值便于对照; CSV 始终导出 hex 与 r/g/b 原始数据</p></li>
 </ul>
 
 <h2>相似度级别</h2>
@@ -43,8 +51,16 @@ const tw = `<h2>這個工具做什麼</h2>
 <ul>
 <li><p>點擊「選擇圖片」, 或把圖片直接拖到虛線框內 (圖片只在瀏覽器本地解析, 不會上傳)</p></li>
 <li><p>用「相似度級別」調整合併力度, 用「輸出顏色數」控制列表長度, 結果會立即重算</p></li>
-<li><p>點擊色塊複製單個 HEX, 或「複製全部」取得 HEX + rgb + 佔比 + 像素數的清單</p></li>
+<li><p>點擊色塊複製該顏色的色值 (依目前顏色格式), 或「複製全部」取得色值 + 佔比 + 像素數的清單</p></li>
 <li><p>「下載 CSV」匯出表格資料, 「下載色卡 PNG」匯出色卡圖 (含佔比條與色值標註)</p></li>
+</ul>
+
+<h2>顏色格式</h2>
+<ul>
+<li><p>列表與匯出支援 8 種顏色格式: <b>HEX / RGB / HSL / CMYK / HSV / LAB / LCH / XYZ</b>, 預設為 HEX</p></li>
+<li><p>在「顏色格式」下拉框隨時切換, 切換後列表色值、複製內容與色卡 PNG 同步變化</p></li>
+<li><p>預設值可在 <b>設定 → 圖片 → 圖片主題色</b> 中修改, 下次開啟工具即依該格式顯示</p></li>
+<li><p>非 HEX 格式的複製 / 匯出文字會額外帶上 HEX 值便於對照; CSV 始終匯出 hex 與 r/g/b 原始資料</p></li>
 </ul>
 
 <h2>相似度級別</h2>
@@ -79,8 +95,16 @@ const en = `<h2>What this tool does</h2>
 <ul>
 <li><p>Click "Choose image" or drop an image onto the dashed area (decoding happens locally in your browser, nothing is uploaded)</p></li>
 <li><p>Tune the merging strength with Similarity level and the list length with Colors to show; results are recomputed immediately</p></li>
-<li><p>Click a swatch to copy a single HEX value, or use "Copy all" for a list of HEX + rgb + share + pixels</p></li>
+<li><p>Click a swatch to copy its value (in the selected color format), or use "Copy all" for a list of value + share + pixels</p></li>
 <li><p>"Download CSV" exports the raw table; "Download swatch PNG" exports a color card with a proportion bar and labels</p></li>
+</ul>
+
+<h2>Color format</h2>
+<ul>
+<li><p>The list and the exports support 8 color formats: <b>HEX / RGB / HSL / CMYK / HSV / LAB / LCH / XYZ</b>, HEX by default</p></li>
+<li><p>Switch anytime with the Color format selector — the list values, copied text and the swatch PNG all follow it</p></li>
+<li><p>The default can be changed in <b>Settings → Image → Dominant colors</b> and is applied the next time you open the tool</p></li>
+<li><p>Copied / exported text in a non-HEX format also carries the HEX value for cross-checking; the CSV always exports the raw hex and r/g/b data</p></li>
 </ul>
 
 <h2>Similarity level</h2>

@@ -5,6 +5,7 @@
 // 2. 合并阶段用切比雪夫距离 (各通道差值的最大值) 衡量相似度, 阈值由「相似度级别」映射;
 // 3. 簇的代表色取加权平均 (按像素数), 合并后仍能反映该色系的真实观感;
 // 4. 簇数量达到上限后, 剩余颜色并入最接近的簇, 保证所有像素都被统计, 占比之和为 100%。
+import { hex } from 'color-convert';
 
 export type Rgb = { r: number; g: number; b: number };
 
@@ -109,6 +110,47 @@ export const hexToRgb = (hex: string): Rgb | null => {
 
 /** Rgb -> rgb(r, g, b) */
 export const formatRgb = (rgb: Rgb): string => `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+
+// ---- 颜色格式 (展示与导出) ----
+
+/** 支持展示的颜色格式 (与「颜色转换」工具保持一致) */
+export type ColorFormat = 'HEX' | 'RGB' | 'HSL' | 'CMYK' | 'HSV' | 'LAB' | 'LCH' | 'XYZ';
+
+/** 颜色格式列表 (首项 HEX 为默认) */
+export const COLOR_FORMATS: ColorFormat[] = [ 'HEX', 'RGB', 'HSL', 'CMYK', 'HSV', 'LAB', 'LCH', 'XYZ' ];
+
+/** 默认颜色格式 */
+export const FORMAT_DEFAULT: ColorFormat = 'HEX';
+
+/** 是否为支持的颜色格式 (用于校验本地设置值) */
+export const isColorFormat = (v: unknown): v is ColorFormat =>
+  typeof v === 'string' && (COLOR_FORMATS as string[]).includes(v);
+
+/** 规范化颜色格式 (非法值回退 HEX) */
+export const normalizeFormat = (v: unknown): ColorFormat => (isColorFormat(v) ? v : FORMAT_DEFAULT);
+
+/** 通道数组 -> "a, b, c" (取整, 保留负号) */
+const channelsText = (arr: number[]): string => arr.map((v) => Math.round(v)).join(', ');
+
+/**
+ * 按指定格式格式化颜色:
+ * HEX #rrggbb / RGB rgb(r, g, b) / HSL hsl(h, s, l) / CMYK cmyk(c, m, y, k)
+ * HSV hsv(h, s, v) / LAB lab(l, a, b) / LCH lch(l, c, h) / XYZ xyz(x, y, z)
+ */
+export const formatColor = (rgb: Rgb, format: ColorFormat = FORMAT_DEFAULT): string => {
+  // 统一经 HEX 转换, 与「颜色转换」工具的取值口径一致
+  const h = rgbToHex(rgb).replace('#', '');
+  switch (format) {
+    case 'RGB': return formatRgb(rgb);
+    case 'HSL': return `hsl(${channelsText(hex.hsl(h))})`;
+    case 'HSV': return `hsv(${channelsText(hex.hsv(h))})`;
+    case 'CMYK': return `cmyk(${channelsText(hex.cmyk(h))})`;
+    case 'LAB': return `lab(${channelsText(hex.lab(h))})`;
+    case 'LCH': return `lch(${channelsText(hex.lch(h))})`;
+    case 'XYZ': return `xyz(${channelsText(hex.xyz(h))})`;
+    default: return rgbToHex(rgb);
+  }
+};
 
 /** 占比 -> 百分数字符串 */
 export const formatRatio = (ratio: number, digits = 2): string =>
@@ -240,13 +282,41 @@ export const coverage = (palette: PaletteColor[]): number =>
 
 export type PaletteTextMode = 'plain' | 'detail';
 
-/** 调色板文本 (复制 / 下载用) */
-export const paletteToText = (palette: PaletteColor[], mode: PaletteTextMode = 'detail'): string =>
+/** 调色板文本 (复制 / 下载用); format 决定颜色值的展示格式 (非 HEX 时会额外带上 hex 便于核对) */
+export const paletteToText = (
+  palette: PaletteColor[],
+  mode: PaletteTextMode = 'detail',
+  format: ColorFormat = FORMAT_DEFAULT,
+): string =>
   palette
-    .map((c) => (mode === 'detail'
-      ? `${c.hex}  ${formatRgb(c.rgb)}  ${formatRatio(c.ratio)}  ${c.count}px`
-      : `${c.hex}  ${formatRatio(c.ratio)}`))
+    .map((c) => {
+      const value = formatColor(c.rgb, format);
+      if (mode === 'detail') {
+        // HEX 保持原有输出 (hex + rgb), 其余格式输出「目标格式 + hex」便于核对
+        const head = format === 'HEX' ? `${c.hex}  ${formatRgb(c.rgb)}` : `${value}  ${c.hex}`;
+        return `${head}  ${formatRatio(c.ratio)}  ${c.count}px`;
+      }
+      return `${value}  ${formatRatio(c.ratio)}`;
+    })
     .join('\n');
+
+// ---- 本地设置 ----
+
+/** 本地存储键: 默认颜色格式 */
+export const KEY_FORMAT = 'image-color.default-format';
+
+const rawGet = (k: string): string | null => {
+  try { return localStorage.getItem(k); } catch { return null; }
+};
+const rawSet = (k: string, v: string): void => {
+  try { localStorage.setItem(k, v); } catch { /* ignore */ }
+};
+
+/** 默认颜色格式 (非法/未设置时回退 HEX) */
+export const getDefaultFormat = (): ColorFormat => normalizeFormat(rawGet(KEY_FORMAT));
+
+/** 保存默认颜色格式 */
+export const setDefaultFormat = (v: ColorFormat): void => rawSet(KEY_FORMAT, normalizeFormat(v));
 
 /** 调色板 CSV */
 export const paletteToCsv = (palette: PaletteColor[]): string => [

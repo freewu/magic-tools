@@ -221,6 +221,14 @@ const ROWS: Record<string, Row> = {
   'SQL 输出的默认表名, 仅保留字母 / 数字 / 下划线 / $': ['SQL 輸出的預設表名, 僅保留字母 / 數字 / 底線 / $', 'Default table name for SQL output; letters, digits, underscore and $ only'],
   '${min} - ${max} 条, 默认 ${d}': ['${min} - ${max} 筆, 預設 ${d}', '${min} - ${max} records, default ${d}'],
 
+  // ---- 图片主题色 (Image Dominant Color) ----
+  '图片主题色': ['圖片主題色', 'Dominant colors'],
+  '默认颜色格式': ['預設顏色格式', 'Default color format'],
+  '打开「图片主题色」工具时默认展示的颜色格式, 默认 ${d}; 工具页可随时切换': [
+    '開啟「圖片主題色」工具時預設顯示的顏色格式, 預設 ${d}; 工具頁可隨時切換',
+    'Default color format shown when opening the dominant-color tool (default ${d}); switchable on the tool page',
+  ],
+
 };
 
 /**

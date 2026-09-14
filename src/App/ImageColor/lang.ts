@@ -26,6 +26,11 @@ const rows: Record<string, [string, string]> = {
   '忽略透明像素': ['忽略透明像素', 'Ignore transparent pixels'],
   '透明阈值 α ≤': ['透明閾值 α ≤', 'Alpha threshold α ≤'],
   '分析参数': ['分析參數', 'Analysis'],
+  '颜色格式': ['顏色格式', 'Color format'],
+  '工具页可随时切换, 默认值在「设置 → 图片 → 图片主题色」中修改': [
+    '工具頁可隨時切換, 預設值在「設定 → 圖片 → 圖片主題色」中修改',
+    'Switchable on this page; the default is configurable in Settings → Image → Dominant colors',
+  ],
 
   // 统计
   '图片尺寸': ['圖片尺寸', 'Image size'],
@@ -46,14 +51,14 @@ const rows: Record<string, [string, string]> = {
   '共 {n} 种颜色': ['共 {n} 種顏色', '{n} colors'],
   '未合并相似颜色, 仅列出占比最高的颜色': ['未合併相似顏色, 僅列出佔比最高的顏色', 'Similar colors are not merged — only the most frequent colors are listed'],
   '图片中没有可统计的像素 (全透明或被透明阈值过滤)': ['圖片中沒有可統計的像素 (全透明或被透明閾值過濾)', 'No countable pixels — the image is fully transparent or filtered by the alpha threshold'],
-  '点击色块可复制对应 HEX 色值': ['點擊色塊可複製對應 HEX 色值', 'Click a swatch to copy its HEX value'],
+  '点击色块可复制对应色值': ['點擊色塊可複製對應色值', 'Click a swatch to copy its color value'],
   '复制': ['複製', 'Copy'],
   '复制全部': ['複製全部', 'Copy all'],
   '下载 CSV': ['下載 CSV', 'Download CSV'],
   '下载色卡 PNG': ['下載色卡 PNG', 'Download swatch PNG'],
   '清空': ['清空', 'Clear'],
   '已复制到剪贴板': ['已複製到剪貼簿', 'Copied to clipboard'],
-  '已复制 {hex}': ['已複製 {hex}', 'Copied {hex}'],
+  '已复制 {v}': ['已複製 {v}', 'Copied {v}'],
   '保存 {n}': ['儲存 {n}', 'Save {n}'],
   '已保存 {n}': ['已儲存 {n}', 'Saved {n}'],
   '保存失败, 请重试': ['儲存失敗, 請重試', 'Saving failed, please retry'],

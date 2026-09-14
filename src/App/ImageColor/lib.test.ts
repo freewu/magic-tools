@@ -2,6 +2,7 @@ import {
   ALPHA_DEFAULT, COLORS_DEFAULT, LEVEL_DEFAULT, LEVEL_MAX, LEVEL_MIN, MAX_EDGE,
   clamp, colorDistance, contrastColor, countColors, coverage, extractPalette, fitSize, formatRatio,
   formatRgb, hexToRgb, levelToBucket, levelToTolerance, mergeEntries, paletteToCsv, paletteToText,
+  COLOR_FORMATS, FORMAT_DEFAULT, formatColor, getDefaultFormat, isColorFormat, normalizeFormat, setDefaultFormat,
   quantizeRgb, rgbToHex, type ColorEntry,
 } from './lib';
 
@@ -263,5 +264,65 @@ describe('ImageColor 导出文本', () => {
   test('空调色板导出为空文本 / 仅表头', () => {
     expect(paletteToText([])).toBe('');
     expect(paletteToCsv([])).toBe('hex,r,g,b,count,ratio');
+  });
+
+  test('指定非 HEX 格式时 detail 输出「目标格式 + hex」', () => {
+    const lines = paletteToText(palette, 'detail', 'RGB').split('\n');
+    expect(lines[0]).toBe('rgb(0, 0, 0)  #000000  75.00%  3px');
+    expect(lines[1]).toBe('rgb(255, 255, 255)  #ffffff  25.00%  1px');
+  });
+
+  test('指定非 HEX 格式时 plain 只输出目标格式与占比', () => {
+    expect(paletteToText(palette, 'plain', 'HSL').split('\n')[0]).toBe('hsl(0, 0, 0)  75.00%');
+  });
+});
+
+describe('ImageColor 颜色格式', () => {
+  const rgb = { r: 170, g: 187, b: 204 };
+
+  test('格式列表首项与默认为 HEX', () => {
+    expect(FORMAT_DEFAULT).toBe('HEX');
+    expect(COLOR_FORMATS[0]).toBe('HEX');
+    expect(COLOR_FORMATS).toEqual([ 'HEX', 'RGB', 'HSL', 'CMYK', 'HSV', 'LAB', 'LCH', 'XYZ' ]);
+  });
+
+  test('isColorFormat / normalizeFormat 校验与回退', () => {
+    expect(isColorFormat('LAB')).toBe(true);
+    expect(isColorFormat('lab')).toBe(false);
+    expect(isColorFormat(null)).toBe(false);
+    expect(normalizeFormat('XYZ')).toBe('XYZ');
+    expect(normalizeFormat('lab')).toBe('HEX');
+    expect(normalizeFormat(undefined)).toBe('HEX');
+  });
+
+  test('formatColor 各格式输出 (#aabbcc)', () => {
+    expect(formatColor(rgb, 'HEX')).toBe('#aabbcc');
+    expect(formatColor(rgb, 'RGB')).toBe('rgb(170, 187, 204)');
+    expect(formatColor(rgb, 'HSL')).toBe('hsl(210, 25, 73)');
+    expect(formatColor(rgb, 'HSV')).toBe('hsv(210, 17, 80)');
+    expect(formatColor(rgb, 'CMYK')).toBe('cmyk(17, 8, 0, 20)');
+    expect(formatColor(rgb, 'LAB')).toBe('lab(75, -2, -11)');
+    expect(formatColor(rgb, 'LCH')).toBe('lch(75, 11, 258)');
+    expect(formatColor(rgb, 'XYZ')).toBe('xyz(45, 48, 64)');
+  });
+
+  test('formatColor 边界色 (黑/白), 默认格式为 HEX', () => {
+    expect(formatColor({ r: 0, g: 0, b: 0 })).toBe('#000000');
+    expect(formatColor({ r: 0, g: 0, b: 0 }, 'HSL')).toBe('hsl(0, 0, 0)');
+    expect(formatColor({ r: 0, g: 0, b: 0 }, 'CMYK')).toBe('cmyk(0, 0, 0, 100)');
+    expect(formatColor({ r: 255, g: 255, b: 255 }, 'LAB')).toBe('lab(100, 0, 0)');
+  });
+
+  test('localStorage 存取默认格式 (非法值回退 HEX)', () => {
+    localStorage.setItem('image-color.default-format', 'LCH');
+    expect(getDefaultFormat()).toBe('LCH');
+    localStorage.setItem('image-color.default-format', 'bogus');
+    expect(getDefaultFormat()).toBe('HEX');
+    setDefaultFormat('XYZ');
+    expect(localStorage.getItem('image-color.default-format')).toBe('XYZ');
+    setDefaultFormat('bad' as unknown as typeof FORMAT_DEFAULT);
+    expect(getDefaultFormat()).toBe('HEX');
+    localStorage.removeItem('image-color.default-format');
+    expect(getDefaultFormat()).toBe('HEX');
   });
 });

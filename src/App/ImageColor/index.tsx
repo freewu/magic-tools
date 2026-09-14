@@ -1,5 +1,5 @@
 // 图片主题色: 提取图片中的颜色 -> 合并相近色 -> 按占比排序
-import { Alert, Button, Checkbox, Divider, InputNumber, Progress, Slider, Space, Tag, Tooltip, Typography, Upload, message, theme } from 'antd';
+import { Alert, Button, Checkbox, Divider, InputNumber, Progress, Select, Slider, Space, Tag, Tooltip, Typography, Upload, message, theme } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { CopyOutlined, DownloadOutlined, FileImageOutlined, UploadOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from '../../lib';
@@ -7,10 +7,11 @@ import { savePngFile, saveTextFile } from '../../lib/tauri';
 import { useLocale } from '../../hook/locale-context';
 import { im, imT } from './lang';
 import {
-  ALPHA_DEFAULT, ALPHA_MAX, ALPHA_MIN, COLORS_DEFAULT, COLORS_MAX, COLORS_MIN,
+  ALPHA_DEFAULT, ALPHA_MAX, ALPHA_MIN, COLORS_DEFAULT, COLORS_MAX, COLORS_MIN, COLOR_FORMATS,
   LEVEL_DEFAULT, LEVEL_MAX, LEVEL_MIN, MAX_EDGE,
-  contrastColor, coverage, extractPalette, fitSize, formatRatio, formatRgb, paletteToCsv, paletteToText,
-  type ExtractResult, type PaletteColor,
+  contrastColor, coverage, extractPalette, fitSize, formatColor, formatRatio, formatRgb, getDefaultFormat,
+  paletteToCsv, paletteToText,
+  type ColorFormat, type ExtractResult, type PaletteColor,
 } from './lib';
 import ImageColorIntro from './intro';
 
@@ -40,6 +41,7 @@ const ImageColor = () => {
   const [ maxColors, setMaxColors ] = useState<number>(COLORS_DEFAULT); // 输出颜色数
   const [ ignoreTransparent, setIgnoreTransparent ] = useState(true); // 忽略透明像素
   const [ alphaThreshold, setAlphaThreshold ] = useState<number>(ALPHA_DEFAULT); // 透明度阈值
+  const [ format, setFormat ] = useState<ColorFormat>(() => getDefaultFormat()); // 颜色格式 (默认值可在设置中修改)
 
   /** 读取文件 -> 解码图片 */
   const onFile = (file: File) => {
@@ -104,13 +106,14 @@ const ImageColor = () => {
   };
 
   const onCopyColor = async (c: PaletteColor) => {
-    await copyTextToClipboard(c.hex);
-    message.success(tT('已复制 {hex}', { hex: c.hex }));
+    const v = formatColor(c.rgb, format);
+    await copyTextToClipboard(v);
+    message.success(tT('已复制 {v}', { v: v }));
   };
 
   const onCopyAll = async () => {
     if (!result || result.palette.length === 0) return;
-    await copyTextToClipboard(paletteToText(result.palette, 'detail'));
+    await copyTextToClipboard(paletteToText(result.palette, 'detail', format));
     message.success(t('已复制到剪贴板'));
   };
 
@@ -157,15 +160,15 @@ const ImageColor = () => {
       ctx.fillRect(cx, cy, CARD_CELL_W - 1, boxH);
       ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
       ctx.strokeRect(cx + 0.5, cy + 0.5, CARD_CELL_W - 2, boxH - 1);
-      // 色块上的 HEX
+      // 色块上的颜色值 (按当前格式)
       ctx.fillStyle = contrastColor(c.rgb);
       ctx.font = '600 16px ' + MONO;
       ctx.textBaseline = 'middle';
-      ctx.fillText(c.hex, cx + 12, cy + boxH / 2);
+      ctx.fillText(formatColor(c.rgb, format), cx + 12, cy + boxH / 2);
       // 下方文案
       ctx.fillStyle = '#333333';
       ctx.font = '13px ' + MONO;
-      ctx.fillText(formatRgb(c.rgb), cx + 12, cy + boxH + 16);
+      ctx.fillText(`${c.hex}  ${formatRgb(c.rgb)}`, cx + 12, cy + boxH + 16);
       ctx.fillText(`${formatRatio(c.ratio, 2)}  ·  ${c.count} px`, cx + 12, cy + boxH + 34);
     });
     const name = `image-colors-${stamp()}.png`;
@@ -228,17 +231,17 @@ const ImageColor = () => {
             <button
               type="button"
               onClick={ () => onCopyColor(c) }
-              title={ c.hex }
+              title={ `${c.hex}  ${formatRgb(c.rgb)}` }
               style={ {
                 flex: '0 0 auto', width: 56, height: 36, borderRadius: token.borderRadius,
                 border: `1px solid ${token.colorBorderSecondary}`, background: c.hex,
                 color: contrastColor(c.rgb), fontFamily: MONO, fontSize: 11, cursor: 'pointer',
               } }
             >
-              { c.hex }
+              { format === 'HEX' ? c.hex.replace('#', '') : '' }
             </button>
             <div style={ { flex: '1 1 160px', minWidth: 120 } }>
-              <Text style={ { fontFamily: MONO, fontSize: 12 } }>{ formatRgb(c.rgb) }</Text>
+              <Text style={ { fontFamily: MONO, fontSize: 12 } } ellipsis={ { tooltip: formatColor(c.rgb, format) } }>{ formatColor(c.rgb, format) }</Text>
               <Progress
                 percent={ Number((c.ratio * 100).toFixed(2)) }
                 size="small"
@@ -357,6 +360,16 @@ const ImageColor = () => {
             onChange={ setMaxColors }
           />
           <InputNumber min={ COLORS_MIN } max={ COLORS_MAX } value={ maxColors } onChange={ (v) => setMaxColors(Number(v ?? COLORS_DEFAULT)) } />
+        </div>
+        <div style={ { display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' } }>
+          <Text style={ { width: 96, flex: '0 0 auto' } }>{ t('颜色格式') }</Text>
+          <Select
+            style={ { width: 160 } }
+            value={ format }
+            onChange={ (v: ColorFormat) => setFormat(v) }
+            options={ COLOR_FORMATS.map((v) => ({ value: v, label: v })) }
+          />
+          <Text type="secondary" style={ { fontSize: 12 } }>{ t('工具页可随时切换, 默认值在「设置 → 图片 → 图片主题色」中修改') }</Text>
         </div>
         <div style={ { display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' } }>
           <Checkbox checked={ ignoreTransparent } onChange={ (e) => setIgnoreTransparent(e.target.checked) }>{ t('忽略透明像素') }</Checkbox>
