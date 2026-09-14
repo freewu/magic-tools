@@ -61,6 +61,7 @@ import CRCCheck from './CRCCheck/lang';
 import Base64Image from './Base64Image/lang';
 import ImageColor from './ImageColor/lang';
 import ImageSplit from './ImageSplit/lang';
+import ImageResize from './ImageResize/lang';
 import GPSConvert from './GPSConvert/lang';
 import DownloadLinkConvert from './DownloadLinkConvert/lang';
 import RMBConvert from './RMBConvert/lang';
@@ -176,6 +177,7 @@ export const langPacks = {
   Base64Image: Base64Image,
   ImageColor: ImageColor,
   ImageSplit: ImageSplit,
+  ImageResize: ImageResize,
   GPSConvert: GPSConvert,
   DownloadLinkConvert: DownloadLinkConvert,
   RMBConvert: RMBConvert,

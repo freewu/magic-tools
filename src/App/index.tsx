@@ -94,6 +94,7 @@ const list = [
   'AsciiImageGenerator',
   'ImageColor',
   'ImageSplit',
+  'ImageResize',
   'AsciiTextArt',
   'CronRules',
   'HtmlStripText',

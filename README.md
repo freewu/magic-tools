@@ -42,8 +42,8 @@ Unix timestamp · Color format · Radix (BIN/OCT/DEC/HEX) · Tree ↔ path · GP
 ### 🛠️ Formatters & Editors *(8)*
 Markdown editor (live preview + LaTeX subset) · JSON · JSON5 · SQL · XML · HTML · SVG · CN/EN typography spacing
 
-### 🖼️ Image Generators *(10)*
-QR code · Barcode (CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · Base64 image · ASCII image · Code screenshot · ICO icon · App icon · Dominant-color palette (merge similar colors + share) · Image split (2/3/4/6/9) · Placeholder image · Shield badge (PNG export ×1–10)
+### 🖼️ Image Generators *(12)*
+QR code · Barcode (CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · Base64 image · ASCII image · Code screenshot · ICO icon · App icon · Dominant-color palette (merge similar colors + share) · Image split (2/3/4/6/9) · Image resize (percent / pixels, PNG·JPEG) · Placeholder image · Shield badge (PNG export ×1–10)
 
 ### 🌐 Webmaster Tools *(9)*
 HTML stripper · Browser fingerprint · URL extractor · Cookie analyzer · User-Agent parser · Sitemap checker · Keyword density · TDK checker · robots.txt generator
@@ -93,10 +93,10 @@ magic-tools
 │   │       ├── index.tsx     # tool page component (default export; lazy-loaded)
 │   │       ├── lang.ts       # default language pack + rows (zh phrase = key → [zh-TW, en]) + lookup helpers
 │   │       ├── lib.ts        # pure logic shared by the page and its unit tests (most tools)
-│   │       ├── lib.test.ts   # jest unit tests (82 tools)
-│   │       ├── data.ts       # option tables / constants / types (49 tools)
-│   │       ├── setting.tsx   # this tool's panel inside the Settings center (60 tools)
-│   │       └── intro.tsx     # About / instructions content, trilingual (33 tools)
+│   │       ├── lib.test.ts   # jest unit tests (83 tools)
+│   │       ├── data.ts       # option tables / constants / types (50 tools)
+│   │       ├── setting.tsx   # this tool's panel inside the Settings center (61 tools)
+│   │       └── intro.tsx     # About / instructions content, trilingual (34 tools)
 │   ├── layout/           # main frame: sidebar / content
 │   ├── hook/             # global state: theme / app context
 │   └── lib/              # shared utilities
@@ -119,7 +119,7 @@ magic-tools
 
 **🛠️ Formatters & Editors *(8)*** — `CnEnSpacing` · `HtmlFormat` · `JSON5Formatter` · `JsonFormatter` · `MarkdownEditor` · `SQLFormatter` · `SvgFormat` · `XmlFormatter`
 
-**🖼️ Image Generators *(11)*** — `AppIconGenerator` · `AsciiImageGenerator` · `BarcodeGenerator` · `Base64Image` · `CodeShot` · `IcoGenerator` · `ImageColor` · `ImageSplit` · `PlaceholderImage` · `QRCodeGenerator` · `ShieldBadgeGenerator`
+**🖼️ Image Generators *(12)*** — `AppIconGenerator` · `AsciiImageGenerator` · `BarcodeGenerator` · `Base64Image` · `CodeShot` · `IcoGenerator` · `ImageColor` · `ImageResize` · `ImageSplit` · `PlaceholderImage` · `QRCodeGenerator` · `ShieldBadgeGenerator`
 
 **🌐 Webmaster Tools *(9)*** — `BrowserFingerprint` · `CookieAnalyzer` · `HtmlStripText` · `KeywordDensity` · `RobotsTxtGenerator` · `SitemapCheck` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck`
 

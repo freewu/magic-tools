@@ -42,8 +42,8 @@ Base64 編解碼 · URL 編解碼 · Unicode 編解碼 · Punycode 編解碼 · 
 ### 🛠️ 格式化 *(8)*
 Markdown 編輯器 · JSON 格式化 · JSON5 格式化 · SQL 格式化 · XML 格式化 · HTML 格式化 · SVG 格式化 · 中英文自動排版
 
-### 🖼️ 圖片 *(10)*
-二維碼生成 · 條碼生成 · Base64 圖片 · ASCII 圖片 · 程式碼截圖 · ICO 生成 · App Icon 生成 · 圖片主題色(合併相近色 + 佔比) · 圖片分割(2/3/4/6/9 份) · 佔位圖片 · Shield Badge 生成
+### 🖼️ 圖片 *(12)*
+二維碼生成 · 條碼生成 · Base64 圖片 · ASCII 圖片 · 程式碼截圖 · ICO 生成 · App Icon 生成 · 圖片主題色(合併相近色 + 佔比) · 圖片分割(2/3/4/6/9 份) · 圖片尺寸調整(依比例/依像素, PNG·JPEG) · 佔位圖片 · Shield Badge 生成
 
 ### 🌐 站長工具 *(9)*
 HTML 標籤去除 · 瀏覽器指紋 · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 檢查 · 關鍵詞密度 · 網頁TDK 資訊檢測 · robots.txt 生成
@@ -93,10 +93,10 @@ magic-tools
 │   │       ├── index.tsx     # 工具頁面元件 (預設匯出, 懶載入)
 │   │       ├── lang.ts       # 預設語言包 + 三語詞條 (zh 短語即 key, 值=[zh-TW, en]) + 本地取詞函式
 │   │       ├── lib.ts        # 純函式邏輯, 頁面與單測共用 (絕大多數工具)
-│   │       ├── lib.test.ts   # jest 單測 (82 個工具)
-│   │       ├── data.ts       # 選項/常數表與型別 (49 個工具)
-│   │       ├── setting.tsx   # 設定中心內本工具的設定面板 (60 個工具)
-│   │       └── intro.tsx     # About/說明 三語內容 (33 個工具)
+│   │       ├── lib.test.ts   # jest 單測 (83 個工具)
+│   │       ├── data.ts       # 選項/常數表與型別 (50 個工具)
+│   │       ├── setting.tsx   # 設定中心內本工具的設定面板 (61 個工具)
+│   │       └── intro.tsx     # About/說明 三語內容 (34 個工具)
 │   ├── layout/           # 主框架: 側邊欄/內容區
 │   ├── hook/             # 全域狀態: 主題/應用上下文
 │   └── lib/              # 共用工具庫
@@ -107,7 +107,7 @@ magic-tools
 
 ### `src/App/` 現有工具清單
 
-[`src/App/`](src/App/) 下現有 **113** 個工具目錄, 每個目錄 = 一個工具, 由其中 `define.tsx` 宣告。**新增工具需兩步登記**：(1) 把目錄名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 陣列 (該陣列決定側邊欄/應用中心選單順序與路由; `import.meta.glob` 只負責發現頁面元件, 不決定選單); (2) 把其 `lang.ts` 預設匯出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名稱與介面文案才能隨語言切換。按下表 `Type` 分組列出 (與側邊欄/上方功能總覽一致), 括號內為目錄數。除下列公共檔案外, 個別工具另有私有檔案 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
+[`src/App/`](src/App/) 下現有 **114** 個工具目錄, 每個目錄 = 一個工具, 由其中 `define.tsx` 宣告。**新增工具需兩步登記**：(1) 把目錄名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 陣列 (該陣列決定側邊欄/應用中心選單順序與路由; `import.meta.glob` 只負責發現頁面元件, 不決定選單); (2) 把其 `lang.ts` 預設匯出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名稱與介面文案才能隨語言切換。按下表 `Type` 分組列出 (與側邊欄/上方功能總覽一致), 括號內為目錄數。除下列公共檔案外, 個別工具另有私有檔案 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
 
 **🔐 加解密 *(21)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
 
@@ -119,7 +119,7 @@ magic-tools
 
 **🛠️ 格式化 *(8)*** — `CnEnSpacing` · `HtmlFormat` · `JSON5Formatter` · `JsonFormatter` · `MarkdownEditor` · `SQLFormatter` · `SvgFormat` · `XmlFormatter`
 
-**🖼️ 圖片 *(11)*** — `AppIconGenerator` · `AsciiImageGenerator` · `BarcodeGenerator` · `Base64Image` · `CodeShot` · `IcoGenerator` · `ImageColor` · `ImageSplit` · `PlaceholderImage` · `QRCodeGenerator` · `ShieldBadgeGenerator`
+**🖼️ 圖片 *(12)*** — `AppIconGenerator` · `AsciiImageGenerator` · `BarcodeGenerator` · `Base64Image` · `CodeShot` · `IcoGenerator` · `ImageColor` · `ImageResize` · `ImageSplit` · `PlaceholderImage` · `QRCodeGenerator` · `ShieldBadgeGenerator`
 
 **🌐 站長工具 *(9)*** — `BrowserFingerprint` · `CookieAnalyzer` · `HtmlStripText` · `KeywordDensity` · `RobotsTxtGenerator` · `SitemapCheck` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck`
 
