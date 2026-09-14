@@ -42,14 +42,14 @@ Base64 編解碼 · URL 編解碼 · Unicode 編解碼 · Punycode 編解碼 · 
 ### 🛠️ 格式化 *(8)*
 Markdown 編輯器 · JSON 格式化 · JSON5 格式化 · SQL 格式化 · XML 格式化 · HTML 格式化 · SVG 格式化 · 中英文自動排版
 
-### 🖼️ 圖片 *(9)*
-二維碼生成 · 條碼生成 · Base64 圖片 · ASCII 圖片 · 程式碼截圖 · ICO 生成 · App Icon 生成 · 佔位圖片 · Shield Badge 生成
+### 🖼️ 圖片 *(10)*
+二維碼生成 · 條碼生成 · Base64 圖片 · ASCII 圖片 · 程式碼截圖 · ICO 生成 · App Icon 生成 · 圖片主題色(合併相近色 + 佔比) · 佔位圖片 · Shield Badge 生成
 
 ### 🌐 站長工具 *(9)*
 HTML 標籤去除 · 瀏覽器指紋 · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 檢查 · 關鍵詞密度 · 網頁TDK 資訊檢測 · robots.txt 生成
 
-### 🧩 其他 *(16)*
-CSS 配色 · 行數統計 · htpasswd 生成 · 正則表達式 · 檔案比較 · 點陣字生成器 · 鍵盤按鍵資訊 · Chmod 權限 · OTP 密碼生成器 · ASCII 文字 · Cron 規則生成 · CIDR 計算器 · 密碼生成 · 圖片主題色 · 資料產生 · WebSocket 偵錯
+### 🧩 其他 *(15)*
+CSS 配色 · 行數統計 · htpasswd 生成 · 正則表達式 · 檔案比較 · 點陣字生成器 · 鍵盤按鍵資訊 · Chmod 權限 · OTP 密碼生成器 · ASCII 文字 · Cron 規則生成 · CIDR 計算器 · 密碼生成 · 資料產生 · WebSocket 偵錯
 
 > 另有內建頁面：**應用中心**、**說明與更新日誌**、**設定**。
 
@@ -119,11 +119,11 @@ magic-tools
 
 **🛠️ 格式化 *(8)*** — `CnEnSpacing` · `HtmlFormat` · `JSON5Formatter` · `JsonFormatter` · `MarkdownEditor` · `SQLFormatter` · `SvgFormat` · `XmlFormatter`
 
-**🖼️ 圖片 *(9)*** — `AppIconGenerator` · `AsciiImageGenerator` · `BarcodeGenerator` · `Base64Image` · `CodeShot` · `IcoGenerator` · `PlaceholderImage` · `QRCodeGenerator` · `ShieldBadgeGenerator`
+**🖼️ 圖片 *(10)*** — `AppIconGenerator` · `AsciiImageGenerator` · `BarcodeGenerator` · `Base64Image` · `CodeShot` · `IcoGenerator` · `ImageColor` · `PlaceholderImage` · `QRCodeGenerator` · `ShieldBadgeGenerator`
 
 **🌐 站長工具 *(9)*** — `BrowserFingerprint` · `CookieAnalyzer` · `HtmlStripText` · `KeywordDensity` · `RobotsTxtGenerator` · `SitemapCheck` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck`
 
-**🧩 其他 *(16)*** — `AsciiTextArt` · `CIDRCalc` · `Chmod` · `Color` · `CronRules` · `DotMatrixFont` · `FileDiff` · `HtpasswdGenerator` · `ImageColor` · `KeyboardKeyInfo` · `LineCount` · `MockData` · `OTPGenerator` · `PasswordGenerator` · `RegexTester` · `WebSocketDebug`
+**🧩 其他 *(15)*** — `AsciiTextArt` · `CIDRCalc` · `Chmod` · `Color` · `CronRules` · `DotMatrixFont` · `FileDiff` · `HtpasswdGenerator` · `KeyboardKeyInfo` · `LineCount` · `MockData` · `OTPGenerator` · `PasswordGenerator` · `RegexTester` · `WebSocketDebug`
 
 > 內建頁面 `AppStore`(應用中心) / `Help` / `Setting` 也位於 `src/App/` 下 (註冊 `Type = 'misc'`), 但屬固定頁面而非工具。
 

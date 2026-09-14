@@ -42,14 +42,14 @@ Unix timestamp · Color format · Radix (BIN/OCT/DEC/HEX) · Tree ↔ path · GP
 ### 🛠️ Formatters & Editors *(8)*
 Markdown editor (live preview + LaTeX subset) · JSON · JSON5 · SQL · XML · HTML · SVG · CN/EN typography spacing
 
-### 🖼️ Image Generators *(9)*
-QR code · Barcode (CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · Base64 image · ASCII image · Code screenshot · ICO icon · App icon · Placeholder image · Shield badge (PNG export ×1–10)
+### 🖼️ Image Generators *(10)*
+QR code · Barcode (CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · Base64 image · ASCII image · Code screenshot · ICO icon · App icon · Dominant-color palette (merge similar colors + share) · Placeholder image · Shield badge (PNG export ×1–10)
 
 ### 🌐 Webmaster Tools *(9)*
 HTML stripper · Browser fingerprint · URL extractor · Cookie analyzer · User-Agent parser · Sitemap checker · Keyword density · TDK checker · robots.txt generator
 
-### 🧩 Utilities *(16)*
-CSS colors · Line counter · htpasswd generator · Regex tester (17 presets) · File diff · Dot-matrix font · Keyboard key info · Chmod calculator · OTP generator · ASCII text art · Cron rules (parse + next runs) · CIDR calculator · Password generator (strength analysis) · Image color palette · Mock data generator (JSON/CSV/SQL) · WebSocket debugger
+### 🧩 Utilities *(15)*
+CSS colors · Line counter · htpasswd generator · Regex tester (17 presets) · File diff · Dot-matrix font · Keyboard key info · Chmod calculator · OTP generator · ASCII text art · Cron rules (parse + next runs) · CIDR calculator · Password generator (strength analysis) · Mock data generator (JSON/CSV/SQL) · WebSocket debugger
 
 > Plus built-in app pages: **App Center**, **Help & changelog**, **Settings**.
 
@@ -119,11 +119,11 @@ magic-tools
 
 **🛠️ Formatters & Editors *(8)*** — `CnEnSpacing` · `HtmlFormat` · `JSON5Formatter` · `JsonFormatter` · `MarkdownEditor` · `SQLFormatter` · `SvgFormat` · `XmlFormatter`
 
-**🖼️ Image Generators *(9)*** — `AppIconGenerator` · `AsciiImageGenerator` · `BarcodeGenerator` · `Base64Image` · `CodeShot` · `IcoGenerator` · `PlaceholderImage` · `QRCodeGenerator` · `ShieldBadgeGenerator`
+**🖼️ Image Generators *(10)*** — `AppIconGenerator` · `AsciiImageGenerator` · `BarcodeGenerator` · `Base64Image` · `CodeShot` · `IcoGenerator` · `ImageColor` · `PlaceholderImage` · `QRCodeGenerator` · `ShieldBadgeGenerator`
 
 **🌐 Webmaster Tools *(9)*** — `BrowserFingerprint` · `CookieAnalyzer` · `HtmlStripText` · `KeywordDensity` · `RobotsTxtGenerator` · `SitemapCheck` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck`
 
-**🧩 Utilities *(16)*** — `AsciiTextArt` · `CIDRCalc` · `Chmod` · `Color` · `CronRules` · `DotMatrixFont` · `FileDiff` · `HtpasswdGenerator` · `ImageColor` · `KeyboardKeyInfo` · `LineCount` · `MockData` · `OTPGenerator` · `PasswordGenerator` · `RegexTester` · `WebSocketDebug`
+**🧩 Utilities *(15)*** — `AsciiTextArt` · `CIDRCalc` · `Chmod` · `Color` · `CronRules` · `DotMatrixFont` · `FileDiff` · `HtpasswdGenerator` · `KeyboardKeyInfo` · `LineCount` · `MockData` · `OTPGenerator` · `PasswordGenerator` · `RegexTester` · `WebSocketDebug`
 
 > Built-in pages `AppStore`（App Center）/ `Help` / `Setting` also live in `src/App/` (registered with `Type = 'misc'`), but are fixed pages rather than tools.
 
