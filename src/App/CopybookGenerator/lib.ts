@@ -2,8 +2,9 @@
 import { A4_MM, PRINT_BASE_CSS, escapeHtml } from '../../lib/print';
 import {
   CELL_LINE_MM, CHAR_RATIO, COLS_DEFAULT, COLS_MAX, COLS_MIN, CUSTOM_FAMILY, DEFAULT_GRID, FOOTER_MM,
-  GAP_DEFAULT, GAP_MAX, GAP_MIN, GUIDE_LINE_MM, HEADER_MM, KEY_COLS, KEY_FONT, KEY_GAP, KEY_LINE, KEY_LOOP,
-  KEY_MODE, KEY_PAGES, KEY_ROWS, KEY_STYLE, KEY_TEXT, LINE_COLOR_VALUE, PAGES_MAX, PAGES_MIN, ROWS_DEFAULT,
+  GAP_DEFAULT, GAP_MAX, GAP_MIN, GUIDE_LINE_MM, HEADER_MM, KEY_BY_ROW, KEY_COLS, KEY_FONT, KEY_GAP, KEY_LINE,
+  KEY_LOOP, KEY_MODE, KEY_PAGES, KEY_ROWS, KEY_STYLE, KEY_TEXT, LINE_COLOR_VALUE, PAGES_MAX, PAGES_MIN,
+  ROWS_DEFAULT,
   ROWS_MAX, ROWS_MIN, TEXT_COLOR_GRAY, TEXT_COLOR_INK, FONTS, FONT_DEFAULT, PAGES_DEFAULT,
   type ContentMode, type GridStyle, type LineColor,
 } from './data';
@@ -455,6 +456,11 @@ export const getDefaultLoop = (): boolean => {
   const raw = readSetting(KEY_LOOP);
   return raw === null ? true : normalizeLoop(raw);
 };
+/** 默认按行填充 (一行练一个字): 未设置过时为关闭 */
+export const getDefaultByRow = (): boolean => {
+  const raw = readSetting(KEY_BY_ROW);
+  return raw === null ? false : normalizeLoop(raw);
+};
 
 export const setDefaultStyle = (v: GridStyle): void => writeSetting(KEY_STYLE, v);
 export const setDefaultFont = (v: string): void => writeSetting(KEY_FONT, v);
@@ -466,3 +472,4 @@ export const setDefaultPages = (v: number): void => writeSetting(KEY_PAGES, Stri
 export const setDefaultGap = (v: number): void => writeSetting(KEY_GAP, String(normalizeGap(v)));
 export const setDefaultText = (v: string): void => writeSetting(KEY_TEXT, v);
 export const setDefaultLoop = (v: boolean): void => writeSetting(KEY_LOOP, v ? '1' : '0');
+export const setDefaultByRow = (v: boolean): void => writeSetting(KEY_BY_ROW, v ? '1' : '0');

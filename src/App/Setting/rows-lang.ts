@@ -295,6 +295,8 @@ const ROWS: Record<string, Row> = {
   '默认每页行数': ['預設每頁行數', 'Default rows per page'],
   '默认格间距': ['預設格間距', 'Default cell gap'],
   '默认文本': ['預設文字', 'Default text'],
+  '默认循环填充': ['預設循環填充', 'Repeat to fill'],
+  '默认按行填充': ['預設依行填充', 'One char per row'],
   '打开「字帖生成器」时默认的格型, 默认 ${d}': [
     '開啟「字帖產生器」時預設的格型, 預設 ${d}',
     'Grid style used when opening the copybook generator (default ${d})',
@@ -322,6 +324,14 @@ const ROWS: Record<string, Row> = {
   '打开「字帖生成器」时默认的格间距 (mm), 范围 ${min} - ${max}, 默认 ${d}': [
     '開啟「字帖產生器」時預設的格間距 (mm), 範圍 ${min} - ${max}, 預設 ${d}',
     'Cell gap used when opening the copybook generator (range ${min} - ${max}, default ${d})',
+  ],
+  '打开「字帖生成器」时是否默认循环填充 (字不够时重复整页)': [
+    '開啟「字帖產生器」時是否預設循環填充 (字不夠時重複整頁)',
+    'Whether the copybook generator repeats the text to fill the page by default',
+  ],
+  '打开「字帖生成器」时是否默认按行填充 (一行练一个字, 第 N 行用第 N 个字)': [
+    '開啟「字帖產生器」時是否預設依行填充 (一行練一個字, 第 N 行用第 N 個字)',
+    'Whether the copybook generator practises one character per row by default (row N uses character N)',
   ],
 
 };

@@ -31,6 +31,36 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-09-15 V2.10.1 Release", "2026-09-15 V2.10.1 Release", "2026-09-15 V2.10.1 Release"),
+    items: trio(
+      [
+        "字帖生成器: 新增「按行填充」开关 (一行练一个字, 同一行重复同一个字、第 N 行用第 N 个字); 格线颜色新增「淡绿」",
+        "字帖生成器: 修复「字在格子里偏右 / 偏下」—— 中文字体字形在字身框里本身不居中, 现在按字逐个光栅化实测墨迹包围盒并反向微调, 米字格十字正好穿过字的中心 (实测 93mm 格子 / 67mm 字号: 偏右 2.16mm → 0.27mm, 偏下 0.84mm → 0.09mm)",
+        "字帖生成器: 修复「上传的自定义字体不生效」—— font-family 里的双引号未转义导致整个 style 属性被截断; 自定义字体为异步加载, 加载完成后自动重新测量字形偏移",
+        "设置中心 → 其它 → 字帖生成器: 新增「默认格间距」「默认循环填充」「默认按行填充」(此前「默认循环填充」只在说明里提到, 界面上无法配置)",
+        "字帖生成器: 设置面板重排 (文本置顶), 「格间距」支持 0 - 5mm 步进 0.5mm 并带单位提示; 关闭循环填充时统计文案直接显示实际填充格数",
+        "侧边栏: 修复折叠状态下鼠标悬停展开的二级菜单浮层超出窗口底部被裁掉的问题 (「其它」分类的子项看不到也点不到), 现在会自动向上翻转并留出安全边距",
+      ],
+      [
+        "字帖產生器: 新增「依行填充」開關 (一行練一個字, 同一行重複同一個字、第 N 行用第 N 個字); 格線顏色新增「淡綠」",
+        "字帖產生器: 修正「字在格子裡偏右 / 偏下」—— 中文字體字形在字身框裡本身不居中, 現在依字逐個光柵化實測墨跡包圍盒並反向微調, 米字格十字正好穿過字的中心 (實測 93mm 格子 / 67mm 字號: 偏右 2.16mm → 0.27mm, 偏下 0.84mm → 0.09mm)",
+        "字帖產生器: 修正「上傳的自訂字型不生效」—— font-family 裡的雙引號未轉義導致整個 style 屬性被截斷; 自訂字型為非同步載入, 載入完成後自動重新測量字形偏移",
+        "設定中心 → 其他 → 字帖產生器: 新增「預設格間距」「預設循環填充」「預設依行填充」(此前「預設循環填充」只在說明裡提到, 介面上無法設定)",
+        "字帖產生器: 設定面板重排 (文字置頂), 「格間距」支援 0 - 5mm 步進 0.5mm 並帶單位提示; 關閉循環填充時統計文案直接顯示實際填充格數",
+        "側邊欄: 修正折疊狀態下滑鼠懸停展開的二級選單浮層超出視窗底部被裁掉的問題 (「其他」分類的子項看不到也點不到), 現在會自動向上翻轉並留出安全邊距",
+      ],
+      [
+        "Copybook Generator: new “One char per row” switch (every cell in a row repeats the same character, row N uses character N) and a new light-green guide line colour",
+        "Copybook Generator: fixed characters sitting right of / below the cell centre — CJK glyphs are not centred inside their em box, so every character's ink box is now rasterised and measured, then nudged back per character (93mm cell / 67mm glyph: 2.16mm → 0.27mm right, 0.84mm → 0.09mm down)",
+        "Copybook Generator: fixed uploaded custom fonts not being applied (unescaped double quotes in font-family truncated the whole style attribute); the offset is also re-measured once the asynchronous font finishes loading",
+        "Settings → Utilities → Copybook Generator: new default cell gap, default repeat-to-fill and default one-char-per-row options (the repeat default previously existed in the docs only)",
+        "Copybook Generator: settings panel reordered (text first), cell gap now 0 - 5mm in 0.5mm steps with a unit hint, and the stats line reports the real number of filled cells when repeat is off",
+        "Sidebar: fixed the collapsed flyout submenu being clipped at the bottom of the window (sub-items of the Utilities category were invisible and unclickable); it now flips upwards with a safe margin",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-09-15 V2.10.0 Release", "2026-09-15 V2.10.0 Release", "2026-09-15 V2.10.0 Release"),
     items: trio(
       [

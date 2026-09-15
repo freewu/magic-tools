@@ -1,16 +1,17 @@
 import {
   buildGridHtml, buildGuideSvg, buildPageHtml, buildSheetCss, buildSheetHtml, buildSheetPages, cellSizeMm,
   cellStyle, cellsPerPage, defaultGridOf, fill, fillChars, fillCharsByRow, fontFamilyOf, fontStack,
-  getDefaultCols, getDefaultGap, getDefaultPages, getDefaultRows, getDefaultText, gridSizeMm, inkNudge,
-  measureInkOffsets, normalizeCols, normalizeFont, normalizeGap, normalizeLine, normalizeLoop, normalizeMode,
-  normalizePages, normalizeRows, normalizeStyle, pageChunks,
-  setDefaultCols, setDefaultGap, setDefaultPages, setDefaultRows, splitChars, totalCells,
+  getDefaultByRow, getDefaultCols, getDefaultGap, getDefaultLoop, getDefaultPages, getDefaultRows, getDefaultText,
+  gridSizeMm, inkNudge, measureInkOffsets, normalizeCols, normalizeFont, normalizeGap, normalizeLine,
+  normalizeLoop, normalizeMode, normalizePages, normalizeRows, normalizeStyle, pageChunks,
+  setDefaultByRow, setDefaultCols, setDefaultGap, setDefaultLoop, setDefaultPages, setDefaultRows, splitChars,
+  totalCells,
   type InkOffset,
 } from './lib';
 import {
   CELL_LINE_MM, CONTENT_MODE_LABEL, COLS_DEFAULT, DEFAULT_GRID, FONTS, FONT_DEFAULT, GAP_DEFAULT, GAP_MAX,
-  GRID_STYLE_LABEL, LINE_COLORS, LINE_COLOR_VALUE, LINE_COLOR_LABEL, PAGES_DEFAULT, ROWS_DEFAULT, TEXT_DEFAULT,
-  TEXT_COLOR_GRAY, TEXT_COLOR_INK,
+  GRID_STYLE_LABEL, KEY_BY_ROW, LINE_COLORS, LINE_COLOR_VALUE, LINE_COLOR_LABEL, PAGES_DEFAULT, ROWS_DEFAULT,
+  TEXT_DEFAULT, TEXT_COLOR_GRAY, TEXT_COLOR_INK,
   type ContentMode, type GridStyle, type LineColor,
 } from './data';
 
@@ -318,6 +319,30 @@ describe('copybook lib / 默认值 (回归: 未保存设置时必须回退到常
     expect(TEXT_DEFAULT).toBe('落霞与孤鹜齐飞秋水共长天一色');
     expect(splitChars(TEXT_DEFAULT)).toHaveLength(14);
     expect(splitChars(TEXT_DEFAULT)[0]).toBe('落');
+  });
+
+  test('循环填充默认开 / 按行填充默认关, 保存后能读回', () => {
+    expect(getDefaultLoop()).toBe(true);
+    expect(getDefaultByRow()).toBe(false);
+    setDefaultLoop(false);
+    setDefaultByRow(true);
+    expect(getDefaultLoop()).toBe(false);
+    expect(getDefaultByRow()).toBe(true);
+    setDefaultLoop(true);
+    setDefaultByRow(false);
+    expect(getDefaultLoop()).toBe(true);
+    expect(getDefaultByRow()).toBe(false);
+  });
+
+  test('保存的按行填充为脏值时归一化为布尔', () => {
+    localStorage.setItem(KEY_BY_ROW, '0');
+    expect(getDefaultByRow()).toBe(false);
+    localStorage.setItem(KEY_BY_ROW, 'false');
+    expect(getDefaultByRow()).toBe(false);
+    localStorage.setItem(KEY_BY_ROW, '1');
+    expect(getDefaultByRow()).toBe(true);
+    localStorage.setItem(KEY_BY_ROW, 'yes');
+    expect(getDefaultByRow()).toBe(true);
   });
 });
 

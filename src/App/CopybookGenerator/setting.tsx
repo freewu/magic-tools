@@ -1,4 +1,4 @@
-import { Divider, Form, Input, InputNumber, Select } from 'antd';
+import { Divider, Form, Input, InputNumber, Select, Switch } from 'antd';
 import { useState } from 'react';
 import { useLocale } from '../../hook/locale-context';
 import { row as _r, rowT } from '../Setting/rows-lang';
@@ -9,9 +9,10 @@ import {
   TEXT_DEFAULT, type ContentMode, type GridStyle, type LineColor,
 } from './data';
 import {
-  getDefaultCols, getDefaultFont, getDefaultGap, getDefaultLine, getDefaultMode, getDefaultPages,
-  getDefaultRows, getDefaultStyle, getDefaultText, setDefaultCols, setDefaultFont, setDefaultGap, setDefaultLine,
-  setDefaultMode, setDefaultPages, setDefaultRows, setDefaultStyle, setDefaultText,
+  getDefaultByRow, getDefaultCols, getDefaultFont, getDefaultGap, getDefaultLine, getDefaultLoop, getDefaultMode,
+  getDefaultPages, getDefaultRows, getDefaultStyle, getDefaultText, setDefaultByRow, setDefaultCols, setDefaultFont,
+  setDefaultGap, setDefaultLine, setDefaultLoop, setDefaultMode, setDefaultPages, setDefaultRows, setDefaultStyle,
+  setDefaultText,
 } from './lib';
 
 /** 字帖生成器默认设置 (挂载到 设置 → 其它) */
@@ -27,6 +28,8 @@ export const CopybookGeneratorSetting: React.FC = () => {
   const [ pages, setPages ] = useState<number>(() => getDefaultPages());
   const [ gap, setGap ] = useState<number>(() => getDefaultGap());
   const [ text, setText ] = useState<string>(() => getDefaultText());
+  const [ loop, setLoop ] = useState<boolean>(() => getDefaultLoop());
+  const [ byRow, setByRow ] = useState<boolean>(() => getDefaultByRow());
 
   return (
     <>
@@ -127,6 +130,24 @@ export const CopybookGeneratorSetting: React.FC = () => {
           suffix="mm"
           value={ gap }
           onChange={ (v) => { const n = Number(v ?? GAP_DEFAULT); setGap(n); setDefaultGap(n); } }
+        />
+      </Form.Item>
+      <Form.Item
+        label={ st('默认循环填充') }
+        extra={ rowT(locale, '打开「字帖生成器」时是否默认循环填充 (字不够时重复整页)') }
+      >
+        <Switch
+          checked={ loop }
+          onChange={ (v: boolean) => { setLoop(v); setDefaultLoop(v); } }
+        />
+      </Form.Item>
+      <Form.Item
+        label={ st('默认按行填充') }
+        extra={ rowT(locale, '打开「字帖生成器」时是否默认按行填充 (一行练一个字, 第 N 行用第 N 个字)') }
+      >
+        <Switch
+          checked={ byRow }
+          onChange={ (v: boolean) => { setByRow(v); setDefaultByRow(v); } }
         />
       </Form.Item>
     </>

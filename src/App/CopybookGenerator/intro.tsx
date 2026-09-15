@@ -19,7 +19,7 @@ const zh = `<h2>这个工具做什么</h2>
 <li><p>米字格 = 方格 + 横竖中线 + 两条对角线; 田字格 = 方格 + 横竖中线; 回宫格 = 方格 + 虚线内框 + 中线到内框的连接线; 作文格 = 纯方格 (稿纸)</p></li>
 <li><p>格线颜色可选红 / 灰 / 蓝 / 淡绿, 均为浅色, 打印后不干扰书写; 「格间距」为 0 时相邻格子共用一条线 (不会有双线或粗细不均), 大于 0 时每格各自成框并留出间距</p></li>
 <li><p>字会自动校正到格子正中: 中文楷体等字体的字形在字身框里本身偏右 / 偏下 (如楷体「落」偏右约 6%), 生成器会按字逐个实测墨迹并微调, 使米字格十字穿过字的中心</p></li>
-<li><p>设置里可配置默认格型 / 默认字体 / 默认格线颜色 / 默认内容模式 / 默认行列数 / 默认页数 / 默认格间距 / 默认文本 / 默认循环填充</p></li>
+<li><p>设置里可配置默认格型 / 默认字体 / 默认格线颜色 / 默认内容模式 / 默认行列数 / 默认页数 / 默认格间距 / 默认文本 / 默认循环填充 / 默认按行填充</p></li>
 </ul>
 
 <h2>说明</h2>
@@ -47,7 +47,7 @@ const tw = `<h2>這個工具做什麼</h2>
 <li><p>米字格 = 方格 + 橫豎中線 + 兩條對角線; 田字格 = 方格 + 橫豎中線; 回宮格 = 方格 + 虛線內框 + 中線到內框的連接線; 作文格 = 純方格 (稿紙)</p></li>
 <li><p>格線顏色可選紅 / 灰 / 藍 / 淡綠, 均為淺色, 列印後不干擾書寫; 「格間距」為 0 時相鄰格子共用一條線 (不會出現雙線或粗細不均), 大於 0 時每格各自成框並留出間距</p></li>
 <li><p>字會自動校正到格子正中: 中文楷體等字體的字形在字身框裡本身偏右 / 偏下 (如楷體「落」偏右約 6%), 產生器會按字逐個實測墨跡並微調, 使米字格十字穿過字的中心</p></li>
-<li><p>設定裡可配置預設格型 / 預設字型 / 預設格線顏色 / 預設內容模式 / 預設行列數 / 預設頁數 / 預設格間距 / 預設文字 / 預設循環填充</p></li>
+<li><p>設定裡可配置預設格型 / 預設字型 / 預設格線顏色 / 預設內容模式 / 預設行列數 / 預設頁數 / 預設格間距 / 預設文字 / 預設循環填充 / 預設依行填充</p></li>
 </ul>
 
 <h2>說明</h2>
@@ -75,7 +75,7 @@ const en = `<h2>What this tool does</h2>
 <li><p>Mi-grid = square + centre cross + both diagonals; tian-grid = square + centre cross; hui-grid = square + dashed inner box + connectors from the midpoints; essay grid = plain squares</p></li>
 <li><p>Line colours are red / gray / blue / light green, all light enough not to fight the writing; with a cell gap of 0 neighbouring cells share a single line (never double or uneven), while a gap above 0 gives every cell its own box</p></li>
 <li><p>Characters are optically centred: CJK fonts draw glyphs slightly right of / below the em box centre (KaiTi 落 is about 6% right), so the generator measures each character's ink and nudges it until the mi-grid cross runs through its centre</p></li>
-<li><p>Settings let you configure the default grid style, font, line colour, content mode, row/column counts, page count, cell gap, text and repeat behaviour</p></li>
+<li><p>Settings let you configure the default grid style, font, line colour, content mode, row/column counts, page count, cell gap, text, repeat behaviour and one-char-per-row mode</p></li>
 </ul>
 
 <h2>Notes</h2>

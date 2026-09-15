@@ -122,6 +122,7 @@ export const KEY_PAGES = 'copybook-generator.pages';
 export const KEY_GAP = 'copybook-generator.gap';
 export const KEY_TEXT = 'copybook-generator.text';
 export const KEY_LOOP = 'copybook-generator.loop';
+export const KEY_BY_ROW = 'copybook-generator.byRow';
 
 /** 上/下 之外的其他常量: 每格字符数上限 (防止一次生成过多页面) */
 export const CELLS_MAX = 24 * 24 * 10;

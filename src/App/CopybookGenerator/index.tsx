@@ -14,8 +14,8 @@ import {
 } from './data';
 import {
   buildSheetCss, buildSheetHtml, buildSheetPages, cellSizeMm, cellsPerPage, defaultGridOf, fillChars,
-  fillCharsByRow, fontFamilyOf, fontStack, getDefaultCols, getDefaultFont, getDefaultGap, getDefaultLine,
-  getDefaultLoop, getDefaultMode, getDefaultPages, getDefaultRows, getDefaultStyle, getDefaultText,
+  fillCharsByRow, fontFamilyOf, fontStack, getDefaultByRow, getDefaultCols, getDefaultFont, getDefaultGap,
+  getDefaultLine, getDefaultLoop, getDefaultMode, getDefaultPages, getDefaultRows, getDefaultStyle, getDefaultText,
   measureInkOffsets, splitChars, totalCells,
   type CopybookText,
 } from './lib';
@@ -51,7 +51,7 @@ const CopybookGenerator: React.FC = () => {
   const [ text, setText ] = useState<string>(() => getDefaultText() || TEXT_DEFAULT);
   const [ loop, setLoop ] = useState<boolean>(() => getDefaultLoop());
   /** 按行填充: 一行练一个字 (同一行重复同一个字) */
-  const [ byRow, setByRow ] = useState(false);
+  const [ byRow, setByRow ] = useState<boolean>(() => getDefaultByRow());
   const [ title, setTitle ] = useState(TITLE_DEFAULT);
   const [ showMeta, setShowMeta ] = useState(true);
   const [ custom, setCustom ] = useState<{ name: string; data: string } | null>(null);
