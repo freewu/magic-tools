@@ -1,10 +1,10 @@
 // 字帖生成器: 文字拆字 / 分页 / A4 版式计算 / 打印页面构建
-import { A4_MM, PRINT_BASE_CSS } from '../../lib/print';
+import { A4_MM, PRINT_BASE_CSS, escapeHtml } from '../../lib/print';
 import {
   CELL_LINE_MM, CHAR_RATIO, COLS_DEFAULT, COLS_MAX, COLS_MIN, CUSTOM_FAMILY, DEFAULT_GRID, FOOTER_MM,
-  GUIDE_LINE_MM, HEADER_MM, KEY_COLS, KEY_FONT, KEY_LINE, KEY_LOOP, KEY_MODE, KEY_PAGES,
-  KEY_ROWS, KEY_STYLE, KEY_TEXT, LINE_COLOR_VALUE, PAGES_MAX, PAGES_MIN, ROWS_DEFAULT, ROWS_MAX, ROWS_MIN,
-  TEXT_COLOR_GRAY, TEXT_COLOR_INK, FONTS, FONT_DEFAULT, PAGES_DEFAULT,
+  GAP_DEFAULT, GAP_MAX, GAP_MIN, GUIDE_LINE_MM, HEADER_MM, KEY_COLS, KEY_FONT, KEY_GAP, KEY_LINE, KEY_LOOP,
+  KEY_MODE, KEY_PAGES, KEY_ROWS, KEY_STYLE, KEY_TEXT, LINE_COLOR_VALUE, PAGES_MAX, PAGES_MIN, ROWS_DEFAULT,
+  ROWS_MAX, ROWS_MIN, TEXT_COLOR_GRAY, TEXT_COLOR_INK, FONTS, FONT_DEFAULT, PAGES_DEFAULT,
   type ContentMode, type GridStyle, type LineColor,
 } from './data';
 
@@ -48,19 +48,24 @@ export function pageChunks(filled: Array<string | null>, per: number, pages: num
 
 // ==================== 版式 (mm) ====================
 
-/** 单格边长 (mm): 由可用宽高与行列数取小者, 精确到 0.1mm */
-export function cellSizeMm(cols: number, rows: number): number {
-  const usableW = A4_MM.width - A4_MM.margin * 2;
-  const usableH = A4_MM.height - A4_MM.margin * 2 - HEADER_MM - FOOTER_MM;
+/** 单格边长 (mm): 由可用宽高、行列数与格间距取小者, 精确到 0.1mm */
+export function cellSizeMm(cols: number, rows: number, gap = 0): number {
+  const g = Math.max(0, gap);
+  const usableW = A4_MM.width - A4_MM.margin * 2 - g * Math.max(0, cols - 1);
+  const usableH = A4_MM.height - A4_MM.margin * 2 - HEADER_MM - FOOTER_MM - g * Math.max(0, rows - 1);
   const byW = usableW / Math.max(1, cols);
   const byH = usableH / Math.max(1, rows);
   return Math.floor(Math.min(byW, byH) * 10) / 10;
 }
 
-/** 网格整体尺寸 (mm) */
-export function gridSizeMm(cols: number, rows: number): { width: number; height: number } {
-  const cell = cellSizeMm(cols, rows);
-  return { width: Math.round(cell * cols * 100) / 100, height: Math.round(cell * rows * 100) / 100 };
+/** 网格整体尺寸 (mm): 计入格间距 (格数 - 1 个空隙) */
+export function gridSizeMm(cols: number, rows: number, gap = 0): { width: number; height: number } {
+  const cell = cellSizeMm(cols, rows, gap);
+  const g = Math.max(0, gap);
+  return {
+    width: Math.round((cell * cols + g * Math.max(0, cols - 1)) * 100) / 100,
+    height: Math.round((cell * rows + g * Math.max(0, rows - 1)) * 100) / 100,
+  };
 }
 
 // ==================== 格子与页面 HTML ====================
@@ -89,10 +94,12 @@ export function buildGuideSvg(style: GridStyle, color: string, cell: number): st
   return `<svg class="cb-lines" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
 }
 
-/** 转义格内文字 (仅单个字符, 主要防 < & 等) */
-function esc(ch: string): string {
-  return ch.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
+/**
+ * 转义将要写进 HTML 的文本 / 属性值。
+ * 注意: 字体栈里带双引号 (如 "CopybookCustom", "Kaiti SC") 必须转义成 &quot;,
+ * 否则 style="..." 属性会在第一个双引号处被截断, font-family 声明丢失, 字体设置全部失效。
+ */
+const attr = (s: string): string => escapeHtml(s);
 
 export interface GridHtmlOptions {
   style: GridStyle;
@@ -104,16 +111,25 @@ export interface GridHtmlOptions {
   chars: Array<string | null>;
   /** CSS font-family (自定义字体已拼在栈首) */
   fontFamily: string;
+  /** 格间距 (mm), 默认 0 */
+  gap?: number;
 }
 
-/** 一个格子的内联样式 (只画上 / 左边线, 末列与末行补右边线 / 下边线, 避免重叠加粗) */
-export function cellStyle(cols: number, rows: number, r: number, c: number, cell: number, color: string): string {
-  const parts = [
-    `width:${cell}mm`,
-    `height:${cell}mm`,
+/**
+ * 一个格子的内联样式。
+ * 无间隔时只画上 / 左边线 (末列与末行补右边线 / 下边线), 相邻格共用一条线避免重叠加粗;
+ * 有间隔时格子彼此分离, 每格都画完整的四边。
+ */
+export function cellStyle(cols: number, rows: number, r: number, c: number, cell: number, color: string, gap = 0): string {
+  const parts = [`width:${cell}mm`, `height:${cell}mm`];
+  if (gap > 0) {
+    parts.push(`border:${CELL_LINE_MM}mm solid ${color}`);
+    return parts.join(';');
+  }
+  parts.push(
     `border-top:${CELL_LINE_MM}mm solid ${color}`,
     `border-left:${CELL_LINE_MM}mm solid ${color}`,
-  ];
+  );
   if (c === cols - 1) parts.push(`border-right:${CELL_LINE_MM}mm solid ${color}`);
   if (r === rows - 1) parts.push(`border-bottom:${CELL_LINE_MM}mm solid ${color}`);
   return parts.join(';');
@@ -122,11 +138,13 @@ export function cellStyle(cols: number, rows: number, r: number, c: number, cell
 /** 整张格子 HTML (含辅助线与文字) */
 export function buildGridHtml(o: GridHtmlOptions): string {
   const { cols, rows, mode } = o;
-  const cell = cellSizeMm(cols, rows);
+  const gap = normalizeGap(o.gap);
+  const cell = cellSizeMm(cols, rows, gap);
   const color = LINE_COLOR_VALUE[o.line];
   const guide = buildGuideSvg(o.style, color, cell);
   const fontSize = (cell * CHAR_RATIO).toFixed(2);
   const textColor = mode === 'ink' ? TEXT_COLOR_INK : TEXT_COLOR_GRAY;
+  const rowGap = gap > 0 ? ` style="gap:${gap}mm"` : '';
   const rowsHtml: string[] = [];
   for (let r = 0; r < rows; r++) {
     const cellsHtml: string[] = [];
@@ -134,14 +152,15 @@ export function buildGridHtml(o: GridHtmlOptions): string {
       const ch = o.chars[r * cols + c] ?? null;
       const show = ch !== null && (mode === 'trace' || mode === 'ink' || (mode === 'demo' && c === 0));
       const span = show
-        ? `<span class="cb-ch" style="font-size:${fontSize}mm;color:${textColor};font-family:${o.fontFamily}">${esc(String(ch))}</span>`
+        ? `<span class="cb-ch" style="font-size:${fontSize}mm;color:${textColor};font-family:${attr(o.fontFamily)}">${attr(String(ch))}</span>`
         : '';
-      cellsHtml.push(`<div class="cb-cell" style="${cellStyle(cols, rows, r, c, cell, color)}">${guide}${span}</div>`);
+      cellsHtml.push(`<div class="cb-cell" style="${cellStyle(cols, rows, r, c, cell, color, gap)}">${guide}${span}</div>`);
     }
-    rowsHtml.push(`<div class="cb-row">${cellsHtml.join('')}</div>`);
+    rowsHtml.push(`<div class="cb-row"${rowGap}>${cellsHtml.join('')}</div>`);
   }
-  const size = gridSizeMm(cols, rows);
-  return `<div class="cb-grid" style="width:${size.width}mm;height:${size.height}mm">${rowsHtml.join('')}</div>`;
+  const size = gridSizeMm(cols, rows, gap);
+  const gridGap = gap > 0 ? `;gap:${gap}mm` : '';
+  return `<div class="cb-grid" style="width:${size.width}mm;height:${size.height}mm${gridGap}">${rowsHtml.join('')}</div>`;
 }
 
 /** 打印文案 (由页面按当前语言组装) */
@@ -171,6 +190,8 @@ export interface CopybookOptions {
   /** CSS font-family (已含自定义字体栈首) */
   fontFamily: string;
   text: CopybookText;
+  /** 格间距 (mm), 默认 0 */
+  gap?: number;
 }
 
 /** 模板变量填充: {a} / {b} 形式 */
@@ -185,14 +206,15 @@ export function buildPageHtml(o: CopybookOptions, page: number, total: number): 
   const per = cellsPerPage(o.cols, o.rows);
   const chars = o.chars.slice((page - 1) * per, page * per);
   const head = `<div class="cb-head">`
-    + `<div class="cb-title">${o.title}</div>`
-    + `<div class="cb-meta"><span>${o.text.styleName} · ${o.text.fontName}</span>`
-    + (o.showMeta ? `<span>${o.text.meta}</span>` : '')
+    + `<div class="cb-title">${attr(o.title)}</div>`
+    + `<div class="cb-meta"><span>${attr(o.text.styleName)} · ${attr(o.text.fontName)}</span>`
+    + (o.showMeta ? `<span>${attr(o.text.meta)}</span>` : '')
     + `</div></div>`;
   const body = `<div class="cb-body">${buildGridHtml({
     style: o.style, line: o.line, mode: o.mode, cols: o.cols, rows: o.rows, chars, fontFamily: o.fontFamily,
+    gap: o.gap,
   })}</div>`;
-  const foot = `<div class="cb-foot">${fill(o.text.footer, { a: page, b: total, d: o.date })}</div>`;
+  const foot = `<div class="cb-foot">${attr(fill(o.text.footer, { a: page, b: total, d: o.date }))}</div>`;
   return `<div class="pg cb-pg">${head}${body}${foot}</div>`;
 }
 
@@ -247,9 +269,20 @@ export function fontFamilyOf(label: string): string {
 // ==================== 归一化与设置项 ====================
 
 const clampInt = (v: unknown, min: number, max: number, fallback: number): number => {
+  // 注意: Number(null) === 0, 若只判 Number.isFinite 会让「未设置」变成范围下限,
+  // 因此 null / undefined / 空串必须显式回退到 fallback
+  if (v === null || v === undefined || String(v).trim() === '') return fallback;
   const n = Number(v);
-  if (!Number.isFinite(n) || String(v).trim() === '') return fallback;
+  if (!Number.isFinite(n)) return fallback;
   return Math.min(max, Math.max(min, Math.round(n)));
+};
+
+/** 与 clampInt 相同, 但保留 0.1 精度 (格间距这类可带小数的设置项) */
+const clampNum = (v: unknown, min: number, max: number, fallback: number): number => {
+  if (v === null || v === undefined || String(v).trim() === '') return fallback;
+  const n = Number(v);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, Math.round(n * 10) / 10));
 };
 
 export const normalizeStyle = (v: unknown): GridStyle =>
@@ -263,6 +296,7 @@ export const normalizeMode = (v: unknown): ContentMode =>
 export const normalizeCols = (v: unknown): number => clampInt(v, COLS_MIN, COLS_MAX, COLS_DEFAULT);
 export const normalizeRows = (v: unknown): number => clampInt(v, ROWS_MIN, ROWS_MAX, ROWS_DEFAULT);
 export const normalizePages = (v: unknown): number => clampInt(v, PAGES_MIN, PAGES_MAX, PAGES_DEFAULT);
+export const normalizeGap = (v: unknown): number => clampNum(v, GAP_MIN, GAP_MAX, GAP_DEFAULT);
 export const normalizeLoop = (v: unknown): boolean => !(v === '0' || v === 'false' || v === false);
 
 /** 某格型的默认行列数 (切换格型时用于智能套用) */
@@ -284,6 +318,7 @@ export const getDefaultMode = (): ContentMode => normalizeMode(readSetting(KEY_M
 export const getDefaultCols = (): number => normalizeCols(readSetting(KEY_COLS));
 export const getDefaultRows = (): number => normalizeRows(readSetting(KEY_ROWS));
 export const getDefaultPages = (): number => normalizePages(readSetting(KEY_PAGES));
+export const getDefaultGap = (): number => normalizeGap(readSetting(KEY_GAP));
 export const getDefaultText = (): string => readSetting(KEY_TEXT) ?? '';
 export const getDefaultLoop = (): boolean => {
   const raw = readSetting(KEY_LOOP);
@@ -297,5 +332,6 @@ export const setDefaultMode = (v: ContentMode): void => writeSetting(KEY_MODE, v
 export const setDefaultCols = (v: number): void => writeSetting(KEY_COLS, String(normalizeCols(v)));
 export const setDefaultRows = (v: number): void => writeSetting(KEY_ROWS, String(normalizeRows(v)));
 export const setDefaultPages = (v: number): void => writeSetting(KEY_PAGES, String(normalizePages(v)));
+export const setDefaultGap = (v: number): void => writeSetting(KEY_GAP, String(normalizeGap(v)));
 export const setDefaultText = (v: string): void => writeSetting(KEY_TEXT, v);
 export const setDefaultLoop = (v: boolean): void => writeSetting(KEY_LOOP, v ? '1' : '0');

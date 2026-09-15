@@ -293,6 +293,7 @@ const ROWS: Record<string, Row> = {
   '默认格线颜色': ['預設格線顏色', 'Default line color'],
   '默认每行格数': ['預設每行格數', 'Default columns'],
   '默认每页行数': ['預設每頁行數', 'Default rows per page'],
+  '默认格间距': ['預設格間距', 'Default cell gap'],
   '默认文本': ['預設文字', 'Default text'],
   '打开「字帖生成器」时默认的格型, 默认 ${d}': [
     '開啟「字帖產生器」時預設的格型, 預設 ${d}',
@@ -317,6 +318,10 @@ const ROWS: Record<string, Row> = {
   '打开「字帖生成器」时填入的默认文本, 留空则用示例「${d}」': [
     '開啟「字帖產生器」時填入的預設文字, 留空則用範例「${d}」',
     'Text pre-filled when opening the copybook generator; empty falls back to the sample "${d}"',
+  ],
+  '打开「字帖生成器」时默认的格间距 (mm), 范围 ${min} - ${max}, 默认 ${d}': [
+    '開啟「字帖產生器」時預設的格間距 (mm), 範圍 ${min} - ${max}, 預設 ${d}',
+    'Cell gap used when opening the copybook generator (range ${min} - ${max}, default ${d})',
   ],
 
 };

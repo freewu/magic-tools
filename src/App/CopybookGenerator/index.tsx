@@ -7,14 +7,15 @@ import { printHtml } from '../../lib/print';
 import { cb, cbT } from './lang';
 import {
   COLS_DEFAULT, COLS_MAX, COLS_MIN, CONTENT_MODES, CONTENT_MODE_LABEL, FONTS, FONT_ACCEPT, FONT_DEFAULT,
-  GRID_STYLES, GRID_STYLE_LABEL, LINE_COLORS, LINE_COLOR_LABEL, MAX_FONT_BYTES, PAGES_DEFAULT, PAGES_MAX,
-  PAGES_MIN, ROWS_DEFAULT, ROWS_MAX, ROWS_MIN, TEXT_DEFAULT, TEXT_MAX, TITLE_DEFAULT,
+  GAP_DEFAULT, GAP_MAX, GAP_MIN, GAP_STEP, GRID_STYLES, GRID_STYLE_LABEL, LINE_COLORS, LINE_COLOR_LABEL,
+  MAX_FONT_BYTES, PAGES_DEFAULT, PAGES_MAX, PAGES_MIN, ROWS_DEFAULT, ROWS_MAX, ROWS_MIN, TEXT_DEFAULT,
+  TEXT_MAX, TITLE_DEFAULT,
   type ContentMode, type GridStyle, type LineColor,
 } from './data';
 import {
   buildSheetCss, buildSheetHtml, buildSheetPages, cellSizeMm, cellsPerPage, defaultGridOf, fillChars,
-  fontFamilyOf, fontStack, getDefaultCols, getDefaultFont, getDefaultLine, getDefaultLoop, getDefaultMode,
-  getDefaultPages, getDefaultRows, getDefaultStyle, getDefaultText, splitChars, totalCells,
+  fontFamilyOf, fontStack, getDefaultCols, getDefaultFont, getDefaultGap, getDefaultLine, getDefaultLoop,
+  getDefaultMode, getDefaultPages, getDefaultRows, getDefaultStyle, getDefaultText, splitChars, totalCells,
   type CopybookText,
 } from './lib';
 import CopybookGeneratorIntro from './intro';
@@ -45,6 +46,7 @@ const CopybookGenerator: React.FC = () => {
   const [ cols, setCols ] = useState<number>(() => getDefaultCols());
   const [ rows, setRows ] = useState<number>(() => getDefaultRows());
   const [ pages, setPages ] = useState<number>(() => getDefaultPages());
+  const [ gap, setGap ] = useState<number>(() => getDefaultGap());
   const [ text, setText ] = useState<string>(() => getDefaultText() || TEXT_DEFAULT);
   const [ loop, setLoop ] = useState<boolean>(() => getDefaultLoop());
   const [ title, setTitle ] = useState(TITLE_DEFAULT);
@@ -72,13 +74,14 @@ const CopybookGenerator: React.FC = () => {
     cols,
     rows,
     pages,
+    gap,
     chars: filled,
     title,
     showMeta,
     date: today(),
     fontFamily: fontStack(font, custom !== null),
     text: sheetText,
-  }), [ style, line, mode, cols, rows, pages, filled, title, showMeta, sheetText, font, custom ]);
+  }), [ style, line, mode, cols, rows, pages, gap, filled, title, showMeta, sheetText, font, custom ]);
 
   const previewPages = useMemo(() => buildSheetPages(options), [ options ]);
 
@@ -139,6 +142,28 @@ const CopybookGenerator: React.FC = () => {
       <Divider style={ { margin: '12px 0' } }>{ t('字帖设置') }</Divider>
 
       <div style={ { display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 920, marginBottom: 8 } }>
+        {/* 文本放在最上面: 打开工具第一件事就是填要练的内容 */}
+        <div style={ { display: 'flex', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' } }>
+          <Text style={ { width: 96, flex: '0 0 auto', lineHeight: '32px' } }>{ t('文本') }</Text>
+          <Input.TextArea
+            value={ text }
+            onChange={ (e) => setText(e.target.value) }
+            maxLength={ TEXT_MAX }
+            autoSize={ { minRows: 2, maxRows: 4 } }
+            style={ { width: 420 } }
+            placeholder={ TEXT_DEFAULT }
+          />
+          <div style={ { display: 'flex', flexDirection: 'column', gap: 4 } }>
+            <Space size={ 8 }>
+              <Text style={ { fontSize: 12 } }>{ t('循环填充') }</Text>
+              <Switch size="small" checked={ loop } onChange={ setLoop } />
+            </Space>
+            <Text type="secondary" style={ { fontSize: 12 } }>{ tT('共 {n} 格 · {c} 字', { n: totalCells(cols, rows, pages), c: chars.length }) }</Text>
+          </div>
+        </div>
+
+        <Text type="secondary" style={ { fontSize: 12 } }>{ t('文本会按空格 / 标点自动逐字拆分, 不足时循环填充 (可关闭)') }</Text>
+
         <div style={ { display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' } }>
           <Text style={ { width: 96, flex: '0 0 auto' } }>{ t('格子样式') }</Text>
           <Segmented
@@ -216,26 +241,17 @@ const CopybookGenerator: React.FC = () => {
             style={ { width: 100 } }
             onChange={ (v) => setPages(Number(v ?? PAGES_DEFAULT)) }
           />
-          <Text type="secondary" style={ { fontSize: 12 } }>{ tT('每格 {cell}mm · 每页 {n} 格', { cell: cellSizeMm(cols, rows), n: per }) }</Text>
-        </div>
-
-        <div style={ { display: 'flex', alignItems: 'flex-start', gap: 12, flexWrap: 'wrap' } }>
-          <Text style={ { width: 96, flex: '0 0 auto', lineHeight: '32px' } }>{ t('文本') }</Text>
-          <Input.TextArea
-            value={ text }
-            onChange={ (e) => setText(e.target.value) }
-            maxLength={ TEXT_MAX }
-            autoSize={ { minRows: 2, maxRows: 4 } }
-            style={ { width: 420 } }
-            placeholder={ TEXT_DEFAULT }
+          <Text style={ { flex: '0 0 auto' } }>{ t('格间距') }</Text>
+          <InputNumber
+            min={ GAP_MIN }
+            max={ GAP_MAX }
+            step={ GAP_STEP }
+            value={ gap }
+            style={ { width: 110 } }
+            addonAfter="mm"
+            onChange={ (v) => setGap(Number(v ?? GAP_DEFAULT)) }
           />
-          <div style={ { display: 'flex', flexDirection: 'column', gap: 4 } }>
-            <Space size={ 8 }>
-              <Text style={ { fontSize: 12 } }>{ t('循环填充') }</Text>
-              <Switch size="small" checked={ loop } onChange={ setLoop } />
-            </Space>
-            <Text type="secondary" style={ { fontSize: 12 } }>{ tT('共 {n} 格 · {c} 字', { n: totalCells(cols, rows, pages), c: chars.length }) }</Text>
-          </div>
+          <Text type="secondary" style={ { fontSize: 12 } }>{ tT('每格 {cell}mm · 每页 {n} 格', { cell: cellSizeMm(cols, rows, gap), n: per }) }</Text>
         </div>
 
         <div style={ { display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' } }>
@@ -250,8 +266,6 @@ const CopybookGenerator: React.FC = () => {
           <Text style={ { flex: '0 0 auto' } }>{ t('显示姓名 / 日期栏') }</Text>
           <Switch checked={ showMeta } onChange={ setShowMeta } />
         </div>
-
-        <Text type="secondary" style={ { fontSize: 12 } }>{ t('文本会按空格 / 标点自动逐字拆分, 不足时循环填充 (可关闭)') }</Text>
       </div>
 
       <Divider style={ { margin: '12px 0' } }>{ t('打印预览 (A4)') }</Divider>

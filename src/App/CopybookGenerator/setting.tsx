@@ -3,14 +3,15 @@ import { useState } from 'react';
 import { useLocale } from '../../hook/locale-context';
 import { row as _r, rowT } from '../Setting/rows-lang';
 import {
-  CONTENT_MODES, CONTENT_MODE_LABEL, COLS_DEFAULT, COLS_MAX, COLS_MIN, FONTS, GRID_STYLES, GRID_STYLE_LABEL,
+  CONTENT_MODES, CONTENT_MODE_LABEL, COLS_DEFAULT, COLS_MAX, COLS_MIN, FONTS, GAP_DEFAULT, GAP_MAX,
+  GAP_MIN, GAP_STEP, GRID_STYLES, GRID_STYLE_LABEL,
   LINE_COLORS, LINE_COLOR_LABEL, PAGES_DEFAULT, PAGES_MAX, PAGES_MIN, ROWS_DEFAULT, ROWS_MAX, ROWS_MIN,
   TEXT_DEFAULT, type ContentMode, type GridStyle, type LineColor,
 } from './data';
 import {
-  getDefaultCols, getDefaultFont, getDefaultLine, getDefaultMode, getDefaultPages, getDefaultRows,
-  getDefaultStyle, getDefaultText, setDefaultCols, setDefaultFont, setDefaultLine, setDefaultMode, setDefaultPages,
-  setDefaultRows, setDefaultStyle, setDefaultText,
+  getDefaultCols, getDefaultFont, getDefaultGap, getDefaultLine, getDefaultMode, getDefaultPages,
+  getDefaultRows, getDefaultStyle, getDefaultText, setDefaultCols, setDefaultFont, setDefaultGap, setDefaultLine,
+  setDefaultMode, setDefaultPages, setDefaultRows, setDefaultStyle, setDefaultText,
 } from './lib';
 
 /** 字帖生成器默认设置 (挂载到 设置 → 其它) */
@@ -24,11 +25,25 @@ export const CopybookGeneratorSetting: React.FC = () => {
   const [ cols, setCols ] = useState<number>(() => getDefaultCols());
   const [ rows, setRows ] = useState<number>(() => getDefaultRows());
   const [ pages, setPages ] = useState<number>(() => getDefaultPages());
+  const [ gap, setGap ] = useState<number>(() => getDefaultGap());
   const [ text, setText ] = useState<string>(() => getDefaultText());
 
   return (
     <>
       <Divider orientation="left" plain>{ st('字帖生成器') }</Divider>
+      <Form.Item
+        label={ st('默认文本') }
+        extra={ rowT(locale, '打开「字帖生成器」时填入的默认文本, 留空则用示例「${d}」', { d: TEXT_DEFAULT }) }
+      >
+        <Input
+          value={ text }
+          style={ { width: 320 } }
+          maxLength={ 200 }
+          onChange={ (e) => { setText(e.target.value); setDefaultText(e.target.value); } }
+          onBlur={ () => setText(getDefaultText()) }
+          placeholder={ TEXT_DEFAULT }
+        />
+      </Form.Item>
       <Form.Item
         label={ st('默认格子样式') }
         extra={ rowT(locale, '打开「字帖生成器」时默认的格型, 默认 ${d}', { d: GRID_STYLE_LABEL.mi }) }
@@ -102,16 +117,16 @@ export const CopybookGeneratorSetting: React.FC = () => {
         />
       </Form.Item>
       <Form.Item
-        label={ st('默认文本') }
-        extra={ rowT(locale, '打开「字帖生成器」时填入的默认文本, 留空则用示例「${d}」', { d: TEXT_DEFAULT }) }
+        label={ st('默认格间距') }
+        extra={ rowT(locale, '打开「字帖生成器」时默认的格间距 (mm), 范围 ${min} - ${max}, 默认 ${d}', { min: GAP_MIN, max: GAP_MAX, d: GAP_DEFAULT }) }
       >
-        <Input
-          value={ text }
-          style={ { width: 320 } }
-          maxLength={ 200 }
-          onChange={ (e) => { setText(e.target.value); setDefaultText(e.target.value); } }
-          onBlur={ () => setText(getDefaultText()) }
-          placeholder={ TEXT_DEFAULT }
+        <InputNumber
+          min={ GAP_MIN }
+          max={ GAP_MAX }
+          step={ GAP_STEP }
+          addonAfter="mm"
+          value={ gap }
+          onChange={ (v) => { const n = Number(v ?? GAP_DEFAULT); setGap(n); setDefaultGap(n); } }
         />
       </Form.Item>
     </>

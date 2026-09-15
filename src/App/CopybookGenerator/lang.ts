@@ -20,6 +20,7 @@ const rows: Record<string, [string, string]> = {
   '每行格数': ['每行格數', 'Columns'],
   '每页行数': ['每頁行數', 'Rows per page'],
   '页数': ['頁數', 'Pages'],
+  '格间距': ['格間距', 'Cell gap'],
   '文本': ['文字', 'Text'],
   '循环填充': ['循環填充', 'Repeat to fill'],
   '标题': ['標題', 'Title'],

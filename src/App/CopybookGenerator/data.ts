@@ -89,7 +89,14 @@ export const PAGES_MIN = 1;
 export const PAGES_MAX = 10;
 export const PAGES_DEFAULT = 2;
 
-export const TEXT_DEFAULT = '永和九年，岁在癸丑';
+/** 格间距 (mm): 相邻格子之间的空隙, 0 = 紧贴 (相邻格共用一条格线) */
+export const GAP_MIN = 0;
+export const GAP_MAX = 5;
+export const GAP_DEFAULT = 0;
+export const GAP_STEP = 0.5;
+
+/** 默认文本: 一次填满 10 × 12 的两页还有余, 且是常见名句 */
+export const TEXT_DEFAULT = '落霞与孤鹜齐飞秋水共长天一色';
 export const TEXT_MAX = 200;
 export const TITLE_DEFAULT = '字帖练习';
 
@@ -110,6 +117,7 @@ export const KEY_MODE = 'copybook-generator.mode';
 export const KEY_COLS = 'copybook-generator.cols';
 export const KEY_ROWS = 'copybook-generator.rows';
 export const KEY_PAGES = 'copybook-generator.pages';
+export const KEY_GAP = 'copybook-generator.gap';
 export const KEY_TEXT = 'copybook-generator.text';
 export const KEY_LOOP = 'copybook-generator.loop';
 
