@@ -158,7 +158,11 @@ const CopybookGenerator: React.FC = () => {
               <Text style={ { fontSize: 12 } }>{ t('循环填充') }</Text>
               <Switch size="small" checked={ loop } onChange={ setLoop } />
             </Space>
-            <Text type="secondary" style={ { fontSize: 12 } }>{ tT('共 {n} 格 · {c} 字', { n: totalCells(cols, rows, pages), c: chars.length }) }</Text>
+            <Text type="secondary" style={ { fontSize: 12 } }>
+              { loop
+                ? tT('共 {n} 格 · {c} 字', { n: totalCells(cols, rows, pages), c: chars.length })
+                : tT('共 {n} 格 · {c} 字 (不循环: 仅前 {c} 格有字)', { n: totalCells(cols, rows, pages), c: chars.length }) }
+            </Text>
           </div>
         </div>
 
@@ -248,7 +252,7 @@ const CopybookGenerator: React.FC = () => {
             step={ GAP_STEP }
             value={ gap }
             style={ { width: 110 } }
-            addonAfter="mm"
+            suffix="mm"
             onChange={ (v) => setGap(Number(v ?? GAP_DEFAULT)) }
           />
           <Text type="secondary" style={ { fontSize: 12 } }>{ tT('每格 {cell}mm · 每页 {n} 格', { cell: cellSizeMm(cols, rows, gap), n: per }) }</Text>

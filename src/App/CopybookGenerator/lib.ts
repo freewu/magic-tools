@@ -290,7 +290,7 @@ export const normalizeStyle = (v: unknown): GridStyle =>
 export const normalizeFont = (v: unknown): string =>
   typeof v === 'string' && FONTS.some((f) => f.label === v) ? v : FONT_DEFAULT;
 export const normalizeLine = (v: unknown): LineColor =>
-  (v === 'red' || v === 'gray' || v === 'blue') ? v : 'red';
+  (v === 'red' || v === 'gray' || v === 'blue' || v === 'green') ? v : 'red';
 export const normalizeMode = (v: unknown): ContentMode =>
   (v === 'trace' || v === 'ink' || v === 'demo' || v === 'blank') ? v : 'trace';
 export const normalizeCols = (v: unknown): number => clampInt(v, COLS_MIN, COLS_MAX, COLS_DEFAULT);

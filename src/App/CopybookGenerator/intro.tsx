@@ -16,7 +16,7 @@ const zh = `<h2>这个工具做什么</h2>
 <ul>
 <li><p>格子尺寸由「每行格数 × 每页行数」自动计算并均分 A4 可用区域 (约 186mm × 253mm), 保证整页不溢出、不裁切; 想移动「格间距」时, 格子会相应变小依然保持整页不溢出</p></li>
 <li><p>米字格 = 方格 + 横竖中线 + 两条对角线; 田字格 = 方格 + 横竖中线; 回宫格 = 方格 + 虚线内框 + 中线到内框的连接线; 作文格 = 纯方格 (稿纸)</p></li>
-<li><p>格线颜色可选红 / 灰 / 蓝, 均为浅色, 打印后不干扰书写; 「格间距」为 0 时相邻格子共用一条线 (不会有双线或粗细不均), 大于 0 时每格各自成框并留出间距</p></li>
+<li><p>格线颜色可选红 / 灰 / 蓝 / 淡绿, 均为浅色, 打印后不干扰书写; 「格间距」为 0 时相邻格子共用一条线 (不会有双线或粗细不均), 大于 0 时每格各自成框并留出间距</p></li>
 <li><p>设置里可配置默认格型 / 默认字体 / 默认格线颜色 / 默认内容模式 / 默认行列数 / 默认页数 / 默认格间距 / 默认文本 / 默认循环填充</p></li>
 </ul>
 
@@ -42,7 +42,7 @@ const tw = `<h2>這個工具做什麼</h2>
 <ul>
 <li><p>格子尺寸由「每行格數 × 每頁行數」自動計算並均分 A4 可用區域 (約 186mm × 253mm), 保證整頁不溢出、不裁切; 調大「格間距」時格子會相應變小, 依然保持整頁不溢出</p></li>
 <li><p>米字格 = 方格 + 橫豎中線 + 兩條對角線; 田字格 = 方格 + 橫豎中線; 回宮格 = 方格 + 虛線內框 + 中線到內框的連接線; 作文格 = 純方格 (稿紙)</p></li>
-<li><p>格線顏色可選紅 / 灰 / 藍, 均為淺色, 列印後不干擾書寫; 「格間距」為 0 時相鄰格子共用一條線 (不會出現雙線或粗細不均), 大於 0 時每格各自成框並留出間距</p></li>
+<li><p>格線顏色可選紅 / 灰 / 藍 / 淡綠, 均為淺色, 列印後不干擾書寫; 「格間距」為 0 時相鄰格子共用一條線 (不會出現雙線或粗細不均), 大於 0 時每格各自成框並留出間距</p></li>
 <li><p>設定裡可配置預設格型 / 預設字型 / 預設格線顏色 / 預設內容模式 / 預設行列數 / 預設頁數 / 預設格間距 / 預設文字 / 預設循環填充</p></li>
 </ul>
 
@@ -68,7 +68,7 @@ const en = `<h2>What this tool does</h2>
 <ul>
 <li><p>Cell size is derived from the column and row counts and evenly fills the printable A4 area (about 186mm × 253mm), so a page never overflows or gets clipped; increasing the cell gap shrinks the cells to keep everything on one page</p></li>
 <li><p>Mi-grid = square + centre cross + both diagonals; tian-grid = square + centre cross; hui-grid = square + dashed inner box + connectors from the midpoints; essay grid = plain squares</p></li>
-<li><p>Line colours are red / gray / blue, all light enough not to fight the writing; with a cell gap of 0 neighbouring cells share a single line (never double or uneven), while a gap above 0 gives every cell its own box</p></li>
+<li><p>Line colours are red / gray / blue / light green, all light enough not to fight the writing; with a cell gap of 0 neighbouring cells share a single line (never double or uneven), while a gap above 0 gives every cell its own box</p></li>
 <li><p>Settings let you configure the default grid style, font, line colour, content mode, row/column counts, page count, cell gap, text and repeat behaviour</p></li>
 </ul>
 

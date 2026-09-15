@@ -124,7 +124,7 @@ export const CopybookGeneratorSetting: React.FC = () => {
           min={ GAP_MIN }
           max={ GAP_MAX }
           step={ GAP_STEP }
-          addonAfter="mm"
+          suffix="mm"
           value={ gap }
           onChange={ (v) => { const n = Number(v ?? GAP_DEFAULT); setGap(n); setDefaultGap(n); } }
         />

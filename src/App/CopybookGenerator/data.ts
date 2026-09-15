@@ -39,20 +39,22 @@ export const MAX_FONT_BYTES = 12 * 1024 * 1024;
 export const FONT_ACCEPT = '.ttf,.otf,.woff,.woff2';
 
 /** 格线颜色 */
-export type LineColor = 'red' | 'gray' | 'blue';
+export type LineColor = 'red' | 'gray' | 'blue' | 'green';
 
-export const LINE_COLORS: LineColor[] = [ 'red', 'gray', 'blue' ];
+export const LINE_COLORS: LineColor[] = [ 'red', 'gray', 'blue', 'green' ];
 
 export const LINE_COLOR_VALUE: Record<LineColor, string> = {
   red: '#d98a8a',
   gray: '#b9b9b9',
   blue: '#93aed8',
+  green: '#92d3a8',
 };
 
 export const LINE_COLOR_LABEL: Record<LineColor, string> = {
   red: '红色',
   gray: '灰色',
   blue: '蓝色',
+  green: '淡绿',
 };
 
 /** 内容模式: 描红 (浅灰) / 黑字 / 首字示范 (每行首格浅灰) / 空白格 */

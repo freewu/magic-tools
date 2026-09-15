@@ -41,6 +41,7 @@ const rows: Record<string, [string, string]> = {
   '红色': ['紅色', 'Red'],
   '灰色': ['灰色', 'Gray'],
   '蓝色': ['藍色', 'Blue'],
+  '淡绿': ['淡綠', 'Light green'],
   '描红 (浅灰)': ['描紅 (淺灰)', 'Trace (light gray)'],
   '黑字': ['黑字', 'Ink'],
   '首字示范': ['首字示範', 'First char only'],
@@ -51,6 +52,10 @@ const rows: Record<string, [string, string]> = {
   // 状态 / 统计
   '每格 {cell}mm · 每页 {n} 格': ['每格 {cell}mm · 每頁 {n} 格', '{cell}mm per cell · {n} per page'],
   '共 {n} 格 · {c} 字': ['共 {n} 格 · {c} 字', '{n} cells · {c} characters'],
+  '共 {n} 格 · {c} 字 (不循环: 仅前 {c} 格有字)': [
+    '共 {n} 格 · {c} 字 (不循環: 僅前 {c} 格有字)',
+    '{n} cells · {c} characters (no repeat: only the first {c} cells are filled)',
+  ],
   '已打开打印对话框, 选择打印机即可打印': ['已開啟列印對話框, 選擇印表機即可列印', 'Print dialog opened — choose your printer'],
   '打印失败: 当前环境不支持打印': ['列印失敗: 目前環境不支援列印', 'Print failed: printing is not supported here'],
   '字体文件过大 (上限 12MB)': ['字型檔案過大 (上限 12MB)', 'Font file is too large (12MB limit)'],

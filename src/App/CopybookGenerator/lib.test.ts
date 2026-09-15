@@ -7,7 +7,7 @@ import {
 } from './lib';
 import {
   CELL_LINE_MM, CONTENT_MODE_LABEL, COLS_DEFAULT, DEFAULT_GRID, FONTS, FONT_DEFAULT, GAP_DEFAULT, GAP_MAX,
-  GRID_STYLE_LABEL, LINE_COLOR_VALUE, LINE_COLOR_LABEL, PAGES_DEFAULT, ROWS_DEFAULT, TEXT_DEFAULT,
+  GRID_STYLE_LABEL, LINE_COLORS, LINE_COLOR_VALUE, LINE_COLOR_LABEL, PAGES_DEFAULT, ROWS_DEFAULT, TEXT_DEFAULT,
   TEXT_COLOR_GRAY, TEXT_COLOR_INK,
   type ContentMode, type GridStyle, type LineColor,
 } from './data';
@@ -377,6 +377,15 @@ describe('copybook lib / 页面 HTML', () => {
 });
 
 describe('copybook lib / 常量与归一化', () => {
+  test('淡绿格线可以实际用于渲染', () => {
+    const html = buildGridHtml({
+      style: 'tian', line: 'green', mode: 'trace', cols: 4, rows: 3,
+      chars: fillChars([ '永' ], 12, true), fontFamily: fontFamilyOf('楷体'),
+    });
+    expect(html).toContain(LINE_COLOR_VALUE.green);
+    expect(html).not.toContain(LINE_COLOR_VALUE.red);
+  });
+
   test('格型 / 颜色 / 模式标签齐全', () => {
     for (const s of Object.keys(GRID_STYLE_LABEL) as GridStyle[]) {
       expect(GRID_STYLE_LABEL[s].length).toBeGreaterThan(0);
@@ -386,7 +395,13 @@ describe('copybook lib / 常量与归一化', () => {
     for (const c of Object.keys(LINE_COLOR_VALUE) as LineColor[]) {
       expect(LINE_COLOR_VALUE[c]).toMatch(/^#[0-9a-f]{6}$/i);
       expect(LINE_COLOR_LABEL[c].length).toBeGreaterThan(0);
+      // 格线必须够浅 (每通道 >= 0x80), 否则打印后压过学生的笔画
+      for (const ch of LINE_COLOR_VALUE[c].slice(1).match(/../g) ?? []) {
+        expect(parseInt(ch, 16)).toBeGreaterThanOrEqual(0x80);
+      }
     }
+    expect(LINE_COLORS).toContain('green');
+    expect(LINE_COLOR_LABEL.green).toBe('淡绿');
     for (const m of Object.keys(CONTENT_MODE_LABEL) as ContentMode[]) {
       expect(CONTENT_MODE_LABEL[m].length).toBeGreaterThan(0);
     }
@@ -408,6 +423,7 @@ describe('copybook lib / 常量与归一化', () => {
     expect(normalizeFont(7)).toBe(FONT_DEFAULT);
 
     expect(normalizeLine('blue')).toBe('blue');
+    expect(normalizeLine('green')).toBe('green');
     expect(normalizeLine('purple')).toBe('red');
 
     expect(normalizeMode('blank')).toBe('blank');
