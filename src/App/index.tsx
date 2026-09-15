@@ -115,6 +115,8 @@ const list = [
   'RobotsTxtGenerator',
   'MockData',
   'WebSocketDebug',
+  'SudokuGenerator',
+  'CopybookGenerator',
 ];
 
 import { defineLoader } from './app-modules';

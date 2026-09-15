@@ -5,6 +5,8 @@ import { HtpasswdGeneratorSetting } from "../HtpasswdGenerator/setting";
 import { RegexTesterSetting } from "../RegexTester/setting";
 import { AsciiTextArtSetting } from "../AsciiTextArt/setting";
 import { MockDataSetting } from "../MockData/setting";
+import { SudokuGeneratorSetting } from "../SudokuGenerator/setting";
+import { CopybookGeneratorSetting } from "../CopybookGenerator/setting";
 
 export const SettingMisc = () => {
 
@@ -15,6 +17,8 @@ export const SettingMisc = () => {
       <RegexTesterSetting />
       <AsciiTextArtSetting />
       <MockDataSetting />
+      <SudokuGeneratorSetting />
+      <CopybookGeneratorSetting />
     </Form>
   )
 }

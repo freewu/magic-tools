@@ -31,6 +31,39 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-09-15 V2.10.0 Release", "2026-09-15 V2.10.0 Release", "2026-09-15 V2.10.0 Release"),
+    items: trio(
+      [
+        "新增「数独生成器」工具: 随机生成唯一解的 4 / 6 / 9 宫格数独题, 采用「随机回溯生成完整解 → 中心对称挖空 → 校验唯一解」三步保证唯一解, 难度分高 / 中 / 低",
+        "数独生成器: 按 A4 版式自动排布 (4 宫 4 题 / 6 宫上下 2 题 / 9 宫 1 题), 可选「仅题目 / 仅答案 (红色) / 题目 + 答案」, 一键「打印 A4」调用系统打印对话框 (也可另存为 PDF)",
+        "新增「字帖生成器」工具: 生成可打印的 A4 练字字帖, 支持米字格 / 田字格 / 回宫格 / 作文格四种格型与楷体 / 行楷 / 隶书 / 宋体 / 黑体 / 仿宋 / 微软雅黑七种字体, 可上传本地 ttf / otf / woff / woff2 字体",
+        "字帖生成器: 内容模式含描红 / 黑字 / 首字示范 / 空白格, 格线红 / 灰 / 蓝可选; 格子尺寸由「每行格数 × 每页行数」自动均分 A4 可用区域, 整页不溢出、不裁切",
+        "新增打印辅助模块 src/lib/print.ts: 用离屏 iframe 承载 A4 版式 HTML 再唤起系统打印, 与页面深色主题样式完全隔离, 打印结果恒为白底",
+        "设置中心 → 其它: 新增「数独生成器」「字帖生成器」面板 (默认宫格 / 难度 / 页数 / 打印内容; 默认格型 / 字体 / 格线颜色 / 内容模式 / 行列数 / 文本等)",
+        "工具总数 113 (含内置页面共 116 个工具目录), 其中「其它」分类 17 个; 三个 README 与官网计数、工具清单同步",
+      ],
+      [
+        "新增「數獨產生器」工具: 隨機產生唯一解的 4 / 6 / 9 宮格數獨題, 採用「隨機回溯產生完整解 → 中心對稱挖空 → 校驗唯一解」三步保證唯一解, 難度分高 / 中 / 低",
+        "數獨產生器: 依 A4 版式自動排布 (4 宮 4 題 / 6 宮上下 2 題 / 9 宮 1 題), 可選「僅題目 / 僅答案 (紅色) / 題目 + 答案」, 一鍵「列印 A4」開啟系統列印對話框 (也可另存為 PDF)",
+        "新增「字帖產生器」工具: 產生可列印的 A4 練字字帖, 支援米字格 / 田字格 / 回宮格 / 作文格四種格型與楷體 / 行楷 / 隸書 / 宋體 / 黑體 / 仿宋 / 微軟雅黑七種字型, 可上傳本機 ttf / otf / woff / woff2 字型",
+        "字帖產生器: 內容模式含描紅 / 黑字 / 首字示範 / 空白格, 格線紅 / 灰 / 藍可選; 格子尺寸由「每行格數 × 每頁行數」自動均分 A4 可用區域, 整頁不溢出、不裁切",
+        "新增列印輔助模組 src/lib/print.ts: 用離屏 iframe 承載 A4 版式 HTML 再開啟系統列印, 與頁面深色主題樣式完全隔離, 列印結果恆為白底",
+        "設定中心 → 其他: 新增「數獨產生器」「字帖產生器」面板 (預設宮格 / 難度 / 頁數 / 列印內容; 預設格型 / 字型 / 格線顏色 / 內容模式 / 行列數 / 文字等)",
+        "工具總數 113 (含內建頁面共 116 個工具目錄), 其中「其他」分類 17 個; 三個 README 與官網計數、工具清單同步",
+      ],
+      [
+        "New tool: Sudoku Generator — random puzzles with a proven unique solution in 4×4 / 6×6 / 9×9 grids, built by randomized backtracking, centre-symmetric hole digging and a uniqueness check; three difficulty levels",
+        "Sudoku Generator: A4 layout packs 4 puzzles (4×4), 2 stacked (6×6) or 1 (9×9) per page, with puzzle-only / answers-only (red) / puzzle + answers output and one-click \"Print A4\" through the system print dialog (or Save as PDF)",
+        "New tool: Copybook Generator — printable A4 handwriting practice sheets in mi / tian / hui / essay grids with KaiTi, Xingkai, LiSu, SimSun, SimHei, FangSong and Microsoft YaHei, plus your own local ttf / otf / woff / woff2 font",
+        "Copybook Generator: trace / ink / first-character-demo / blank content modes and red, gray or blue guide lines; cell size is derived from columns × rows so a page always fits the A4 printable area without clipping",
+        "New print helper src/lib/print.ts — renders A4 HTML inside an off-screen iframe and opens the system print dialog, fully isolated from the app's dark theme so prints are always black-on-white",
+        "Settings → Utilities: new Sudoku Generator and Copybook Generator panels (default grid / difficulty / pages / print content; default grid style / font / line color / content mode / columns / rows / text)",
+        "Tool count is now 113 (116 directories including the built-in pages), 17 in the Utilities category; the three READMEs and the website counts and tool lists were synced",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-09-15 V2.9.0 Release", "2026-09-15 V2.9.0 Release", "2026-09-15 V2.9.0 Release"),
     items: trio(
       [

@@ -114,6 +114,8 @@ import Setting from './Setting/lang';
 import Help from './Help/lang';
 import MockData from './MockData/lang';
 import WebSocketDebug from './WebSocketDebug/lang';
+import SudokuGenerator from './SudokuGenerator/lang';
+import CopybookGenerator from './CopybookGenerator/lang';
 
 export const langPacks = {
   Hash: Hash,
@@ -230,4 +232,6 @@ export const langPacks = {
   Help,
   MockData,
   WebSocketDebug,
+  SudokuGenerator,
+  CopybookGenerator,
 };

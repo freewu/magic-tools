@@ -263,6 +263,62 @@ const ROWS: Record<string, Row> = {
     'Whether the aspect ratio is locked by default in pixel mode (default ${d})',
   ],
 
+  // ---- 数独生成器 (Sudoku Generator) ----
+  '数独生成器': ['數獨產生器', 'Sudoku Generator'],
+  '默认宫格': ['預設宮格', 'Default grid'],
+  '默认难度': ['預設難度', 'Default difficulty'],
+  '默认页数': ['預設頁數', 'Default pages'],
+  '默认打印内容': ['預設列印內容', 'Default print content'],
+  '打开「数独生成器」时默认的宫格规格, 默认 ${d}': [
+    '開啟「數獨產生器」時預設的宮格規格, 預設 ${d}',
+    'Grid size used when opening the sudoku generator (default ${d})',
+  ],
+  '打开「数独生成器」时默认的难度, 默认 ${d}': [
+    '開啟「數獨產生器」時預設的難度, 預設 ${d}',
+    'Difficulty used when opening the sudoku generator (default ${d})',
+  ],
+  '打开「数独生成器」时默认生成的页数 (每页题数由宫格决定), 默认 ${d}': [
+    '開啟「數獨產生器」時預設產生的頁數 (每頁題數由宮格決定), 預設 ${d}',
+    'Number of pages generated when opening the sudoku generator (puzzles per page depend on the grid), default ${d}',
+  ],
+  '打开「数独生成器」时默认的打印内容 (标题默认 ${d}), 默认 ${m}': [
+    '開啟「數獨產生器」時預設的列印內容 (標題預設 ${d}), 預設 ${m}',
+    'Content printed when opening the sudoku generator (default title ${d}), default ${m}',
+  ],
+
+  // ---- 字帖生成器 (Copybook Generator) ----
+  '字帖生成器': ['字帖產生器', 'Copybook Generator'],
+  '默认格子样式': ['預設格子樣式', 'Default grid style'],
+  '默认内容模式': ['預設內容模式', 'Default content mode'],
+  '默认格线颜色': ['預設格線顏色', 'Default line color'],
+  '默认每行格数': ['預設每行格數', 'Default columns'],
+  '默认每页行数': ['預設每頁行數', 'Default rows per page'],
+  '默认文本': ['預設文字', 'Default text'],
+  '打开「字帖生成器」时默认的格型, 默认 ${d}': [
+    '開啟「字帖產生器」時預設的格型, 預設 ${d}',
+    'Grid style used when opening the copybook generator (default ${d})',
+  ],
+  '打开「字帖生成器」时默认的内容模式, 默认 ${d}': [
+    '開啟「字帖產生器」時預設的內容模式, 預設 ${d}',
+    'Content mode used when opening the copybook generator (default ${d})',
+  ],
+  '打开「字帖生成器」时默认的每行格数, 范围 ${min} - ${max}, 默认 ${d}': [
+    '開啟「字帖產生器」時預設的每行格數, 範圍 ${min} - ${max}, 預設 ${d}',
+    'Columns used when opening the copybook generator (range ${min} - ${max}, default ${d})',
+  ],
+  '打开「字帖生成器」时默认的每页行数, 范围 ${min} - ${max}, 默认 ${d}': [
+    '開啟「字帖產生器」時預設的每頁行數, 範圍 ${min} - ${max}, 預設 ${d}',
+    'Rows per page used when opening the copybook generator (range ${min} - ${max}, default ${d})',
+  ],
+  '打开「字帖生成器」时默认生成的页数, 范围 ${min} - ${max}, 默认 ${d}': [
+    '開啟「字帖產生器」時預設產生的頁數, 範圍 ${min} - ${max}, 預設 ${d}',
+    'Pages generated when opening the copybook generator (range ${min} - ${max}, default ${d})',
+  ],
+  '打开「字帖生成器」时填入的默认文本, 留空则用示例「${d}」': [
+    '開啟「字帖產生器」時填入的預設文字, 留空則用範例「${d}」',
+    'Text pre-filled when opening the copybook generator; empty falls back to the sample "${d}"',
+  ],
+
 };
 
 /**
