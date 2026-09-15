@@ -1,9 +1,11 @@
 import {
   buildGridHtml, buildGuideSvg, buildPageHtml, buildSheetCss, buildSheetHtml, buildSheetPages, cellSizeMm,
-  cellStyle, cellsPerPage, defaultGridOf, fill, fillChars, fontFamilyOf, fontStack, getDefaultCols, getDefaultGap,
-  getDefaultPages, getDefaultRows, getDefaultText, gridSizeMm, normalizeCols, normalizeFont, normalizeGap,
-  normalizeLine, normalizeLoop, normalizeMode, normalizePages, normalizeRows, normalizeStyle, pageChunks,
+  cellStyle, cellsPerPage, defaultGridOf, fill, fillChars, fillCharsByRow, fontFamilyOf, fontStack,
+  getDefaultCols, getDefaultGap, getDefaultPages, getDefaultRows, getDefaultText, gridSizeMm, inkNudge,
+  measureInkOffsets, normalizeCols, normalizeFont, normalizeGap, normalizeLine, normalizeLoop, normalizeMode,
+  normalizePages, normalizeRows, normalizeStyle, pageChunks,
   setDefaultCols, setDefaultGap, setDefaultPages, setDefaultRows, splitChars, totalCells,
+  type InkOffset,
 } from './lib';
 import {
   CELL_LINE_MM, CONTENT_MODE_LABEL, COLS_DEFAULT, DEFAULT_GRID, FONTS, FONT_DEFAULT, GAP_DEFAULT, GAP_MAX,
@@ -63,6 +65,120 @@ describe('copybook lib / 文字拆分与填充', () => {
     expect(chunks[1]).toHaveLength(120);
     expect(chunks[0][0]).toBe('甲');
     expect(chunks[1][0]).toBe(chunks[0][0]); // 120 是 2 的整数倍, 第二页从同一个字开始
+  });
+});
+
+describe('copybook lib / 按行填充 (一行练一个字)', () => {
+  test('同一行重复同一个字, 第 N 行用第 N 个字', () => {
+    const out = fillCharsByRow([ '永', '和', '九' ], 3, 3, 1, false);
+    expect(out).toEqual([
+      '永', '永', '永',
+      '和', '和', '和',
+      '九', '九', '九',
+    ]);
+  });
+
+  test('行数超过字数: loop 决定循环还是留空', () => {
+    expect(fillCharsByRow([ '永', '和' ], 2, 4, 1, true)).toEqual([
+      '永', '永', '和', '和', '永', '永', '和', '和',
+    ]);
+    expect(fillCharsByRow([ '永', '和' ], 2, 4, 1, false)).toEqual([
+      '永', '永', '和', '和', null, null, null, null,
+    ]);
+  });
+
+  test('多页时行号连续 (第二页不从头开始)', () => {
+    const out = fillCharsByRow([ '甲', '乙', '丙' ], 2, 2, 2, false);
+    expect(out).toEqual([ '甲', '甲', '乙', '乙', '丙', '丙', null, null ]);
+    expect(out).toHaveLength(totalCells(2, 2, 2));
+  });
+
+  test('空文本 / 零列: 不报错也不产生脏数据', () => {
+    expect(fillCharsByRow([], 2, 2, 1, true)).toEqual([ null, null, null, null ]);
+    expect(fillCharsByRow([ '永' ], 0, 3, 1, true)).toEqual([]);
+  });
+
+  test('按行填充能直接喂给 buildGridHtml (每行首格与末格相同)', () => {
+    const chars = fillCharsByRow(splitChars('永和'), 4, 2, 1, false);
+    const html = buildGridHtml({
+      style: 'mi', line: 'red', mode: 'ink', cols: 4, rows: 2, chars,
+      fontFamily: fontFamilyOf('楷体'),
+    });
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const rows = Array.from(doc.querySelectorAll('.cb-row'));
+    expect(rows).toHaveLength(2);
+    const texts = rows.map((r) => Array.from(r.querySelectorAll('.cb-ch')).map((s) => s.textContent));
+    expect(texts[0]).toEqual([ '永', '永', '永', '永' ]);
+    expect(texts[1]).toEqual([ '和', '和', '和', '和' ]);
+  });
+});
+
+describe('copybook lib / 墨迹视觉居中', () => {
+  test('inkNudge: 偏移换算为反向 transform (单位 mm, 保留两位小数)', () => {
+    expect(inkNudge({ dx: 0, dy: 0 }, 13.4)).toBe('');
+    expect(inkNudge(undefined, 13.4)).toBe('');
+    // 墨迹偏右 5% em → 向左平移 5% 字号
+    expect(inkNudge({ dx: 0.05, dy: 0 }, 20)).toBe(';transform:translate(-1.00mm,0.00mm)');
+    expect(inkNudge({ dx: -0.05, dy: 0.025 }, 20)).toBe(';transform:translate(1.00mm,-0.50mm)');
+  });
+
+  test('buildGridHtml: 有偏移表时每个字都带 transform, 无表时不带', () => {
+    const ink = new Map<string, InkOffset>([
+      [ '落', { dx: 0.06, dy: 0.01 } ],
+      [ '霞', { dx: 0.02, dy: 0.01 } ],
+    ]);
+    const base = {
+      style: 'mi' as GridStyle, line: 'red' as LineColor, mode: 'ink' as ContentMode,
+      cols: 2, rows: 1, chars: [ '落', '霞' ], fontFamily: fontFamilyOf('楷体'),
+    };
+    const plain = buildGridHtml(base);
+    expect(plain).not.toContain('transform');
+
+    const nudged = buildGridHtml({ ...base, ink });
+    const doc = new DOMParser().parseFromString(nudged, 'text/html');
+    const spans = Array.from(doc.querySelectorAll('.cb-ch'));
+    expect(spans.map((s) => s.getAttribute('style'))).toEqual([
+      expect.stringContaining('transform:translate('),
+      expect.stringContaining('transform:translate('),
+    ]);
+    // 字形偏右 → 必须向左平移 (负值)
+    const fontSize = cellSizeMm(2, 1, 0) * 0.72;
+    expect(spans[0].getAttribute('style')).toContain(`translate(${(-0.06 * fontSize).toFixed(2)}mm`);
+    expect(spans[1].getAttribute('style')).toContain(`translate(${(-0.02 * fontSize).toFixed(2)}mm`);
+  });
+
+  test('buildGridHtml: 偏移表里没有的字不受影响', () => {
+    const ink = new Map<string, InkOffset>([ [ '落', { dx: 0.05, dy: 0 } ] ]);
+    const html = buildGridHtml({
+      style: 'mi', line: 'red', mode: 'ink', cols: 2, rows: 1, chars: [ '落', '一' ],
+      fontFamily: fontFamilyOf('楷体'), ink,
+    });
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const spans = Array.from(doc.querySelectorAll('.cb-ch'));
+    expect(spans[0].getAttribute('style')).toContain('transform:translate(');
+    expect(spans[1].getAttribute('style')).not.toContain('transform');
+  });
+
+  test('measureInkOffsets: 无 canvas 环境返回空表而不抛错 (jsdom)', () => {
+    const out = measureInkOffsets(fontFamilyOf('楷体'), [ '永', '永', '和' ]);
+    expect(out).toBeInstanceOf(Map);
+    expect(out.size).toBe(0);
+  });
+
+  test('measureInkOffsets: 接受缓存版本号 (换字体后可作废缓存)', () => {
+    // jsdom 下始终返回空表, 这里只验证签名与不抛错 (版本号参与缓存 key)
+    expect(() => measureInkOffsets(fontFamilyOf('楷体'), [ '永' ], 1)).not.toThrow();
+    expect(measureInkOffsets(fontFamilyOf('楷体'), [ '永' ], 2).size).toBe(0);
+  });
+
+  test('墨迹偏移会随 buildSheetHtml 一起进入打印页', () => {
+    const ink = new Map<string, InkOffset>([ [ '永', { dx: 0.05, dy: 0.02 } ] ]);
+    const html = buildSheetHtml({
+      style: 'mi', line: 'red', mode: 'ink', cols: 2, rows: 1, pages: 1,
+      chars: [ '永', '永' ], title: '字帖练习', showMeta: true, date: '2026-09-15',
+      fontFamily: fontFamilyOf('楷体'), text, ink,
+    });
+    expect((html.match(/transform:translate\(/g) ?? [])).toHaveLength(2);
   });
 });
 

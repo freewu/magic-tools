@@ -1,21 +1,22 @@
 // 字帖生成器: 米字格 / 田字格 / 回宫格 / 作文格 · 多字体 · A4 打印
 import { Button, Divider, Input, InputNumber, Segmented, Select, Space, Switch, Tag, Typography, Upload, message, theme } from 'antd';
 import { DeleteOutlined, PrinterOutlined, UploadOutlined } from '@ant-design/icons';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocale } from '../../hook/locale-context';
 import { printHtml } from '../../lib/print';
 import { cb, cbT } from './lang';
 import {
-  COLS_DEFAULT, COLS_MAX, COLS_MIN, CONTENT_MODES, CONTENT_MODE_LABEL, FONTS, FONT_ACCEPT, FONT_DEFAULT,
-  GAP_DEFAULT, GAP_MAX, GAP_MIN, GAP_STEP, GRID_STYLES, GRID_STYLE_LABEL, LINE_COLORS, LINE_COLOR_LABEL,
-  MAX_FONT_BYTES, PAGES_DEFAULT, PAGES_MAX, PAGES_MIN, ROWS_DEFAULT, ROWS_MAX, ROWS_MIN, TEXT_DEFAULT,
-  TEXT_MAX, TITLE_DEFAULT,
+  COLS_DEFAULT, COLS_MAX, COLS_MIN, CONTENT_MODES, CONTENT_MODE_LABEL, CUSTOM_FAMILY, FONTS, FONT_ACCEPT,
+  FONT_DEFAULT, GAP_DEFAULT, GAP_MAX, GAP_MIN, GAP_STEP, GRID_STYLES, GRID_STYLE_LABEL, LINE_COLORS,
+  LINE_COLOR_LABEL, MAX_FONT_BYTES, PAGES_DEFAULT, PAGES_MAX, PAGES_MIN, ROWS_DEFAULT, ROWS_MAX, ROWS_MIN,
+  TEXT_DEFAULT, TEXT_MAX, TITLE_DEFAULT,
   type ContentMode, type GridStyle, type LineColor,
 } from './data';
 import {
   buildSheetCss, buildSheetHtml, buildSheetPages, cellSizeMm, cellsPerPage, defaultGridOf, fillChars,
-  fontFamilyOf, fontStack, getDefaultCols, getDefaultFont, getDefaultGap, getDefaultLine, getDefaultLoop,
-  getDefaultMode, getDefaultPages, getDefaultRows, getDefaultStyle, getDefaultText, splitChars, totalCells,
+  fillCharsByRow, fontFamilyOf, fontStack, getDefaultCols, getDefaultFont, getDefaultGap, getDefaultLine,
+  getDefaultLoop, getDefaultMode, getDefaultPages, getDefaultRows, getDefaultStyle, getDefaultText,
+  measureInkOffsets, splitChars, totalCells,
   type CopybookText,
 } from './lib';
 import CopybookGeneratorIntro from './intro';
@@ -49,13 +50,44 @@ const CopybookGenerator: React.FC = () => {
   const [ gap, setGap ] = useState<number>(() => getDefaultGap());
   const [ text, setText ] = useState<string>(() => getDefaultText() || TEXT_DEFAULT);
   const [ loop, setLoop ] = useState<boolean>(() => getDefaultLoop());
+  /** 按行填充: 一行练一个字 (同一行重复同一个字) */
+  const [ byRow, setByRow ] = useState(false);
   const [ title, setTitle ] = useState(TITLE_DEFAULT);
   const [ showMeta, setShowMeta ] = useState(true);
   const [ custom, setCustom ] = useState<{ name: string; data: string } | null>(null);
+  const [ fontTick, setFontTick ] = useState(0);
 
   const per = cellsPerPage(cols, rows);
   const chars = useMemo(() => splitChars(text), [ text ]);
-  const filled = useMemo(() => fillChars(chars, totalCells(cols, rows, pages), loop), [ chars, cols, rows, pages, loop ]);
+  const filled = useMemo(
+    () => (byRow
+      ? fillCharsByRow(chars, cols, rows, pages, loop)
+      : fillChars(chars, totalCells(cols, rows, pages), loop)),
+    [ byRow, chars, cols, rows, pages, loop ],
+  );
+  /** 有字的格子数 (不循环时用于提示实际填充量) */
+  const filledCount = useMemo(() => filled.filter((c) => c !== null).length, [ filled ]);
+
+  /** 自定义字体是异步加载的, 加载完成后重测墨迹 (否则按回退字体测出的偏移会错位) */
+  useEffect(() => {
+    const fonts = typeof document === 'undefined' ? undefined : document.fonts;
+    if (!fonts || !custom) return;
+    let alive = true;
+    fonts.load(`100px "${CUSTOM_FAMILY}"`)
+      .then(() => { if (alive) setFontTick((n) => n + 1); })
+      .catch(() => { /* 加载失败就沿用回退字体的测量结果 */ });
+    return () => { alive = false; };
+  }, [ custom ]);
+
+  /**
+   * 墨迹偏移表: 中文字体在 em 框里并非几何居中 (楷体偏右, 华文楷体更明显),
+   * 仅靠 flex 居中会让字整体偏右 / 偏下, 米字格十字就不穿过字的中心。
+   */
+  const ink = useMemo(() => {
+    const all = filled.filter((c): c is string => c !== null);
+    // fontTick: 自定义字体异步加载完成后作废测量缓存 (之前是按回退字体测的)
+    return measureInkOffsets(fontStack(font, custom !== null), all, custom ? fontTick : 0);
+  }, [ font, custom, filled, fontTick ]);
 
   /** 打印文案 (按当前语言组装) */
   const sheetText: CopybookText = useMemo(() => ({
@@ -81,7 +113,8 @@ const CopybookGenerator: React.FC = () => {
     date: today(),
     fontFamily: fontStack(font, custom !== null),
     text: sheetText,
-  }), [ style, line, mode, cols, rows, pages, gap, filled, title, showMeta, sheetText, font, custom ]);
+    ink,
+  }), [ style, line, mode, cols, rows, pages, gap, filled, title, showMeta, sheetText, font, custom, ink ]);
 
   const previewPages = useMemo(() => buildSheetPages(options), [ options ]);
 
@@ -158,15 +191,26 @@ const CopybookGenerator: React.FC = () => {
               <Text style={ { fontSize: 12 } }>{ t('循环填充') }</Text>
               <Switch size="small" checked={ loop } onChange={ setLoop } />
             </Space>
+            <Space size={ 8 }>
+              <Text style={ { fontSize: 12 } }>{ t('按行填充') }</Text>
+              <Switch
+                size="small"
+                checked={ byRow }
+                onChange={ setByRow }
+              />
+            </Space>
             <Text type="secondary" style={ { fontSize: 12 } }>
-              { loop
-                ? tT('共 {n} 格 · {c} 字', { n: totalCells(cols, rows, pages), c: chars.length })
-                : tT('共 {n} 格 · {c} 字 (不循环: 仅前 {c} 格有字)', { n: totalCells(cols, rows, pages), c: chars.length }) }
+              { tT('共 {n} 格 · {c} 字', { n: totalCells(cols, rows, pages), c: chars.length }) }
+              { byRow ? ` · ${t('每行一字')}` : '' }
+              { loop ? '' : ` · ${tT('不循环: {f} 格有字', { f: filledCount })}` }
             </Text>
           </div>
         </div>
 
-        <Text type="secondary" style={ { fontSize: 12 } }>{ t('文本会按空格 / 标点自动逐字拆分, 不足时循环填充 (可关闭)') }</Text>
+        <Text type="secondary" style={ { fontSize: 12 } }>
+          { t('文本会按空格 / 标点自动逐字拆分, 不足时循环填充 (可关闭)') }
+          { byRow ? ' ' + t('按行填充: 每行重复同一个字, 第 N 行用第 N 个字') : '' }
+        </Text>
 
         <div style={ { display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' } }>
           <Text style={ { width: 96, flex: '0 0 auto' } }>{ t('格子样式') }</Text>

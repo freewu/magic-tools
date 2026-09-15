@@ -23,6 +23,8 @@ const rows: Record<string, [string, string]> = {
   '格间距': ['格間距', 'Cell gap'],
   '文本': ['文字', 'Text'],
   '循环填充': ['循環填充', 'Repeat to fill'],
+  '按行填充': ['依行填充', 'One char per row'],
+  '每行一字': ['每行一字', 'same char per row'],
   '标题': ['標題', 'Title'],
   '显示姓名 / 日期栏': ['顯示姓名 / 日期欄', 'Show name / date row'],
   // 格型 / 字体 / 颜色 / 模式
@@ -52,10 +54,7 @@ const rows: Record<string, [string, string]> = {
   // 状态 / 统计
   '每格 {cell}mm · 每页 {n} 格': ['每格 {cell}mm · 每頁 {n} 格', '{cell}mm per cell · {n} per page'],
   '共 {n} 格 · {c} 字': ['共 {n} 格 · {c} 字', '{n} cells · {c} characters'],
-  '共 {n} 格 · {c} 字 (不循环: 仅前 {c} 格有字)': [
-    '共 {n} 格 · {c} 字 (不循環: 僅前 {c} 格有字)',
-    '{n} cells · {c} characters (no repeat: only the first {c} cells are filled)',
-  ],
+  '不循环: {f} 格有字': ['不循環: {f} 格有字', 'no repeat: {f} cells filled'],
   '已打开打印对话框, 选择打印机即可打印': ['已開啟列印對話框, 選擇印表機即可列印', 'Print dialog opened — choose your printer'],
   '打印失败: 当前环境不支持打印': ['列印失敗: 目前環境不支援列印', 'Print failed: printing is not supported here'],
   '字体文件过大 (上限 12MB)': ['字型檔案過大 (上限 12MB)', 'Font file is too large (12MB limit)'],
@@ -65,6 +64,10 @@ const rows: Record<string, [string, string]> = {
   '文本会按空格 / 标点自动逐字拆分, 不足时循环填充 (可关闭)': [
     '文字會依空格 / 標點自動逐字拆分, 不足時循環填充 (可關閉)',
     'The text is split per character; when it runs out it repeats unless "Repeat to fill" is off',
+  ],
+  '按行填充: 每行重复同一个字, 第 N 行用第 N 个字': [
+    '依行填充: 每行重複同一個字, 第 N 行用第 N 個字',
+    'One char per row: every cell in a row uses the same character (row N uses character N)',
   ],
   '可上传 ttf / otf / woff / woff2 字体文件, 仅在本地使用, 不会上传': [
     '可上傳 ttf / otf / woff / woff2 字型檔案, 僅在本機使用, 不會上傳',

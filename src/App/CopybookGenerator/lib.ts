@@ -32,6 +32,132 @@ export function fillChars(chars: string[], count: number, loop: boolean): Array<
   return out;
 }
 
+/**
+ * 按行填充: 同一行重复同一个字, 第 N 行用第 N 个字 (字帖常见的「一行练一个字」)。
+ * 行数超过字数时, loop 决定是回到开头循环还是留空。
+ */
+export function fillCharsByRow(
+  chars: string[], cols: number, rows: number, pages: number, loop: boolean,
+): Array<string | null> {
+  const out: Array<string | null> = [];
+  const totalRows = Math.max(0, rows) * Math.max(1, pages);
+  for (let r = 0; r < totalRows; r++) {
+    let ch: string | null = null;
+    if (chars.length > 0) {
+      if (r < chars.length) ch = chars[r];
+      else if (loop) ch = chars[r % chars.length];
+    }
+    for (let c = 0; c < Math.max(0, cols); c++) out.push(ch);
+  }
+  return out;
+}
+
+// ==================== 视觉居中 (墨迹补偿) ====================
+
+/** 单字墨迹中心相对 em 框中心的偏移 (单位为 em 的比例, 正值 = 偏右 / 偏下) */
+export interface InkOffset {
+  dx: number;
+  dy: number;
+}
+
+/** 测量用字号: 偏移按 em 比例缩放, 与最终字号无关 (实测该比例在不同字号下一致) */
+const MEASURE_PX = 160;
+/** 光栅化时 em 框四周留白 (避免超出字身框的笔画被截断) */
+const MEASURE_PAD = Math.round(MEASURE_PX * 0.3);
+
+/** 墨迹测量缓存 (key = 字体栈 + 字): 长文本不会反复光栅化, 每个字每字体只测一次 */
+const inkCache = new Map<string, InkOffset>();
+
+/**
+ * 实测单个字的墨迹中心相对字身框 (em) 中心的偏移。
+ *
+ * 做法: 把字按 .cb-ch 的盒子在 canvas 上光栅化 (line-height:1 → 行盒高 1em,
+ * 基线位置 = 半行距 + 字体 ascent), 再扫描像素取覆盖度 > 50% 的墨迹包围盒中心。
+ * 用光栅化而不是 measureText 的 actualBoundingBox*: 后者是印刷学边界,
+ * 会把极淡的笔画外溢也算进去, 与肉眼看到的「字的范围」不一致 (实测偏差可达 1mm)。
+ */
+function measureOne(fontFamily: string, ch: string): InkOffset | null {
+  try {
+    const size = MEASURE_PAD * 2 + MEASURE_PX;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    ctx.font = `400 ${MEASURE_PX}px ${fontFamily}`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    const m = ctx.measureText(ch);
+    const asc = m.fontBoundingBoxAscent;
+    const desc = m.fontBoundingBoxDescent;
+    if (!Number.isFinite(asc) || !Number.isFinite(desc)) return null;
+    const baseline = MEASURE_PAD + (MEASURE_PX - (asc + desc)) / 2 + asc;
+    ctx.fillStyle = '#000';
+    ctx.fillText(ch, MEASURE_PAD, baseline);
+    const data = ctx.getImageData(0, 0, size, size).data;
+    let x0 = size; let y0 = size; let x1 = -1; let y1 = -1;
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        if (data[(y * size + x) * 4 + 3] > 128) {
+          if (x < x0) x0 = x;
+          if (x > x1) x1 = x;
+          if (y < y0) y0 = y;
+          if (y > y1) y1 = y;
+        }
+      }
+    }
+    if (x1 < 0) return null;
+    const center = MEASURE_PAD + MEASURE_PX / 2;
+    return {
+      dx: ((x0 + x1) / 2 - center) / MEASURE_PX,
+      dy: ((y0 + y1) / 2 - center) / MEASURE_PX,
+    };
+  } catch (e) {
+    return null; // jsdom 等环境没有 canvas
+  }
+}
+
+/**
+ * 实测每个字的墨迹中心相对 em 框中心的偏移, 供格子里做视觉居中。
+ *
+ * 楷体等中文字体的字形在 em 框里并非几何居中 (实测楷体「落」偏右约 7% em, 华文楷体更明显),
+ * 只用 flex 居中会让字整体偏右 / 偏下, 米字格十字就不再穿过字的中心。
+ * 无 canvas 环境 (jsdom / 老浏览器) 返回空表 → 退化为按 em 框居中。
+ *
+ * @param fontFamily CSS font-family (可含引号与多字体回退栈)
+ * @param chars 需要测量的字符 (自动去重)
+ * @param version 缓存版本号: 同一字体栈换了实际字体 (如异步加载完自定义字体) 时递增即可作废缓存
+ */
+export function measureInkOffsets(
+  fontFamily: string,
+  chars: readonly string[],
+  version: number | string = 0,
+): Map<string, InkOffset> {
+  const out = new Map<string, InkOffset>();
+  if (typeof document === 'undefined') return out;
+  for (const ch of Array.from(new Set(chars))) {
+    if (ch === '') continue;
+    const key = `${version}|${fontFamily}|${ch}`;
+    let off = inkCache.get(key);
+    if (off === undefined) {
+      const measured = measureOne(fontFamily, ch);
+      if (!measured) continue;
+      off = measured;
+      inkCache.set(key, off);
+    }
+    out.set(ch, off);
+  }
+  return out;
+}
+
+/** 把墨迹偏移换算成 CSS transform (mm), 使墨迹中心落到格子中心 */
+export function inkNudge(off: InkOffset | undefined, fontSizeMm: number): string {
+  if (!off || (!off.dx && !off.dy)) return '';
+  const x = (-off.dx * fontSizeMm).toFixed(2);
+  const y = (-off.dy * fontSizeMm).toFixed(2);
+  return `;transform:translate(${x}mm,${y}mm)`;
+}
+
 /** 每页格数 */
 export const cellsPerPage = (cols: number, rows: number): number => cols * rows;
 
@@ -113,6 +239,8 @@ export interface GridHtmlOptions {
   fontFamily: string;
   /** 格间距 (mm), 默认 0 */
   gap?: number;
+  /** 墨迹偏移表 (measureInkOffsets 的结果), 用于把字的墨迹摆到格子正中 */
+  ink?: Map<string, InkOffset> | null;
 }
 
 /**
@@ -142,7 +270,8 @@ export function buildGridHtml(o: GridHtmlOptions): string {
   const cell = cellSizeMm(cols, rows, gap);
   const color = LINE_COLOR_VALUE[o.line];
   const guide = buildGuideSvg(o.style, color, cell);
-  const fontSize = (cell * CHAR_RATIO).toFixed(2);
+  const fontSizeMm = cell * CHAR_RATIO;
+  const fontSize = fontSizeMm.toFixed(2);
   const textColor = mode === 'ink' ? TEXT_COLOR_INK : TEXT_COLOR_GRAY;
   const rowGap = gap > 0 ? ` style="gap:${gap}mm"` : '';
   const rowsHtml: string[] = [];
@@ -152,7 +281,7 @@ export function buildGridHtml(o: GridHtmlOptions): string {
       const ch = o.chars[r * cols + c] ?? null;
       const show = ch !== null && (mode === 'trace' || mode === 'ink' || (mode === 'demo' && c === 0));
       const span = show
-        ? `<span class="cb-ch" style="font-size:${fontSize}mm;color:${textColor};font-family:${attr(o.fontFamily)}">${attr(String(ch))}</span>`
+        ? `<span class="cb-ch" style="font-size:${fontSize}mm;color:${textColor};font-family:${attr(o.fontFamily)}${inkNudge(o.ink?.get(String(ch)), fontSizeMm)}">${attr(String(ch))}</span>`
         : '';
       cellsHtml.push(`<div class="cb-cell" style="${cellStyle(cols, rows, r, c, cell, color, gap)}">${guide}${span}</div>`);
     }
@@ -192,6 +321,8 @@ export interface CopybookOptions {
   text: CopybookText;
   /** 格间距 (mm), 默认 0 */
   gap?: number;
+  /** 墨迹偏移表 (measureInkOffsets 的结果), 用于把字的墨迹摆到格子正中 */
+  ink?: Map<string, InkOffset> | null;
 }
 
 /** 模板变量填充: {a} / {b} 形式 */
@@ -212,7 +343,7 @@ export function buildPageHtml(o: CopybookOptions, page: number, total: number): 
     + `</div></div>`;
   const body = `<div class="cb-body">${buildGridHtml({
     style: o.style, line: o.line, mode: o.mode, cols: o.cols, rows: o.rows, chars, fontFamily: o.fontFamily,
-    gap: o.gap,
+    gap: o.gap, ink: o.ink,
   })}</div>`;
   const foot = `<div class="cb-foot">${attr(fill(o.text.footer, { a: page, b: total, d: o.date }))}</div>`;
   return `<div class="pg cb-pg">${head}${body}${foot}</div>`;
