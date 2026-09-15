@@ -5,6 +5,8 @@ import { tr, trTpl } from "../i18n/lang";
 import shell from "../i18n/shell";
 import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, SettingOutlined, CheckOutlined } from '@ant-design/icons';
 import { Badge, Button, Dropdown, Layout, Menu, Space } from "antd";
+import type { MenuProps } from "antd";
+import { SIDER_SUBMENU_PLACEMENTS } from "./submenu-placements";
 import React, { useMemo, useState, useContext } from "react";
 const { Sider } = Layout;
 import { useNavigate } from "react-router-dom"
@@ -15,6 +17,10 @@ import { openUrl } from "../lib/tauri";
 import { useUpdate } from "./update-context";
 import { getVersion } from "../version";
 import "./layout.css";
+
+// antd 的 MenuProps 未声明 builtinPlacements, 但 antd 会把未知属性原样透传给 rc-menu,
+// rc-menu 据此覆盖默认浮层对齐方式 (详见 submenu-placements.ts)
+const siderMenuExtraProps = { builtinPlacements: SIDER_SUBMENU_PLACEMENTS } as unknown as MenuProps;
 
 const MainSider: React.FC = () => {
 
@@ -99,6 +105,7 @@ const MainSider: React.FC = () => {
       {/* 菜单区: 滚动占满中部, 底部留给设置按钮 */}
       <div style={ { flex: 1, minHeight: 0, overflowY: 'auto', background: '#001529' } }>
         <Menu
+          { ...siderMenuExtraProps }
           theme="dark"
           mode="inline"
           inlineCollapsed={ collapsed }

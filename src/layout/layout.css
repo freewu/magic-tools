@@ -98,6 +98,15 @@ select {
   height: 100%;
 }
 
+/* 折叠侧栏时分类子菜单的飞出浮层: 子项较多时保证列表在视口内可滚动
+   (与 submenu-placements.ts 的 shiftY 配合, 浮层整体平移进视口后底部子项不再被裁掉) */
+.ant-menu-submenu-popup .ant-menu-sub.ant-menu-vertical {
+  max-height: calc(100vh - 100px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
 /* 侧边菜单分类标题: 应用数徽标与分类名同行右侧对齐 */
 .menu-group-label {
   display: inline-flex;
