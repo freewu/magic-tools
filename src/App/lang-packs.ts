@@ -62,6 +62,7 @@ import Base64Image from './Base64Image/lang';
 import ImageColor from './ImageColor/lang';
 import ImageSplit from './ImageSplit/lang';
 import ImageResize from './ImageResize/lang';
+import ImageWatermark from './ImageWatermark/lang';
 import GPSConvert from './GPSConvert/lang';
 import DownloadLinkConvert from './DownloadLinkConvert/lang';
 import RMBConvert from './RMBConvert/lang';
@@ -181,6 +182,7 @@ export const langPacks = {
   ImageColor: ImageColor,
   ImageSplit: ImageSplit,
   ImageResize: ImageResize,
+  ImageWatermark: ImageWatermark,
   GPSConvert: GPSConvert,
   DownloadLinkConvert: DownloadLinkConvert,
   RMBConvert: RMBConvert,

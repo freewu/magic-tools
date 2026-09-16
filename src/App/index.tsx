@@ -95,6 +95,7 @@ const list = [
   'ImageColor',
   'ImageSplit',
   'ImageResize',
+  'ImageWatermark',
   'AsciiTextArt',
   'CronRules',
   'HtmlStripText',
