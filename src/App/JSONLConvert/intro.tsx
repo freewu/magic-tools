@@ -16,7 +16,8 @@ const zh = `<h2>这个工具做什么</h2>
 <li><p><b>JSONL → JSON</b>: 顶部粘贴每行一条的 JSONL 文本, 点击绿色按钮, 输出一个格式化后的 JSON 数组 (缩进可选 2 空格 / 4 空格 / Tab)</p></li>
 <li><p>顶部下方会显示识别结果 (JSON 数组 / JSON 对象 / JSONL 及其条数), 便于确认粘贴的内容符合预期</p></li>
 <li><p>拖拽文件到输入框、点击「选择文件」或「载入示例」时, 会按识别结果<b>自动选择转换方向</b>并立即转换</p></li>
-<li><p>结果可双击复制、点「复制结果」或「下载」(扩展名随转换方向为 <code>.jsonl</code> / <code>.json</code>, 文件名沿用已载入文件的主名)</p></li>
+<li><p>结果可双击复制、点「复制结果」或「下载」: 桌面版会弹出系统保存对话框 (可自选目录与文件名), Web 版走浏览器下载; 扩展名随转换方向为 <code>.jsonl</code> / <code>.json</code>, 文件名沿用已载入文件的主名</p></li>
+<li><p>点错按钮或把内容粘到了下方结果框也没关系: 输入内容与按钮方向明显不符时会<b>自动按正确方向转换</b>并给出提示</p></li>
 </ul>
 
 <h2>说明</h2>
@@ -45,7 +46,8 @@ const tw = `<h2>這個工具做什麼</h2>
 <li><p><b>JSONL → JSON</b>: 上方貼上每列一筆的 JSONL 文字, 點擊綠色按鈕, 輸出格式化後的 JSON 陣列 (縮排可選 2 空格 / 4 空格 / Tab)</p></li>
 <li><p>輸入框下方會顯示識別結果 (JSON 陣列 / JSON 物件 / JSONL 及其筆數), 便於確認貼上的內容符合預期</p></li>
 <li><p>拖曳檔案到輸入框、點擊「選擇檔案」或「載入範例」時, 會依識別結果<b>自動選擇轉換方向</b>並立即轉換</p></li>
-<li><p>結果可雙擊複製、點「複製結果」或「下載」(副檔名依轉換方向為 <code>.jsonl</code> / <code>.json</code>, 檔名沿用已載入檔案的主名)</p></li>
+<li><p>結果可雙擊複製、點「複製結果」或「下載」: 桌面版會彈出系統儲存對話框 (可自選目錄與檔名), Web 版走瀏覽器下載; 副檔名依轉換方向為 <code>.jsonl</code> / <code>.json</code>, 檔名沿用已載入檔案的主名</p></li>
+<li><p>點錯按鈕或把內容貼到了下方結果框也沒關係: 輸入內容與按鈕方向明顯不符時會<b>自動依正確方向轉換</b>並給出提示</p></li>
 </ul>
 
 <h2>說明</h2>
@@ -74,7 +76,8 @@ const en = `<h2>What this tool does</h2>
 <li><p><b>JSONL → JSON</b>: paste line-delimited JSON and click the green button — the output is a formatted JSON array (2 spaces / 4 spaces / Tab indent)</p></li>
 <li><p>A detection line under the input shows what was recognized (JSON array / JSON object / JSONL and how many records), so you can verify the pasted content</p></li>
 <li><p>Dropping a file, choosing one, or loading the sample <b>picks the conversion direction automatically</b> from that detection and converts right away</p></li>
-<li><p>Copy the result by double-clicking it, with the "Copy result" button, or save it with "Download" (the extension follows the direction — <code>.jsonl</code> / <code>.json</code> — and the name keeps the loaded file's base name)</p></li>
+<li><p>Copy the result by double-clicking it, with the "Copy result" button, or save it with "Download": the desktop build opens the system save dialog (pick any folder and file name) while the Web build falls back to a browser download. The extension follows the direction — <code>.jsonl</code> / <code>.json</code> — and the name keeps the loaded file's base name</p></li>
+<li><p>Clicking the wrong button — or pasting into the result box below — is fine too: when the content clearly disagrees with the button's direction the tool <b>converts the correct way automatically</b> and tells you about it</p></li>
 </ul>
 
 <h2>Notes</h2>

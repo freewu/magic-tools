@@ -1,6 +1,13 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import JSONLConvert from './index';
+import { saveTextFile } from '../../lib/tauri';
+
+// 桌面环境: 下载应走系统保存对话框 (saveTextFile)
+jest.mock('../../lib/tauri', () => ({
+  isTauri: () => true,
+  saveTextFile: jest.fn().mockResolvedValue(true),
+}));
 
 /** 输入 / 输出两个多行文本框 */
 const boxes = (): HTMLTextAreaElement[] => screen.getAllByRole('textbox') as HTMLTextAreaElement[];
@@ -27,6 +34,7 @@ describe('JSONLConvert 交互', () => {
   beforeEach(() => {
     // jsdom 没有实现粘贴板, 注入一个 jest.fn 便于断言复制行为
     Object.assign(navigator, { clipboard: { writeText: jest.fn().mockResolvedValue(undefined) } });
+    (saveTextFile as jest.Mock).mockClear();
   });
 
   test('JSON 数组 -> JSONL: 每个元素压成一行, 并显示识别结果与统计', () => {
@@ -58,12 +66,20 @@ describe('JSONLConvert 交互', () => {
     expect(within(container).getByText('已转换 1 条记录 (JSON → JSONL, 顶层为单个值)')).toBeInTheDocument();
   });
 
-  test('用错方向时给出提示且不产生结果', () => {
+  test('点错按钮时自动按正确方向转换 (JSON 数组 + 「JSONL → JSON」)', () => {
     const { container } = render(<JSONLConvert />);
     setInput('[{"id":1},{"id":2}]');
     click('JSONL → JSON');
-    expect(outputValue()).toBe('');
-    expect(within(container).queryByText(/已转换/)).toBeNull();
+    expect(outputValue()).toBe('{"id":1}\n{"id":2}');
+    expect(within(container).getByText('已转换 2 条记录 (JSON → JSONL)')).toBeInTheDocument();
+  });
+
+  test('文本误粘到下方结果框时也能转换', () => {
+    const { container } = render(<JSONLConvert />);
+    fireEvent.change(boxes()[1], { target: { value: '{"id":1}\n{"id":2}' } });
+    click('JSONL → JSON');
+    expect(outputValue()).toBe('[\n  {\n    "id": 1\n  },\n  {\n    "id": 2\n  }\n]\n');
+    expect(within(container).getByText('已转换 2 条记录 (JSONL → JSON)')).toBeInTheDocument();
   });
 
   test('非法行 / 空输入不产生结果', () => {
@@ -105,6 +121,23 @@ describe('JSONLConvert 交互', () => {
 
     fireEvent.doubleClick(boxes()[1]);
     await waitFor(() => expect(navigator.clipboard.writeText).toHaveBeenCalledTimes(2));
+  });
+
+  test('下载走系统保存对话框 (桌面版), 文件名沿用已载入文件主名', async () => {
+    render(<JSONLConvert />);
+    setInput('[1,2]');
+    click('JSON → JSONL');
+    click('下载');
+    await waitFor(() => expect(saveTextFile).toHaveBeenCalledTimes(1));
+    expect((saveTextFile as jest.Mock).mock.calls[0][0]).toBe('data.jsonl');
+    expect((saveTextFile as jest.Mock).mock.calls[0][1]).toBe('1\n2');
+
+    // 切换方向后扩展名跟着变
+    setInput('{"a":1}');
+    click('JSONL → JSON');
+    click('下载');
+    await waitFor(() => expect(saveTextFile).toHaveBeenCalledTimes(2));
+    expect((saveTextFile as jest.Mock).mock.calls[1][0]).toBe('data.json');
   });
 
   test('输出框可手工编辑 (结果可继续修改)', () => {

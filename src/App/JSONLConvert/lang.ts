@@ -8,6 +8,8 @@ export default {
 // 界面文案词条 (zh 短语即 key; 缺 zh-CN 时回退原文)
 const jcRows: Record<string, [string, string]> = {
   // 输入 / 输出
+  '输入 (JSON 数组 / JSONL)': ['輸入 (JSON 陣列 / JSONL)', 'Input (JSON array / JSONL)'],
+  '转换结果 (可直接编辑)': ['轉換結果 (可直接編輯)', 'Result (editable)'],
   '输入 JSON 数组 或 JSONL 文本  或 拖拽文件到框内打开': ['輸入 JSON 陣列 或 JSONL 文字, 或將檔案拖入框內開啟', 'Paste a JSON array or JSONL text, or drag & drop a file here'],
   '转换结果会显示在这里 (双击可复制)': ['轉換結果會顯示在這裡 (雙擊可複製)', 'The converted result shows here (double-click to copy)'],
   '双击复制内容到粘贴板': ['雙擊複製內容到剪貼簿', 'Double-click to copy'],
@@ -25,7 +27,15 @@ const jcRows: Record<string, [string, string]> = {
   '忽略空行 (JSONL 输入)': ['忽略空行 (JSONL 輸入)', 'Skip blank lines (JSONL input)'],
 
   // 提示
-  '请先输入内容': ['請先輸入內容', 'Please enter some content first'],
+  '请先在上方输入框粘贴或输入内容': ['請先在上方輸入框貼上或輸入內容', 'Paste or type something into the input box above first'],
+  '输入框为空, 已改用下方结果框的内容': ['輸入框為空, 已改用下方結果框的內容', 'The input box was empty — using the result box below instead'],
+  '检测到输入是 {kind}, 已自动按「{dir}」转换': ['偵測到輸入是 {kind}, 已自動依「{dir}」轉換', 'Input detected as {kind} — converted with "{dir}" instead'],
+  'JSON 数组': ['JSON 陣列', 'a JSON array'],
+  '已保存 {file}': ['已儲存 {file}', 'Saved {file}'],
+  '保存 JSONL 文件': ['儲存 JSONL 檔案', 'Save JSONL file'],
+  '保存 JSON 文件': ['儲存 JSON 檔案', 'Save JSON file'],
+  'JSONL 文件': ['JSONL 檔案', 'JSONL file'],
+  'JSON 文件': ['JSON 檔案', 'JSON file'],
   '已复制到剪贴板': ['已複製到剪貼簿', 'Copied to clipboard'],
   '已下载 {file}': ['已下載 {file}', 'Downloaded {file}'],
   '复制失败, 请手动选择文本复制': ['複製失敗, 請手動選取文字複製', 'Copy failed — please select the text and copy manually'],

@@ -3,6 +3,7 @@ import { ArrowDownOutlined, ArrowUpOutlined, CopyOutlined, DownloadOutlined, Inb
 import { useState } from 'react';
 import { copyTextToClipboard } from '../../lib';
 import { openFile } from '../../lib/file';
+import { isTauri, saveTextFile } from '../../lib/tauri';
 import { useLocale } from '../../hook/locale-context';
 import { jc, jcT } from './lang';
 import {
@@ -67,21 +68,43 @@ const JSONLConvert: React.FC = () => {
     }
   };
 
-  /** 转换: dir 方向; text 传入时以传入内容为准 (载入文件 / 示例后立即转换) */
+  /**
+   * 转换
+   * @param dir 目标方向 (按钮声明的方向)
+   * @param text 指定源文本 (载入文件 / 示例后立即转换); 不传则取输入框, 输入框为空时改用结果框
+   * 说明: 输入内容与目标方向明显不符时 (JSON 数组却点了「JSONL → JSON」等) 自动纠正方向,
+   *       避免用户因为放错框 / 点错按钮而拿到报错
+   */
   const convert = (dir: Direction, text?: string) => {
-    const src = text ?? raw;
+    const given = text ?? raw;
+    const useOutBox = given.trim() === '' && out.trim() !== '';
+    const src = useOutBox ? out : given;
     if (src.trim() === '') {
-      message.warning(t('请先输入内容'));
+      message.warning(t('请先在上方输入框粘贴或输入内容'));
       return;
     }
+    if (useOutBox) message.info(t('输入框为空, 已改用下方结果框的内容'));
+
+    // 识别输入形态, 纠正明显的方向错误
+    const kind = detectInput(src);
+    let real = dir;
+    if (dir === 'to-json' && kind.array === true) real = 'to-jsonl'; // 整段是 JSON 数组, 不可能按行解析
+    if (dir === 'to-jsonl' && kind.kind === 'jsonl') real = 'to-json'; // 逐行 JSON, 整段 JSON.parse 会失败
+    if (real !== dir) {
+      message.info(tT('检测到输入是 {kind}, 已自动按「{dir}」转换', {
+        kind: kind.array === true ? t('JSON 数组') : t('JSONL'),
+        dir: DIR_LABEL[real],
+      }));
+    }
+
     try {
-      const r = dir === 'to-jsonl' ? jsonToJsonl(src) : jsonlToJson(src, { indent, skipBlank });
-      const dirLabel = DIR_LABEL[dir];
+      const r = real === 'to-jsonl' ? jsonToJsonl(src) : jsonlToJson(src, { indent, skipBlank });
+      const dirLabel = DIR_LABEL[real];
       const tip = r.single
         ? tT('已转换 1 条记录 ({dir}, 顶层为单个值)', { dir: dirLabel })
         : tT('已转换 {n} 条记录 ({dir})', { n: r.count, dir: dirLabel });
       setOut(r.text);
-      setOutExt(dir === 'to-jsonl' ? 'jsonl' : 'json');
+      setOutExt(real === 'to-jsonl' ? 'jsonl' : 'json');
       setStat(tip);
       message.success(tip);
     } catch (e) {
@@ -120,28 +143,25 @@ const JSONLConvert: React.FC = () => {
       .catch(() => message.error(t('复制失败, 请手动选择文本复制')));
   };
 
-  const download = () => {
+  /** 下载: 桌面版弹系统保存对话框 (可选目录/文件名), Web 版回退为浏览器下载 */
+  const download = async () => {
     if (out === '') return;
     const base = (fileName === '' ? 'data' : fileName.replace(/\.[^/.]+$/u, '')) || 'data';
     const name = `${base}.${outExt}`;
-    const blob = new Blob([ out ], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = name;
-    // 先挂到文档再触发、延时回收 Blob URL: 部分环境 (如桌面 WebView) 要求 a 在文档中且
-    // URL 稍晚释放, 否则会出现"点击下载无反应/不弹保存框"的现象
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 2000);
-    message.success(tT('已下载 {file}', { file: name }));
+    const isJsonl = outExt === 'jsonl';
+    const ok = await saveTextFile(name, out, t(isJsonl ? '保存 JSONL 文件' : '保存 JSON 文件'), {
+      filterName: t(isJsonl ? 'JSONL 文件' : 'JSON 文件'),
+      extensions: isJsonl ? [ 'jsonl', 'ndjson' ] : [ 'json' ],
+    });
+    if (!ok) return; // 用户取消保存
+    message.success(tT(isTauri() ? '已保存 {file}' : '已下载 {file}', { file: name }));
   };
 
   let inputRef: HTMLInputElement | null = null;
 
   return (
     <div>
+      <Text strong style={ { fontSize: 12 } }>{ t('输入 (JSON 数组 / JSONL)') }</Text>
       <TextArea
         style={ { margin: '5px 0 5px 0' } }
         onDoubleClick={ textareaDoubleClick }
@@ -173,7 +193,7 @@ const JSONLConvert: React.FC = () => {
           icon={ <CopyOutlined /> }
         >{ t('复制结果') }</Button>
         <Button
-          onClick={ download }
+          onClick={ () => { void download(); } }
           style={ { backgroundColor: '#6c757d', color: '#fff' } }
           disabled={ out === '' }
           icon={ <DownloadOutlined /> }
@@ -214,6 +234,7 @@ const JSONLConvert: React.FC = () => {
         >{ t('忽略空行 (JSONL 输入)') }</Checkbox>
       </Space>
 
+      <Text strong style={ { fontSize: 12 } }>{ t('转换结果 (可直接编辑)') }</Text>
       <TextArea
         style={ { margin: '5px 0 5px 0' } }
         onDoubleClick={ textareaDoubleClick }
