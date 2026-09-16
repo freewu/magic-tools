@@ -172,12 +172,16 @@ const JSONLConvert: React.FC = () => {
     const base = (fileName === '' ? 'data' : fileName.replace(/\.[^/.]+$/u, '')) || 'data';
     const name = `${base}.${side}`;
     const isJsonl = side === 'jsonl';
-    const ok = await saveTextFile(name, result, t(isJsonl ? '保存 JSONL 文件' : '保存 JSON 文件'), {
-      filterName: t(isJsonl ? 'JSONL 文件' : 'JSON 文件'),
-      extensions: isJsonl ? [ 'jsonl', 'ndjson' ] : [ 'json' ],
-    });
-    if (!ok) return; // 用户取消保存
-    message.success(tT(isTauri() ? '已保存 {file}' : '已下载 {file}', { file: name }));
+    try {
+      const ok = await saveTextFile(name, result, t(isJsonl ? '保存 JSONL 文件' : '保存 JSON 文件'), {
+        filterName: t(isJsonl ? 'JSONL 文件' : 'JSON 文件'),
+        extensions: isJsonl ? [ 'jsonl', 'ndjson' ] : [ 'json' ],
+      });
+      if (!ok) return; // 用户取消保存
+      message.success(tT(isTauri() ? '已保存 {file}' : '已下载 {file}', { file: name }));
+    } catch (e) {
+      message.error(tT('保存失败: {msg}', { msg: e instanceof Error ? e.message : String(e) }));
+    }
   };
 
   let inputRef: HTMLInputElement | null = null;

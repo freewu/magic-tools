@@ -29,6 +29,7 @@ const jcRows: Record<string, [string, string]> = {
   '输入框为空, 已改用下方结果框的内容': ['輸入框為空, 已改用下方結果框的內容', 'The input box was empty — using the result box below instead'],
   '检测到输入是 {kind}, 已自动按「{dir}」转换': ['偵測到輸入是 {kind}, 已自動依「{dir}」轉換', 'Input detected as {kind} — converted with "{dir}" instead'],
   'JSON 数组': ['JSON 陣列', 'a JSON array'],
+  '保存失败: {msg}': ['儲存失敗: {msg}', 'Save failed: {msg}'],
   '已保存 {file}': ['已儲存 {file}', 'Saved {file}'],
   '保存 JSONL 文件': ['儲存 JSONL 檔案', 'Save JSONL file'],
   '保存 JSON 文件': ['儲存 JSON 檔案', 'Save JSON file'],

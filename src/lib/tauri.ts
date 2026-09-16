@@ -87,7 +87,6 @@ export async function saveTextFile(defaultName: string, content: string, title =
   if (isTauri()) {
     try {
       const { save } = await import('@tauri-apps/plugin-dialog');
-      const { writeTextFile } = await import('@tauri-apps/plugin-fs');
       const path = await save({
         title,
         defaultPath: defaultName,
@@ -98,10 +97,19 @@ export async function saveTextFile(defaultName: string, content: string, title =
         }],
       });
       if (path === null) return false;
-      await writeTextFile(path, content);
+      const fs = await import('@tauri-apps/plugin-fs');
+      try {
+        // writeTextFile 走 plugin:fs|write_text_file (需要 fs:allow-write-text-file 权限)
+        await fs.writeTextFile(path, content);
+      } catch (err) {
+        // 权限缺失等情况下退回 writeFile (字节写入, 由 fs:allow-write-file 授权), 保证一定能落盘
+        console.warn('writeTextFile failed, retry with writeFile:', err);
+        await fs.writeFile(path, new TextEncoder().encode(content));
+      }
       return true;
     } catch (err) {
       console.error('tauri saveTextFile failed:', err);
+      throw err; // 不再静默回退浏览器下载: 桌面端回退会让人以为「保存了但没有文件」
     }
   }
   // 浏览器回退

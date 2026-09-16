@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "默认能力: 主窗口可以使用 core + opener 插件权限",
+  "description": "默认能力: 主窗口可以使用 core + opener 插件权限; fs:allow-write-file 授 write_file/open/write, fs:allow-write-text-file 授 write_text_file (writeTextFile 走的是后者, 缺了会导致保存文本静默失败)",
   "windows": ["main"],
   "permissions": [
     "core:default",
@@ -10,6 +10,17 @@
     "dialog:allow-open",
     {
       "identifier": "fs:allow-write-file",
+      "allow": [
+        { "path": "**" },
+        { "path": "$HOME/**" },
+        { "path": "$DOWNLOAD/**" },
+        { "path": "$DESKTOP/**" },
+        { "path": "$DOCUMENT/**" },
+        { "path": "$PICTURE/**" }
+      ]
+    },
+    {
+      "identifier": "fs:allow-write-text-file",
       "allow": [
         { "path": "**" },
         { "path": "$HOME/**" },
