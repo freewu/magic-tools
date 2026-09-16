@@ -1,8 +1,8 @@
 // ImageResize 语言包: 名称 (zh-CN = define.tsx AppName 默认; 缺省回退 zh-CN)
 export default {
   default: 'zh-CN',
-  'zh-TW': { appName: '圖片尺寸調整' },
-  en: { appName: 'Image Resizer' },
+  'zh-TW': { appName: '圖片調整' },
+  en: { appName: 'Image Adjuster' },
 } as const;
 
 // 界面文案词条 (zh 短语即 key; 缺 zh-CN 时回退原文)
@@ -35,25 +35,29 @@ const irRows: Record<string, [string, string]> = {
   '结果体积': ['結果體積', 'Result size on disk'],
   '{a} × {b} px': ['{a} × {b} px', '{a} × {b} px'],
 
-  // 尺寸参数
-  '尺寸参数': ['尺寸參數', 'Size settings'],
+  // 尺寸 / 旋转参数
+  '调整参数': ['調整參數', 'Adjust settings'],
   '尺寸模式': ['尺寸模式', 'Size mode'],
   '按比例': ['依比例', 'By percentage'],
   '按像素': ['依像素', 'By pixels'],
   '宽度': ['寬度', 'Width'],
   '高度': ['高度', 'Height'],
   '用原图尺寸': ['用原圖尺寸', 'Use original size'],
+  '旋转角度': ['旋轉角度', 'Rotation'],
+  '顺时针旋转; 90° / 270° 会交换宽高': ['順時針旋轉; 90° / 270° 會交換寬高', 'Rotates clockwise; 90° / 270° swap width and height'],
   '锁定宽高比': ['鎖定長寬比', 'Lock aspect ratio'],
   '按像素模式下生效: 修改宽度或高度时自动换算另一边': ['依像素模式下生效: 修改寬度或高度時自動換算另一邊', 'Applies in pixel mode: editing one side recalculates the other'],
   '不放大图片 (仅缩小)': ['不放大圖片 (僅縮小)', 'Never enlarge (shrink only)'],
   '输出格式': ['輸出格式', 'Output format'],
-  'JPEG 质量': ['JPEG 品質', 'JPEG quality'],
-  'JPEG 体积更小, 适合照片; PNG 无损且保留透明': ['JPEG 體積較小, 適合照片; PNG 無損且保留透明', 'JPEG is smaller and better for photos; PNG is lossless and keeps transparency'],
+  '输出质量': ['輸出品質', 'Output quality'],
+  '仅 JPEG / WebP 输出时生效': ['僅 JPEG / WebP 輸出時生效', 'Applies to JPEG / WebP output only'],
+  '当前环境不支持 WebP 导出': ['目前環境不支援 WebP 匯出', 'WebP export is not supported in this environment'],
+  'PNG 无损且保留透明; JPEG / WebP 体积更小, 质量可调': ['PNG 無損且保留透明; JPEG / WebP 體積較小, 品質可調', 'PNG is lossless and keeps transparency; JPEG / WebP are smaller with adjustable quality'],
   '缩小超过一半时会分多步绘制, 避免出现锯齿': ['縮小超過一半時會分多步繪製, 避免出現鋸齒', 'Large reductions are drawn in several steps to avoid aliasing'],
   '「不放大」开启时结果不会超过原图尺寸': ['「不放大」開啟時結果不會超過原圖尺寸', 'With "Never enlarge" on, the result never exceeds the original size'],
 
   // 说明
-  '图片尺寸调整说明': ['圖片尺寸調整說明', 'About resizing'],
+  '图片调整说明': ['圖片調整說明', 'About image adjustment'],
 };
 
 // 取词: 无命中回退 zh 原文

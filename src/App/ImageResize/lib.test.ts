@@ -1,13 +1,13 @@
 import {
   KEY_FORMAT, KEY_LOCK, KEY_PERCENT, KEY_QUALITY,
   baseName, clampPixel, computeSize, dataUrlToBytes, extOf, fitWithin, formatBytes, formatScale, getDefaultFormat,
-  getDefaultPercent, getDefaultQuality, getLockRatio, mimeOf, normalizeFormat, normalizeMode,
-  normalizePercent, normalizeQuality, outputFileName, scaleFactor, scaleSteps, setDefaultFormat,
-  setDefaultPercent, setDefaultQuality, setLockRatio, sizeFromHeight, sizeFromPercent, sizeFromWidth,
+  getDefaultPercent, getDefaultQuality, getLockRatio, isLossy, isQuarterTurn, mimeOf, normalizeFormat, normalizeMode,
+  normalizePercent, normalizeQuality, normalizeRotation, outputFileName, rotatedSize, scaleFactor, scaleSteps,
+  setDefaultFormat, setDefaultPercent, setDefaultQuality, setLockRatio, sizeFromHeight, sizeFromPercent, sizeFromWidth,
 } from './lib';
 import { PERCENT_DEFAULT, QUALITY_DEFAULT, SIZE_MIN } from './data';
 
-describe('图片尺寸调整', () => {
+describe('图片调整', () => {
   describe('数值归一化', () => {
     it('比例裁剪到 1-400 并取整', () => {
       expect(normalizePercent(50)).toBe(50);
@@ -31,13 +31,43 @@ describe('图片尺寸调整', () => {
 
     it('格式 / 模式 / 质量回退', () => {
       expect(normalizeFormat('png')).toBe('PNG');
-      expect(normalizeFormat('webp')).toBe('PNG');
+      expect(normalizeFormat('webp')).toBe('WebP');
+      expect(normalizeFormat('WebP')).toBe('WebP');
+      expect(normalizeFormat('jpeg')).toBe('JPEG');
       expect(normalizeFormat('JPEG')).toBe('JPEG');
       expect(normalizeMode('pixel')).toBe('pixel');
       expect(normalizeMode('other')).toBe('percent');
       expect(normalizeQuality(2)).toBe(1);
       expect(normalizeQuality(0.1)).toBe(0.5);
       expect(normalizeQuality('-')).toBe(QUALITY_DEFAULT);
+    });
+
+    it('旋转角度归一到 0 / 90 / 180 / 270', () => {
+      expect(normalizeRotation(0)).toBe(0);
+      expect(normalizeRotation(90)).toBe(90);
+      expect(normalizeRotation(180)).toBe(180);
+      expect(normalizeRotation(270)).toBe(270);
+      expect(normalizeRotation(360)).toBe(0);
+      expect(normalizeRotation(-90)).toBe(270);
+      expect(normalizeRotation('90')).toBe(90);
+      expect(normalizeRotation(45)).toBe(90);
+      expect(normalizeRotation(null)).toBe(0);
+      expect(normalizeRotation('abc')).toBe(0);
+    });
+
+    it('旋转后的尺寸与有损格式判定', () => {
+      const size = { width: 1920, height: 1080 };
+      expect(isQuarterTurn(0)).toBe(false);
+      expect(isQuarterTurn(90)).toBe(true);
+      expect(isQuarterTurn(180)).toBe(false);
+      expect(isQuarterTurn(270)).toBe(true);
+      expect(rotatedSize(size, 0)).toEqual(size);
+      expect(rotatedSize(size, 180)).toEqual(size);
+      expect(rotatedSize(size, 90)).toEqual({ width: 1080, height: 1920 });
+      expect(rotatedSize(size, 270)).toEqual({ width: 1080, height: 1920 });
+      expect(isLossy('PNG')).toBe(false);
+      expect(isLossy('JPEG')).toBe(true);
+      expect(isLossy('WebP')).toBe(true);
     });
   });
 
@@ -131,14 +161,17 @@ describe('图片尺寸调整', () => {
     it('outputFileName 带尺寸后缀', () => {
       expect(outputFileName('photo', { width: 800, height: 600 }, 'PNG')).toBe('photo_800x600.png');
       expect(outputFileName('photo', { width: 800, height: 600 }, 'JPEG')).toBe('photo_800x600.jpg');
+      expect(outputFileName('photo', { width: 800, height: 600 }, 'WebP')).toBe('photo_800x600.webp');
       expect(outputFileName('', { width: 1, height: 1 }, 'PNG')).toBe('image_1x1.png');
     });
 
     it('扩展名 / MIME', () => {
       expect(extOf('PNG')).toBe('png');
       expect(extOf('JPEG')).toBe('jpg');
+      expect(extOf('WebP')).toBe('webp');
       expect(mimeOf('PNG')).toBe('image/png');
       expect(mimeOf('JPEG')).toBe('image/jpeg');
+      expect(mimeOf('WebP')).toBe('image/webp');
     });
 
     it('formatBytes', () => {
@@ -165,17 +198,17 @@ describe('图片尺寸调整', () => {
       expect(getLockRatio()).toBe(true);
 
       setDefaultPercent(75);
-      setDefaultFormat('JPEG');
+      setDefaultFormat('WebP');
       setDefaultQuality(0.8);
       setLockRatio(false);
 
       expect(localStorage.getItem(KEY_PERCENT)).toBe('75');
-      expect(localStorage.getItem(KEY_FORMAT)).toBe('JPEG');
+      expect(localStorage.getItem(KEY_FORMAT)).toBe('WebP');
       expect(localStorage.getItem(KEY_QUALITY)).toBe('0.8');
       expect(localStorage.getItem(KEY_LOCK)).toBe('0');
 
       expect(getDefaultPercent()).toBe(75);
-      expect(getDefaultFormat()).toBe('JPEG');
+      expect(getDefaultFormat()).toBe('WebP');
       expect(getDefaultQuality()).toBe(0.8);
       expect(getLockRatio()).toBe(false);
     });

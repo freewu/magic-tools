@@ -3,12 +3,12 @@ import { useState } from 'react';
 import { PERCENT_DEFAULT, PERCENT_MAX, PERCENT_MIN, QUALITY_DEFAULT, QUALITY_MAX, QUALITY_MIN } from './data';
 import {
   OUTPUT_FORMATS, getDefaultFormat, getDefaultPercent, getDefaultQuality, getLockRatio,
-  setDefaultFormat, setDefaultPercent, setDefaultQuality, setLockRatio, type OutputFormat,
+  setDefaultFormat, setDefaultPercent, setDefaultQuality, setLockRatio, supportsWebp, type OutputFormat,
 } from './lib';
 import { useLocale } from '../../hook/locale-context';
 import { row as _r, rowT } from '../Setting/rows-lang';
 
-/** 图片尺寸调整默认设置 (挂载到 设置 → 图片) */
+/** 图片调整默认设置 (挂载到 设置 → 图片) */
 export const ImageResizeSetting: React.FC = () => {
   const { locale } = useLocale();
   const st = (zh: string) => _r(locale, zh);
@@ -19,10 +19,10 @@ export const ImageResizeSetting: React.FC = () => {
 
   return (
     <>
-      <Divider orientation="left" plain>{ st('图片尺寸调整') }</Divider>
+      <Divider orientation="left" plain>{ st('图片调整') }</Divider>
       <Form.Item
         label={ st('默认缩放比例') }
-        extra={ rowT(locale, '按比例模式打开「图片尺寸调整」时默认的缩放比例, 默认 ${d}%', { d: PERCENT_DEFAULT }) }
+        extra={ rowT(locale, '按比例模式打开「图片调整」时默认的缩放比例, 默认 ${d}%', { d: PERCENT_DEFAULT }) }
       >
         <Slider
           style={ { width: 280 } }
@@ -35,18 +35,18 @@ export const ImageResizeSetting: React.FC = () => {
       </Form.Item>
       <Form.Item
         label={ st('默认输出格式') }
-        extra={ rowT(locale, '打开「图片尺寸调整」工具时默认的输出格式, 默认 ${d}', { d: 'PNG' }) }
+        extra={ rowT(locale, '打开「图片调整」工具时默认的输出格式, 默认 ${d}', { d: 'PNG' }) }
       >
         <Select
           style={ { width: 280 } }
           value={ format }
           onChange={ (v: OutputFormat) => { setFormat(v); setDefaultFormat(v); } }
-          options={ OUTPUT_FORMATS.map((v) => ({ value: v, label: v })) }
+          options={ OUTPUT_FORMATS.map((v) => ({ value: v, label: v, disabled: v === 'WebP' && !supportsWebp() })) }
         />
       </Form.Item>
       <Form.Item
-        label={ st('默认 JPEG 质量') }
-        extra={ rowT(locale, '仅输出 JPEG 时生效, 默认 ${d}', { d: QUALITY_DEFAULT }) }
+        label={ st('默认输出质量') }
+        extra={ rowT(locale, '仅 JPEG / WebP 输出时生效, 默认 ${d}', { d: QUALITY_DEFAULT }) }
       >
         <Slider
           style={ { width: 280 } }

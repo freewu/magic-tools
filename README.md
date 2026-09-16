@@ -43,7 +43,7 @@ Unix timestamp · Color format · Radix (BIN/OCT/DEC/HEX) · Tree ↔ path · GP
 Markdown editor (live preview + LaTeX subset) · JSON · JSON5 · SQL · XML · HTML · SVG · CN/EN typography spacing
 
 ### 🖼️ Image Generators *(12)*
-QR code · Barcode (CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · Base64 image · ASCII image · Code screenshot · ICO icon · App icon · Dominant-color palette (merge similar colors + share) · Image split (2/3/4/6/9) · Image resize (percent / pixels, PNG·JPEG) · Placeholder image · Shield badge (PNG export ×1–10)
+QR code · Barcode (CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · Base64 image · ASCII image · Code screenshot · ICO icon · App icon · Dominant-color palette (merge similar colors + share) · Image split (2/3/4/6/9) · Image adjust (resize percent / pixels, rotate 90°·180°·270°, PNG·JPEG·WebP) · Placeholder image · Shield badge (PNG export ×1–10)
 
 ### 🌐 Webmaster Tools *(9)*
 HTML stripper · Browser fingerprint · URL extractor · Cookie analyzer · User-Agent parser · Sitemap checker · Keyword density · TDK checker · robots.txt generator

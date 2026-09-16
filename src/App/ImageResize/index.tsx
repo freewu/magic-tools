@@ -1,4 +1,4 @@
-// 图片尺寸调整: 按比例或按像素缩放图片, 支持锁定宽高比 / 不放大 / PNG·JPEG 输出
+// 图片调整: 按比例或按像素缩放 + 顺时针旋转 (90/180/270 度), 支持锁定宽高比 / 不放大 / PNG·JPEG·WebP 输出
 import { Alert, Button, Divider, InputNumber, Radio, Segmented, Slider, Space, Switch, Tag, Typography, Upload, message, theme } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { DownloadOutlined, UploadOutlined } from '@ant-design/icons';
@@ -9,10 +9,10 @@ import {
   CANVAS_MAX, PERCENT_MAX, PERCENT_MIN, PERCENT_PRESETS, QUALITY_DEFAULT, QUALITY_MAX, QUALITY_MIN, SIZE_MAX, SIZE_MIN,
 } from './data';
 import {
-  OUTPUT_FORMATS, SIZE_MODES, baseName, computeSize, dataUrlToBytes, formatBytes, formatScale,
-  getDefaultFormat, getDefaultPercent, getDefaultQuality, getLockRatio, outputFileName, scaleSteps,
-  setLockRatio, sizeFromHeight, sizeFromWidth,
-  type OutputFormat, type Size, type SizeMode,
+  OUTPUT_FORMATS, ROTATIONS, SIZE_MODES, baseName, computeSize, dataUrlToBytes, formatBytes, formatScale,
+  getDefaultFormat, getDefaultPercent, getDefaultQuality, getLockRatio, isLossy, mimeOf, outputFileName, rotatedSize,
+  scaleSteps, setLockRatio, sizeFromHeight, sizeFromWidth, supportsWebp,
+  type OutputFormat, type Rotation, type Size, type SizeMode,
 } from './lib';
 import ImageResizeIntro from './intro';
 
@@ -40,12 +40,20 @@ const ImageResize = () => {
   const [ height, setHeight ] = useState(0); // 目标高度 (按像素)
   const [ lock, setLock ] = useState<boolean>(() => getLockRatio()); // 锁定宽高比
   const [ noUpscale, setNoUpscale ] = useState(true); // 不放大 (仅缩小)
-  const [ format, setFormat ] = useState<OutputFormat>(() => getDefaultFormat()); // 输出格式
-  const [ quality, setQuality ] = useState<number>(() => getDefaultQuality()); // JPEG 质量
+  const [ rotation, setRotation ] = useState<Rotation>(0); // 顺时针旋转角度
+  const [ format, setFormat ] = useState<OutputFormat>(() => {
+    const f = getDefaultFormat();
+    // 环境不支持 WebP 导出时回退 PNG, 避免导出结果名不副实
+    return f === 'WebP' && !supportsWebp() ? 'PNG' : f;
+  }); // 输出格式
+  const [ quality, setQuality ] = useState<number>(() => getDefaultQuality()); // JPEG / WebP 质量
   const [ result, setResult ] = useState<ResizeResult | null>(null);
   const [ busy, setBusy ] = useState(false); // 处理中
   const [ saving, setSaving ] = useState(false); // 保存中
   const [ err, setErr ] = useState('');
+
+  // 旋转 90 / 270 度时宽高互换: 尺寸计算 / 锁定宽高比 / 不放大 都以旋转后的原图为准
+  const frameSize = rotatedSize(orig, rotation);
 
   /** 读取文件 -> 解码图片 (同时记下文件名与原始字节数) */
   const onFile = (file: File) => {
@@ -76,7 +84,7 @@ const ImageResize = () => {
   /** 切换尺寸模式: 进入按像素时用当前结果尺寸回填, 避免数值跳变 */
   const onModeChange = (v: SizeMode) => {
     if (v === 'pixel' && src !== '') {
-      const cur = computeSize(orig, { mode, percent, width, height, noUpscale });
+      const cur = computeSize(frameSize, { mode, percent, width, height, noUpscale });
       setWidth(cur.width);
       setHeight(cur.height);
     }
@@ -86,32 +94,41 @@ const ImageResize = () => {
   const onWidthChange = (v: number | null) => {
     const w = Number(v ?? SIZE_MIN);
     setWidth(w);
-    if (lock) setHeight(sizeFromWidth(w, orig).height);
+    if (lock) setHeight(sizeFromWidth(w, frameSize).height);
   };
 
   const onHeightChange = (v: number | null) => {
     const h = Number(v ?? SIZE_MIN);
     setHeight(h);
-    if (lock) setWidth(sizeFromHeight(h, orig).width);
+    if (lock) setWidth(sizeFromHeight(h, frameSize).width);
   };
 
   const onLockChange = (v: boolean) => {
     setLock(v);
     setLockRatio(v);
-    if (v) setHeight(sizeFromWidth(width, orig).height);
+    if (v) setHeight(sizeFromWidth(width, frameSize).height);
   };
 
-  /** 用原图尺寸回填宽高 */
+  /** 切换旋转角度: 宽高按旋转后的原图回填, 保证「不放大」与锁定宽高比判断的是最终方向 */
+  const onRotationChange = (v: Rotation) => {
+    const pre = rotatedSize(orig, rotation);
+    const next = rotatedSize(orig, v);
+    if (width === pre.width && height === pre.height) { setWidth(next.width); setHeight(next.height); }
+    else if (lock) setHeight(sizeFromWidth(width, next).height);
+    setRotation(v);
+  };
+
+  /** 用（旋转后的）原图尺寸回填宽高 */
   const onUseOriginal = () => {
-    setWidth(orig.width);
-    setHeight(orig.height);
+    setWidth(frameSize.width);
+    setHeight(frameSize.height);
   };
 
-  /** 缩放: 逐级绘制 (大比例缩小时画质更好) -> dataURL */
+  /** 缩放 + 旋转: 逐级绘制 (大比例缩小时画质更好) -> dataURL */
   const resize = () => {
     const img = imgRef.current;
     if (!img) return;
-    const t0 = computeSize(orig, { mode, percent, width, height, noUpscale });
+    const t0 = computeSize(frameSize, { mode, percent, width, height, noUpscale });
     if (t0.width < 1 || t0.height < 1) {
       setResult(null);
       setErr(t('目标尺寸无效'));
@@ -122,16 +139,18 @@ const ImageResize = () => {
       setErr(tT('目标尺寸过大, 单边不能超过 {n} px', { n: CANVAS_MAX }));
       return;
     }
+    // 目标尺寸是旋转后的尺寸, 绘制时先按未旋转的尺寸逐级缩放, 最后再整体旋转
+    const draw = rotatedSize(t0, rotation);
     // 原图 -> 逐级中间尺寸 -> 目标尺寸
     let source: HTMLImageElement | HTMLCanvasElement = img;
-    for (const step of scaleSteps(img.naturalWidth, img.naturalHeight, t0.width, t0.height)) {
+    for (const step of scaleSteps(img.naturalWidth, img.naturalHeight, draw.width, draw.height)) {
       const canvas = document.createElement('canvas');
       canvas.width = step.width;
       canvas.height = step.height;
       const ctx = canvas.getContext('2d');
       if (!ctx) { setResult(null); setErr(t('当前环境不支持 Canvas, 无法调整尺寸')); return; }
-      // JPEG 无透明通道, 先铺白底避免透明区域变黑
-      if (format === 'JPEG') {
+      // JPEG / WebP 无透明通道, 先铺白底避免透明区域变黑
+      if (isLossy(format)) {
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, step.width, step.height);
       }
@@ -140,9 +159,24 @@ const ImageResize = () => {
       ctx.drawImage(source, 0, 0, step.width, step.height);
       source = canvas;
     }
-    const url = format === 'JPEG'
-      ? (source as HTMLCanvasElement).toDataURL('image/jpeg', quality)
-      : (source as HTMLCanvasElement).toDataURL('image/png');
+    // 旋转 (只对最终尺寸的小画布做一次)
+    if (rotation !== 0) {
+      const rotated = document.createElement('canvas');
+      rotated.width = t0.width;
+      rotated.height = t0.height;
+      const rctx = rotated.getContext('2d');
+      if (!rctx) { setResult(null); setErr(t('当前环境不支持 Canvas, 无法调整尺寸')); return; }
+      if (isLossy(format)) {
+        rctx.fillStyle = '#ffffff';
+        rctx.fillRect(0, 0, t0.width, t0.height);
+      }
+      rctx.translate(t0.width / 2, t0.height / 2);
+      rctx.rotate(rotation * Math.PI / 180);
+      rctx.drawImage(source, -draw.width / 2, -draw.height / 2);
+      source = rotated;
+    }
+    const out = source as HTMLCanvasElement;
+    const url = isLossy(format) ? out.toDataURL(mimeOf(format), quality) : out.toDataURL(mimeOf(format));
     setResult({
       url,
       // base64 长度 -> 大致字节数 (4 字符表示 3 字节)
@@ -168,7 +202,7 @@ const ImageResize = () => {
       }
     }, 0);
     return () => window.clearTimeout(timer);
-  }, [ src, orig, mode, percent, width, height, noUpscale, format, quality ]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [ src, orig, mode, percent, width, height, noUpscale, rotation, format, quality ]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onClear = () => {
     imgRef.current = null;
@@ -181,7 +215,7 @@ const ImageResize = () => {
     setErr('');
   };
 
-  /** 保存结果 (PNG 走图片保存, JPEG 走字节保存) */
+  /** 保存结果 (PNG 走图片保存, JPEG / WebP 走字节保存) */
   const onSave = async () => {
     if (!result || saving) return;
     setSaving(true);
@@ -191,8 +225,8 @@ const ImageResize = () => {
         ? await savePngFile(name, result.url)
         : await saveBytesFile(name, dataUrlToBytes(result.url), {
           title: t('保存'),
-          filterName: 'JPEG',
-          extensions: [ 'jpg', 'jpeg' ],
+          filterName: format === 'WebP' ? 'WebP' : 'JPEG',
+          extensions: format === 'WebP' ? [ 'webp' ] : [ 'jpg', 'jpeg' ],
         });
       if (ok) message.success(tT('已保存 {n}', { n: name }));
       else message.info(t('已取消保存'));
@@ -302,15 +336,15 @@ const ImageResize = () => {
           <div style={ { display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start', maxWidth: 420 } }>
             { statTag(t('原图尺寸'), fmtSize(orig)) }
             { statTag(t('结果尺寸'), result ? fmtSize({ width: result.width, height: result.height }) : '—') }
-            { statTag(t('缩放比例'), result ? formatScale(orig, { width: result.width, height: result.height }) : '—') }
+            { statTag(t('缩放比例'), result ? formatScale(frameSize, { width: result.width, height: result.height }) : '—') }
             { statTag(t('原图体积'), fileBytes > 0 ? formatBytes(fileBytes) : '—') }
             { statTag(t('结果体积'), result ? formatBytes(result.bytes) : '—') }
-            { statTag(t('输出格式'), format === 'JPEG' ? `JPEG · ${quality}` : 'PNG') }
+            { statTag(t('输出格式'), isLossy(format) ? `${format} · ${quality}` : 'PNG') }
           </div>
         </div>
       ) }
 
-      <Divider style={ { margin: '12px 0' } }>{ t('尺寸参数') }</Divider>
+      <Divider style={ { margin: '12px 0' } }>{ t('调整参数') }</Divider>
 
       {/* 参数 */}
       <div style={ { display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 900 } }>
@@ -375,6 +409,17 @@ const ImageResize = () => {
         ) }
 
         <div style={ { display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' } }>
+          <Text style={ { width: 96, flex: '0 0 auto' } }>{ t('旋转角度') }</Text>
+          <Segmented
+            value={ rotation }
+            onChange={ (v) => onRotationChange(v as Rotation) }
+            options={ ROTATIONS.map((r) => ({ value: r, label: `${r}°` })) }
+            disabled={ !src }
+          />
+          <Text type="secondary" style={ { fontSize: 12 } }>{ t('顺时针旋转; 90° / 270° 会交换宽高') }</Text>
+        </div>
+
+        <div style={ { display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' } }>
           <Text style={ { width: 96, flex: '0 0 auto' } }>{ t('锁定宽高比') }</Text>
           <Switch checked={ lock } onChange={ onLockChange } disabled={ mode === 'percent' } />
           <Text type="secondary" style={ { fontSize: 12 } }>{ t('按像素模式下生效: 修改宽度或高度时自动换算另一边') }</Text>
@@ -391,20 +436,27 @@ const ImageResize = () => {
           <Segmented
             value={ format }
             onChange={ (v) => setFormat(v as OutputFormat) }
-            options={ OUTPUT_FORMATS.map((v) => ({ value: v, label: v })) }
+            options={ OUTPUT_FORMATS.map((v) => ({
+              value: v,
+              label: v,
+              disabled: v === 'WebP' && !supportsWebp(),
+            })) }
           />
-          <Text type="secondary" style={ { fontSize: 12 } }>{ t('JPEG 体积更小, 适合照片; PNG 无损且保留透明') }</Text>
+          <Text type="secondary" style={ { fontSize: 12 } }>{ t('PNG 无损且保留透明; JPEG / WebP 体积更小, 质量可调') }</Text>
+          { supportsWebp()
+            ? null
+            : <Text type="secondary" style={ { fontSize: 12 } }>{ t('当前环境不支持 WebP 导出') }</Text> }
         </div>
 
         <div style={ { display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' } }>
-          <Text style={ { width: 96, flex: '0 0 auto' } }>{ t('JPEG 质量') }</Text>
+          <Text style={ { width: 96, flex: '0 0 auto' } }>{ t('输出质量') }</Text>
           <Slider
             style={ { flex: 1, minWidth: 180, maxWidth: 320 } }
             min={ QUALITY_MIN }
             max={ QUALITY_MAX }
             step={ 0.01 }
             value={ quality }
-            disabled={ format !== 'JPEG' }
+            disabled={ !isLossy(format) }
             marks={ { [QUALITY_MIN]: String(QUALITY_MIN), [QUALITY_MAX]: String(QUALITY_MAX) } }
             onChange={ setQuality }
           />
@@ -413,15 +465,16 @@ const ImageResize = () => {
             max={ QUALITY_MAX }
             step={ 0.01 }
             value={ quality }
-            disabled={ format !== 'JPEG' }
+            disabled={ !isLossy(format) }
             onChange={ (v) => setQuality(Number(v ?? QUALITY_DEFAULT)) }
           />
+          <Text type="secondary" style={ { fontSize: 12 } }>{ t('仅 JPEG / WebP 输出时生效') }</Text>
         </div>
 
         <Text type="secondary" style={ { fontSize: 12 } }>{ t('缩小超过一半时会分多步绘制, 避免出现锯齿') }</Text>
       </div>
 
-      <Divider>{ t('图片尺寸调整说明') }</Divider>
+      <Divider>{ t('图片调整说明') }</Divider>
       <ImageResizeIntro />
     </>
   );

@@ -1,13 +1,18 @@
-// 图片尺寸调整: 纯逻辑 (目标尺寸计算 / 逐级缩放步骤 / 文件命名 / 设置持久化)
+// 图片调整: 纯逻辑 (目标尺寸计算 / 旋转 / 逐级缩放步骤 / 文件命名 / 设置持久化)
 // 说明: 与 DOM / Canvas 无关, 便于单测; 页面只负责把结果画到 canvas 上
 import {
   DEFAULT_BASE, PERCENT_DEFAULT, PERCENT_MAX, PERCENT_MIN,
-  QUALITY_DEFAULT, QUALITY_MAX, QUALITY_MIN, SIZE_MAX, SIZE_MIN,
+  QUALITY_DEFAULT, QUALITY_MAX, QUALITY_MIN, ROTATION_PRESETS, SIZE_MAX, SIZE_MIN,
 } from './data';
 
-/** 输出格式 */
-export type OutputFormat = 'PNG' | 'JPEG';
-export const OUTPUT_FORMATS: OutputFormat[] = [ 'PNG', 'JPEG' ];
+/** 输出格式 (WebP 需要浏览器支持 canvas 导出, 见 supportsWebp) */
+export type OutputFormat = 'PNG' | 'JPEG' | 'WebP';
+export const OUTPUT_FORMATS: OutputFormat[] = [ 'PNG', 'JPEG', 'WebP' ];
+
+/** 旋转角度 (顺时针, 度): 0 / 90 / 180 / 270 */
+export type Rotation = typeof ROTATION_PRESETS[number];
+export const ROTATIONS: Rotation[] = [ ...ROTATION_PRESETS ];
+export const isRotation = (v: unknown): v is Rotation => ROTATIONS.includes(v as Rotation);
 
 /** 尺寸模式: percent = 按原图比例缩放; pixel = 指定宽高像素 */
 export type SizeMode = 'percent' | 'pixel';
@@ -39,8 +44,29 @@ export const normalizePercent = (v: unknown): number => {
   return Math.min(PERCENT_MAX, Math.max(PERCENT_MIN, Math.round(n)));
 };
 
-/** 非法格式回退 PNG */
-export const normalizeFormat = (v: unknown): OutputFormat => (isOutputFormat(v) ? v : 'PNG');
+/** 非法格式回退 PNG (大小写不敏感, 如 'webp' / 'jpeg') */
+export const normalizeFormat = (v: unknown): OutputFormat => {
+  if (typeof v !== 'string') return 'PNG';
+  const up = v.trim().toUpperCase();
+  return OUTPUT_FORMATS.find((f) => f.toUpperCase() === up) ?? 'PNG';
+};
+/** 角度归一化到 0 / 90 / 180 / 270, 非法值回退 0 */
+export const normalizeRotation = (v: unknown): Rotation => {
+  const n = typeof v === 'number' ? v : typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN;
+  if (!Number.isFinite(n)) return 0;
+  const deg = ((Math.round(n / 90) * 90) % 360 + 360) % 360;
+  return isRotation(deg) ? deg : 0;
+};
+
+/** 是否为 90 / 270 度 (横竖互换) */
+export const isQuarterTurn = (deg: number): boolean => Math.abs(deg % 180) === 90;
+
+/** 尺寸按角度旋转后的结果 (90 / 270 度宽高互换, 0 / 180 度不变) */
+export const rotatedSize = (size: Size, deg: number): Size =>
+  (isQuarterTurn(deg) ? { width: size.height, height: size.width } : size);
+
+/** 输出格式是否为有损编码 (质量参数生效) */
+export const isLossy = (format: OutputFormat): boolean => format !== 'PNG';
 /** 非法模式回退按比例 */
 export const normalizeMode = (v: unknown): SizeMode => (isSizeMode(v) ? v : 'percent');
 
@@ -121,9 +147,30 @@ export const scaleSteps = (origW: number, origH: number, targetW: number, target
 };
 
 /** 输出扩展名 */
-export const extOf = (format: OutputFormat): string => (format === 'JPEG' ? 'jpg' : 'png');
-/** 输出 MIME */
-export const mimeOf = (format: OutputFormat): string => (format === 'JPEG' ? 'image/jpeg' : 'image/png');
+export const extOf = (format: OutputFormat): string =>
+  (format === 'JPEG' ? 'jpg' : format === 'WebP' ? 'webp' : 'png');
+/** 输出 MIME (同时用作 canvas.toDataURL 的 type) */
+export const mimeOf = (format: OutputFormat): string =>
+  (format === 'JPEG' ? 'image/jpeg' : format === 'WebP' ? 'image/webp' : 'image/png');
+
+let webpSupport: boolean | null = null;
+/**
+ * 当前环境是否支持 canvas 导出 WebP (结果做一次缓存)
+ * 不支持的浏览器 toDataURL('image/webp') 会静默返回 PNG, 因此用前缀判断
+ */
+export const supportsWebp = (): boolean => {
+  if (webpSupport !== null) return webpSupport;
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1;
+    canvas.height = 1;
+    const url = canvas.toDataURL('image/webp');
+    webpSupport = typeof url === 'string' && url.startsWith('data:image/webp');
+  } catch {
+    webpSupport = false;
+  }
+  return webpSupport;
+};
 
 /** 去掉扩展名与路径分隔符 / 非法字符, 生成文件名主体 */
 export const baseName = (fileName: string): string => {

@@ -43,7 +43,7 @@ Base64 編解碼 · URL 編解碼 · Unicode 編解碼 · Punycode 編解碼 · 
 Markdown 編輯器 · JSON 格式化 · JSON5 格式化 · SQL 格式化 · XML 格式化 · HTML 格式化 · SVG 格式化 · 中英文自動排版
 
 ### 🖼️ 圖片 *(12)*
-二維碼生成 · 條碼生成 · Base64 圖片 · ASCII 圖片 · 程式碼截圖 · ICO 生成 · App Icon 生成 · 圖片主題色(合併相近色 + 佔比) · 圖片分割(2/3/4/6/9 份) · 圖片尺寸調整(依比例/依像素, PNG·JPEG) · 佔位圖片 · Shield Badge 生成
+二維碼生成 · 條碼生成 · Base64 圖片 · ASCII 圖片 · 程式碼截圖 · ICO 生成 · App Icon 生成 · 圖片主題色(合併相近色 + 佔比) · 圖片分割(2/3/4/6/9 份) · 圖片調整(依比例/依像素縮放 + 旋轉 90°·180°·270°, PNG·JPEG·WebP) · 佔位圖片 · Shield Badge 生成
 
 ### 🌐 站長工具 *(9)*
 HTML 標籤去除 · 瀏覽器指紋 · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 檢查 · 關鍵詞密度 · 網頁TDK 資訊檢測 · robots.txt 生成

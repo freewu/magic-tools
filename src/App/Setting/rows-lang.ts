@@ -246,17 +246,22 @@ const ROWS: Record<string, Row> = {
     'Applies to JPEG output only, default ${d}',
   ],
 
-  // ---- 图片尺寸调整 (Image Resizer) ----
-  '图片尺寸调整': ['圖片尺寸調整', 'Image Resizer'],
+  // ---- 图片调整 (Image Adjuster) ----
+  '图片调整': ['圖片調整', 'Image Adjuster'],
   '默认缩放比例': ['預設縮放比例', 'Default scale'],
   '默认锁定宽高比': ['預設鎖定長寬比', 'Lock aspect ratio by default'],
-  '按比例模式打开「图片尺寸调整」时默认的缩放比例, 默认 ${d}%': [
-    '依比例模式開啟「圖片尺寸調整」時預設的縮放比例, 預設 ${d}%',
-    'Default percentage used when opening the image resizer in percent mode (default ${d}%)',
+  '默认输出质量': ['預設輸出品質', 'Default output quality'],
+  '仅 JPEG / WebP 输出时生效, 默认 ${d}': [
+    '僅 JPEG / WebP 輸出時生效, 預設 ${d}',
+    'Applies to JPEG / WebP output only, default ${d}',
   ],
-  '打开「图片尺寸调整」工具时默认的输出格式, 默认 ${d}': [
-    '開啟「圖片尺寸調整」工具時預設的輸出格式, 預設 ${d}',
-    'Default output format when opening the image resizer (default ${d})',
+  '按比例模式打开「图片调整」时默认的缩放比例, 默认 ${d}%': [
+    '依比例模式開啟「圖片調整」時預設的縮放比例, 預設 ${d}%',
+    'Default percentage used when opening the image adjuster in percent mode (default ${d}%)',
+  ],
+  '打开「图片调整」工具时默认的输出格式, 默认 ${d}': [
+    '開啟「圖片調整」工具時預設的輸出格式, 預設 ${d}',
+    'Default output format when opening the image adjuster (default ${d})',
   ],
   '按像素模式下默认是否锁定宽高比, 默认 ${d}': [
     '依像素模式下預設是否鎖定長寬比, 預設 ${d}',
