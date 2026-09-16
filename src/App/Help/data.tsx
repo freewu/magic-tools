@@ -31,6 +31,39 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-09-16 V2.11.0 Release", "2026-09-16 V2.11.0 Release", "2026-09-16 V2.11.0 Release"),
+    items: trio(
+      [
+        "新增「JSONL 转换」工具 (类型转换): JSON 数组 ↔ JSONL 互转 —— 上方 JSON 框 / 下方 JSONL 框两个框都既可输入也可输出, 结果写进目标格式的框 (源内容保留); 支持 2 空格 / 4 空格 / Tab 缩进、忽略空行、拖拽或选择文件载入、双击复制、载入示例",
+        "「JSONL 转换」: 点错按钮或把内容放进另一个框时会自动按正确方向转换并给出提示; 「下载」改为弹出系统保存对话框 (可选目录与文件名, 扩展名随结果框为 .jsonl / .json)",
+        "「数据生成」新增 .jsonl 输出格式 (每行一条紧凑 JSON, 便于导入大数据平台)",
+        "「图片尺寸调整」更名为「图片调整」, 并新增 90° / 180° / 270° 旋转与 WebP 输出格式 (WebP 可选输出质量, 浏览器不支持时该选项自动禁用)",
+        "修复所有「保存 / 导出文本」类工具在桌面版保存对话框选好路径后却没有生成文件的问题 (capabilities 缺少 fs:allow-write-text-file, 写入被拒后又静默回退为浏览器下载); 现在补齐权限并增加字节写入兜底, 真失败会明确报错 —— 影响配置转换、数据生成、JSON / JSON5 / SQL 格式化、RSA / SM2 密钥导出、robots.txt、htpasswd、点阵字库、图像取色、WebSocket 调试等",
+        "修复「Markdown 编辑器」深色模式下预览区标题 (h1 - h6) 与正文几乎看不清的问题",
+        "just release 现在会输出开始时间 / 结束时间 / 耗时",
+      ],
+      [
+        "新增「JSONL 轉換」工具 (類型轉換): JSON 陣列 ↔ JSONL 互轉 —— 上方 JSON 框 / 下方 JSONL 框兩個框都既可輸入也可輸出, 結果寫進目標格式的框 (來源內容保留); 支援 2 空格 / 4 空格 / Tab 縮排、忽略空行、拖曳或選擇檔案載入、雙擊複製、載入範例",
+        "「JSONL 轉換」: 點錯按鈕或把內容放進另一個框時會自動依正確方向轉換並給出提示; 「下載」改為彈出系統儲存對話框 (可選目錄與檔名, 副檔名依結果框為 .jsonl / .json)",
+        "「資料產生」新增 .jsonl 輸出格式 (每列一筆緊湊 JSON, 便於匯入大資料平台)",
+        "「圖片尺寸調整」更名為「圖片調整」, 並新增 90° / 180° / 270° 旋轉與 WebP 輸出格式 (WebP 可選輸出品質, 瀏覽器不支援時該選項自動停用)",
+        "修正所有「儲存 / 匯出文字」類工具在桌面版儲存對話框選好路徑後卻沒有產生檔案的問題 (capabilities 缺少 fs:allow-write-text-file, 寫入被拒後又靜默退回瀏覽器下載); 現在補齊權限並增加位元組寫入備援, 真失敗會明確報錯 —— 影響設定轉換、資料產生、JSON / JSON5 / SQL 格式化、RSA / SM2 金鑰匯出、robots.txt、htpasswd、點陣字庫、影像取色、WebSocket 偵錯等",
+        "修正「Markdown 編輯器」深色模式下預覽區標題 (h1 - h6) 與正文幾乎看不清的問題",
+        "just release 現在會輸出開始時間 / 結束時間 / 耗時",
+      ],
+      [
+        "New “JSONL Converter” tool (Converters): convert a JSON array ↔ JSONL — the top JSON box and the bottom JSONL box both accept input and show output, the result is written into the box matching its format and the source is kept. Supports 2-space / 4-space / Tab indent, skipping blank lines, drag & drop or file picking, double-click copy and a sample",
+        "JSONL Converter: clicking the wrong button — or putting the content into the other box — now converts the correct way automatically and tells you; “Download” opens the system save dialog (pick folder and file name, the extension follows the result box: .jsonl / .json)",
+        "Mock Data Generator: new .jsonl output format (one compact JSON per line, ready for big-data platforms)",
+        "“Image Resize” renamed to “Image Adjust” with new 90° / 180° / 270° rotation and WebP output (optional quality; the option is disabled automatically when the browser cannot encode WebP)",
+        "Fixed every “save / export text” tool producing no file on desktop after picking a path in the save dialog (the capabilities were missing fs:allow-write-text-file, so the write was rejected and then silently fell back to a browser download). A byte-level writeFile fallback was added and real failures now report an error — affects Config Converter, Mock Data, JSON / JSON5 / SQL Formatter, RSA / SM2 key export, robots.txt, htpasswd, Dot Matrix Font, Image Color and WebSocket Debug",
+        "Fixed Markdown Editor preview headings (h1 - h6) and body text being almost unreadable in dark mode",
+        "just release now prints start time / end time / elapsed time",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-09-15 V2.10.1 Release", "2026-09-15 V2.10.1 Release", "2026-09-15 V2.10.1 Release"),
     items: trio(
       [
