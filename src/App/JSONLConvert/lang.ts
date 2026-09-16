@@ -8,10 +8,8 @@ export default {
 // 界面文案词条 (zh 短语即 key; 缺 zh-CN 时回退原文)
 const jcRows: Record<string, [string, string]> = {
   // 输入 / 输出
-  '输入 (JSON 数组 / JSONL)': ['輸入 (JSON 陣列 / JSONL)', 'Input (JSON array / JSONL)'],
-  '转换结果 (可直接编辑)': ['轉換結果 (可直接編輯)', 'Result (editable)'],
-  '输入 JSON 数组 或 JSONL 文本  或 拖拽文件到框内打开': ['輸入 JSON 陣列 或 JSONL 文字, 或將檔案拖入框內開啟', 'Paste a JSON array or JSONL text, or drag & drop a file here'],
-  '转换结果会显示在这里 (双击可复制)': ['轉換結果會顯示在這裡 (雙擊可複製)', 'The converted result shows here (double-click to copy)'],
+  '输入或粘贴 JSON (数组 / 对象)  或 拖拽文件到框内打开': ['輸入或貼上 JSON (陣列 / 物件), 或將檔案拖入框內開啟', 'Paste JSON (array / object), or drag & drop a file here'],
+  '输入或粘贴 JSONL (每行一条 JSON)  或 拖拽文件到框内打开': ['輸入或貼上 JSONL (每列一筆 JSON), 或將檔案拖入框內開啟', 'Paste JSONL (one JSON per line), or drag & drop a file here'],
   '双击复制内容到粘贴板': ['雙擊複製內容到剪貼簿', 'Double-click to copy'],
 
   // 操作
