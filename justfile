@@ -82,10 +82,10 @@ bundle target:
 
 # Usage: just release            -> build a single portable exe (no installer), copy to release/
 #        just release nsis       -> build only the given format (nsis/msi/appimage/deb/dmg/rpm/app)
-# Build and copy installers into release/ - default: single portable executable (--no-bundle, needs system WebView2)
+# 默认单体免安装 exe (--no-bundle, 需系统 WebView2); 会额外输出开始时间 / 结束时间 / 耗时
+# Build and copy installers into release/ (default: portable exe); prints start/end/elapsed time
 release target="":
-    {{ if target == "" { "npm run tauri build -- --no-bundle" } else { "npm run tauri build -- --bundles " + target } }}
-    node scripts/copy-to-release.js {{target}}
+    bash scripts/release.sh {{target}}
 
 # 1. Build all installers
 # 2. gh release create creates/overwrites the release (creates it if missing)
