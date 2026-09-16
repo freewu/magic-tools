@@ -260,6 +260,24 @@ export const MD_EXPORT_CSS = `.md-preview{font-family:-apple-system,BlinkMacSyst
 .md-preview sup,.md-preview sub{font-size:.72em}
 .md-preview .tt{font-style:normal}`;
 
+/**
+ * 深色模式下的预览覆盖样式 (仅应用内生效, 导出 HTML 仍用上面的浅色)
+ * 需在 MD_EXPORT_CSS 之后插入: 同优先级时后出现的规则生效
+ */
+export const MD_DARK_CSS = `.md-preview{color:#e6edf3}
+.md-preview h1,.md-preview h2,.md-preview h3,.md-preview h4,.md-preview h5,.md-preview h6{color:#f0f6fc}
+.md-preview h1{border-bottom-color:#30363d}
+.md-preview h2{border-bottom-color:#30363d}
+.md-preview a{color:#4493f8}
+.md-preview code{background:#2d333b;color:#e6edf3}
+.md-preview pre.md-code{background:#161b22;border-color:#30363d}
+.md-preview blockquote{color:#9198a1;border-left-color:#3d444d;background:#656c7626}
+.md-preview th,.md-preview td{border-color:#3d444d}
+.md-preview th{background:#161b22}
+.md-preview hr{border-top-color:#30363d}
+.md-preview del{color:#9198a1}
+.md-preview .math-block{background:#161b22;border-color:#30363d}`;
+
 /** 把渲染后的正文包装成可独立打开的 HTML 文档 */
 export function wrapExportHtml(bodyHtml: string, title = 'Markdown 预览'): string {
   return [

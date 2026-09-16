@@ -10,11 +10,13 @@ export type ThemeMode = 'light' | 'dark' | 'system';
 
 interface ThemeContextValue {
   mode: ThemeMode;
+  isDark: boolean;
   setMode: (mode: ThemeMode) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
   mode: 'system',
+  isDark: false,
   setMode: () => {},
 });
 
@@ -74,7 +76,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [isDark]);
 
   return (
-    <ThemeContext.Provider value={{ mode, setMode }}>
+    <ThemeContext.Provider value={{ mode, isDark, setMode }}>
       <ConfigProvider
         theme={{
           algorithm: isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,

@@ -1,8 +1,9 @@
 import { Alert, Button, Card, Input, Segmented, Space, Tooltip, Typography, message } from 'antd';
 import { CopyOutlined, DownloadOutlined, EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { useMemo, useRef, useState } from 'react';
-import { renderMarkdown, wrapExportHtml, MD_EXPORT_CSS } from './lib';
+import { renderMarkdown, wrapExportHtml, MD_DARK_CSS, MD_EXPORT_CSS } from './lib';
 import { useLocale } from '../../hook/locale-context';
+import { useTheme } from '../../hook/theme-context';
 import { u, uT } from './lang';
 
 const { Text } = Typography;
@@ -79,6 +80,7 @@ const markdown = (text: string) => new Blob([text], { type: 'text/plain;charset=
 
 const MarkdownEditor: React.FC = () => {
   const { locale } = useLocale();
+  const { isDark } = useTheme();
   const t = (zh: string) => u(locale, zh);
   const tt = (zh: string, v?: Record<string, string | number>) => uT(locale, zh, v);
   const copy = async (text: string, tip?: string) => {
@@ -216,6 +218,7 @@ const MarkdownEditor: React.FC = () => {
             {view === 'preview' ? (
               <div style={{ maxHeight: 520, overflow: 'auto' }}>
                 <style>{MD_EXPORT_CSS}</style>
+                {isDark ? <style>{MD_DARK_CSS}</style> : null}
                 <div className="md-preview" dangerouslySetInnerHTML={{ __html: html || `<p style="color:#999">${t('(空内容)')}</p>` }} />
               </div>
             ) : (
