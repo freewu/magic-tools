@@ -1,4 +1,8 @@
-import { taiMinusUtc, gpsTimeOf, bdtTimeOf, gstTimeOf, glonassTimeText, julianDayOf } from './lib';
+import {
+  taiMinusUtc, gpsTimeOf, bdtTimeOf, gstTimeOf, glonassTimeText, julianDayOf,
+  formatDateTime, getMonthBegin, getMonthEnd, getLastMonthBegin, getLastMonthEnd,
+  getNextMonthBegin, getNextMonthEnd, getLastMonth, getNextMonth,
+} from './lib';
 
 // 固定锚点 UTC 时刻 (独立于本地时区)
 const t = (s: string): number => new Date(s).getTime();
@@ -71,5 +75,81 @@ describe('儒略日', () => {
     const r = julianDayOf(t('1970-01-01T00:00:00Z'));
     expect(r.jd).toBeCloseTo(2440587.5, 6);
     expect(r.mjd).toBeCloseTo(40587, 6);
+  });
+});
+
+// ==================== 月历边界 (围绕系统时间, 用假定时器固定"现在") ====================
+describe('月初 / 月末 (固定本地时间)', () => {
+  const at = (s: string) => {
+    jest.useFakeTimers().setSystemTime(new Date(s));
+  };
+  const txt = (d: Date) => formatDateTime(d);
+  afterEach(() => jest.useRealTimers());
+
+  it('2026-09-16: 本月初 00:00:00, 本月末 23:59:59', () => {
+    at('2026-09-16T10:20:30');
+    expect(txt(getMonthBegin())).toBe('2026-09-01 00:00:00');
+    expect(txt(getMonthEnd())).toBe('2026-09-30 23:59:59');
+    expect(txt(getLastMonthBegin())).toBe('2026-08-01 00:00:00');
+    expect(txt(getLastMonthEnd())).toBe('2026-08-31 23:59:59');
+    expect(txt(getNextMonthBegin())).toBe('2026-10-01 00:00:00');
+    expect(txt(getNextMonthEnd())).toBe('2026-10-31 23:59:59');
+  });
+
+  it('上月末 / 下月末 用 23:59:59 (本月末一致), 月初用 00:00:00', () => {
+    at('2026-09-16T10:20:30');
+    expect(txt(getLastMonthEnd()).endsWith('23:59:59')).toBe(true);
+    expect(txt(getNextMonthEnd()).endsWith('23:59:59')).toBe(true);
+    expect(txt(getMonthEnd()).endsWith('23:59:59')).toBe(true);
+    expect(txt(getLastMonthBegin()).endsWith('00:00:00')).toBe(true);
+    expect(txt(getNextMonthBegin()).endsWith('00:00:00')).toBe(true);
+  });
+
+  it('跨年: 1 月的上月为去年 12 月, 12 月的下月为明年 1 月', () => {
+    at('2026-01-05T08:00:00');
+    expect(txt(getLastMonthBegin())).toBe('2025-12-01 00:00:00');
+    expect(txt(getLastMonthEnd())).toBe('2025-12-31 23:59:59');
+    expect(txt(getNextMonthEnd())).toBe('2026-02-28 23:59:59');
+
+    at('2026-12-20T08:00:00');
+    expect(txt(getLastMonthEnd())).toBe('2026-11-30 23:59:59');
+    expect(txt(getNextMonthBegin())).toBe('2027-01-01 00:00:00');
+    expect(txt(getNextMonthEnd())).toBe('2027-01-31 23:59:59');
+  });
+
+  it('闰年 2 月: 2024-02 为 29 天', () => {
+    at('2024-02-10T00:00:00');
+    expect(txt(getMonthEnd())).toBe('2024-02-29 23:59:59');
+    expect(txt(getLastMonthEnd())).toBe('2024-01-31 23:59:59');
+    expect(txt(getNextMonthEnd())).toBe('2024-03-31 23:59:59');
+  });
+});
+
+describe('上月 / 下月 (同一天同一时刻, 日期不存在时取月末)', () => {
+  const at = (s: string) => jest.useFakeTimers().setSystemTime(new Date(s));
+  const txt = (d: Date) => formatDateTime(d);
+  afterEach(() => jest.useRealTimers());
+
+  it('普通日期保持时分秒', () => {
+    at('2026-09-16T10:20:30');
+    expect(txt(getLastMonth())).toBe('2026-08-16 10:20:30');
+    expect(txt(getNextMonth())).toBe('2026-10-16 10:20:30');
+  });
+
+  it('3-31 的上月为 2-28 (不再错成去年 3-28)', () => {
+    at('2026-03-31T09:00:00');
+    expect(txt(getLastMonth())).toBe('2026-02-28 09:00:00');
+  });
+
+  it('1-31 的下月为 2-28 (不再错成去年 1-28)', () => {
+    at('2026-01-31T09:00:00');
+    expect(txt(getNextMonth())).toBe('2026-02-28 09:00:00');
+  });
+
+  it('跨年: 1-15 的上月为去年 12-15, 12-15 的下月为明年 1-15', () => {
+    at('2026-01-15T23:30:00');
+    expect(txt(getLastMonth())).toBe('2025-12-15 23:30:00');
+    at('2026-12-15T23:30:00');
+    expect(txt(getNextMonth())).toBe('2027-01-15 23:30:00');
   });
 });

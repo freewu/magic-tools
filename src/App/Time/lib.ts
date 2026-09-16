@@ -24,109 +24,107 @@ export const getNextWeek = () :Date => {
   return new Date((new Date()).getTime() + (7 * 24 * 60 * 60 * 1000))
 }
 
+// 指定年月的天数 (month 为 0-11)
+export const daysInMonth = (year :number, month :number) :number => {
+  return new Date(year, month + 1, 0).getDate();
+}
+
 // 上月
+// 取上个月的同一天同一时刻; 上月没有该日 (如 3-31) 时取上月最后一天 (2-28 / 2-29)
 export const getLastMonth = () :Date => {
   let now = new Date();
   let year = now.getFullYear();// getYear()+1900=getFullYear()
-  let month = now.getMonth() + 1;// 0-11表示1-12月
+  let month = now.getMonth();// 0-11
   let day = now.getDate();
   let hour = now.getHours();
   let minute = now.getMinutes();
   let second = now.getSeconds();
 
-  // 当前时间为 1月时 
-  if(1 === month) return new Date(`${year - 1}-12-${day} ${hour}:${minute}:${second}`);
-  // 上月总天数
-  let preSize= new Date(year, month - 1, 0).getDate();
-  //  2 月可能是 28 或 29天,如果本日为3月的  30 / 31 日时 只能取 02-28 或 02-29  
-  if( day > preSize ) return new Date(`${year - 1}-${month}-${preSize} ${hour}:${minute}:${second}`); 
+  // 当前时间为 1 月时, 上月为去年 12 月
+  let targetYear = (0 === month)? year - 1 : year;
+  let targetMonth = (0 === month)? 11 : month - 1;
 
-  return new Date(`${year}-${month - 1 }-${day} ${hour}:${minute}:${second}`);
+  return new Date(targetYear, targetMonth, Math.min(day, daysInMonth(targetYear, targetMonth)), hour, minute, second);
 }
 
 // 下月
+// 取下个月的同一天同一时刻; 下个月没有该日 (如 1-31 → 2 月) 时取下月最后一天
 export const getNextMonth = () :Date => {
   let now = new Date();
   let year = now.getFullYear();// getYear()+1900=getFullYear()
-  let month = now.getMonth() + 1;// 0-11表示1-12月
+  let month = now.getMonth();// 0-11
   let day = now.getDate();
   let hour = now.getHours();
   let minute = now.getMinutes();
   let second = now.getSeconds();
 
-  // 当前时间为 12月时 
-  if(12 === month) return new Date(`${year + 1}-1-${day} ${hour}:${minute}:${second}`);
-  // 下月总天数
-  let preSize= new Date(year, month + 1, 0).getDate();
-  //  2 月可能是 28 或 29天,如果本日为1月的  30 / 31 日时 只能取 02-28 或 02-29  
-  if( day > preSize ) return new Date(`${year - 1}-${month}-${preSize} ${hour}:${minute}:${second}`); 
+  // 当前时间为 12 月时, 下月为明年 1 月
+  let targetYear = (11 === month)? year + 1 : year;
+  let targetMonth = (11 === month)? 0 : month + 1;
 
-  return new Date(`${year}-${month + 1 }-${day} ${hour}:${minute}:${second}`);
+  return new Date(targetYear, targetMonth, Math.min(day, daysInMonth(targetYear, targetMonth)), hour, minute, second);
 }
 
 // 本月初
 export const getMonthBegin = () :Date => {
   let now = new Date();
   let year = now.getFullYear();// getYear()+1900=getFullYear()
-  let month = now.getMonth() + 1;// 0-11表示1-12月
+  let month = now.getMonth();// 0-11
 
-  return new Date(`${year}-${month}-1 00:00:00`);
+  return new Date(year, month, 1, 0, 0, 0);
 }
 
-// 本月未
+// 本月末 (当月最后一天 23:59:59)
 export const getMonthEnd = () :Date => {
   let now = new Date();
   let year = now.getFullYear();// getYear()+1900=getFullYear()
-  let month = now.getMonth() + 1;// 0-11表示1-12月
-  let totleDay = new Date(year, month, 0).getDate();; // 本月总天数
+  let month = now.getMonth();// 0-11
 
-  return new Date(`${year}-${month}-${totleDay} 23:59:59`);
+  return new Date(year, month, daysInMonth(year, month), 23, 59, 59);
 }
 
 // 上月初
 export const getLastMonthBegin = () :Date => {
   let now = new Date();
   let year = now.getFullYear();// getYear()+1900=getFullYear()
-  let month = now.getMonth() + 1;// 0-11表示1-12月
+  let month = now.getMonth();// 0-11
 
-  // 当前时间为 1月时 
-  if(1 === month) return new Date(`${year - 1}-12-1 00:00:00`);
-  return new Date(`${year}-${ month - 1 }-1 00:00:00`);
+  // 当前时间为 1 月时, 上月为去年 12 月
+  if(0 === month) return new Date(year - 1, 11, 1, 0, 0, 0);
+  return new Date(year, month - 1, 1, 0, 0, 0);
 }
 
-// 上月未
+// 上月末 (上月最后一天 23:59:59)
 export const getLastMonthEnd = () :Date => {
   let now = new Date();
   let year = now.getFullYear();// getYear()+1900=getFullYear()
-  let month = now.getMonth() + 1;// 0-11表示1-12月
-  let totalDay= new Date(year, month - 1, 0).getDate(); // 上月总天数
+  let month = now.getMonth();// 0-11
 
-  // 当前时间为 1 月时 
-  if(1 === month) return new Date(`${year - 1}-12-${totalDay} 00:00:00`);
-  return new Date(`${year}-${ month - 1 }-${totalDay} 00:00:00`);
+  // 当前时间为 1 月时, 上月末为去年 12-31
+  if(0 === month) return new Date(year - 1, 11, 31, 23, 59, 59);
+  return new Date(year, month - 1, daysInMonth(year, month - 1), 23, 59, 59);
 }
 
 // 下月初
 export const getNextMonthBegin = () :Date => {
   let now = new Date();
   let year = now.getFullYear();// getYear()+1900=getFullYear()
-  let month = now.getMonth() + 1;// 0-11表示1-12月
+  let month = now.getMonth();// 0-11
 
-  // 当前时间为 12 月时 
-  if(12 === month) return new Date(`${year + 1}-1-1 00:00:00`);
-  return new Date(`${year}-${ month + 1 }-1 00:00:00`);
+  // 当前时间为 12 月时, 下月为明年 1 月
+  if(11 === month) return new Date(year + 1, 0, 1, 0, 0, 0);
+  return new Date(year, month + 1, 1, 0, 0, 0);
 }
 
-// 下月未
+// 下月末 (下月最后一天 23:59:59)
 export const getNextMonthEnd = () :Date => {
   let now = new Date();
   let year = now.getFullYear();// getYear()+1900=getFullYear()
-  let month = now.getMonth() + 1;// 0-11表示1-12月
-  let totalDay= new Date(year, month + 1, 0).getDate(); // 上月总天数
+  let month = now.getMonth();// 0-11
 
-  // 当前时间为 12 月时 
-  if(12 === month) return new Date(`${year + 1}-1-${totalDay} 00:00:00`);
-  return new Date(`${year}-${ month + 1 }-${totalDay} 00:00:00`);
+  // 当前时间为 12 月时, 下月末为明年 1-31
+  if(11 === month) return new Date(year + 1, 0, 31, 23, 59, 59);
+  return new Date(year, month + 1, daysInMonth(year, month + 1), 23, 59, 59);
 }
 // ==================== 导航/天文时间系统 ====================
 // TAI-UTC 闰秒表: 每项为 [该 UTC 时刻起生效, 差值秒]
