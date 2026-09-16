@@ -188,7 +188,37 @@ const JSONLConvert: React.FC = () => {
 
   return (
     <div>
-      <Text strong style={ { fontSize: 12 } }>JSON</Text>
+      {/* 上框工具条: JSON 框标签 + 文件/示例载入 + 缩进/忽略空行 (均属于上方 JSON 框区域) */}
+      <Space wrap size={ [ 8, 6 ] } align="center" style={ { marginBottom: 4 } }>
+        <Text strong style={ { fontSize: 12 } }>JSON</Text>
+        <Button
+          onClick={ () => { inputRef?.click(); } }
+          icon={ <InboxOutlined /> }
+        >{ t('选择文件') }</Button>
+        <Button
+          icon={ <ThunderboltOutlined /> }
+          onClick={ () => { setFileName(''); loadText(SAMPLE_JSON); } }
+        >{ t('载入示例') }</Button>
+        <Text type="secondary" style={ { fontSize: 12 } }>{ t('缩进') }</Text>
+        <Select
+          size="small"
+          value={ indent }
+          style={ { width: 110 } }
+          onChange={ (v: Indent) => setIndent(v) }
+          options={ INDENT_LIST.map((v) => ({ value: v.value, label: t(v.label) })) }
+        />
+        <Checkbox
+          checked={ skipBlank }
+          onChange={ (e) => setSkipBlank(e.target.checked) }
+        >{ t('忽略空行 (JSONL 输入)') }</Checkbox>
+      </Space>
+      <input
+        type="file"
+        ref={ (el) => { inputRef = el; } }
+        style={ { display: 'none' } }
+        accept=".json,.jsonl,.ndjson,.txt"
+        onChange={ (e) => { onFile(e.target.files); e.target.value = ''; } }
+      />
       <TextArea
         style={ { margin: '5px 0 5px 0' } }
         onDoubleClick={ textareaDoubleClick }
@@ -229,39 +259,9 @@ const JSONLConvert: React.FC = () => {
           icon={ <DownloadOutlined /> }
         >{ t('下载') }</Button>
         <Button
-          onClick={ () => { inputRef?.click(); } }
-          icon={ <InboxOutlined /> }
-        >{ t('选择文件') }</Button>
-        <input
-          type="file"
-          ref={ (el) => { inputRef = el; } }
-          style={ { display: 'none' } }
-          accept=".json,.jsonl,.ndjson,.txt"
-          onChange={ (e) => { onFile(e.target.files); e.target.value = ''; } }
-        />
-        <Button
-          icon={ <ThunderboltOutlined /> }
-          onClick={ () => { setFileName(''); loadText(SAMPLE_JSON); } }
-        >{ t('载入示例') }</Button>
-        <Button
           onClick={ () => { setJson(''); setJsonl(''); setStat(''); setSide(''); setFileName(''); } }
           style={ { backgroundColor: '#dc3545', color: '#fff' } }
         >{ t('清除') }</Button>
-      </Space>
-      &nbsp;
-      <Space wrap style={ { marginBottom: 6 } }>
-        <Text type="secondary" style={ { fontSize: 12 } }>{ t('缩进') }</Text>
-        <Select
-          size="small"
-          value={ indent }
-          style={ { width: 110 } }
-          onChange={ (v: Indent) => setIndent(v) }
-          options={ INDENT_LIST.map((v) => ({ value: v.value, label: t(v.label) })) }
-        />
-        <Checkbox
-          checked={ skipBlank }
-          onChange={ (e) => setSkipBlank(e.target.checked) }
-        >{ t('忽略空行 (JSONL 输入)') }</Checkbox>
       </Space>
 
       <Text strong style={ { fontSize: 12 } }>JSONL</Text>

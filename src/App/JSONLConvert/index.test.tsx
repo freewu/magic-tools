@@ -153,3 +153,35 @@ describe('JSONLConvert 交互', () => {
     expect((saveTextFile as jest.Mock).mock.calls[1][1]).toContain('"a": 1');
   });
 });
+
+describe('JSONLConvert 布局: 工具条位于上方 JSON 框之上', () => {
+  /** a 是否出现在 b 之前 (文档顺序) */
+  const before = (a: Element | null, b: Element | null): boolean =>
+    !!a && !!b && !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+
+  test('选择文件 / 载入示例 / 缩进 / 忽略空行 都在上方 JSON 框之前', () => {
+    render(<JSONLConvert />);
+
+    expect(before(btn('选择文件'), jsonBox())).toBe(true);
+    expect(before(btn('载入示例'), jsonBox())).toBe(true);
+    expect(before(screen.getByText('缩进'), jsonBox())).toBe(true);          // 缩进下拉
+    expect(before(screen.getByText('忽略空行 (JSONL 输入)'), jsonBox())).toBe(true); // 忽略空行勾选
+
+    // 这些控件都应在上方框之上、且不在下方 JSONL 框之后
+    expect(before(jsonBox(), screen.getByText('缩进'))).toBe(false);
+  });
+
+  test('转换按钮行 (含清除) 仍在上方 JSON 框之下、下方 JSONL 框之上', () => {
+    render(<JSONLConvert />);
+    for (const name of [ 'JSON → JSONL', 'JSONL → JSON', '复制结果', '下载', '清除' ]) {
+      expect(before(jsonBox(), btn(name))).toBe(true);
+      expect(before(btn(name), jsonlBox())).toBe(true);
+    }
+    // 上框工具条里不应再出现重复的「选择文件 / 载入示例」按钮
+    const named = (name: string) => screen
+      .getAllByRole('button')
+      .filter((b) => (b.textContent ?? '').replace(/\s+/g, '') === name);
+    expect(named('选择文件').length).toBe(1);
+    expect(named('载入示例').length).toBe(1);
+  });
+});

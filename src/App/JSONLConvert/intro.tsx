@@ -16,7 +16,7 @@ const zh = `<h2>这个工具做什么</h2>
 <li><p><b>JSON → JSONL</b>: 在上方 JSON 框粘贴 JSON 数组 (或单个 JSON 对象 / 值), 点击蓝色按钮, 每个数组元素会被压成一行紧凑 JSON 写入下方 JSONL 框</p></li>
 <li><p><b>JSONL → JSON</b>: 在下方 JSONL 框粘贴每行一条的 JSONL 文本, 点击绿色按钮, 结果是一个格式化后的 JSON 数组 (缩进可选 2 空格 / 4 空格 / Tab) 写入上方 JSON 框</p></li>
 <li><p>每个框下方都会显示识别结果 (JSON 数组 / JSON 对象 / JSONL 及其条数), 便于确认粘贴的内容符合预期</p></li>
-<li><p>拖拽文件到任一框、点击「选择文件」或「载入示例」时, 会按识别结果放进对应的框并<b>立即转换</b>到另一个框</p></li>
+<li><p>拖拽文件到任一框、点击「选择文件」或「载入示例」时, 会按识别结果放进对应的框并<b>立即转换</b>到另一个框; 「选择文件」「载入示例」与「缩进」「忽略空行」都在页面顶部、<b>上方 JSON 框之上</b>, 左侧的「JSON」即是该框的标题</p></li>
 <li><p>结果可双击复制、点「复制结果」或「下载」: 桌面版会弹出系统保存对话框 (可自选目录与文件名), Web 版走浏览器下载; 扩展名随转换方向为 <code>.jsonl</code> / <code>.json</code>, 文件名沿用已载入文件的主名</p></li>
 <li><p>点错按钮或把内容放进了另一个框也没关系: 源框为空或内容与按钮方向明显不符时, 会<b>自动按正确方向转换</b>并给出提示</p></li>
 </ul>
@@ -47,7 +47,7 @@ const tw = `<h2>這個工具做什麼</h2>
 <li><p><b>JSON → JSONL</b>: 在上方 JSON 框貼上 JSON 陣列 (或單一 JSON 物件 / 值), 點擊藍色按鈕, 每個陣列元素會被壓成一列緊湊 JSON 寫入下方 JSONL 框</p></li>
 <li><p><b>JSONL → JSON</b>: 在下方 JSONL 框貼上每列一筆的 JSONL 文字, 點擊綠色按鈕, 結果是格式化後的 JSON 陣列 (縮排可選 2 空格 / 4 空格 / Tab) 寫入上方 JSON 框</p></li>
 <li><p>每個框下方都會顯示識別結果 (JSON 陣列 / JSON 物件 / JSONL 及其筆數), 便於確認貼上的內容符合預期</p></li>
-<li><p>拖曳檔案到任一框、點擊「選擇檔案」或「載入範例」時, 會依識別結果放進對應的框並<b>立即轉換</b>到另一個框</p></li>
+<li><p>拖曳檔案到任一框、點擊「選擇檔案」或「載入範例」時, 會依識別結果放進對應的框並<b>立即轉換</b>到另一個框; 「選擇檔案」「載入範例」與「縮排」「忽略空行」都在頁面頂端、<b>上方 JSON 框之上</b>, 左側的「JSON」即是該框的標題</p></li>
 <li><p>結果可雙擊複製、點「複製結果」或「下載」: 桌面版會彈出系統儲存對話框 (可自選目錄與檔名), Web 版走瀏覽器下載; 副檔名依轉換方向為 <code>.jsonl</code> / <code>.json</code>, 檔名沿用已載入檔案的主名</p></li>
 <li><p>點錯按鈕或把內容放進了另一個框也沒關係: 來源框為空或內容與按鈕方向明顯不符時, 會<b>自動依正確方向轉換</b>並給出提示</p></li>
 </ul>
@@ -78,7 +78,7 @@ const en = `<h2>What this tool does</h2>
 <li><p><b>JSON → JSONL</b>: paste a JSON array (or a single JSON object/value) into the top JSON box and click the blue button — every element becomes one compact JSON line in the bottom JSONL box</p></li>
 <li><p><b>JSONL → JSON</b>: paste line-delimited JSON into the bottom JSONL box and click the green button — a formatted JSON array (2 spaces / 4 spaces / Tab indent) is written into the top JSON box</p></li>
 <li><p>A detection line under each box shows what was recognized (JSON array / JSON object / JSONL and how many records), so you can verify the pasted content</p></li>
-<li><p>Dropping a file onto either box, choosing one, or loading the sample places the content into the matching box from that detection and <b>converts right away</b> into the other box</p></li>
+<li><p>Dropping a file onto either box, choosing one, or loading the sample places the content into the matching box from that detection and <b>converts right away</b> into the other box. "Choose file", "Load sample", "Indent" and "Skip blank lines" all sit at the top of the page, <b>above the JSON box</b> — the "JSON" label at their left is that box's title</p></li>
 <li><p>Copy the result by double-clicking it, with the "Copy result" button, or save it with "Download": the desktop build opens the system save dialog (pick any folder and file name) while the Web build falls back to a browser download. The extension follows the direction — <code>.jsonl</code> / <code>.json</code> — and the name keeps the loaded file's base name</p></li>
 <li><p>Clicking the wrong button — or putting the content into the other box — is fine too: when the source box is empty or the content clearly disagrees with the button's direction the tool <b>converts the correct way automatically</b> and tells you about it</p></li>
 </ul>
