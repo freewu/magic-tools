@@ -1,4 +1,4 @@
-import { Button, Form, Input, Divider, message, Space, Tag } from "antd";
+import { Button, Card, Form, Input, Divider, message, Space, Tag } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib";
@@ -20,6 +20,9 @@ const Time = () => {
   const [ notice, contextHolder ] = message.useMessage();
 
   const inputStyle = { cursor: "pointer" };
+  // 卫星导航系统时间分组框 (占满结果区两列, 内部再分两列)
+  const satCardStyle = { gridColumn: '1 / -1', marginBottom: 16 };
+  const satGridStyle = { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', columnGap: 16 };
   const inputClick = (e :React.MouseEvent<HTMLElement>) => {
     const txt = (e.target as HTMLInputElement).value.trim();
     if(txt != "") {
@@ -172,33 +175,64 @@ const Time = () => {
             data.custom? data.custom.split(" ")["0"] : '' 
           }/>
         </Form.Item>
-        <Form.Item label={t('lb_gps', 'GPS 时间')}>
-          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gps }/>
-        </Form.Item>
-        <Form.Item label={t('lb_gps_ws', 'GPS 时间 (周,秒)')}>
-          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gpsWeekTow }/>
-        </Form.Item>
-        <Form.Item label={t('lb_gps_ts', 'GPS 时间 (总秒)')}>
-          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gpsTotal }/>
-        </Form.Item>
-        <Form.Item label={t('lb_bdt', '北斗时间')}>
-          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.bdt }/>
-        </Form.Item>
-        <Form.Item label={t('lb_bdt_ws', '北斗时间 (周,秒)')}>
-          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.bdtWeekTow }/>
-        </Form.Item>
-        <Form.Item label={t('lb_bdt_ts', '北斗时间 (总秒)')}>
-          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.bdtTotal }/>
-        </Form.Item>
-        <Form.Item label={t('lb_gst', '伽利略时间')}>
-          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gst }/>
-        </Form.Item>
-        <Form.Item label={t('lb_gst_ws', '伽利略时间 (周,秒)')}>
-          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gstWeekTow }/>
-        </Form.Item>
-        <Form.Item label={t('lb_gst_ts', '伽利略时间 (总秒)')}>
-          <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gstTotal }/>
-        </Form.Item>
+        {/* GPS / 北斗 / 伽利略: 各自一个分组框圈起来 (内部标签不再重复系统名) */}
+        <Card
+          size="small"
+          title={t('lb_gps', 'GPS 时间')}
+          style={ satCardStyle }
+          styles={ { body: { paddingTop: 12, paddingBottom: 0 } } }
+        >
+          <div style={ satGridStyle }>
+            <Form.Item label={t('lb_ws', '周 + 秒')}>
+              <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gps }/>
+            </Form.Item>
+            <Form.Item label={t('lb_wsCsv', '周, 秒')}>
+              <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gpsWeekTow }/>
+            </Form.Item>
+            <Form.Item label={t('lb_total', '总秒数')}>
+              <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gpsTotal }/>
+            </Form.Item>
+          </div>
+        </Card>
+
+        <Card
+          size="small"
+          title={t('lb_bdt', '北斗时间')}
+          style={ satCardStyle }
+          styles={ { body: { paddingTop: 12, paddingBottom: 0 } } }
+        >
+          <div style={ satGridStyle }>
+            <Form.Item label={t('lb_ws', '周 + 秒')}>
+              <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.bdt }/>
+            </Form.Item>
+            <Form.Item label={t('lb_wsCsv', '周, 秒')}>
+              <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.bdtWeekTow }/>
+            </Form.Item>
+            <Form.Item label={t('lb_total', '总秒数')}>
+              <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.bdtTotal }/>
+            </Form.Item>
+          </div>
+        </Card>
+
+        <Card
+          size="small"
+          title={t('lb_gst', '伽利略时间')}
+          style={ satCardStyle }
+          styles={ { body: { paddingTop: 12, paddingBottom: 0 } } }
+        >
+          <div style={ satGridStyle }>
+            <Form.Item label={t('lb_ws', '周 + 秒')}>
+              <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gst }/>
+            </Form.Item>
+            <Form.Item label={t('lb_wsCsv', '周, 秒')}>
+              <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gstWeekTow }/>
+            </Form.Item>
+            <Form.Item label={t('lb_total', '总秒数')}>
+              <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.gstTotal }/>
+            </Form.Item>
+          </div>
+        </Card>
+
         <Form.Item label={t('lb_glonass', '格洛纳斯时间 (UTC+3)')}>
           <Input readOnly style={ inputStyle} onClick={ inputClick } value= { data.glonass }/>
         </Form.Item>
