@@ -13,6 +13,7 @@ const rows: Record<string, [string, string]> = {
   '表名': ['表名', 'Table name'],
   '包含 CREATE TABLE 建表语句': ['包含 CREATE TABLE 建表語句', 'Include CREATE TABLE statement'],
   'CSV 包含表头': ['CSV 包含表頭', 'CSV header row'],
+  'JSONL: 每行一条记录, 便于流式读取与导入大数据平台': ['JSONL: 每列一筆記錄, 便於串流讀取與匯入大資料平台', 'JSONL: one record per line — ideal for streaming and big-data pipelines'],
   '模板 (Mock.js 语法)': ['範本 (Mock.js 語法)', 'Template (Mock.js syntax)'],
   '生成数据': ['產生資料', 'Generate'],
   '填充示例': ['填入範例', 'Load sample'],

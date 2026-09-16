@@ -3,10 +3,10 @@ import {
   getDefaultFormat, setDefaultFormat,
   getDefaultTable, setDefaultTable, normalizeTable,
   parseKey, splitArgs, resolvePlaceholders, genValue, generateRows,
-  parseTemplate, toCsv, toSql, sqlValue, sqlTypeOf, generateOutput,
+  parseTemplate, toCsv, toJsonl, toSql, sqlValue, sqlTypeOf, generateOutput, isMockFormat,
   type GenCtx,
 } from './lib';
-import { COUNT_MAX, DEFAULT_COUNT, DEFAULT_TABLE } from './data';
+import { COUNT_MAX, DEFAULT_COUNT, DEFAULT_TABLE, FORMAT_LIST } from './data';
 
 const ctxOf = (): GenCtx => ({ inc: new Map<string, number>() });
 
@@ -86,7 +86,8 @@ describe('数据生成 / 规则生成', () => {
     const f = genValue(1, 'score|60-100.1-2', '#', ctx) as number;
     expect(f).toBeGreaterThanOrEqual(60);
     expect(f).toBeLessThanOrEqual(101);
-    expect(String(f).split('.')[1].length).toBeGreaterThanOrEqual(1);
+    // 小数位可能为 0 (整数值), 因此只校验上限
+    expect((String(f).split('.')[1] ?? '').length).toBeLessThanOrEqual(2);
   });
 
   it('|+step 自增 (跨记录连续)', () => {
@@ -170,6 +171,15 @@ describe('数据生成 / 序列化', () => {
     expect(toCsv(rows, false).split('\n')[0]).toBe('1,"a,b","he said ""hi""","[""x"",""y""]"');
   });
 
+  it('JSONL: 每行一条紧凑 JSON, 行数=记录数且逐行可解析', () => {
+    const jsonl = toJsonl(rows);
+    const lines = jsonl.split('\n');
+    expect(lines).toHaveLength(2);
+    expect(lines[0]).toBe('{"id":1,"name":"a,b","note":"he said \\"hi\\"","tags":["x","y"]}');
+    for (const l of lines) expect(JSON.parse(l)).toBeInstanceOf(Object);
+    expect(toJsonl([])).toBe('');
+  });
+
   it('SQL: 值转义 / 布尔与 null / 表名规整', () => {
     expect(sqlValue("O'Brien")).toBe("'O''Brien'");
     expect(sqlValue(true)).toBe('1');
@@ -201,6 +211,16 @@ describe('数据生成 / 设置读写', () => {
     expect(getDefaultTable()).toBe(DEFAULT_TABLE);
     expect(DEFAULT_COUNT).toBe(100);
     expect(getDefaultCount()).toBe(100);
+  });
+
+  it('格式白名单: jsonl 可存取, 未知值回退默认', () => {
+    expect(FORMAT_LIST.map((f) => f.value)).toEqual(['json', 'jsonl', 'csv', 'sql']);
+    expect(isMockFormat('jsonl')).toBe(true);
+    expect(isMockFormat('ndjson')).toBe(false);
+    setDefaultFormat('jsonl');
+    expect(getDefaultFormat()).toBe('jsonl');
+    setDefaultFormat('xml' as never);
+    expect(getDefaultFormat()).toBe('json');
   });
 
   it('往返一致 + 计数钳制', () => {
@@ -235,6 +255,16 @@ describe('数据生成 / 完整输出', () => {
     const arr = JSON.parse(r.text) as { id: number }[];
     expect(arr).toHaveLength(5);
     expect(arr.map((v) => v.id)).toEqual([1, 2, 3, 4, 5]);
+  });
+
+  it('JSONL: 每行一条记录, 可逐行解析', () => {
+    const r = generateOutput(tpl, { format: 'jsonl', count: 3 });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    const lines = r.text.split('\n');
+    expect(lines).toHaveLength(3);
+    const ids = lines.map((l) => (JSON.parse(l) as { id: number }).id);
+    expect(ids).toEqual([1, 2, 3]);
   });
 
   it('CSV / SQL 输出', () => {

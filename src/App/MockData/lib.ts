@@ -1,7 +1,7 @@
-// 数据生成: Mock.js 语法模板解析 + 规则生成 + JSON/CSV/SQL 序列化
+// 数据生成: Mock.js 语法模板解析 + 规则生成 + JSON/JSONL/CSV/SQL 序列化
 // 纯函数实现 (不依赖 mockjs), 便于单测; 随机性全部走 Math.random, 便于种子化扩展
 import JSON5 from 'json5';
-import { COUNT_MAX, COUNT_MIN, DEFAULT_COUNT, DEFAULT_FORMAT, DEFAULT_TABLE, type MockFormat } from './data';
+import { COUNT_MAX, COUNT_MIN, DEFAULT_COUNT, DEFAULT_FORMAT, DEFAULT_TABLE, FORMAT_LIST, type MockFormat } from './data';
 
 // ---------------- 设置存取 (设置 → 其它 → 数据生成) ----------------
 const KEY_FORMAT = 'mock-data.format';
@@ -31,12 +31,15 @@ export function setDefaultCount(v: number): void {
   rawSet(KEY_COUNT, String(clampCount(v)));
 }
 
+/** 输出格式白名单校验 (读回设置 / 兼容旧值) */
+export const isMockFormat = (v: unknown): v is MockFormat => FORMAT_LIST.some((f) => f.value === v);
+
 export function getDefaultFormat(): MockFormat {
   const v = rawGet(KEY_FORMAT);
-  return v === 'json' || v === 'csv' || v === 'sql' ? v : DEFAULT_FORMAT;
+  return isMockFormat(v) ? v : DEFAULT_FORMAT;
 }
 export function setDefaultFormat(v: MockFormat): void {
-  rawSet(KEY_FORMAT, v === 'json' || v === 'csv' || v === 'sql' ? v : DEFAULT_FORMAT);
+  rawSet(KEY_FORMAT, isMockFormat(v) ? v : DEFAULT_FORMAT);
 }
 
 /** 表名规整: 只保留字母/数字/下划线/$, 数字开头补下划线, 空值回退默认表名 */
@@ -575,6 +578,11 @@ export function toCsv(rows: Record<string, unknown>[], header = true): string {
   return (header ? [cols.map(csvCell).join(',')] : []).concat(lines).join('\n');
 }
 
+/** JSONL (JSON Lines / NDJSON): 每行一条记录的紧凑 JSON, 便于流式读取与大数据导入 */
+export function toJsonl(rows: Record<string, unknown>[]): string {
+  return rows.map((r) => JSON.stringify(r) ?? 'null').join('\n');
+}
+
 const quoteSql = (s: string): string => "'" + s.replace(/\\/g, '\\\\').replace(/'/g, "''") + "'";
 
 /** SQL 值字面量 */
@@ -645,6 +653,8 @@ export function generateOutput(text: string, input: GenInput): GenResult {
     ? toCsv(rows, input.csvHeader ?? true)
     : format === 'sql'
       ? toSql(rows, input.tableName ?? DEFAULT_TABLE, input.createTable ?? false)
-      : JSON.stringify(rows, null, 2);
+      : format === 'jsonl'
+        ? toJsonl(rows)
+        : JSON.stringify(rows, null, 2);
   return { ok: true, text: out, rows };
 }

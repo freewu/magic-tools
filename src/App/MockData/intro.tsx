@@ -1,7 +1,7 @@
 import { useLocale } from '../../hook/locale-context';
 
 const zh = `<h2>什么是 Mock 数据生成</h2>
-<blockquote><p>按 <b>Mock.js 模板语法</b> 批量生成测试数据, 支持导出 <b>JSON</b> / <b>CSV</b> / <b>SQL</b>。模板用 JSON5 解析 (允许单引号、注释、尾逗号), 无需编写代码。</p></blockquote>
+<blockquote><p>按 <b>Mock.js 模板语法</b> 批量生成测试数据, 支持导出 <b>JSON</b> / <b>JSONL</b> / <b>CSV</b> / <b>SQL</b>。模板用 JSON5 解析 (允许单引号、注释、尾逗号), 无需编写代码。</p></blockquote>
 
 <h2>模板写法</h2>
 <p>模板的 <b>根节点表示"一条记录"</b>, 生成数量由页面上的「生成数量」决定:</p>
@@ -29,6 +29,7 @@ const zh = `<h2>什么是 Mock 数据生成</h2>
 <h2>输出格式</h2>
 <ul>
 <li><p><b>JSON</b> — 记录数组, 缩进 2 空格, 可直接用于前端 mock</p></li>
+<li><p><b>JSONL</b> (JSON Lines / NDJSON) — 每行一条记录的紧凑 JSON, 无外层数组与缩进, 便于流式读取、按行追加与导入大数据平台</p></li>
 <li><p><b>CSV</b> — 首行为列名表头 (可关闭); 含逗号 / 引号 / 换行的单元格自动加引号转义, 嵌套对象与数组按 JSON 字符串写入</p></li>
 <li><p><b>SQL</b> — 每行一条 <code>INSERT</code>, 可选生成 <code>CREATE TABLE</code> 建表语句 (列类型按值推断), 表名可自定义</p></li>
 </ul>
@@ -42,7 +43,7 @@ const zh = `<h2>什么是 Mock 数据生成</h2>
 </ul>`;
 
 const tw = `<h2>什麼是 Mock 資料產生</h2>
-<blockquote><p>依 <b>Mock.js 範本語法</b> 批次產生測試資料, 支援匯出 <b>JSON</b> / <b>CSV</b> / <b>SQL</b>。範本以 JSON5 解析 (允許單引號、註解、尾逗號), 無需撰寫程式碼。</p></blockquote>
+<blockquote><p>依 <b>Mock.js 範本語法</b> 批次產生測試資料, 支援匯出 <b>JSON</b> / <b>JSONL</b> / <b>CSV</b> / <b>SQL</b>。範本以 JSON5 解析 (允許單引號、註解、尾逗號), 無需撰寫程式碼。</p></blockquote>
 
 <h2>範本寫法</h2>
 <p>範本的 <b>根節點表示「一筆記錄」</b>, 產生數量由頁面上的「產生數量」決定:</p>
@@ -70,6 +71,7 @@ const tw = `<h2>什麼是 Mock 資料產生</h2>
 <h2>輸出格式</h2>
 <ul>
 <li><p><b>JSON</b> — 記錄陣列, 縮排 2 空格, 可直接用於前端 mock</p></li>
+<li><p><b>JSONL</b> (JSON Lines / NDJSON) — 每列一筆記錄的緊湊 JSON, 無外層陣列與縮排, 便於串流讀取、逐列追加與匯入大資料平台</p></li>
 <li><p><b>CSV</b> — 首列為欄名表頭 (可關閉); 含逗號 / 引號 / 換行的儲存格自動加引號轉義, 巢狀物件與陣列以 JSON 字串寫入</p></li>
 <li><p><b>SQL</b> — 每列一筆 <code>INSERT</code>, 可選產生 <code>CREATE TABLE</code> 建表語句 (欄位型別依值推斷), 表名可自訂</p></li>
 </ul>
@@ -83,7 +85,7 @@ const tw = `<h2>什麼是 Mock 資料產生</h2>
 </ul>`;
 
 const en = `<h2>What is mock data generation</h2>
-<blockquote><p>Generate test data in bulk from a <b>Mock.js template syntax</b> and export it as <b>JSON</b>, <b>CSV</b> or <b>SQL</b>. Templates are parsed as JSON5 (single quotes, comments and trailing commas allowed) — no coding required.</p></blockquote>
+<blockquote><p>Generate test data in bulk from a <b>Mock.js template syntax</b> and export it as <b>JSON</b>, <b>JSONL</b>, <b>CSV</b> or <b>SQL</b>. Templates are parsed as JSON5 (single quotes, comments and trailing commas allowed) — no coding required.</p></blockquote>
 
 <h2>Template syntax</h2>
 <p>The template <b>root is one record</b>; the number of records comes from the Records field:</p>
@@ -111,6 +113,7 @@ const en = `<h2>What is mock data generation</h2>
 <h2>Output formats</h2>
 <ul>
 <li><p><b>JSON</b> — array of records, 2-space indent, ready for front-end mocks</p></li>
+<li><p><b>JSONL</b> (JSON Lines / NDJSON) — one compact JSON record per line, no wrapping array or indentation; great for streaming, line-by-line appends and big-data ingestion</p></li>
 <li><p><b>CSV</b> — first row is the header (can be disabled); cells containing commas, quotes or line breaks are quoted and escaped, nested objects/arrays are written as JSON strings</p></li>
 <li><p><b>SQL</b> — one <code>INSERT</code> per row, optional <code>CREATE TABLE</code> statement (column types inferred from values), custom table name</p></li>
 </ul>

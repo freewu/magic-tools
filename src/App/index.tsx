@@ -117,6 +117,7 @@ const list = [
   'WebSocketDebug',
   'SudokuGenerator',
   'CopybookGenerator',
+  'JSONLConvert',
 ];
 
 import { defineLoader } from './app-modules';

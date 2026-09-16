@@ -52,11 +52,13 @@ const MockData = () => {
     message.success(t('已复制到剪贴板'));
   };
 
-  const ext = format === 'csv' ? 'csv' : format === 'sql' ? 'sql' : 'json';
+  // 下载扩展名 / 过滤名取自 FORMAT_LIST (新增格式只需改 data.ts)
+  const fmt = FORMAT_LIST.find((f) => f.value === format) ?? FORMAT_LIST[0];
+  const ext = fmt.ext;
   const fileName = `mock-data-${Date.now()}.${ext}`;
   const onDownload = async () => {
     if (out === '') return;
-    const ok = await saveTextFile(fileName, out, tT('保存 {n}', { n: fileName }), { filterName: ext.toUpperCase(), extensions: [ ext ] });
+    const ok = await saveTextFile(fileName, out, tT('保存 {n}', { n: fileName }), { filterName: fmt.label, extensions: [ ext ] });
     if (ok) message.success(tT('已保存 {n}', { n: fileName }));
   };
 
@@ -110,6 +112,9 @@ const MockData = () => {
         ) }
         { format === 'csv' && (
           <Checkbox checked={ csvHeader } onChange={ (e) => setCsvHeader(e.target.checked) }>{ t('CSV 包含表头') }</Checkbox>
+        ) }
+        { format === 'jsonl' && (
+          <Text type="secondary" style={ { fontSize: 12 } }>{ t('JSONL: 每行一条记录, 便于流式读取与导入大数据平台') }</Text>
         ) }
         <Button type="primary" icon={ <ThunderboltOutlined /> } onClick={ doGenerate }>{ t('生成数据') }</Button>
       </div>
