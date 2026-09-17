@@ -86,6 +86,7 @@ import MarkdownEditor from './MarkdownEditor/lang';
 import MermaidEditor from './MermaidEditor/lang';
 import JsonFormatter from './JsonFormatter/lang';
 import JSON5Formatter from './JSON5Formatter/lang';
+import JsFormatter from './JsFormatter/lang';
 import SQLFormatter from './SQLFormatter/lang';
 import XmlFormatter from './XmlFormatter/lang';
 import HtmlFormat from './HtmlFormat/lang';
@@ -216,6 +217,7 @@ export const langPacks = {
   MermaidEditor: MermaidEditor,
   JsonFormatter: JsonFormatter,
   JSON5Formatter: JSON5Formatter,
+  JsFormatter: JsFormatter,
   SQLFormatter: SQLFormatter,
   XmlFormatter: XmlFormatter,
   HtmlFormat: HtmlFormat,

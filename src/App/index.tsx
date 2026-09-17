@@ -89,6 +89,7 @@ const list = [
   'MermaidEditor',
   'JsonFormatter',
   'JSON5Formatter',
+  'JsFormatter',
   'SQLFormatter',
   'XmlFormatter',
   'HtmlFormat',
