@@ -1,7 +1,8 @@
 import '@testing-library/jest-dom';
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { message } from 'antd';
 import Teleprompter from './index';
-import { OPTIONS_STORAGE_KEY, PAD_RATIO, READ_RATIO, SAMPLE_SCRIPTS } from './data';
+import { DEFAULTS_STORAGE_KEY, PAD_RATIO, READ_RATIO, SAMPLE_SCRIPTS } from './data';
 import { focusOpacity, splitScript } from './lib';
 import { LocaleProvider } from '../../hook/locale-context';
 
@@ -58,6 +59,7 @@ beforeEach(() => {
   // 示例诗是随机取一首的, 固定 Math.random 以便断言具体文本
   jest.spyOn(Math, 'random').mockReturnValue(0);
   localStorage.clear();
+  message.destroy(); // antd 提示在同一文件内会跨用例残留
 });
 
 afterEach(() => {
@@ -241,8 +243,11 @@ describe('Teleprompter 播放控制', () => {
 });
 
 describe('Teleprompter 设置', () => {
-  test('↑↓ 与滑块调速, 并写入本地记忆', () => {
+  test('↑↓ 与滑块调速只改当前参数, 不自动改写默认设置', () => {
     render(<Teleprompter />);
+
+    // 参数与默认值一致时无需保存
+    expect(btn('保存为默认设置')).toBeDisabled();
 
     fireEvent.keyDown(document, { key: 'ArrowUp' });
     expect(screen.getByText('65 px/s')).toBeInTheDocument();
@@ -253,7 +258,30 @@ describe('Teleprompter 设置', () => {
     fireEvent.keyDown(handleOf('速度'), arrowUp);
     expect(screen.getByText('65 px/s')).toBeInTheDocument();
 
-    expect(JSON.parse(localStorage.getItem(OPTIONS_STORAGE_KEY) as string).speed).toBe(65);
+    // 只是临时调整: 不会自动落盘, 但按钮变为可点 (提示可以存为默认)
+    expect(localStorage.getItem(DEFAULTS_STORAGE_KEY)).toBeNull();
+    expect(btn('保存为默认设置')).toBeEnabled();
+  });
+
+  test('「保存为默认设置」把当前参数存为默认值并提示, 重新打开时沿用', async () => {
+    render(<Teleprompter />);
+
+    fireEvent.keyDown(document, { key: 'ArrowUp' });
+    fireEvent.click(switchOf('淡入淡出'));
+    fireEvent.click(btn('保存为默认设置'));
+
+    expect(JSON.parse(localStorage.getItem(DEFAULTS_STORAGE_KEY) as string)).toEqual({
+      speed: 65, fontSize: 40, lineHeight: 1.8, fade: false, focus: true,
+    });
+    await waitFor(() => expect(document.querySelector('.ant-message')?.textContent).toContain('已保存为默认设置'));
+    // 与默认值一致后按钮重新置灰
+    expect(btn('保存为默认设置')).toBeDisabled();
+
+    cleanup();
+    render(<Teleprompter />);
+    expect(screen.getByText('65 px/s')).toBeInTheDocument();
+    expect(stage().className).not.toContain('tp-fade');
+    expect(btn('保存为默认设置')).toBeDisabled();
   });
 
   test('字号 / 行距 / 淡入淡出 即时生效', () => {
@@ -296,8 +324,8 @@ describe('Teleprompter 设置', () => {
     lineEls().forEach((el) => expect(Number(el.style.opacity)).toBe(1));
   });
 
-  test('打开时沿用上次记忆的速度 / 字号 / 行距 / 淡入淡出 / 逐行高亮', () => {
-    localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify({ speed: 120, fontSize: 52, lineHeight: 2.2, fade: false, focus: false }));
+  test('打开时沿用已保存的默认设置 (设置中心与「保存为默认设置」共用)', () => {
+    localStorage.setItem(DEFAULTS_STORAGE_KEY, JSON.stringify({ speed: 120, fontSize: 52, lineHeight: 2.2, fade: false, focus: false }));
     render(<Teleprompter />);
 
     expect(screen.getByText('120 px/s')).toBeInTheDocument();

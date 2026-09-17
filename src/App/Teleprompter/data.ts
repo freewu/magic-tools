@@ -39,8 +39,11 @@ export const STAGE_FG = '#f2f3f5';
 /** 当前阅读行的强调色 (其余行由透明度向下衰减) */
 export const STAGE_FOCUS_FG = '#ffffff';
 
-/** 选项记忆 key (速度 / 字号 / 行距 / 淡入淡出, 下次打开沿用) */
-export const OPTIONS_STORAGE_KEY = 'teleprompter-options';
+/**
+ * 默认设置 key (速度 / 字号 / 行距 / 淡入淡出 / 逐行高亮)
+ * 修改入口: 设置中心「其它 → 提词器」, 或工具页的「保存为默认设置」按钮
+ */
+export const DEFAULTS_STORAGE_KEY = 'teleprompter-defaults';
 
 // ==================== 示例脚本 ====================
 // 打开页面 / 点「载入示例」时随机取一首 (中英文各两首示范诗);

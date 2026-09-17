@@ -52,7 +52,7 @@ QR code (batch, logo/label) · Barcode (CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacod
 HTML stripper · Browser fingerprint · CSR request generator (WebCrypto RSA + PKCS#10, SAN, key + CSR download) · URL extractor · Cookie analyzer · User-Agent parser · Sitemap checker · Keyword density · TDK checker · robots.txt generator
 
 ### 🧩 Utilities *(10)*
-CSS colors · Line counter · Regex tester (17 presets) · File diff · Keyboard key info · Chmod calculator · ASCII text art · CIDR calculator · WebSocket debugger · Teleprompter (speed / fade / line focus / fullscreen, Space to play·pause)
+CSS colors · Line counter · Regex tester (17 presets) · File diff · Keyboard key info · Chmod calculator · ASCII text art · CIDR calculator · WebSocket debugger · Teleprompter (speed / fade / line focus / fullscreen, Space to play·pause, defaults editable in Settings / saveable from the page)
 
 > Plus built-in app pages: **App Center**, **Help & changelog**, **Settings**.
 
@@ -98,7 +98,7 @@ magic-tools
 │   │       ├── lib.ts        # pure logic shared by the page and its unit tests (most tools)
 │   │       ├── lib.test.ts   # jest unit tests (90 tools)
 │   │       ├── data.ts       # option tables / constants / types (54 tools)
-│   │       ├── setting.tsx   # this tool's panel inside the Settings center (63 tools)
+│   │       ├── setting.tsx   # this tool's panel inside the Settings center (64 tools)
 │   │       └── intro.tsx     # About / instructions content, trilingual (41 tools)
 │   ├── layout/           # main frame: sidebar / content
 │   ├── hook/             # global state: theme / app context

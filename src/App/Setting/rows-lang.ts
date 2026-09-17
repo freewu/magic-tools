@@ -339,6 +339,38 @@ const ROWS: Record<string, Row> = {
     'Whether the copybook generator practises one character per row by default (row N uses character N)',
   ],
 
+  // ---- 提词器 (Teleprompter) ----
+  '提词器': ['提詞器', 'Teleprompter'],
+  '默认滚动速度': ['預設滾動速度', 'Default scroll speed'],
+  '默认字号': ['預設字號', 'Default font size'],
+  '默认行距': ['預設行距', 'Default line height'],
+  '默认淡入淡出': ['預設淡入淡出', 'Fade edges by default'],
+  '默认逐行高亮': ['預設逐行高亮', 'Line focus by default'],
+  '打开「提词器」时默认的滚动速度 (px/s), 范围 ${min} - ${max}, 默认 ${d}': [
+    '開啟「提詞器」時預設的滾動速度 (px/s), 範圍 ${min} - ${max}, 預設 ${d}',
+    'Scroll speed used when opening the teleprompter (px/s, range ${min} - ${max}, default ${d})',
+  ],
+  '打开「提词器」时默认的字号 (px), 范围 ${min} - ${max}, 默认 ${d}': [
+    '開啟「提詞器」時預設的字號 (px), 範圍 ${min} - ${max}, 預設 ${d}',
+    'Font size used when opening the teleprompter (px, range ${min} - ${max}, default ${d})',
+  ],
+  '打开「提词器」时默认的行距倍率, 范围 ${min} - ${max}, 默认 ${d}': [
+    '開啟「提詞器」時預設的行距倍率, 範圍 ${min} - ${max}, 預設 ${d}',
+    'Line height used when opening the teleprompter (range ${min} - ${max}, default ${d})',
+  ],
+  '打开「提词器」时是否默认开启边缘淡入淡出 (文字在上下边缘渐隐, 更接近真实提词器)': [
+    '開啟「提詞器」時是否預設開啟邊緣淡入淡出 (文字在上下邊緣漸隱, 更接近真實提詞器)',
+    'Whether edge fading is on by default when opening the teleprompter (lines dissolve in at the bottom and out at the top, like a real teleprompter)',
+  ],
+  '打开「提词器」时是否默认开启逐行高亮 (只高亮当前阅读行, 离它越远的行越透明、颜色越淡)': [
+    '開啟「提詞器」時是否預設開啟逐行高亮 (只高亮目前閱讀行, 離它越遠的行越透明、顏色越淡)',
+    'Whether line focus is on by default when opening the teleprompter (only the line at the reading point stays bright, the rest get more transparent the further away they are)',
+  ],
+  '工具页的「保存为默认设置」按钮可把当前页面的参数一键存为这里的默认值; 默认值在打开工具页时生效, 不影响已打开的页面': [
+    '工具頁的「儲存為預設設定」按鈕可把目前頁面的參數一鍵存為此處的預設值; 預設值在開啟工具頁時生效, 不影響已開啟的頁面',
+    'The “Save as defaults” button on the tool page stores the current page settings here; defaults are applied when the tool page opens and never disturb a page that is already open',
+  ],
+
 };
 
 /**

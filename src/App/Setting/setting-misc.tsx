@@ -3,6 +3,7 @@ import { Form } from "antd";
 import { ColorSetting } from "../Color/setting";
 import { RegexTesterSetting } from "../RegexTester/setting";
 import { AsciiTextArtSetting } from "../AsciiTextArt/setting";
+import { TeleprompterSetting } from "../Teleprompter/setting";
 
 export const SettingMisc = () => {
 
@@ -11,6 +12,7 @@ export const SettingMisc = () => {
       <ColorSetting />
       <RegexTesterSetting />
       <AsciiTextArtSetting />
+      <TeleprompterSetting />
     </Form>
   )
 }

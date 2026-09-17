@@ -1,14 +1,15 @@
-// 提词器: 纯逻辑 (选项校验与记忆 / 脚本切行 / 滚动数学 / 时间格式 / 快捷键判定)
+// 提词器: 纯逻辑 (默认设置校验与读写 / 脚本切行 / 滚动数学 / 时间格式 / 快捷键判定)
 // 设计: 与 DOM 解耦 —— 组件负责测量"视口高度"与"文本高度"后注入,
 //       滚动推进 / 进度 / 剩余时间等计算都放在这里, 便于单元测试覆盖
 import {
+  DEFAULTS_STORAGE_KEY,
   FADE_DEFAULT, FOCUS_DECAY, FOCUS_DEFAULT, FOCUS_MIN_OPACITY,
   FONT_SIZE_DEFAULT, FONT_SIZE_MAX, FONT_SIZE_MIN,
   LINE_HEIGHT_DEFAULT, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN,
-  OPTIONS_STORAGE_KEY, PAD_RATIO, SAMPLE_SCRIPTS, SPEED_DEFAULT, SPEED_MAX, SPEED_MIN,
+  PAD_RATIO, SAMPLE_SCRIPTS, SPEED_DEFAULT, SPEED_MAX, SPEED_MIN,
 } from './data';
 
-/** 提词器选项 (会记忆到本地, 下次打开沿用) */
+/** 提词器选项 (工具页的当前参数; 默认值可在 设置中心 或工具页里修改) */
 export interface PrompterOptions {
   /** 滚动速度 (像素/秒) */
   speed: number;
@@ -58,7 +59,7 @@ export const clampLineHeight = (v: unknown): number => {
   return Math.round(clamped * 10) / 10;
 };
 
-/** 把任意来源 (JSON / 旧版本记忆值) 规整成合法选项: 缺字段与非法值都回退默认 */
+/** 把任意来源 (JSON / 旧版本存储值) 规整成合法选项: 缺字段与非法值都回退默认 */
 export const normalizeOptions = (raw: unknown): PrompterOptions => {
   const src = (raw && typeof raw === 'object' ? raw : {}) as Partial<Record<keyof PrompterOptions, unknown>>;
   return {
@@ -70,23 +71,36 @@ export const normalizeOptions = (raw: unknown): PrompterOptions => {
   };
 };
 
-/** 读取记忆的选项 (无记忆 / JSON 损坏 / 隐私模式禁用 localStorage 时均回退默认) */
-export const getStoredOptions = (): PrompterOptions => {
+/** 读取默认设置 (工具页打开时的初始值; 无配置 / JSON 损坏 / 隐私模式禁用 localStorage 时均回退内置默认) */
+export const getDefaultOptions = (): PrompterOptions => {
   try {
-    const raw = localStorage.getItem(OPTIONS_STORAGE_KEY);
+    const raw = localStorage.getItem(DEFAULTS_STORAGE_KEY);
     return raw ? normalizeOptions(JSON.parse(raw)) : normalizeOptions(null);
   } catch {
     return normalizeOptions(null);
   }
 };
 
-/** 记忆选项 (写入失败时静默忽略, 不影响使用) */
-export const setStoredOptions = (opts: PrompterOptions): void => {
+/** 保存默认设置 (整体覆盖; 非法规整后再存, 写入失败时静默忽略, 不影响使用) */
+export const setDefaultOptions = (opts: PrompterOptions): PrompterOptions => {
+  const next = normalizeOptions(opts);
   try {
-    localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify(normalizeOptions(opts)));
+    localStorage.setItem(DEFAULTS_STORAGE_KEY, JSON.stringify(next));
   } catch {
     /* 忽略 */
   }
+  return next;
+};
+
+/** 局部更新默认设置 (设置中心逐项修改用), 返回写入后的完整设置 */
+export const patchDefaultOptions = (next: Partial<PrompterOptions>): PrompterOptions =>
+  setDefaultOptions({ ...getDefaultOptions(), ...next });
+
+/** 两组选项 (规整后) 是否完全一致 —— 工具页据此判断「保存为默认设置」是否还有必要 */
+export const isSameOptions = (a: PrompterOptions, b: PrompterOptions): boolean => {
+  const x = normalizeOptions(a);
+  const y = normalizeOptions(b);
+  return (Object.keys(x) as (keyof PrompterOptions)[]).every((k) => x[k] === y[k]);
 };
 
 // ==================== 示例脚本 ====================

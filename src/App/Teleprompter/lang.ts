@@ -27,6 +27,15 @@ const uilangRows: Record<string, [string, string]> = {
     '逐行焦點: 只高亮目前閱讀行, 離它越遠的行越透明、顏色越淡',
     'Only the line at the reading point is highlighted — the further away a line is, the more transparent and dimmer it becomes',
   ],
+  '保存为默认设置': ['儲存為預設設定', 'Save as defaults'],
+  '已保存为默认设置, 下次打开提词器时生效': [
+    '已儲存為預設設定, 下次開啟提詞器時生效',
+    'Saved as defaults — it will apply next time you open the teleprompter',
+  ],
+  '把当前的速度 / 字号 / 行距 / 淡入淡出 / 逐行高亮存为默认值, 下次打开时沿用; 也可在 设置 → 其它 → 提词器 中修改': [
+    '把目前的速度 / 字號 / 行距 / 淡入淡出 / 逐行高亮存為預設值, 下次開啟時沿用; 也可在 設定 → 其他 → 提詞器 中修改',
+    'Store the current speed / font size / line height / fade / line focus as the defaults used next time; they can also be edited in Settings → Utilities → Teleprompter',
+  ],
   '边缘淡入淡出: 文字在上下边缘渐隐, 更接近真实提词器': [
     '邊緣淡入淡出: 文字在上下邊緣漸隱, 更接近真實提詞器',
     'Fade the top and bottom edges so lines dissolve in and out, like a real teleprompter',

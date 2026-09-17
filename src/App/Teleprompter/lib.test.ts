@@ -1,12 +1,13 @@
 import {
   DEFAULT_OPTIONS, activeLineIndex, advance, clampFontSize, clampLineHeight, clampSpeed,
-  focusOpacity, formatClock, getStoredOptions, isSliderTarget, isToggleKey, isTypingTarget,
-  lineCentersOf, lineStepOf, nextSampleScript, normalizeOptions, pickSampleScript, progressOf,
-  remainingSeconds, sampleScriptsOf, scrollDistance, setStoredOptions, splitScript,
+  focusOpacity, formatClock, getDefaultOptions, isSameOptions, isSliderTarget, isToggleKey,
+  isTypingTarget, lineCentersOf, lineStepOf, nextSampleScript, normalizeOptions,
+  patchDefaultOptions, pickSampleScript, progressOf, remainingSeconds, sampleScriptsOf,
+  scrollDistance, setDefaultOptions, splitScript,
 } from './lib';
 import {
-  FADE_DEFAULT, FOCUS_DEFAULT, FOCUS_MIN_OPACITY, FONT_SIZE_DEFAULT, FONT_SIZE_MAX,
-  FONT_SIZE_MIN, LINE_HEIGHT_DEFAULT, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN, OPTIONS_STORAGE_KEY,
+  DEFAULTS_STORAGE_KEY, FADE_DEFAULT, FOCUS_DEFAULT, FOCUS_MIN_OPACITY, FONT_SIZE_DEFAULT,
+  FONT_SIZE_MAX, FONT_SIZE_MIN, LINE_HEIGHT_DEFAULT, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN,
   PAD_RATIO, SAMPLE_SCRIPTS, SPEED_DEFAULT, SPEED_MAX, SPEED_MIN,
 } from './data';
 
@@ -52,26 +53,48 @@ describe('选项校验', () => {
   });
 });
 
-describe('选项记忆', () => {
-  test('无记忆时返回默认值', () => {
-    expect(localStorage.getItem(OPTIONS_STORAGE_KEY)).toBeNull();
-    expect(getStoredOptions()).toEqual(DEFAULT_OPTIONS);
+describe('默认设置', () => {
+  test('无配置时返回内置默认值', () => {
+    expect(localStorage.getItem(DEFAULTS_STORAGE_KEY)).toBeNull();
+    expect(getDefaultOptions()).toEqual(DEFAULT_OPTIONS);
   });
 
-  test('写入后可读回 (非法规整后再存)', () => {
-    setStoredOptions({ speed: 999, fontSize: 52, lineHeight: 2.04, fade: false, focus: false });
-    expect(JSON.parse(localStorage.getItem(OPTIONS_STORAGE_KEY) as string)).toEqual({
-      speed: SPEED_MAX, fontSize: 52, lineHeight: 2, fade: false, focus: false,
+  test('写入后可读回 (非法规整后再存), 返回落盘内容', () => {
+    const saved = setDefaultOptions({ speed: 999, fontSize: 52, lineHeight: 2.04, fade: false, focus: false });
+    expect(saved).toEqual({ speed: SPEED_MAX, fontSize: 52, lineHeight: 2, fade: false, focus: false });
+    expect(JSON.parse(localStorage.getItem(DEFAULTS_STORAGE_KEY) as string)).toEqual(saved);
+    expect(getDefaultOptions()).toEqual(saved);
+  });
+
+  test('patchDefaultOptions 只改传入字段, 其余沿用已存值 (无存值时回退内置默认)', () => {
+    setDefaultOptions({ speed: 120, fontSize: 52, lineHeight: 2, fade: false, focus: false });
+    const after = patchDefaultOptions({ speed: 90 });
+    expect(after).toEqual({ speed: 90, fontSize: 52, lineHeight: 2, fade: false, focus: false });
+    expect(getDefaultOptions()).toEqual(after);
+
+    localStorage.clear();
+    expect(patchDefaultOptions({ fade: false })).toEqual({ ...DEFAULT_OPTIONS, fade: false });
+  });
+
+  test('isSameOptions: 规整后逐字段比较 (越界值先被夹取)', () => {
+    expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS })).toBe(true);
+    expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS, speed: SPEED_MAX })).toBe(false);
+    expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS, fade: !DEFAULT_OPTIONS.fade })).toBe(false);
+    // 各字段独立比较: 只差一项就不算相同
+    const keys = Object.keys(DEFAULT_OPTIONS) as (keyof typeof DEFAULT_OPTIONS)[];
+    keys.forEach((k) => {
+      const other: Record<string, unknown> = { ...DEFAULT_OPTIONS };
+      other[k] = typeof other[k] === 'boolean' ? !other[k] : Number(other[k]) + 1;
+      expect(isSameOptions(DEFAULT_OPTIONS, other as unknown as typeof DEFAULT_OPTIONS)).toBe(false);
     });
-    expect(getStoredOptions()).toEqual({ speed: SPEED_MAX, fontSize: 52, lineHeight: 2, fade: false, focus: false });
   });
 
-  test('记忆内容损坏 / 越界时回退 (不抛异常)', () => {
-    localStorage.setItem(OPTIONS_STORAGE_KEY, '{ not json');
-    expect(getStoredOptions()).toEqual(DEFAULT_OPTIONS);
+  test('默认设置内容损坏 / 越界时回退 (不抛异常)', () => {
+    localStorage.setItem(DEFAULTS_STORAGE_KEY, '{ not json');
+    expect(getDefaultOptions()).toEqual(DEFAULT_OPTIONS);
 
-    localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify({ speed: 1, fontSize: 9999, lineHeight: -3 }));
-    expect(getStoredOptions()).toEqual({
+    localStorage.setItem(DEFAULTS_STORAGE_KEY, JSON.stringify({ speed: 1, fontSize: 9999, lineHeight: -3 }));
+    expect(getDefaultOptions()).toEqual({
       speed: SPEED_MIN, fontSize: FONT_SIZE_MAX, lineHeight: LINE_HEIGHT_MIN, fade: FADE_DEFAULT, focus: FOCUS_DEFAULT,
     });
   });
@@ -79,8 +102,9 @@ describe('选项记忆', () => {
   test('localStorage 不可用 (隐私模式) 时读写都不抛异常', () => {
     const spy = jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('denied'); });
     const setSpy = jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('denied'); });
-    expect(getStoredOptions()).toEqual(DEFAULT_OPTIONS);
-    expect(() => setStoredOptions(DEFAULT_OPTIONS)).not.toThrow();
+    expect(getDefaultOptions()).toEqual(DEFAULT_OPTIONS);
+    expect(() => setDefaultOptions(DEFAULT_OPTIONS)).not.toThrow();
+    expect(() => patchDefaultOptions({ speed: 100 })).not.toThrow();
     spy.mockRestore();
     setSpy.mockRestore();
   });

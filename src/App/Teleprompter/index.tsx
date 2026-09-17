@@ -1,7 +1,7 @@
-import { Button, Card, Divider, Input, Progress, Slider, Space, Switch, Tooltip, Typography } from 'antd';
+import { Button, Card, Divider, Input, Progress, Slider, Space, Switch, Tooltip, Typography, message } from 'antd';
 import {
   ClearOutlined, FileTextOutlined, FullscreenExitOutlined, FullscreenOutlined,
-  PauseCircleOutlined, PlayCircleOutlined, ReloadOutlined,
+  PauseCircleOutlined, PlayCircleOutlined, ReloadOutlined, SaveOutlined,
 } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocale } from '../../hook/locale-context';
@@ -11,9 +11,9 @@ import {
 } from './data';
 import {
   activeLineIndex, advance, clampFontSize, clampLineHeight, clampSpeed, focusOpacity,
-  formatClock, getStoredOptions, isSliderTarget, isToggleKey, isTypingTarget, lineCentersOf,
-  lineStepOf, nextSampleScript, pickSampleScript, progressOf, remainingSeconds,
-  scrollDistance, setStoredOptions, splitScript, type PrompterOptions,
+  formatClock, getDefaultOptions, isSameOptions, isSliderTarget, isToggleKey, isTypingTarget,
+  lineCentersOf, lineStepOf, nextSampleScript, pickSampleScript, progressOf, remainingSeconds,
+  scrollDistance, setDefaultOptions, splitScript, type PrompterOptions,
 } from './lib';
 import { u, uT } from './lang';
 import TeleprompterIntro from './intro';
@@ -48,7 +48,10 @@ const Teleprompter: React.FC = () => {
   const t = (zh: string) => u(locale, zh);
   const tt = (zh: string, vars?: Record<string, string | number>) => uT(locale, zh, vars);
 
-  const [ opts, setOpts ] = useState<PrompterOptions>(() => getStoredOptions());
+  // 打开时按保存的默认设置初始化 (默认设置可在 设置中心 或本页「保存为默认设置」中修改)
+  const [ opts, setOpts ] = useState<PrompterOptions>(() => getDefaultOptions());
+  /** 已保存的默认设置: 与当前参数不一致时「保存为默认设置」才可点 */
+  const [ defaults, setDefaults ] = useState<PrompterOptions>(() => getDefaultOptions());
   // 首次打开的默认稿件: 按当前语言随机取一首示例诗
   const [ text, setText ] = useState(() => pickSampleScript(locale));
   const [ playing, setPlaying ] = useState(false);
@@ -113,8 +116,12 @@ const Teleprompter: React.FC = () => {
     commit(0);
   }, [ commit ]);
 
-  // 选项记忆: 速度 / 字号 / 行距 / 淡入淡出 下次打开沿用
-  useEffect(() => { setStoredOptions(opts); }, [ opts ]);
+  // 保存为默认设置: 把当前页面的参数写成本地默认值, 下次打开 (含设置中心) 沿用
+  const canSaveDefaults = !isSameOptions(opts, defaults);
+  const saveDefaults = useCallback(() => {
+    setDefaults(setDefaultOptions(opts));
+    message.success(t('已保存为默认设置, 下次打开提词器时生效'));
+  }, [ opts, t ]);
 
   // 测量视口与文本高度 → 得到滚动总距离 (尺寸变化时重算, 已在结尾则贴住结尾)
   useEffect(() => {
@@ -305,6 +312,19 @@ const Teleprompter: React.FC = () => {
               <span style={{ color: '#888' }}>{t('逐行高亮')}</span>
             </Tooltip>
           </Space>
+          <Tooltip title={t('把当前的速度 / 字号 / 行距 / 淡入淡出 / 逐行高亮存为默认值, 下次打开时沿用; 也可在 设置 → 其它 → 提词器 中修改')}>
+            {/* 按钮 disabled 时自身不响应鼠标, 用 span 包一层保证提示仍可弹出 */}
+            <span style={{ display: 'inline-block' }}>
+              <Button
+                size="small"
+                icon={<SaveOutlined />}
+                disabled={!canSaveDefaults}
+                onClick={saveDefaults}
+              >
+                {t('保存为默认设置')}
+              </Button>
+            </span>
+          </Tooltip>
         </Space>
       </Card>
 
