@@ -40,7 +40,7 @@ Base64 · URL · Unicode · Punycode · UUencode · XXencode · BCD · Morse cod
 Unix timestamp · Color format · Radix (BIN/OCT/DEC/HEX) · Tree ↔ path · GPS coordinates · Download-link converter · JSONL · RMB uppercase (CNY) · Byte units · Chinese Pinyin · Temperature · Distance · Config (INI/JSON/YAML/TOML/properties) · Subtitle (SRT/ASS/…) · Speed · Volume · Area · Weight
 
 ### 🛠️ Formatters & Editors *(9)*
-Markdown editor (live preview + LaTeX subset) · Mermaid editor (live preview, export SVG/PNG/WebP) · JSON · JSON5 · SQL · XML · HTML · SVG · CN/EN typography spacing
+Markdown editor (live preview + LaTeX subset) · Mermaid editor (live preview, 30+ built-in diagram samples, export SVG/PNG/WebP) · JSON · JSON5 · SQL · XML · HTML · SVG · CN/EN typography spacing
 
 ### 🖼️ Image Generators *(13)*
 QR code · Barcode (CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · Base64 image · ASCII image · Code screenshot · ICO icon · App icon · Dominant-color palette (merge similar colors + share) · Image split (2/3/4/6/9) · Image adjust (resize percent / pixels, rotate 90°·180°·270°, PNG·JPEG·WebP) · Image watermark (text / logo, nine-grid · tiled, rotation + opacity) · Placeholder image · Shield badge (PNG export ×1–10)

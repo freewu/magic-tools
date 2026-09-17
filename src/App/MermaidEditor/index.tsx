@@ -10,9 +10,11 @@ import {
   BACKGROUND_OPTIONS,
   DEFAULT_FILE_BASE,
   DEFAULT_SCALE,
+  GROUP_LABELS,
   RASTER_QUALITY,
   SAMPLES,
   SCALE_OPTIONS,
+  type MermaidSampleGroup,
   type RasterBackground,
 } from './data';
 import {
@@ -103,6 +105,15 @@ const MermaidEditor: React.FC = () => {
   }, [code, isDark]);
 
   const size = useMemo(() => parseSvgSize(svg), [svg]);
+  // 按图形家族分组, 并支持输入关键字筛选 (示例较多, 分组而非平铺)
+  const sampleOptions = useMemo(
+    () => (Object.keys(GROUP_LABELS) as MermaidSampleGroup[]).map((g) => ({
+      label: t(GROUP_LABELS[g]),
+      options: SAMPLES.filter((s) => s.group === g).map((s) => ({ value: s.id, label: t(s.label) })),
+    })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [ locale ],
+  );
   const canExport = !!svg && !!size;
   const base = sampleId ? `mermaid-${sampleId}` : DEFAULT_FILE_BASE;
   const lines = code ? code.split('\n').length : 0;
@@ -170,15 +181,19 @@ const MermaidEditor: React.FC = () => {
             <Space size={8}>
               <Select
                 size="small"
+                showSearch
                 value={sampleId}
-                style={{ minWidth: 190 }}
+                style={{ minWidth: 210 }}
+                optionFilterProp="label"
+                styles={{ popup: { root: { minWidth: 300 } } }}
+                listHeight={360}
                 onChange={(v) => {
                   const s = SAMPLES.find((x) => x.id === v);
                   if (!s) return;
                   setSampleId(s.id);
                   setCode(s.code);
                 }}
-                options={SAMPLES.map((s) => ({ value: s.id, label: t(s.label) }))}
+                options={sampleOptions}
               />
               <Button size="small" icon={<CopyOutlined />} disabled={!code} onClick={() => { void copy(code, t('已复制源码')); }}>{t('复制源码')}</Button>
               <Button size="small" danger disabled={!code} onClick={() => setCode('')}>{t('清空')}</Button>

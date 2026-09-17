@@ -3,7 +3,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { message } from 'antd';
 import { ThemeProvider } from '../../hook/theme-context';
 import MermaidEditor from './index';
-import { SAMPLES } from './data';
+import { GROUP_LABELS, SAMPLES } from './data';
+import { u } from './lang';
 import { saveBytesFile, savePngFile, saveTextFile } from '../../lib/tauri';
 
 jest.mock('../../lib/tauri', () => ({
@@ -71,6 +72,21 @@ const btn = (name: string): HTMLButtonElement => {
   if (!hit) throw new Error(`未找到按钮: ${name}`);
   return hit;
 };
+/** 在分组下拉框中搜索并选中某个示例 (列表虚拟滚动, 需先输入关键字筛出目标项) */
+const pickSample = async (label: string) => {
+  fireEvent.mouseDown(document.querySelector('.ant-select-selector') as HTMLElement);
+  const input = document.querySelector('.ant-select-selection-search-input') as HTMLInputElement;
+  fireEvent.change(input, { target: { value: label } });
+  const option = await waitFor(() => {
+    const hit = screen
+      .getAllByText(label)
+      .find((el) => el.closest('.ant-select-item-option'))
+      ?.closest('.ant-select-item-option');
+    if (!hit) throw new Error(`未找到示例选项: ${label}`);
+    return hit as HTMLElement;
+  });
+  fireEvent.click(option);
+};
 /** 源码编辑框 */
 const codeArea = () => screen.getByPlaceholderText('在此输入 Mermaid 代码…') as HTMLTextAreaElement;
 /** 等待首次渲染完成 (200ms 防抖) */
@@ -126,13 +142,19 @@ describe('MermaidEditor 初始界面', () => {
     render(<MermaidEditor />);
     await waitRendered();
 
-    fireEvent.mouseDown(document.querySelector('.ant-select-selector') as HTMLElement);
-    const option = screen.getAllByText('饼图 (pie)').find((el) => el.closest('.ant-select-item'));
-    fireEvent.click(option!.closest('.ant-select-item') as HTMLElement);
+    await pickSample('饼图 (pie)');
 
     const pie = SAMPLES.find((s) => s.id === 'pie')!;
     expect(codeArea().value).toBe(pie.code);
     await waitFor(() => expect(rendered[rendered.length - 1]).toBe(pie.code));
+  });
+
+  test('示例下拉按图形家族分组 (首个分组为「基础图」)', async () => {
+    render(<MermaidEditor />);
+    await waitRendered();
+    fireEvent.mouseDown(document.querySelector('.ant-select-selector') as HTMLElement);
+    await waitFor(() => expect(screen.getByText(GROUP_LABELS.basic)).toBeInTheDocument());
+    expect(document.querySelectorAll('.ant-select-item-group').length).toBeGreaterThan(0);
   });
 
   test('手动编辑源码后重新渲染', async () => {
@@ -240,9 +262,7 @@ describe('MermaidEditor 导出', () => {
   test('导出文件名跟随所选示例', async () => {
     render(<MermaidEditor />);
     await waitRendered();
-    fireEvent.mouseDown(document.querySelector('.ant-select-selector') as HTMLElement);
-    const option = screen.getAllByText('时序图 (sequenceDiagram)').find((el) => el.closest('.ant-select-item'));
-    fireEvent.click(option!.closest('.ant-select-item') as HTMLElement);
+    await pickSample('时序图 (sequenceDiagram)');
     await waitFor(() => expect(codeArea().value).toContain('sequenceDiagram'));
 
     fireEvent.click(btn('导出 SVG'));
@@ -288,5 +308,51 @@ describe('MermaidEditor 说明区', () => {
     expect(intro.textContent).toContain('sequenceDiagram');
     expect(intro.textContent).toContain('gitGraph');
     expect(intro.textContent).toContain('htmlLabels');
+  });
+});
+
+describe('MermaidEditor 内置示例', () => {
+  /** 各图形源码的开头关键字 (sankey 带 front-matter, 断言前先剥掉) */
+  const KEYWORDS: Record<string, RegExp> = {
+    flowchart: /^flowchart /, sequence: /^sequenceDiagram/, class: /^classDiagram/, state: /^stateDiagram-v2/,
+    er: /^erDiagram/, mindmap: /^mindmap/, journey: /^journey/, c4: /^C4Context/, architecture: /^architecture-beta/,
+    block: /^block-beta/, requirement: /^requirementDiagram/, pie: /^pie /, quadrant: /^quadrantChart/, xychart: /^xychart/,
+    sankey: /^sankey/, radar: /^radar-beta/, treemap: /^treemap-beta/, venn: /^venn-beta/, packet: /^packet/,
+    gantt: /^gantt/, gitgraph: /^gitGraph/, timeline: /^timeline/, kanban: /^kanban/, ishikawa: /^ishikawa-beta/,
+    cynefin: /^cynefin-beta/, wardley: /^wardley-beta/, eventmodeling: /^eventmodeling/, treeview: /^treeView-beta/,
+    'railroad-ir': /^railroad-beta/, 'railroad-ebnf': /^railroad-ebnf-beta/,
+    'railroad-abnf': /^railroad-abnf-beta/, 'railroad-peg': /^railroad-peg-beta/,
+  };
+
+  test('覆盖全部可预览图形: id 唯一、分组齐全、源码关键字正确', () => {
+    const ids = SAMPLES.map((s) => s.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    // 与关键字清单一一对应 (新增/删除示例时同步维护)
+    expect([...ids].sort()).toEqual(Object.keys(KEYWORDS).sort());
+    // 四个分组都有示例
+    expect([...new Set(SAMPLES.map((s) => s.group))].sort()).toEqual([ 'basic', 'chart', 'flow', 'grammar' ]);
+
+    for (const s of SAMPLES) {
+      const body = s.code.replace(/^---\n[\s\S]*?\n---\n/, '').trim();
+      expect(body).toMatch(KEYWORDS[s.id]);
+      expect(s.code.length).toBeGreaterThan(20);
+    }
+
+    // 需要外挂插件 / 无解析器的图形不应出现在内置示例里
+    for (const hidden of [ 'usecase', 'zenuml', 'flowchart-elk', 'info' ]) {
+      expect(ids).not.toContain(hidden);
+    }
+  });
+
+  test('示例名与分组名均有 zh-TW / en 词条', () => {
+    for (const s of SAMPLES) {
+      // en 词条必须齐全; zh-TW 允许与 zh 相同 (如「看板 (kanban)」两地用字一致)
+      expect(u('en', s.label)).not.toBe(s.label);
+      expect(u('zh-TW', s.label).length).toBeGreaterThan(0);
+      expect(u('zh-CN', s.label)).toBe(s.label);
+    }
+    for (const g of Object.values(GROUP_LABELS)) {
+      expect(u('en', g)).not.toBe(g);
+    }
   });
 });
