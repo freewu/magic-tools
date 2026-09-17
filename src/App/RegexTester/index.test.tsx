@@ -87,6 +87,19 @@ describe('RegexTester 说明 / 代码生成 页签', () => {
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith(expect.stringContaining('re.compile(r"^a$")'));
   });
 
+  test('生成代码带语法高亮, 但复制出去的仍是纯文本', () => {
+    render(<RegexTester />);
+    fireEvent.click(tab(/代码生成/));
+    typePattern('^1[3-9]\\d{9}$');
+    const pre = pane().querySelector('pre.hljs') as HTMLElement;
+    expect(pre).toBeTruthy();
+    expect(pre.querySelectorAll('[class^="hljs-"]').length).toBeGreaterThan(0);
+    expect(pre.textContent).toContain('pattern = re.compile');
+    clickCopy('复制代码');
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(expect.stringContaining('re.compile'));
+    expect(navigator.clipboard.writeText).not.toHaveBeenCalledWith(expect.stringContaining('<span'));
+  });
+
   test('示例文本取自上方的输入内容, 超过上限时给出截取提示', () => {
     render(<RegexTester />);
     fireEvent.click(tab(/代码生成/));

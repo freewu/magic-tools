@@ -11,6 +11,7 @@ import {
   MAX_TEXT_LINES,
   type RegexCodeLang,
 } from './codegen'
+import { highlightCode } from './highlight'
 
 interface Props {
   /** 当前正则表达式 */
@@ -33,6 +34,8 @@ const RegexCodeTab = ({ pattern, flags, text }: Props) => {
   const [ notice, contextHolder ] = message.useMessage();
 
   const code = useMemo(() => buildRegexCode(lang, { pattern, flags, text }), [ lang, pattern, flags, text ]);
+  /** 高亮后的代码 (仅用于展示, 复制仍用原始文本) */
+  const html = useMemo(() => highlightCode(code, lang), [ code, lang ]);
 
   const needPattern = pattern.trim() === '';
   const truncated = text.replace(/\r\n/g, '\n').replace(/\n+$/, '').split('\n').length > MAX_TEXT_LINES;
@@ -75,21 +78,22 @@ const RegexCodeTab = ({ pattern, flags, text }: Props) => {
         </div>
       ) : (
         <pre
+          className="hljs regex-code"
           style={ {
             margin: '10px 0 0',
             padding: '10px 12px',
             maxHeight: 460,
             overflow: 'auto',
-            background: token.colorFillQuaternary,
+            background: '#23241f',
             border: `1px solid ${token.colorBorderSecondary}`,
             borderRadius: 6,
-            color: token.colorText,
             fontFamily: "Consolas, Monaco, 'Courier New', monospace",
             fontSize: 13,
             lineHeight: 1.6,
             whiteSpace: 'pre',
           } }
-        >{ code }</pre>
+          dangerouslySetInnerHTML={ { __html: html } }
+        />
       ) }
     </div>
   );
