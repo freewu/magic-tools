@@ -32,6 +32,12 @@ export default defineConfig({
         // 手动分包: 主入口 (layout/App 注册表) 只留业务骨架,
         // 框架/UI/工具依赖拆成独立 vendor chunk, 供懒加载页面按需复用
         manualChunks(id) {
+          // Vite 注入的 __vitePreload 助手 (\0vite/preload-helper.js) 被入口与所有按需 chunk 共享:
+          // 必须固定到入口已预载的小 chunk, 否则 Rollup 会把它并入某个大按需 chunk
+          // (实测并入 vendor-mermaid), 使该 chunk 变成入口静态依赖 → 首屏被全量预载
+          if (id.includes('vite/preload-helper')) {
+            return 'vendor-react';
+          }
           if (!id.includes('node_modules')) return undefined;
           if (/node_modules\/(?:react|react-dom|react-router|react-router-dom|scheduler|use-sync-external-store|@remix-run|object-assign|loose-envify|prop-types)\//.test(id)) {
             return 'vendor-react';
@@ -58,6 +64,12 @@ export default defineConfig({
           }
           if (/node_modules\/pinyin-pro\//.test(id)) {
             return 'vendor-pinyin';
+          }
+          // mermaid 与其图形依赖 (d3 / cytoscape / katex 等, 合计约 2MB): 独立 chunk 按需加载,
+          // 只在打开「Mermaid 编辑器」页时拉取; 混入 vendor-misc 会拖大其余页面的预载体积
+          // (注意此规则必须在 vendor-antd 之后: stylis 同时被 @ant-design/cssinjs 使用)
+          if (/node_modules\/(?:mermaid|@mermaid-js|@braintree|@iconify|@upsetjs|cytoscape|cytoscape-[^/]+|d3|d3-[^/]+|dagre-d3-es|dompurify|es-toolkit|fastdom|katex|khroma|marked|roughjs|ts-dedent|uuid)\//.test(id)) {
+            return 'vendor-mermaid';
           }
           // Shiki 语言语法包: 保持独立 dynamic chunk (import.meta.glob 按需加载),
           // 不并入 vendor-misc, 否则代码截图首次打开会拉取全部语言 (gzip ~1.7MB)

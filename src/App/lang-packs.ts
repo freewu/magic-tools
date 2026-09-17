@@ -79,6 +79,7 @@ import WeightConvert from './WeightConvert/lang';
 import HtpasswdGenerator from './HtpasswdGenerator/lang';
 import RegexTester from './RegexTester/lang';
 import MarkdownEditor from './MarkdownEditor/lang';
+import MermaidEditor from './MermaidEditor/lang';
 import JsonFormatter from './JsonFormatter/lang';
 import JSON5Formatter from './JSON5Formatter/lang';
 import SQLFormatter from './SQLFormatter/lang';
@@ -110,6 +111,7 @@ import SitemapCheck from './SitemapCheck/lang';
 import KeywordDensity from './KeywordDensity/lang';
 import WebTDKCheck from './WebTDKCheck/lang';
 import RobotsTxtGenerator from './RobotsTxtGenerator/lang';
+import CSRGenerator from './CSRGenerator/lang';
 import AppStore from './AppStore/lang';
 import Setting from './Setting/lang';
 import Help from './Help/lang';
@@ -199,6 +201,7 @@ export const langPacks = {
   HtpasswdGenerator: HtpasswdGenerator,
   RegexTester: RegexTester,
   MarkdownEditor: MarkdownEditor,
+  MermaidEditor: MermaidEditor,
   JsonFormatter: JsonFormatter,
   JSON5Formatter: JSON5Formatter,
   SQLFormatter: SQLFormatter,
@@ -230,6 +233,7 @@ export const langPacks = {
   KeywordDensity: KeywordDensity,
   WebTDKCheck: WebTDKCheck,
   RobotsTxtGenerator: RobotsTxtGenerator,
+  CSRGenerator: CSRGenerator,
   AppStore,
   Setting,
   Help,

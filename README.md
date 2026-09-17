@@ -2,7 +2,7 @@
 
 # 🧰 Magic Tools
 
-**An all-in-one developer toolbox — 114 utilities in 8 categories, cross-platform desktop & Web.**
+**An all-in-one developer toolbox — 117 utilities in 8 categories, cross-platform desktop & Web.**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
@@ -39,14 +39,14 @@ Base64 · URL · Unicode · Punycode · UUencode · XXencode · BCD · Morse cod
 ### ⚖️ Converters *(18)*
 Unix timestamp · Color format · Radix (BIN/OCT/DEC/HEX) · Tree ↔ path · GPS coordinates · Download-link converter · JSONL · RMB uppercase (CNY) · Byte units · Chinese Pinyin · Temperature · Distance · Config (INI/JSON/YAML/TOML/properties) · Subtitle (SRT/ASS/…) · Speed · Volume · Area · Weight
 
-### 🛠️ Formatters & Editors *(8)*
-Markdown editor (live preview + LaTeX subset) · JSON · JSON5 · SQL · XML · HTML · SVG · CN/EN typography spacing
+### 🛠️ Formatters & Editors *(9)*
+Markdown editor (live preview + LaTeX subset) · Mermaid editor (live preview, export SVG/PNG/WebP) · JSON · JSON5 · SQL · XML · HTML · SVG · CN/EN typography spacing
 
 ### 🖼️ Image Generators *(13)*
 QR code · Barcode (CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · Base64 image · ASCII image · Code screenshot · ICO icon · App icon · Dominant-color palette (merge similar colors + share) · Image split (2/3/4/6/9) · Image adjust (resize percent / pixels, rotate 90°·180°·270°, PNG·JPEG·WebP) · Image watermark (text / logo, nine-grid · tiled, rotation + opacity) · Placeholder image · Shield badge (PNG export ×1–10)
 
-### 🌐 Webmaster Tools *(9)*
-HTML stripper · Browser fingerprint · URL extractor · Cookie analyzer · User-Agent parser · Sitemap checker · Keyword density · TDK checker · robots.txt generator
+### 🌐 Webmaster Tools *(10)*
+HTML stripper · Browser fingerprint · CSR request generator (WebCrypto RSA + PKCS#10, SAN, key + CSR download) · URL extractor · Cookie analyzer · User-Agent parser · Sitemap checker · Keyword density · TDK checker · robots.txt generator
 
 ### 🧩 Utilities *(17)*
 CSS colors · Line counter · htpasswd generator · Regex tester (17 presets) · File diff · Dot-matrix font · Keyboard key info · Chmod calculator · OTP generator · ASCII text art · Cron rules (parse + next runs) · CIDR calculator · Password generator (strength analysis) · Mock data generator (JSON/CSV/SQL) · WebSocket debugger · Sudoku generator (4×4 / 6×6 / 9×9, unique solution, A4 print) · Copybook generator (mi / tian / hui / essay grids, A4 print)
@@ -88,15 +88,15 @@ magic-tools
 │   │   ├── app-modules.ts    # build-time collection via import.meta.glob (replaces webpack context)
 │   │   ├── app-i18n.ts       # app registry: appNameOf() trilingual names for tools & fixed pages
 │   │   ├── lang-packs.ts     # aggregates every tool's default language pack (lang.ts default export)
-│   │   └── <Tool>/           # one folder per tool (115, grouped list below) — 2-step registration
+│   │   └── <Tool>/           # one folder per tool (117, grouped list below) — 2-step registration
 │   │       ├── define.tsx    # registration metadata: AppName (zh-CN default) / Icon / Type (category)
 │   │       ├── index.tsx     # tool page component (default export; lazy-loaded)
 │   │       ├── lang.ts       # default language pack + rows (zh phrase = key → [zh-TW, en]) + lookup helpers
 │   │       ├── lib.ts        # pure logic shared by the page and its unit tests (most tools)
-│   │       ├── lib.test.ts   # jest unit tests (87 tools)
-│   │       ├── data.ts       # option tables / constants / types (51 tools)
+│   │       ├── lib.test.ts   # jest unit tests (89 tools)
+│   │       ├── data.ts       # option tables / constants / types (53 tools)
 │   │       ├── setting.tsx   # this tool's panel inside the Settings center (63 tools)
-│   │       └── intro.tsx     # About / instructions content, trilingual (38 tools)
+│   │       └── intro.tsx     # About / instructions content, trilingual (40 tools)
 │   ├── layout/           # main frame: sidebar / content
 │   ├── hook/             # global state: theme / app context
 │   └── lib/              # shared utilities
@@ -107,7 +107,7 @@ magic-tools
 
 ### Existing tools under `src/App/`
 
-115 tool folders live under [`src/App/`](src/App/) and each holds one tool declared by its `define.tsx`. **Adding a tool takes two steps:** (1) append the folder name to the `list` array in [`src/App/index.tsx`](src/App/index.tsx) — that hand-maintained registry drives the sidebar / App Center menu order and routing, while `import.meta.glob` only discovers the page component; (2) add its `lang.ts` default export to [`src/App/lang-packs.ts`](src/App/lang-packs.ts) so names/UI strings can be translated. Grouped below by the `Type` registered in `define.tsx` (same categories as the sidebar / [feature overview](#-feature-overview)). Some tools add tool-specific files besides the common ones (e.g. `AESCrypto/gcm.ts`, `Hash/sm3.ts`+`keccak.ts`, `CronRules/parse.tsx`, `Setting/setting-*.tsx`):
+117 tool folders live under [`src/App/`](src/App/) and each holds one tool declared by its `define.tsx`. **Adding a tool takes two steps:** (1) append the folder name to the `list` array in [`src/App/index.tsx`](src/App/index.tsx) — that hand-maintained registry drives the sidebar / App Center menu order and routing, while `import.meta.glob` only discovers the page component; (2) add its `lang.ts` default export to [`src/App/lang-packs.ts`](src/App/lang-packs.ts) so names/UI strings can be translated. Grouped below by the `Type` registered in `define.tsx` (same categories as the sidebar / [feature overview](#-feature-overview)). Some tools add tool-specific files besides the common ones (e.g. `AESCrypto/gcm.ts`, `Hash/sm3.ts`+`keccak.ts`, `CronRules/parse.tsx`, `Setting/setting-*.tsx`):
 
 **🔐 Cryptography *(21)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
 
@@ -117,11 +117,11 @@ magic-tools
 
 **⚖️ Converters *(18)*** — `AreaConvert` · `ByteConvert` · `ColorConvert` · `ConfigConvert` · `DistanceConvert` · `DownloadLinkConvert` · `GPSConvert` · `JSONLConvert` · `NumberConvert` · `PinyinConvert` · `RMBConvert` · `SpeedConvert` · `SubtitleConvert` · `TemperatureConvert` · `Time` · `TreePathConvert` · `VolumeConvert` · `WeightConvert`
 
-**🛠️ Formatters & Editors *(8)*** — `CnEnSpacing` · `HtmlFormat` · `JSON5Formatter` · `JsonFormatter` · `MarkdownEditor` · `SQLFormatter` · `SvgFormat` · `XmlFormatter`
+**🛠️ Formatters & Editors *(9)*** — `CnEnSpacing` · `HtmlFormat` · `JSON5Formatter` · `JsonFormatter` · `MarkdownEditor` · `MermaidEditor` · `SQLFormatter` · `SvgFormat` · `XmlFormatter`
 
 **🖼️ Image Generators *(13)*** — `AppIconGenerator` · `AsciiImageGenerator` · `BarcodeGenerator` · `Base64Image` · `CodeShot` · `IcoGenerator` · `ImageColor` · `ImageResize` · `ImageSplit` · `ImageWatermark` · `PlaceholderImage` · `QRCodeGenerator` · `ShieldBadgeGenerator`
 
-**🌐 Webmaster Tools *(9)*** — `BrowserFingerprint` · `CookieAnalyzer` · `HtmlStripText` · `KeywordDensity` · `RobotsTxtGenerator` · `SitemapCheck` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck`
+**🌐 Webmaster Tools *(10)*** — `BrowserFingerprint` · `CSRGenerator` · `CookieAnalyzer` · `HtmlStripText` · `KeywordDensity` · `RobotsTxtGenerator` · `SitemapCheck` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck`
 
 **🧩 Utilities *(17)*** — `AsciiTextArt` · `CIDRCalc` · `Chmod` · `Color` · `CopybookGenerator` · `CronRules` · `DotMatrixFont` · `FileDiff` · `HtpasswdGenerator` · `KeyboardKeyInfo` · `LineCount` · `MockData` · `OTPGenerator` · `PasswordGenerator` · `RegexTester` · `SudokuGenerator` · `WebSocketDebug`
 
