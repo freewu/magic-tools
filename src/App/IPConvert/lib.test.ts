@@ -85,3 +85,103 @@ describe('intToHex / intToBin', () => {
     expect(intToBin('3232235777')).toBe('11000000101010000000000100000001');
   });
 });
+
+// ---------- IPv4 -> IPv6 ----------
+import { compressIpv6, formatIpv6, ipv4ToIpv6Forms, ipv4ToIpv6FormsSafe } from './lib';
+
+describe('compressIpv6', () => {
+  it('最长连续 0 段压缩成 ::', () => {
+    expect(compressIpv6([ 1, 0, 0, 0, 0, 0, 0, 1 ])).toBe('1::1');
+    expect(compressIpv6([ 0, 0, 0, 0, 0, 0, 0, 0 ])).toBe('::');
+    expect(compressIpv6([ 0x2002, 0xc0a8, 0x101, 0, 0, 0, 0, 0 ])).toBe('2002:c0a8:101::');
+    expect(compressIpv6([ 0, 0, 0, 0, 0, 0xffff, 0xc0a8, 0x101 ])).toBe('::ffff:c0a8:101');
+  });
+
+  it('只有一段 0 时不压缩, 字母小写并去前导零', () => {
+    expect(compressIpv6([ 1, 0, 2, 3, 4, 5, 6, 7 ])).toBe('1:0:2:3:4:5:6:7');
+    expect(compressIpv6([ 0xabcd, 1, 2, 3, 4, 5, 6, 7 ])).toBe('abcd:1:2:3:4:5:6:7');
+    expect(compressIpv6([ 0x0001, 0x0002, 3, 4, 5, 6, 7, 8 ])).toBe('1:2:3:4:5:6:7:8');
+  });
+
+  it('并列的 0 段取靠左的一段, 行首 / 行尾的 :: 也不会多出冒号', () => {
+    expect(compressIpv6([ 0, 0, 1, 0, 0 ])).toBe('::1:0:0');
+    // 两段 0 长度不同 -> 压缩更长的那段 (此处是行尾)
+    expect(compressIpv6([ 0, 0, 1, 2, 3, 0, 0, 0 ])).toBe('0:0:1:2:3::');
+    expect(compressIpv6([ 1, 2, 3, 4, 5, 6, 0, 0 ])).toBe('1:2:3:4:5:6::');
+  });
+});
+
+describe('formatIpv6', () => {
+  it('full: 8 组补足 4 位', () => {
+    expect(formatIpv6([ 0, 0, 0, 0, 0, 0xffff, 0xc0a8, 0x101 ], 'full'))
+      .toBe('0000:0000:0000:0000:0000:ffff:c0a8:0101');
+    expect(formatIpv6([ 0x2002, 0xc0a8, 0x101 ], 'full'))
+      .toBe('2002:c0a8:0101:0000:0000:0000:0000:0000'); // 不足 8 组按 0 补齐
+  });
+
+  it('mixed: 末尾 32 位写成点分 IPv4', () => {
+    expect(formatIpv6([ 0, 0, 0, 0, 0, 0xffff, 0xc0a8, 0x101 ], 'mixed')).toBe('::ffff:192.168.1.1');
+    expect(formatIpv6([ 0, 0, 0, 0, 0, 0, 0xc0a8, 0x101 ], 'mixed')).toBe('::192.168.1.1');
+    expect(formatIpv6([ 0x64, 0xff9b, 0, 0, 0, 0, 0xc0a8, 0x101 ], 'mixed')).toBe('64:ff9b::192.168.1.1');
+    expect(formatIpv6([ 0, 0, 0, 0, 0, 0, 0, 0 ], 'mixed')).toBe('::0.0.0.0');
+  });
+
+  it('compressed: 不写点分, 直接压缩', () => {
+    expect(formatIpv6([ 0, 0, 0, 0, 0, 0xc0a8, 0x101, 0xffff ], 'compressed'))
+      .toBe('::c0a8:101:ffff');
+    expect(formatIpv6([ 0, 0, 0, 0, 0, 0xffff, 0xc0a8, 0x101 ])).toBe('::ffff:c0a8:101');
+  });
+});
+
+describe('ipv4ToIpv6Forms', () => {
+  it('192.168.1.1 的各类写法', () => {
+    const map = Object.fromEntries(ipv4ToIpv6Forms('192.168.1.1').map((f) => [ f.key, f.value ]));
+    expect(map).toEqual({
+      ipv6Mapped: '::ffff:192.168.1.1',
+      ipv6MappedHex: '::ffff:c0a8:101',
+      ipv6Compat: '::192.168.1.1',
+      ipv6SixToFour: '2002:c0a8:101::',
+      ipv6Nat64: '64:ff9b::192.168.1.1',
+      ipv6Full: '0000:0000:0000:0000:0000:ffff:c0a8:0101',
+    });
+  });
+
+  it('1.2.3.4 的各类写法', () => {
+    const map = Object.fromEntries(ipv4ToIpv6Forms('1.2.3.4').map((f) => [ f.key, f.value ]));
+    expect(map.ipv6Mapped).toBe('::ffff:1.2.3.4');
+    expect(map.ipv6MappedHex).toBe('::ffff:102:304');
+    expect(map.ipv6Compat).toBe('::1.2.3.4');
+    expect(map.ipv6SixToFour).toBe('2002:102:304::');
+    expect(map.ipv6Nat64).toBe('64:ff9b::1.2.3.4');
+    expect(map.ipv6Full).toBe('0000:0000:0000:0000:0000:ffff:0102:0304');
+  });
+
+  it('0.0.0.0 与 255.255.255.255 也不产生多余冒号', () => {
+    const zero = Object.fromEntries(ipv4ToIpv6Forms('0.0.0.0').map((f) => [ f.key, f.value ]));
+    expect(zero.ipv6Mapped).toBe('::ffff:0.0.0.0');
+    expect(zero.ipv6MappedHex).toBe('::ffff:0:0');
+    expect(zero.ipv6Compat).toBe('::0.0.0.0');
+    expect(zero.ipv6SixToFour).toBe('2002::');
+    expect(zero.ipv6Nat64).toBe('64:ff9b::0.0.0.0');
+    const all = Object.fromEntries(ipv4ToIpv6Forms('255.255.255.255').map((f) => [ f.key, f.value ]));
+    expect(all.ipv6Mapped).toBe('::ffff:255.255.255.255');
+    expect(all.ipv6SixToFour).toBe('2002:ffff:ffff::');
+    expect(all.ipv6Full).toBe('0000:0000:0000:0000:0000:ffff:ffff:ffff');
+  });
+
+  it('每条写法都带 key, 非法地址抛错 / 安全版返回空数组', () => {
+    expect(ipv4ToIpv6Forms('8.8.8.8')).toHaveLength(6);
+    expect(ipv4ToIpv6Forms('8.8.8.8').every((f) => f.key !== '' && f.value !== '')).toBe(true);
+    expect(() => ipv4ToIpv6Forms('256.1.1.1')).toThrow();
+    expect(() => ipv4ToIpv6Forms('')).toThrow();
+    expect(ipv4ToIpv6FormsSafe('256.1.1.1')).toEqual([]);
+    expect(ipv4ToIpv6FormsSafe('8.8.8.8')).toHaveLength(6);
+  });
+
+  it('映射地址与兼容地址的十六进制写法互不相同', () => {
+    const map = Object.fromEntries(ipv4ToIpv6Forms('10.0.0.1').map((f) => [ f.key, f.value ]));
+    expect(map.ipv6MappedHex).toBe('::ffff:a00:1');
+    expect(map.ipv6SixToFour).toBe('2002:a00:1::');
+    expect(map.ipv6Nat64).toBe('64:ff9b::10.0.0.1');
+  });
+});

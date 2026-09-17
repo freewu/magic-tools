@@ -63,3 +63,101 @@ export const intToHex = (intText :string) :string =>
 /** 整数 -> 32 位二进制字符串 */
 export const intToBin = (intText :string) :string =>
   parseIntText(intText).toString(2).padStart(32, '0');
+
+// ---------- IPv4 -> IPv6 各种写法 ----------
+
+/** IPv6 写法: compressed = RFC 5952 压缩; full = 8 组完整展开; mixed = 末尾 32 位写成点分 IPv4 */
+export type Ipv6Style = 'compressed' | 'full' | 'mixed';
+
+/** 一组 16 位的十六进制 (小写, 去前导零) */
+const groupHex = (v :number) :string => (v & 0xffff).toString(16);
+
+/** 找出最长的连续 0 段 (长度 >= 2; 并列时取最靠左的一段) */
+const longestZeroRun = (groups :number[]) :{ start :number; len :number } => {
+  let best :{ start :number; len :number } = { start: -1, len: 0 };
+  let i = 0;
+  while (i < groups.length) {
+    if (groups[i] !== 0) { i += 1; continue; }
+    let j = i;
+    while (j < groups.length && groups[j] === 0) j += 1;
+    const len = j - i;
+    if (len > best.len) best = { start: i, len }; // 严格大于 -> 并列时保留靠左的一段
+    i = j;
+  }
+  return best.len >= 2 ? best : { start: -1, len: 0 };
+};
+
+/**
+ * 按 RFC 5952 压缩 8 组 16 位分组:
+ * - 字母小写, 每组去掉前导零
+ * - 最长的连续 0 段 (>= 2 组) 压缩成 `::`, 并列时压缩靠左的一段
+ * - 全 0 地址压缩成 `::`
+ */
+export const compressIpv6 = (groups :number[]) :string => {
+  const hex = groups.map(groupHex);
+  const run = longestZeroRun(groups);
+  if (run.start < 0) return hex.join(':');
+  const head = hex.slice(0, run.start).join(':');
+  const tail = hex.slice(run.start + run.len).join(':');
+  return `${head}::${tail}`;
+};
+
+/** 8 组分组 -> 点分 IPv4 (取最后两组) */
+const dottedOf = (groups :number[]) :string => {
+  const hi = groups[6] & 0xffff;
+  const lo = groups[7] & 0xffff;
+  return `${(hi >> 8) & 0xff}.${hi & 0xff}.${(lo >> 8) & 0xff}.${lo & 0xff}`;
+};
+
+/** 8 组 16 位分组 -> 指定写法的 IPv6 文本 (不足 8 组按 0 补齐) */
+export const formatIpv6 = (groups :number[], style :Ipv6Style = 'compressed') :string => {
+  const g = [ ...groups ];
+  while (g.length < 8) g.push(0);
+  const padded = g.slice(0, 8).map((v) => v & 0xffff);
+  if (style === 'full') return padded.map((v) => groupHex(v).padStart(4, '0')).join(':');
+  if (style === 'mixed') {
+    const head = compressIpv6(padded.slice(0, 6));
+    // head 以 :: 结尾时不再补冒号, 否则会出现三连冒号
+    return head.endsWith('::') ? `${head}${dottedOf(padded)}` : `${head}:${dottedOf(padded)}`;
+  }
+  return compressIpv6(padded);
+};
+
+/** 由 IPv4 整数拆出高/低两个 16 位分组 */
+const ipv4Groups = (ip :string) :{ hi :number; lo :number } => {
+  const v = ipv4ToInt(ip);
+  return { hi: (v >>> 16) & 0xffff, lo: v & 0xffff };
+};
+
+/** 一条 IPv4 对应的 IPv6 写法 (key 为语言包词条键) */
+export interface Ipv6Form { key :string; value :string }
+
+/**
+ * 把 IPv4 地址换算成几种常见的 IPv6 写法 (非法地址抛错):
+ * - IPv4 映射地址 ::ffff:0:0/96 (最常见的 v4/v6 共存写法)
+ * - IPv4 兼容地址 ::/96 (已废弃, 仅作对照)
+ * - 6to4 2002::/16 (IPv4 嵌在地址前 32 位)
+ * - NAT64 / DNS64 64:ff9b::/96 (IPv4 嵌在最后 32 位)
+ * - 完整展开 (把压缩的 :: 写全, 便于逐段核对)
+ */
+export const ipv4ToIpv6Forms = (ip :string) :Ipv6Form[] => {
+  const { hi, lo } = ipv4Groups(ip);
+  const zero5 = [ 0, 0, 0, 0, 0 ];
+  const mapped = [ ...zero5, 0xffff, hi, lo ];
+  const compat = [ ...zero5, 0, hi, lo ];
+  const sixToFour = [ 0x2002, hi, lo, 0, 0, 0, 0, 0 ];
+  const nat64 = [ 0x64, 0xff9b, 0, 0, 0, 0, hi, lo ];
+  return [
+    { key: 'ipv6Mapped', value: formatIpv6(mapped, 'mixed') },
+    { key: 'ipv6MappedHex', value: formatIpv6(mapped, 'compressed') },
+    { key: 'ipv6Compat', value: formatIpv6(compat, 'mixed') },
+    { key: 'ipv6SixToFour', value: formatIpv6(sixToFour, 'compressed') },
+    { key: 'ipv6Nat64', value: formatIpv6(nat64, 'mixed') },
+    { key: 'ipv6Full', value: formatIpv6(mapped, 'full') },
+  ];
+};
+
+/** 安全版: 非法地址返回空数组, 便于界面直接渲染 */
+export const ipv4ToIpv6FormsSafe = (ip :string) :Ipv6Form[] => {
+  try { return ipv4ToIpv6Forms(ip); } catch { return []; }
+};

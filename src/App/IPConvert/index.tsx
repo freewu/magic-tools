@@ -1,7 +1,7 @@
-import { Card, Form, Input, Row, Col, Typography } from 'antd';
+import { Card, Divider, Form, Input, Row, Col, Typography } from 'antd';
 import React, { useState } from 'react';
 import { SwapOutlined } from '@ant-design/icons';
-import { ipv4ToInt, ipv4Valid, intToIpv4, intTextValid, intToHex, intToBin } from './lib';
+import { ipv4ToInt, ipv4Valid, intToIpv4, intTextValid, intToHex, intToBin, ipv4ToIpv6FormsSafe } from './lib';
 import type { InputStatus } from 'antd/es/_util/statusUtils';
 import ipLang from "./lang";
 import { useLocale } from "../../hook/locale-context";
@@ -83,7 +83,7 @@ const IPConvert :React.FC = () => {
         </Row>
       </Card>
       { valid && (
-        <Card size="small" style={{ width: 640 }}>
+        <Card size="small" style={{ width: 640, marginBottom: 12 }}>
           <Form layout="vertical" style={{ marginBottom: 0 }}>
             <Form.Item label="HEX" style={{ marginBottom: 4 }}>
               <Text copyable code>0x{ intToHex(int) }</Text>
@@ -92,6 +92,19 @@ const IPConvert :React.FC = () => {
               <Text copyable style={{ fontSize: 12, fontFamily: 'monospace', wordBreak: 'break-all' }}>{ intToBin(int) }</Text>
             </Form.Item>
           </Form>
+        </Card>
+      ) }
+      { valid && (
+        <Card size="small" style={{ width: 640 }}>
+          <Divider orientation="left" style={{ margin: '0 0 8px' }}>{ t('ipv6Title','对应的 IPv6 写法') }</Divider>
+          <Form layout="vertical" style={{ marginBottom: 0 }}>
+            { ipv4ToIpv6FormsSafe(ip).map((form) => (
+              <Form.Item key={ form.key } label={ t(form.key, form.key) } style={{ marginBottom: 4 }}>
+                <Text copyable code style={{ wordBreak: 'break-all' }}>{ form.value }</Text>
+              </Form.Item>
+            )) }
+          </Form>
+          <Text type="secondary" style={{ fontSize: 12 }}>{ t('ipv6Hint','同一条 IPv4 在不同过渡方案下的写法, 点右侧图标可复制') }</Text>
         </Card>
       ) }
     </>
