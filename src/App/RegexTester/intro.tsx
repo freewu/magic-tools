@@ -10,6 +10,7 @@ const zh = `
 <li><p>行匹配采用「整行」语义, 因此内置预设大多带 <code>^…$</code> 锚点; 若只想找「包含」的内容, 把 <code>^</code> 与 <code>$</code> 去掉即可</p></li>
 <li><p>标志位: <code>i</code> 忽略大小写 / <code>g</code> 全局(同时显示全文匹配次数) / <code>m</code> 多行 / <code>s</code> 让 <code>.</code> 匹配换行</p></li>
 <li><p>「复制匹配行」可把绿色行原样复制出来; 双击正则或内容输入框也可复制内容</p></li>
+<li><p><b>代码生成</b>页签: 选好语言后, 会用当前正则 + 标志位 (以及上方文本) 生成对应语言的调用代码, 支持 Python / JavaScript / TypeScript / Java / C / C++ / C# / Go / Rust / PHP / Ruby / Perl / Swift / Kotlin / Julia / R / Lua / PowerShell / Delphi / Erlang / Objective-C 共 21 种语言, 可一键复制</p></li>
 </ul>
 <h2>常用元字符速查</h2>
 <ul>
@@ -30,6 +31,7 @@ const tw = `
 <li><p>行比對採用「整行」語意, 因此內建預設大多帶 <code>^…$</code> 錨點; 若只想找「包含」的內容, 把 <code>^</code> 與 <code>$</code> 去掉即可</p></li>
 <li><p>旗標: <code>i</code> 忽略大小寫 / <code>g</code> 全域(同時顯示全文比對次數) / <code>m</code> 多行 / <code>s</code> 讓 <code>.</code> 比對換行</p></li>
 <li><p>「複製符合行」可把綠色行原樣複製出來; 雙擊正則或內容輸入框也可複製內容</p></li>
+<li><p><b>程式碼產生</b>頁籤: 選好語言後, 會用目前正則 + 旗標 (以及上方文字) 產生對應語言的呼叫程式碼, 支援 Python / JavaScript / TypeScript / Java / C / C++ / C# / Go / Rust / PHP / Ruby / Perl / Swift / Kotlin / Julia / R / Lua / PowerShell / Delphi / Erlang / Objective-C 共 21 種語言, 可一鍵複製</p></li>
 </ul>
 <h2>常用元字元速查</h2>
 <ul>
@@ -50,6 +52,7 @@ const en = `
 <li><p>Matching is line-based (“whole line”), so most presets carry <code>^…$</code> anchors; to search for “contains” instead, simply drop the <code>^</code> and <code>$</code></p></li>
 <li><p>Flags: <code>i</code> case-insensitive / <code>g</code> global (also shows the total match count) / <code>m</code> multiline / <code>s</code> makes <code>.</code> match newlines</p></li>
 <li><p>“Copy matching lines” copies the green lines verbatim; double-clicking the pattern or content box copies its text as well</p></li>
+<li><p><b>Code</b> tab: pick a language and it generates ready-to-copy usage code for the current pattern + flags (plus the text above) in 21 languages — Python / JavaScript / TypeScript / Java / C / C++ / C# / Go / Rust / PHP / Ruby / Perl / Swift / Kotlin / Julia / R / Lua / PowerShell / Delphi / Erlang / Objective-C</p></li>
 </ul>
 <h2>Common metacharacters</h2>
 <ul>

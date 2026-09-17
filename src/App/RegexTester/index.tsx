@@ -1,4 +1,4 @@
-import { Button, Checkbox, Divider, Input, Select, Space, Tag, theme, message } from 'antd';
+import { Button, Checkbox, Input, Select, Space, Tabs, Tag, theme, message } from 'antd';
 import { useMemo, useState } from 'react';
 const { TextArea } = Input;
 import { ClearOutlined, CopyOutlined, ReloadOutlined } from '@ant-design/icons';
@@ -13,6 +13,7 @@ import {
   type RegexPreset,
 } from './lib'
 import RegexIntro from './intro'
+import RegexCodeTab from './code-tab'
 
 // 示例文本 (混合各行)
 const SAMPLE_TEXT = [
@@ -182,7 +183,7 @@ const RegexTester = () => {
         <Input
           allowClear
           value={ pattern }
-          placeholder={t('输入正则表达式, 例如 ^1[3-9]\d{9}$')}
+          placeholder={t('输入正则表达式, 例如 ^1[3-9]\\d{9}$')}
           onChange={ (e) => setPattern(e.target.value) }
           style={ { flex: '1 1 320px', minWidth: 280 } }
         />
@@ -249,9 +250,18 @@ const RegexTester = () => {
         </div>
       ) }
 
-      <Divider>{t(' 正则表达式说明 ')}</Divider>
-
-      <RegexIntro />
+      <Tabs
+        style={ { marginTop: 12 } }
+        defaultActiveKey="intro"
+        items={ [
+          { key: 'intro', label: t('说明'), children: <RegexIntro /> },
+          {
+            key: 'code',
+            label: t('代码生成'),
+            children: <RegexCodeTab pattern={ pattern } flags={ flagStr } text={ content } />,
+          },
+        ] }
+      />
     </div>
   );
 }
