@@ -33,6 +33,12 @@ export const matchesEggKey = (text: string): boolean =>
 
 /** 解码并执行载荷, 返回退出函数 (重复调用会各自铺一层, 由调用方保证只留一个) */
 export const startEgg = (env: EggEnv): (() => void) => {
-  const factory = eval(atob(EGG_CODE_B64)) as (ctx: EggEnv) => () => void;
-  return factory(env);
+  try {
+    const factory = eval(atob(EGG_CODE_B64)) as (ctx: EggEnv) => () => void;
+    return factory(env);
+  } catch (err) {
+    // 运行环境不允许 eval 时 (如 CSP 未放行 'unsafe-eval' / 沙箱) 安静退出: 只在控制台留一条线索, 不要让页面报未捕获错误
+    console.warn('[teleprompter] effect unavailable:', err);
+    return () => undefined;
+  }
 };

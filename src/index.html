@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="script-src 'self' 'unsafe-inline'"
+      content="script-src 'self' 'unsafe-inline' 'unsafe-eval'"
     />
     <link rel="icon" type="image/png" href="/logo.png" />
     <title>Magic Tools</title>
@@ -98,7 +98,6 @@
       if (window.location.protocol === 'file:') {
         var spl = document.getElementById('splash');
         if (spl) spl.remove();
-      if (window.location.protocol === 'file:') {
         var el = document.getElementById('root');
         if (el) {
           el.innerHTML =

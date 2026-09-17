@@ -76,6 +76,17 @@ describe('提词器口令彩蛋', () => {
     expect(() => stop()).not.toThrow();
   });
 
+  test('环境不允许 eval (CSP 未放行 unsafe-eval) 时安静退出, 不抛未捕获错误', () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+    // 让载荷解码失败, 等价于"这段代码无法执行": 应返回一个空退出函数并在控制台留提示
+    jest.spyOn(globalThis, 'atob').mockImplementation(() => { throw new Error('EvalError: blocked by CSP'); });
+    const stop = start();
+    expect(typeof stop).toBe('function');
+    expect(() => stop()).not.toThrow();
+    expect(warn).toHaveBeenCalled();
+    expect(document.querySelector('.tp-egg-canvas')).not.toBeInTheDocument();
+  });
+
   test('口令识别忽略首尾空白与大小写', () => {
     expect(eggKey()).toHaveLength(8);
     expect(matchesEggKey(eggKey())).toBe(true);
