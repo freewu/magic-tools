@@ -19,7 +19,7 @@ export interface PrompterOptions {
   lineHeight: number;
   /** 上下边缘淡入淡出 */
   fade: boolean;
-  /** 逐行焦点高亮 (只高亮当前阅读行, 越远越淡) */
+  /** 逐行焦点高亮 (高亮当前阅读行并按阅读进度逐字点亮, 越远越淡) */
   focus: boolean;
 }
 
@@ -195,24 +195,44 @@ export const focusOpacity = (distanceLines: number): number => {
   return FOCUS_MIN_OPACITY + (1 - FOCUS_MIN_OPACITY) * Math.pow(FOCUS_DECAY, d);
 };
 
+/** 一行的排版信息 (相对轨道顶部的上边距与自身高度; 行内自动折行时高度更大) */
+export interface LineRect {
+  top: number;
+  height: number;
+}
+
 /** 每行中心线在轨道坐标系里的位置 (行内折行时行高更大, 中心线仍然居中) */
-export const lineCentersOf = (rects: readonly { top: number; height: number }[]): number[] =>
+export const lineCentersOf = (rects: readonly LineRect[]): number[] =>
   rects.map((r) => (toNum(r?.top) || 0) + (toNum(r?.height) || 0) / 2);
 
-/** 距阅读线最近的一行下标 (阅读线屏幕坐标 = 轨道内位置 - 偏移量); 无行时返回 -1 */
-export const activeLineIndex = (centers: readonly number[], offset: number, readY: number): number => {
-  if (!centers.length) return -1;
+/**
+ * 阅读线当前压在哪一行上, 以及这一行已经读到的比例 (逐行焦点 + 逐字高亮的依据)
+ * 阅读线在轨道内的坐标 = 阅读线屏幕位置 + 偏移量;
+ * 落在首行之前钳到首行 (比例 0), 越过末行之后钳到末行 (比例 1)
+ */
+export const sweepOf = (rects: readonly LineRect[], offset: number, readY: number): { index: number; progress: number } => {
+  if (!rects.length) return { index: -1, progress: 0 };
   const target = (toNum(readY) || 0) + (toNum(offset) || 0);
-  let best = 0;
-  let bestGap = Infinity;
-  centers.forEach((c, i) => {
-    const gap = Math.abs((toNum(c) || 0) - target);
-    if (gap < bestGap) {
-      bestGap = gap;
-      best = i;
-    }
-  });
-  return best;
+  let index = 0;
+  rects.forEach((r, i) => { if (target >= (toNum(r?.top) || 0)) index = i; });
+  const top = toNum(rects[index]?.top) || 0;
+  const height = Math.max(1, toNum(rects[index]?.height) || 0);
+  return { index, progress: Math.min(1, Math.max(0, (target - top) / height)) };
+};
+
+/** 高亮单位: 中日韩文字/假名/谚文逐字, 连续的非空白串 (英文单词、数字、标点) 整块, 空白单独成块 */
+const UNIT_RE = /[\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]|\s+|[^\s\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]+/gu;
+
+/** 把一行切成高亮单位 (拼接后与原文一致) */
+export const lineUnits = (line: string): string[] => String(line ?? '').match(UNIT_RE) ?? [];
+
+/** 按进度把一行拆成 [已点亮, 未点亮] 两段 (拼接后与原文完全一致) */
+export const splitLineAt = (line: string, progress: number): [string, string] => {
+  const units = lineUnits(line);
+  if (!units.length) return [ '', '' ];
+  const p = Math.min(1, Math.max(0, toNum(progress) || 0));
+  const lit = Math.min(units.length, Math.max(0, Math.round(p * units.length)));
+  return [ units.slice(0, lit).join(''), units.slice(lit).join('') ];
 };
 
 /** 行距基准 (相邻行中心间距的中位数, 折行的长行不会把基准拉大); 测不到时用字号 × 行距兜底 */

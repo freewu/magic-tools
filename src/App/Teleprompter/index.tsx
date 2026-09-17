@@ -4,17 +4,20 @@ import {
   PauseCircleOutlined, PlayCircleOutlined, ReloadOutlined, SaveOutlined,
 } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { LocaleId } from '../../i18n/lang';
 import { useLocale } from '../../hook/locale-context';
 import {
   FONT_SIZE_MAX, FONT_SIZE_MIN, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN, PAD_RATIO, READ_RATIO,
-  SPEED_MAX, SPEED_MIN, SPEED_STEP, STAGE_BG, STAGE_FG, STAGE_FOCUS_FG,
+  SPEED_MAX, SPEED_MIN, SPEED_STEP, STAGE_BG, STAGE_DIM_FG, STAGE_FG, STAGE_FOCUS_FG,
 } from './data';
 import {
-  activeLineIndex, advance, clampFontSize, clampLineHeight, clampSpeed, focusOpacity,
+  advance, clampFontSize, clampLineHeight, clampSpeed, focusOpacity,
   formatClock, getDefaultOptions, isSameOptions, isSliderTarget, isToggleKey, isTypingTarget,
   lineCentersOf, lineStepOf, nextSampleScript, pickSampleScript, progressOf, remainingSeconds,
-  scrollDistance, setDefaultOptions, splitScript, type PrompterOptions,
+  scrollDistance, setDefaultOptions, splitLineAt, splitScript, sweepOf,
+  type LineRect, type PrompterOptions,
 } from './lib';
+import { matchesEggKey, startEgg } from './egg';
 import { u, uT } from './lang';
 import TeleprompterIntro from './intro';
 
@@ -31,7 +34,9 @@ const STAGE_CSS = `
 .tp-track { will-change: transform; }
 .tp-text { white-space: pre-wrap; word-break: break-word; font-weight: 600; color: ${STAGE_FG}; }
 .tp-line { padding: 0 8px; margin: 0 -8px; border-radius: 6px; }
-.tp-line-active { color: ${STAGE_FOCUS_FG}; background: rgba(255,255,255,0.05); text-shadow: 0 2px 16px rgba(255,255,255,0.18); }
+.tp-line-active { color: ${STAGE_FOCUS_FG}; background: rgba(255,255,255,0.05); }
+.tp-lit { color: ${STAGE_FOCUS_FG}; text-shadow: 0 2px 16px rgba(255,255,255,0.18); }
+.tp-rest { color: ${STAGE_DIM_FG}; }
 .tp-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 8px 12px; background: rgba(255,255,255,0.06); border-top: 1px solid rgba(255,255,255,0.12); }
 .tp-fade { -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%); }
 `;
@@ -41,6 +46,21 @@ type FullscreenElement = HTMLDivElement & { webkitRequestFullscreen?: () => Prom
 type FullscreenDocument = Document & {
   webkitFullscreenElement?: Element | null;
   webkitExitFullscreen?: () => Promise<void> | void;
+};
+
+/**
+ * 口令彩蛋里的字取自应用中心: 按当前语言取全部应用名
+ * 用动态导入 (而非顶部 import) 拿应用列表: 应用外壳里有顶层 await, 静态引入会拖累工具页单测
+ */
+const loadEggNames = async (locale: LocaleId): Promise<string[]> => {
+  try {
+    const [ shell, i18n ] = await Promise.all([ import('../index'), import('../app-i18n') ]);
+    return shell.appList
+      .map((item) => i18n.appNameOf(locale, item.key, item.label))
+      .filter((name) => name.trim() !== '');
+  } catch {
+    return [];
+  }
 };
 
 const Teleprompter: React.FC = () => {
@@ -57,13 +77,14 @@ const Teleprompter: React.FC = () => {
   const [ playing, setPlaying ] = useState(false);
   const [ offset, setOffset ] = useState(0);
   const [ box, setBox ] = useState({ vh: 0, th: 0 }); // 视口高度 / 文本高度 (测量所得)
-  const [ centers, setCenters ] = useState<number[]>([]); // 每行中心线位置 (逐行高亮用)
+  const [ measured, setMeasured ] = useState<LineRect[]>([]); // 每行实测位置 (逐行/逐字高亮用, 未测到时为 0)
   const [ full, setFull ] = useState(false);
 
   const stageRef = useRef<HTMLDivElement | null>(null);
   const viewRef = useRef<HTMLDivElement | null>(null);
   const textRef = useRef<HTMLDivElement | null>(null);
   const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const eggRef = useRef<(() => void) | null>(null); // 彩蛋的退出函数 (退出/卸载时调用)
   const offsetRef = useRef(0);
   const distanceRef = useRef(0);
   const speedRef = useRef(opts.speed);
@@ -77,18 +98,18 @@ const Teleprompter: React.FC = () => {
   const left = remainingSeconds(offset, distance, opts.speed);
   const done = distance > 0 && offset >= distance;
 
-  // ---- 逐行焦点: 阅读线附近那一行高亮, 其余行按与它的距离衰减透明度 ----
+  // ---- 逐行焦点 + 逐字高亮: 阅读线压着的那一行按进度从左到右点亮, 其余行按距离衰减透明度 ----
   const readY = box.vh * READ_RATIO;
-  // 还没测到行位置时 (首帧 / 无法测量) 按 字号 × 行距 推一个行距出来
-  const focusCenters = useMemo(() => {
+  // 还没测到行位置时 (首帧 / 无法测量) 按 字号 × 行距 推一份行框出来
+  const lineRects = useMemo(() => {
     const step = Math.max(1, opts.fontSize * opts.lineHeight);
-    const fallback = lines.map((_, i) => pad + step * i + step / 2);
-    return centers.length === lines.length && centers.some((v) => v > 0) ? centers : fallback;
-  }, [ centers, lines, pad, opts.fontSize, opts.lineHeight ]);
-  const activeIndex = useMemo(
-    () => activeLineIndex(focusCenters, offset, readY),
-    [ focusCenters, offset, readY ],
-  );
+    const fallback = lines.map((_, i) => ({ top: pad + step * i, height: step }));
+    return measured.length === lines.length && measured.some((r) => r.height > 0) ? measured : fallback;
+  }, [ measured, lines, pad, opts.fontSize, opts.lineHeight ]);
+  const focusCenters = useMemo(() => lineCentersOf(lineRects), [ lineRects ]);
+  // 当前正在读的行 + 该行已读比例 (进入阅读线时为 0, 离开时为 1)
+  const sweep = useMemo(() => sweepOf(lineRects, offset, readY), [ lineRects, offset, readY ]);
+  const activeIndex = sweep.index;
   const lineStep = useMemo(
     () => lineStepOf(focusCenters, opts.fontSize * opts.lineHeight),
     [ focusCenters, opts.fontSize, opts.lineHeight ],
@@ -135,11 +156,12 @@ const Teleprompter: React.FC = () => {
       const rects = lineRefs.current
         .slice(0, lines.length)
         .map((el) => ({ top: el?.offsetTop ?? 0, height: el?.offsetHeight ?? 0 }));
-      const measured = lineCentersOf(rects);
-      setCenters((prev) => (
-        prev.length === measured.length && prev.every((v, i) => Math.abs(v - measured[i]) < 0.5)
+      setMeasured((prev) => (
+        prev.length === rects.length && prev.every((r, i) => (
+          Math.abs(r.top - rects[i].top) < 0.5 && Math.abs(r.height - rects[i].height) < 0.5
+        ))
           ? prev
-          : measured
+          : rects
       ));
       if (offsetRef.current > next) commit(next);
     };
@@ -182,15 +204,42 @@ const Teleprompter: React.FC = () => {
     return () => cancelAnimationFrame(raf);
   }, [ playing, commit ]);
 
+  // ---- 内置口令彩蛋: 稿件内容正好是口令时, 「开始」不滚动, 改为铺一层应用名雨 (点按 / Esc / 空格退出) ----
+  const startEggRain = useCallback(async () => {
+    const names = await loadEggNames(locale);
+    // 全屏时只有全屏元素内的内容可见, 所以优先挂在全屏元素上
+    const host = (document.fullscreenElement as HTMLElement | null) ?? document.body;
+    eggRef.current = startEgg({
+      win: window,
+      doc: document,
+      host,
+      names,
+      raf: (cb) => window.requestAnimationFrame(cb),
+      caf: (id) => window.cancelAnimationFrame(id),
+      done: () => { eggRef.current = null; },
+    });
+  }, [ locale ]);
+
+  // 离开页面时收掉还在播放的彩蛋 (避免动画帧与画布残留)
+  useEffect(() => () => eggRef.current?.(), []);
+
   const toggle = useCallback(() => {
     if (!hasScript) return;
     if (playing) {
       setPlaying(false);
       return;
     }
+    if (eggRef.current) {
+      eggRef.current(); // 彩蛋正在播放: 再按一次 (开始 / 空格) 先收掉它
+      return;
+    }
+    if (matchesEggKey(text)) {
+      void startEggRain();
+      return;
+    }
     if (offsetRef.current >= distanceRef.current) commit(0); // 播完后再点: 从头开始
     setPlaying(true);
-  }, [ hasScript, playing, commit ]);
+  }, [ hasScript, playing, text, startEggRain, commit ]);
 
   // ---- 全屏: 先请求原生全屏, 失败 (内嵌 webview / 非用户手势) 时用窗口内全屏兜底 ----
   const enterFull = useCallback(() => {
@@ -308,7 +357,7 @@ const Teleprompter: React.FC = () => {
           </Space>
           <Space size={8}>
             <Switch size="small" checked={opts.focus} onChange={(v) => patch({ focus: v })} />
-            <Tooltip title={t('逐行焦点: 只高亮当前阅读行, 离它越远的行越透明、颜色越淡')}>
+            <Tooltip title={t('逐行焦点: 高亮当前阅读行, 并按阅读进度从左到右逐字点亮; 离它越远的行越透明、颜色越淡')}>
               <span style={{ color: '#888' }}>{t('逐行高亮')}</span>
             </Tooltip>
           </Space>
@@ -338,16 +387,25 @@ const Teleprompter: React.FC = () => {
             <div className="tp-track" style={{ transform: `translateY(${-offset}px)`, padding: `${pad}px 0` }}>
               <div className="tp-text" ref={textRef} style={{ fontSize: opts.fontSize, lineHeight: opts.lineHeight }}>
                 {hasScript
-                  ? lines.map((line, i) => (
-                    <div
-                      key={i}
-                      ref={(el) => { lineRefs.current[i] = el; }}
-                      className={`tp-line${opts.focus && i === activeIndex ? ' tp-line-active' : ''}`}
-                      style={{ opacity: opacityOf(i) }}
-                    >
-                      {line === '' ? '\u00A0' : line}
-                    </div>
-                  ))
+                  ? lines.map((line, i) => {
+                    // 逐字高亮: 焦点行按阅读进度拆成「已点亮 / 未点亮」两段 (拼接后与原文一致)
+                    const lit = opts.focus && i === activeIndex && line !== '';
+                    const [ head, tail ] = lit ? splitLineAt(line, sweep.progress) : [ '', '' ];
+                    return (
+                      <div
+                        key={i}
+                        ref={(el) => { lineRefs.current[i] = el; }}
+                        className={`tp-line${opts.focus && i === activeIndex ? ' tp-line-active' : ''}`}
+                        style={{ opacity: opacityOf(i) }}
+                      >
+                        {line === ''
+                          ? '\u00A0'
+                          : lit
+                            ? <><span className="tp-lit">{head}</span><span className="tp-rest">{tail}</span></>
+                            : line}
+                      </div>
+                    );
+                  })
                   : <div style={{ color: '#777' }}>{t('请先在上方输入提词脚本')}</div>}
               </div>
             </div>

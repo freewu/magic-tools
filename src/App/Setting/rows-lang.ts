@@ -362,9 +362,9 @@ const ROWS: Record<string, Row> = {
     '開啟「提詞器」時是否預設開啟邊緣淡入淡出 (文字在上下邊緣漸隱, 更接近真實提詞器)',
     'Whether edge fading is on by default when opening the teleprompter (lines dissolve in at the bottom and out at the top, like a real teleprompter)',
   ],
-  '打开「提词器」时是否默认开启逐行高亮 (只高亮当前阅读行, 离它越远的行越透明、颜色越淡)': [
-    '開啟「提詞器」時是否預設開啟逐行高亮 (只高亮目前閱讀行, 離它越遠的行越透明、顏色越淡)',
-    'Whether line focus is on by default when opening the teleprompter (only the line at the reading point stays bright, the rest get more transparent the further away they are)',
+  '打开「提词器」时是否默认开启逐行高亮 (高亮当前阅读行并按进度从左到右逐字点亮, 离它越远的行越透明、颜色越淡)': [
+    '開啟「提詞器」時是否預設開啟逐行高亮 (高亮目前閱讀行並依進度由左至右逐字點亮, 離它越遠的行越透明、顏色越淡)',
+    'Whether line focus is on by default when opening the teleprompter (the line at the reading point is lit word by word from left to right, and the rest get more transparent the further away they are)',
   ],
   '工具页的「保存为默认设置」按钮可把当前页面的参数一键存为这里的默认值; 默认值在打开工具页时生效, 不影响已打开的页面': [
     '工具頁的「儲存為預設設定」按鈕可把目前頁面的參數一鍵存為此處的預設值; 預設值在開啟工具頁時生效, 不影響已開啟的頁面',

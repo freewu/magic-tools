@@ -1,9 +1,9 @@
 import {
-  DEFAULT_OPTIONS, activeLineIndex, advance, clampFontSize, clampLineHeight, clampSpeed,
+  DEFAULT_OPTIONS, advance, clampFontSize, clampLineHeight, clampSpeed,
   focusOpacity, formatClock, getDefaultOptions, isSameOptions, isSliderTarget, isToggleKey,
-  isTypingTarget, lineCentersOf, lineStepOf, nextSampleScript, normalizeOptions,
+  isTypingTarget, lineCentersOf, lineStepOf, lineUnits, nextSampleScript, normalizeOptions,
   patchDefaultOptions, pickSampleScript, progressOf, remainingSeconds, sampleScriptsOf,
-  scrollDistance, setDefaultOptions, splitScript,
+  scrollDistance, setDefaultOptions, splitLineAt, splitScript, sweepOf,
 } from './lib';
 import {
   DEFAULTS_STORAGE_KEY, FADE_DEFAULT, FOCUS_DEFAULT, FOCUS_MIN_OPACITY, FONT_SIZE_DEFAULT,
@@ -185,19 +185,43 @@ describe('逐行焦点', () => {
     expect(lineCentersOf([{ top: NaN, height: NaN }])).toEqual([ 0 ]);
   });
 
-  test('activeLineIndex: 取离阅读线最近的一行, 随偏移量下移', () => {
-    const centers = [ 120, 180, 240, 300 ];
-    expect(activeLineIndex([], 0, 100)).toBe(-1);
-    expect(activeLineIndex(centers, 0, 100)).toBe(0); // 120 最近
-    expect(activeLineIndex(centers, 0, 200)).toBe(1); // 180 最近
-    expect(activeLineIndex(centers, 0, 210)).toBe(1); // 与 180/240 等距 → 取靠前一行
-    expect(activeLineIndex(centers, 0, 211)).toBe(2);
-    expect(activeLineIndex(centers, 0, 270)).toBe(2); // 与 240/300 等距 → 取靠前一行
-    expect(activeLineIndex(centers, 0, 271)).toBe(3);
-    // 向上滚动 (偏移量增加) 时阅读线在轨道内向下走
-    expect(activeLineIndex(centers, 60, 100)).toBe(1);
-    expect(activeLineIndex(centers, 120, 100)).toBe(2);
-    expect(activeLineIndex(centers, 1000, 100)).toBe(3);
+  test('sweepOf: 阅读线压在哪一行 + 该行已读比例 (越界钳到首/末行)', () => {
+    const rects = [ { top: 240, height: 72 }, { top: 312, height: 72 }, { top: 384, height: 72 } ];
+    expect(sweepOf([], 0, 168)).toEqual({ index: -1, progress: 0 });
+    // 首行还没走到阅读线: 钳在首行, 比例 0 (整行还没开始点亮)
+    expect(sweepOf(rects, 0, 168)).toEqual({ index: 0, progress: 0 });
+    expect(sweepOf(rects, 72, 168)).toEqual({ index: 0, progress: 0 });
+    // 首行正压着阅读线: 比例随滚动线性增长
+    expect(sweepOf(rects, 108, 168).index).toBe(0);
+    expect(sweepOf(rects, 108, 168).progress).toBeCloseTo(0.5, 6);
+    // 比例 1 时正好轮到下一行从 0 开始 (逐字点亮因此无缝衔接)
+    expect(sweepOf(rects, 144, 168)).toEqual({ index: 1, progress: 0 });
+    expect(sweepOf(rects, 156, 168).progress).toBeCloseTo(0.1667, 3);
+    // 越过了最后一行: 钳在末行且比例封顶 1
+    expect(sweepOf(rects, 1000, 168)).toEqual({ index: 2, progress: 1 });
+    // 非法输入不报错也不越界
+    expect(sweepOf(rects, NaN, NaN)).toEqual({ index: 0, progress: 0 });
+  });
+
+  test('lineUnits / splitLineAt: 中文逐字、英文整词, 两段拼接后与原文完全一致', () => {
+    expect(lineUnits('')).toEqual([]);
+    expect(lineUnits('你好 world')).toEqual([ '你', '好', ' ', 'world' ]);
+    expect(lineUnits('AES 加解密 v2')).toEqual([ 'AES', ' ', '加', '解', '密', ' ', 'v2' ]);
+
+    const line = '你好 world';
+    expect(splitLineAt(line, 0)).toEqual([ '', line ]);
+    expect(splitLineAt(line, 1)).toEqual([ line, '' ]);
+    expect(splitLineAt(line, 0.5)).toEqual([ '你好', ' world' ]); // 4 个单位点亮 2 个
+    expect(splitLineAt('中文', 0.3)).toEqual([ '中', '文' ]);
+    expect(splitLineAt('', 0.5)).toEqual([ '', '' ]);
+    // 非法进度按 0 / 1 处理
+    expect(splitLineAt('abc', NaN)).toEqual([ '', 'abc' ]);
+    expect(splitLineAt('abc', 5)).toEqual([ 'abc', '' ]);
+    // 任意进度下两段拼接都等于原文 (不丢字、不多字)
+    [ 0, 0.13, 0.5, 0.87, 1 ].forEach((p) => {
+      const [ head, tail ] = splitLineAt(line, p);
+      expect(head + tail).toBe(line);
+    });
   });
 
   test('lineStepOf: 取相邻行中心间距的中位数, 测不到时用兜底值', () => {

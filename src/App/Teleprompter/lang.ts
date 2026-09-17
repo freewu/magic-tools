@@ -23,9 +23,9 @@ const uilangRows: Record<string, [string, string]> = {
   '行距': ['行距', 'Line height'],
   '淡入淡出': ['淡入淡出', 'Fade edges'],
   '逐行高亮': ['逐行高亮', 'Line focus'],
-  '逐行焦点: 只高亮当前阅读行, 离它越远的行越透明、颜色越淡': [
-    '逐行焦點: 只高亮目前閱讀行, 離它越遠的行越透明、顏色越淡',
-    'Only the line at the reading point is highlighted — the further away a line is, the more transparent and dimmer it becomes',
+  '逐行焦点: 高亮当前阅读行, 并按阅读进度从左到右逐字点亮; 离它越远的行越透明、颜色越淡': [
+    '逐行焦點: 高亮目前閱讀行, 並依閱讀進度由左至右逐字點亮; 離它越遠的行越透明、顏色越淡',
+    'The line at the reading point is highlighted and lit word by word from left to right; the further away a line is, the more transparent and dimmer it becomes',
   ],
   '保存为默认设置': ['儲存為預設設定', 'Save as defaults'],
   '已保存为默认设置, 下次打开提词器时生效': [

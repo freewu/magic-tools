@@ -75,7 +75,7 @@ export const TeleprompterSetting: React.FC = () => {
       </Form.Item>
       <Form.Item
         label={ st('默认逐行高亮') }
-        extra={ st('打开「提词器」时是否默认开启逐行高亮 (只高亮当前阅读行, 离它越远的行越透明、颜色越淡)') }
+        extra={ st('打开「提词器」时是否默认开启逐行高亮 (高亮当前阅读行并按进度从左到右逐字点亮, 离它越远的行越透明、颜色越淡)') }
       >
         <Switch
           checked={ opts.focus }

@@ -2,9 +2,24 @@ import '@testing-library/jest-dom';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { message } from 'antd';
 import Teleprompter from './index';
+import { eggKey } from './egg';
 import { DEFAULTS_STORAGE_KEY, PAD_RATIO, READ_RATIO, SAMPLE_SCRIPTS } from './data';
 import { focusOpacity, splitScript } from './lib';
 import { LocaleProvider } from '../../hook/locale-context';
+
+// 口令彩蛋要取应用中心的应用名: 单测里给一份固定列表, 避免把整个应用外壳 (含顶层 await) 拖进来
+jest.mock('../index', () => ({
+  appList: [
+    { key: 'DnsQuery', icon: '', label: 'DNS 查询', type: 'webmaster', desktop: true },
+    { key: 'Base64', icon: '', label: 'Base64 编解码', type: 'codec', desktop: false },
+  ],
+}));
+jest.mock('../app-i18n', () => ({
+  appNameOf: (_locale: string, _key: string, fallback: string) => fallback,
+}));
+
+/** 彩蛋雨滴字符的取值池 (与上面的 mock 应用名一致) */
+const EGG_POOL = 'DNS 查询Base64 编解码';
 
 /** 默认语言 (zh-CN) 下打开时随机取到的第一首示例诗 (Mock 里的 Math.random 固定为 0) */
 const SAMPLE = SAMPLE_SCRIPTS['zh-CN'][0];
@@ -133,6 +148,22 @@ const activeEls = () => lineEls().filter((el) => el.classList.contains('tp-line-
 const opacityAt = (i: number) => Number(lineEls()[i].style.opacity);
 /** 第 i 行中心线到阅读线的距离 (单位: 行) */
 const centerGap = (i: number, offset: number) => Math.abs(LINE_TOP + LINE_STEP * i + LINE_STEP / 2 - offset - READ_Y) / LINE_STEP;
+
+/** 逐字高亮: 焦点行按阅读进度拆成已点亮 / 未点亮两段 */
+const litTextOf = (i: number) => lineEls()[i].querySelector('.tp-lit')?.textContent ?? '';
+const restTextOf = (i: number) => lineEls()[i].querySelector('.tp-rest')?.textContent ?? '';
+
+/** 彩蛋画布 (口令触发后出现, 退出后消失) */
+const eggCanvas = () => document.querySelector('.tp-egg-canvas') as HTMLCanvasElement | null;
+
+/** 假的 2D 上下文: 记录被画出来的字符, 用来验证"雨滴字符就是应用名" */
+const fakeCtx = (drawn: string[]) => ({
+  font: '',
+  textBaseline: '',
+  fillStyle: '',
+  fillRect: () => undefined,
+  fillText: (text: string) => { drawn.push(text); },
+}) as unknown as CanvasRenderingContext2D;
 
 describe('Teleprompter 初始界面', () => {
   test('渲染脚本编辑区 / 提词舞台与播放控制', () => {
@@ -375,6 +406,101 @@ describe('Teleprompter 设置', () => {
     expect(scriptAreaAny().value).toContain('Rage, rage against the dying of the light.');
     expect(screen.getByText('Script')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Paste or type your script here…')).toBeInTheDocument();
+  });
+});
+
+describe('Teleprompter 逐字高亮', () => {
+  test('焦点行按阅读进度从左到右逐字点亮, 读完自然接到下一行', () => {
+    render(<Teleprompter />);
+    const first = splitScript(SAMPLE)[0];
+
+    // 未滚动: 首行还没到阅读线 → 整行都是未点亮
+    expect(lineEls()[0].textContent).toBe(first);
+    expect(litTextOf(0)).toBe('');
+    expect(restTextOf(0)).toBe(first);
+    // 非焦点行不拆段, 保持整行渲染
+    expect(lineEls()[1].querySelector('.tp-lit')).toBeNull();
+
+    // 滚过一段后: 首行亮起左侧一段, 两段拼接仍是原文
+    fireEvent.click(btn('开始'));
+    advanceFrames(11); // 10 帧推进 × 12px = 120px (阅读线 168 + 120 = 288, 首行 240 起 → 已读 2/3)
+    expect(litTextOf(0)).not.toBe('');
+    expect(litTextOf(0)).not.toBe(first);
+    expect(litTextOf(0) + restTextOf(0)).toBe(first);
+    expect(first.startsWith(litTextOf(0))).toBe(true); // 亮的是左侧那一段
+
+    // 读到下一行: 高亮行换成第二行, 它从 0 开始重新点亮
+    advanceFrames(2); // 再 2 帧 × 12px = 24px (累计 144px → 第二行刚进阅读线, 从 0 重新点亮)
+    const second = splitScript(SAMPLE)[1];
+    expect(activeEls()[0]).toBe(lineEls()[1]);
+    expect(litTextOf(1)).toBe('');
+    expect(restTextOf(1)).toBe(second);
+    expect(litTextOf(0)).toBe(''); // 已换行的行不再拆段
+    expect(lineEls()[0].textContent).toBe(first);
+  });
+
+  test('关掉「逐行高亮」后不再逐字拆段, 卸载时也无需清理', () => {
+    render(<Teleprompter />);
+    fireEvent.click(btn('开始'));
+    advanceFrames(11);
+    expect(litTextOf(0)).not.toBe('');
+
+    fireEvent.click(switchOf('逐行高亮'));
+    expect(document.querySelector('.tp-lit')).toBeNull();
+    expect(lineEls()[0].textContent).toBe(splitScript(SAMPLE)[0]);
+  });
+});
+
+describe('Teleprompter 口令彩蛋', () => {
+  let drawn: string[] = [];
+
+  beforeEach(() => {
+    drawn = [];
+    jest.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(fakeCtx(drawn));
+  });
+
+  test('稿件是口令时「开始」不滚动, 而是铺一层应用名雨 (点一下退出后可正常播放)', async () => {
+    render(<Teleprompter />);
+
+    // 口令忽略首尾空白与大小写
+    fireEvent.change(scriptArea(), { target: { value: `  ${eggKey().toUpperCase()}  ` } });
+    fireEvent.click(btn('开始'));
+
+    await waitFor(() => expect(eggCanvas()).not.toBeNull());
+    expect(btn('开始')).toBeInTheDocument(); // 没有进入滚动播放
+
+    // 动画帧里画出来的字符全部来自应用名
+    advanceFrames(3);
+    expect(drawn.length).toBeGreaterThan(0);
+    expect(drawn.every((ch) => EGG_POOL.includes(ch))).toBe(true);
+
+    // 点画布退出, 换一篇正常稿件即可继续播放
+    fireEvent.click(eggCanvas() as HTMLCanvasElement);
+    await waitFor(() => expect(eggCanvas()).toBeNull());
+
+    fireEvent.change(scriptArea(), { target: { value: '正常稿件' } });
+    fireEvent.click(btn('开始'));
+    expect(btn('暂停')).toBeInTheDocument();
+  });
+
+  test('普通稿件不触发彩蛋, 直接进入滚动播放', () => {
+    render(<Teleprompter />);
+    fireEvent.change(scriptArea(), { target: { value: 'blue' } });
+    fireEvent.click(btn('开始'));
+
+    expect(eggCanvas()).toBeNull();
+    expect(btn('暂停')).toBeInTheDocument();
+  });
+
+  test('彩蛋播放中按空格先收掉彩蛋, 不会叠第二层', async () => {
+    render(<Teleprompter />);
+    fireEvent.change(scriptArea(), { target: { value: eggKey() } });
+    fireEvent.click(btn('开始'));
+    await waitFor(() => expect(eggCanvas()).not.toBeNull());
+
+    fireEvent.keyDown(document, { key: ' ', code: 'Space' });
+    expect(document.querySelectorAll('.tp-egg-canvas')).toHaveLength(0);
+    expect(btn('开始')).toBeInTheDocument();
   });
 });
 

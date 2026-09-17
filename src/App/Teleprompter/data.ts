@@ -23,7 +23,7 @@ export const PAD_RATIO = 0.6;
 /** 上下边缘淡入淡出 (渐隐) 默认开启 */
 export const FADE_DEFAULT = true;
 
-/** 逐行焦点高亮 (只高亮当前阅读行, 越远越淡) 默认开启 */
+/** 逐行焦点高亮 (高亮当前阅读行并按阅读进度逐字点亮, 越远越淡) 默认开启 */
 export const FOCUS_DEFAULT = true;
 
 /** 阅读基准线: 视线停留位置占视口高度的比例 (略高于正中, 给下方留出预告行) */
@@ -38,6 +38,8 @@ export const STAGE_BG = '#101114';
 export const STAGE_FG = '#f2f3f5';
 /** 当前阅读行的强调色 (其余行由透明度向下衰减) */
 export const STAGE_FOCUS_FG = '#ffffff';
+/** 当前阅读行里「还没读到」的部分: 逐字高亮从左侧点亮, 右侧保持这个暗淡色 */
+export const STAGE_DIM_FG = 'rgba(242,243,245,0.5)';
 
 /**
  * 默认设置 key (速度 / 字号 / 行距 / 淡入淡出 / 逐行高亮)
