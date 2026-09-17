@@ -18,9 +18,12 @@ const POOL = NAMES.join('');
 describe('提词器口令彩蛋', () => {
   let frames: FrameRequestCallback[] = [];
   let caf: jest.Mock;
+  /** 虚拟时钟: 载荷按时间推进下落节奏, 每帧固定 200ms (与页面测试一致) */
+  let clock = 0;
 
   beforeEach(() => {
     frames = [];
+    clock = 0;
     caf = jest.fn();
   });
 
@@ -34,7 +37,8 @@ describe('提词器口令彩蛋', () => {
     for (let i = 0; i < n; i += 1) {
       const pending = frames;
       frames = [];
-      pending.forEach((cb) => cb(0));
+      clock += 200;
+      pending.forEach((cb) => cb(clock));
     }
   };
 
