@@ -1,5 +1,5 @@
 /** @jest-environment jsdom */
-// 彩蛋载荷的健壮性单测: 载荷是 base64 存放后 eval 执行的, 这里只验证"解码 → 执行 → 退出"整条链路可用
+// 彩蛋载荷的健壮性单测: 载荷是 base64 存放后以注入内联 script 方式执行的, 这里只验证"解码 → 执行 → 退出"整条链路可用
 import '@testing-library/jest-dom';
 import { eggKey, matchesEggKey, startEgg } from './egg';
 
@@ -76,14 +76,24 @@ describe('提词器口令彩蛋', () => {
     expect(() => stop()).not.toThrow();
   });
 
-  test('环境不允许 eval (CSP 未放行 unsafe-eval) 时安静退出, 不抛未捕获错误', () => {
+  test('环境不允许执行脚本 (解码失败) 时安静退出, 不抛未捕获错误', () => {
     const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
     // 让载荷解码失败, 等价于"这段代码无法执行": 应返回一个空退出函数并在控制台留提示
-    jest.spyOn(globalThis, 'atob').mockImplementation(() => { throw new Error('EvalError: blocked by CSP'); });
+    jest.spyOn(globalThis, 'atob').mockImplementation(() => { throw new Error('blocked'); });
     const stop = start();
     expect(typeof stop).toBe('function');
     expect(() => stop()).not.toThrow();
     expect(warn).toHaveBeenCalled();
+    expect(document.querySelector('.tp-egg-canvas')).not.toBeInTheDocument();
+  });
+
+  test('载荷以注入内联 script 的方式执行, 执行完不留 script 节点', () => {
+    jest.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(fakeCtx([]));
+    const before = document.querySelectorAll('script').length;
+    const stop = start();
+    expect(document.querySelectorAll('script').length).toBe(before);
+    expect(document.querySelector('.tp-egg-canvas')).toBeInTheDocument();
+    stop();
     expect(document.querySelector('.tp-egg-canvas')).not.toBeInTheDocument();
   });
 

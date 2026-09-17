@@ -1,5 +1,6 @@
 // 提词器内置口令彩蛋: 稿件内容正好是口令时, 点「开始」不滚动, 而是铺一层「应用名雨」
-// 实现: 口令与载荷都以 base64 存放, 命中后 atob 解码 → eval 执行 (见 startEgg)
+// 实现: 口令与载荷都以 base64 存放; 命中后 atob 解码, 再以「注入内联 <script>」的方式执行载荷
+//       (内联脚本由 CSP 的 'unsafe-inline' 放行, 无需 'unsafe-eval', 严格策略下也能跑)
 // 约束: 载荷保持纯 ASCII (否则 atob 解出的 UTF-8 会乱码); 应用名列表由组件注入, 载荷内不含任何业务文案
 
 /** 口令 (base64) */
@@ -24,6 +25,9 @@ export interface EggEnv {
   done?: () => void;
 }
 
+/** 注入执行时用来传递入参 / 回传退出函数的全局槽位 (执行后立即清理) */
+const EGG_SLOT = '__mtTpEffect';
+
 /** 口令原文 (仅供内部判断与测试) */
 export const eggKey = (): string => atob(EGG_KEY_B64);
 
@@ -31,14 +35,29 @@ export const eggKey = (): string => atob(EGG_KEY_B64);
 export const matchesEggKey = (text: string): boolean =>
   String(text ?? '').trim().toLowerCase() === eggKey();
 
-/** 解码并执行载荷, 返回退出函数 (重复调用会各自铺一层, 由调用方保证只留一个) */
+/**
+ * 注入执行载荷, 返回退出函数
+ * 注入一段内联 <script>: 插入文档即同步执行 (不用 eval, 不依赖 'unsafe-eval')
+ * 入参经全局槽位传给载荷, 退出函数再由载荷写回槽位; 解码 / 执行失败时安静退出并在控制台留一条提示
+ */
 export const startEgg = (env: EggEnv): (() => void) => {
+  const slot: { env?: EggEnv; stop?: () => void } = { env };
+  const g = globalThis as unknown as Record<string, unknown>;
+  const holder = g[EGG_SLOT] as typeof slot | undefined;
+  g[EGG_SLOT] = slot;
   try {
-    const factory = eval(atob(EGG_CODE_B64)) as (ctx: EggEnv) => () => void;
-    return factory(env);
+    // 解码后是一个函数表达式: `(function (ctx) { … })`
+    const code = atob(EGG_CODE_B64);
+    const script = env.doc.createElement('script');
+    script.textContent = `globalThis.${EGG_SLOT}.stop=(${code})(globalThis.${EGG_SLOT}.env);`;
+    (env.doc.head ?? env.doc.body).appendChild(script); // 内联脚本插入即同步执行
+    script.remove();
   } catch (err) {
-    // 运行环境不允许 eval 时 (如 CSP 未放行 'unsafe-eval' / 沙箱) 安静退出: 只在控制台留一条线索, 不要让页面报未捕获错误
     console.warn('[teleprompter] effect unavailable:', err);
-    return () => undefined;
+  } finally {
+    delete slot.env; // 不长期持有组件与 DOM 引用
+    if (holder) g[EGG_SLOT] = holder;
+    else delete g[EGG_SLOT];
   }
+  return slot.stop ?? (() => undefined);
 };
