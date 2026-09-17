@@ -10,7 +10,7 @@ import {
 
 const { Text } = Typography;
 
-/** 数据生成 设置面板 (设置 → 其它) */
+/** 数据生成 设置面板 (设置 → 生成器) */
 export const MockDataSetting = () => {
   const { locale } = useLocale();
   const st = (zh: string) => _r(locale, zh);

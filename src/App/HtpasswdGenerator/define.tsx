@@ -1,6 +1,6 @@
 const AppName = 'htpasswd 生成';
 const Icon = '';
-const Type = 'misc';
+const Type = 'generator';
 
 export {
   AppName,

@@ -5,13 +5,14 @@ import type { LangPack } from './lang';
 const shell: LangPack = {
   default: 'zh-CN',
   'zh-CN': {
-    // 菜单分类 (convert/codec/crypto/value-calc/formatter/image/webmaster/misc)
+    // 菜单分类 (convert/codec/crypto/value-calc/formatter/image/generator/webmaster/misc)
     'cat.convert': '类型转换',
     'cat.codec': '编解码',
     'cat.crypto': '加解密',
     'cat.value-calc': '值计算',
     'cat.formatter': '格式化',
     'cat.image': '图片',
+    'cat.generator': '生成器',
     'cat.webmaster': '站长工具',
     'cat.misc': '其它',
     // 设置中心左侧「系统设置」分组
@@ -37,6 +38,7 @@ const shell: LangPack = {
     'cat.value-calc': '值計算',
     'cat.formatter': '格式化',
     'cat.image': '圖片',
+    'cat.generator': '產生器',
     'cat.webmaster': '站長工具',
     'cat.misc': '其他',
     system: '系統設定',
@@ -55,7 +57,8 @@ const shell: LangPack = {
     'cat.crypto': 'Cryptography',
     'cat.value-calc': 'Value Calc',
     'cat.formatter': 'Formatters',
-    'cat.image': 'Image Generators',
+    'cat.image': 'Image Tools',
+    'cat.generator': 'Generators',
     'cat.webmaster': 'Webmaster Tools',
     'cat.misc': 'Utilities',
     system: 'System',

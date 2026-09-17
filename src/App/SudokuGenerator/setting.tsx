@@ -11,7 +11,7 @@ import {
   setDefaultDifficulty, setDefaultMode, setDefaultPages, setDefaultSize,
 } from './lib';
 
-/** 数独生成器默认设置 (挂载到 设置 → 其它) */
+/** 数独生成器默认设置 (挂载到 设置 → 生成器) */
 export const SudokuGeneratorSetting: React.FC = () => {
   const { locale } = useLocale();
   const st = (zh: string) => _r(locale, zh);

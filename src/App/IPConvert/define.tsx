@@ -1,6 +1,6 @@
 const AppName = 'IP 转换';
 const Icon = '';
-const Type = 'value-calc';
+const Type = 'convert';
 
 export {
   AppName,

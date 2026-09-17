@@ -1,4 +1,4 @@
-// 数独生成器: 4 / 6 / 9 宫格 · 高/中/低三档难度 · A4 打印 (答案红色)
+// 数独生成器: 4 / 6 / 9 宫格 · 高/中/低三档难度 · A4 排版打印 (答案红色)
 import { Button, Divider, Input, InputNumber, Segmented, Space, Switch, Tag, Typography, message, theme } from 'antd';
 import { PrinterOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useEffect, useMemo, useState } from 'react';
@@ -114,7 +114,7 @@ const SudokuGenerator: React.FC = () => {
             { t('重新生成') }
           </Button>
           <Button size="small" type="primary" icon={ <PrinterOutlined /> } onClick={ onPrint } disabled={ puzzles.length === 0 }>
-            { t('打印 A4') }
+            { t('打印') }
           </Button>
         </Space>
         <Space wrap>

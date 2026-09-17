@@ -9,7 +9,7 @@ export default {
 const rows: Record<string, [string, string]> = {
   // 工具栏 / 设置
   '重新生成': ['重新產生', 'Regenerate'],
-  '打印 A4': ['列印 A4', 'Print A4'],
+  '打印': ['列印', 'Print'],
   '生成中…': ['產生中…', 'Generating…'],
   '数独设置': ['數獨設定', 'Sudoku settings'],
   '打印预览 (A4)': ['列印預覽 (A4)', 'Print preview (A4)'],

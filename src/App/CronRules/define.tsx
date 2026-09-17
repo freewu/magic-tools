@@ -1,6 +1,6 @@
 const AppName = 'Cron 规则生成';
 const Icon = '';
-const Type = 'misc';
+const Type = 'generator';
 
 export {
   AppName,

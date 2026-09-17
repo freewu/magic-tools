@@ -2,7 +2,7 @@
 
 # 🧰 Magic Tools
 
-**An all-in-one developer toolbox — 118 utilities in 8 categories, cross-platform desktop & Web.**
+**An all-in-one developer toolbox — 118 utilities in 9 categories, cross-platform desktop & Web.**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
@@ -16,7 +16,7 @@
 
 ## ✨ Highlights
 
-- **100+ everyday developer tools** organized into 8 categories: codecs, converters, cryptography, hashing, formatters, image generators, webmaster tools and utilities.
+- **100+ everyday developer tools** organized into 9 categories: codecs, converters, cryptography, hashing, formatters, image tools, generators, webmaster tools and utilities.
 - **Full cryptography suite** — symmetric (AES / DES / 3DES / SM4 / ChaCha20 / Blowfish / Rabbit / RC2–RC6 / TEA / XTEA / XXTEA), asymmetric (RSA / SM2), classical ciphers (Caesar / Rail Fence / Vigenère / Hill) plus Cisco Type 7.
 - **Hashing & MACs** — MD5, SHA-1, SHA-2, SHA-3, Keccak, SM3, BCrypt, Scrypt, PBKDF2, HKDF, HMAC, CMAC, KMAC and BCC / LRC / CRC checksums.
 - **Batch QR / barcode** generation — create many codes at once and export every PNG to a folder in one click on desktop.
@@ -30,26 +30,29 @@
 ### 🔐 Cryptography *(21)*
 AES · DES · 3DES · RSA · SM2 · SM4 · ChaCha20 · Blowfish · Rabbit · RC2 · RC4 · RC5 · RC6 · TEA · XTEA · XXTEA · Caesar · Rail Fence · Vigenère · Hill · Cisco Type 7
 
-### 🧮 Hash, MAC & Value Calculators *(16)*
-Hash (MD5/SHA1/SHA2/SM3/…) · HMAC · SHA-3 · Keccak · BCrypt · Scrypt · PBKDF2 · CMAC · HKDF · KMAC · PPI · Complement (sign-magnitude / 1's / 2's) · IP converter · BCC checksum · LRC checksum · CRC checksum (30+ parameterised standards)
+### 🧮 Hash, MAC & Value Calculators *(15)*
+Hash (MD5/SHA1/SHA2/SM3/…) · HMAC · SHA-3 · Keccak · BCrypt · Scrypt · PBKDF2 · CMAC · HKDF · KMAC · PPI · Complement (sign-magnitude / 1's / 2's) · BCC checksum · LRC checksum · CRC checksum (30+ parameterised standards)
 
 ### 🔄 Codecs & Encoders *(13)*
 Base64 · URL · Unicode · Punycode · UUencode · XXencode · BCD · Morse code (with audio/WAV) · JWT decoder · HTTP Basic Auth · BaseX · Base58 · Gzip
 
-### ⚖️ Converters *(18)*
-Unix timestamp · Color format · Radix (BIN/OCT/DEC/HEX) · Tree ↔ path · GPS coordinates · Download-link converter · JSONL · RMB uppercase (CNY) · Byte units · Chinese Pinyin · Temperature · Distance · Config (INI/JSON/YAML/TOML/properties) · Subtitle (SRT/ASS/…) · Speed · Volume · Area · Weight
+### ⚖️ Converters *(19)*
+Unix timestamp · Color format · Radix (BIN/OCT/DEC/HEX) · Tree ↔ path · GPS coordinates · IP converter (IPv4/IPv6 ↔ decimal/hex/binary) · Download-link converter · JSONL · RMB uppercase (CNY) · Byte units · Chinese Pinyin · Temperature · Distance · Config (INI/JSON/YAML/TOML/properties) · Subtitle (SRT/ASS/…) · Speed · Volume · Area · Weight
 
 ### 🛠️ Formatters & Editors *(9)*
 Markdown editor (live preview + LaTeX subset) · Mermaid editor (live preview, 30+ built-in diagram samples, export SVG/PNG/WebP) · JSON · JSON5 · SQL · XML · HTML · SVG · CN/EN typography spacing
 
-### 🖼️ Image Generators *(13)*
-QR code · Barcode (CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · Base64 image · ASCII image · Code screenshot · ICO icon · App icon · Dominant-color palette (merge similar colors + share) · Image split (2/3/4/6/9) · Image adjust (resize percent / pixels, rotate 90°·180°·270°, PNG·JPEG·WebP) · Image watermark (text / logo, nine-grid · tiled, rotation + opacity) · Placeholder image · Shield badge (PNG export ×1–10)
+### 🖼️ Image Tools *(11)*
+Base64 image · ASCII image · Code screenshot · ICO icon · App icon · Dominant-color palette (merge similar colors + share) · Image split (2/3/4/6/9) · Image adjust (resize percent / pixels, rotate 90°·180°·270°, PNG·JPEG·WebP) · Image watermark (text / logo, nine-grid · tiled, rotation + opacity) · Placeholder image · Shield badge (PNG export ×1–10)
+
+### 🎲 Generators *(10)*
+QR code (batch, logo/label) · Barcode (CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · Password generator (strength analysis) · OTP (TOTP/HOTP, QR export) · htpasswd · Mock data (JSON/CSV/SQL) · Dot-matrix font · Sudoku generator (4×4 / 6×6 / 9×9, unique solution, A4 print) · Copybook generator (mi / tian / hui / essay grids, A4 print) · Cron rules (parse + next runs)
 
 ### 🌐 Webmaster Tools *(10)*
 HTML stripper · Browser fingerprint · CSR request generator (WebCrypto RSA + PKCS#10, SAN, key + CSR download) · URL extractor · Cookie analyzer · User-Agent parser · Sitemap checker · Keyword density · TDK checker · robots.txt generator
 
-### 🧩 Utilities *(18)*
-CSS colors · Line counter · htpasswd generator · Regex tester (17 presets) · File diff · Dot-matrix font · Keyboard key info · Chmod calculator · OTP generator · ASCII text art · Cron rules (parse + next runs) · CIDR calculator · Password generator (strength analysis) · Mock data generator (JSON/CSV/SQL) · WebSocket debugger · Sudoku generator (4×4 / 6×6 / 9×9, unique solution, A4 print) · Copybook generator (mi / tian / hui / essay grids, A4 print) · Teleprompter (speed / fade / fullscreen, Space to play·pause)
+### 🧩 Utilities *(10)*
+CSS colors · Line counter · Regex tester (17 presets) · File diff · Keyboard key info · Chmod calculator · ASCII text art · CIDR calculator · WebSocket debugger · Teleprompter (speed / fade / line focus / fullscreen, Space to play·pause)
 
 > Plus built-in app pages: **App Center**, **Help & changelog**, **Settings**.
 
@@ -111,19 +114,21 @@ magic-tools
 
 **🔐 Cryptography *(21)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
 
-**🧮 Hash, MAC & Value Calculators *(16)*** — `BCCCheck` · `BcryptCalc` · `CMACCalc` · `CRCCheck` · `ComplementCalc` · `HKDFCalc` · `Hash` · `HmacHash` · `IPConvert` · `KMACCalc` · `KeccakHash` · `LRCCheck` · `PBKDF2Calc` · `PPICalc` · `SHA3Hash` · `ScryptCalc`
+**🧮 Hash, MAC & Value Calculators *(15)*** — `BCCCheck` · `BcryptCalc` · `CMACCalc` · `CRCCheck` · `ComplementCalc` · `HKDFCalc` · `Hash` · `HmacHash` · `KMACCalc` · `KeccakHash` · `LRCCheck` · `PBKDF2Calc` · `PPICalc` · `SHA3Hash` · `ScryptCalc`
 
 **🔄 Codecs & Encoders *(13)*** — `BCDCodec` · `Base58Codec` · `Base64` · `BaseXCodec` · `BasicAuthCodec` · `GzipCodec` · `JWTDecoder` · `MorseCodec` · `Punycode` · `URL` · `UUencode` · `Unicode` · `XXencode`
 
-**⚖️ Converters *(18)*** — `AreaConvert` · `ByteConvert` · `ColorConvert` · `ConfigConvert` · `DistanceConvert` · `DownloadLinkConvert` · `GPSConvert` · `JSONLConvert` · `NumberConvert` · `PinyinConvert` · `RMBConvert` · `SpeedConvert` · `SubtitleConvert` · `TemperatureConvert` · `Time` · `TreePathConvert` · `VolumeConvert` · `WeightConvert`
+**⚖️ Converters *(19)*** — `AreaConvert` · `ByteConvert` · `ColorConvert` · `ConfigConvert` · `DistanceConvert` · `DownloadLinkConvert` · `GPSConvert` · `IPConvert` · `JSONLConvert` · `NumberConvert` · `PinyinConvert` · `RMBConvert` · `SpeedConvert` · `SubtitleConvert` · `TemperatureConvert` · `Time` · `TreePathConvert` · `VolumeConvert` · `WeightConvert`
 
 **🛠️ Formatters & Editors *(9)*** — `CnEnSpacing` · `HtmlFormat` · `JSON5Formatter` · `JsonFormatter` · `MarkdownEditor` · `MermaidEditor` · `SQLFormatter` · `SvgFormat` · `XmlFormatter`
 
-**🖼️ Image Generators *(13)*** — `AppIconGenerator` · `AsciiImageGenerator` · `BarcodeGenerator` · `Base64Image` · `CodeShot` · `IcoGenerator` · `ImageColor` · `ImageResize` · `ImageSplit` · `ImageWatermark` · `PlaceholderImage` · `QRCodeGenerator` · `ShieldBadgeGenerator`
+**🖼️ Image Tools *(11)*** — `AppIconGenerator` · `AsciiImageGenerator` · `Base64Image` · `CodeShot` · `IcoGenerator` · `ImageColor` · `ImageResize` · `ImageSplit` · `ImageWatermark` · `PlaceholderImage` · `ShieldBadgeGenerator`
+
+**🎲 Generators *(10)*** — `BarcodeGenerator` · `CopybookGenerator` · `CronRules` · `DotMatrixFont` · `HtpasswdGenerator` · `MockData` · `OTPGenerator` · `PasswordGenerator` · `QRCodeGenerator` · `SudokuGenerator`
 
 **🌐 Webmaster Tools *(10)*** — `BrowserFingerprint` · `CSRGenerator` · `CookieAnalyzer` · `HtmlStripText` · `KeywordDensity` · `RobotsTxtGenerator` · `SitemapCheck` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck`
 
-**🧩 Utilities *(18)*** — `AsciiTextArt` · `CIDRCalc` · `Chmod` · `Color` · `CopybookGenerator` · `CronRules` · `DotMatrixFont` · `FileDiff` · `HtpasswdGenerator` · `KeyboardKeyInfo` · `LineCount` · `MockData` · `OTPGenerator` · `PasswordGenerator` · `RegexTester` · `SudokuGenerator` · `WebSocketDebug` · `Teleprompter`
+**🧩 Utilities *(10)*** — `AsciiTextArt` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `RegexTester` · `Teleprompter` · `WebSocketDebug`
 
 > Built-in pages `AppStore`（App Center）/ `Help` / `Setting` also live in `src/App/` (registered with `Type = 'misc'`), but are fixed pages rather than tools.
 

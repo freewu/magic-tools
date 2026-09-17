@@ -15,7 +15,7 @@ import {
   setDefaultText,
 } from './lib';
 
-/** 字帖生成器默认设置 (挂载到 设置 → 其它) */
+/** 字帖生成器默认设置 (挂载到 设置 → 生成器) */
 export const CopybookGeneratorSetting: React.FC = () => {
   const { locale } = useLocale();
   const st = (zh: string) => _r(locale, zh);

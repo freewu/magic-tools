@@ -1,6 +1,6 @@
 const AppName = 'OTP 密码生成器';
 const Icon = '';
-const Type = 'misc';
+const Type = 'generator';
 
 export {
   AppName,

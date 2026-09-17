@@ -143,7 +143,7 @@ const MockData = () => {
         type="info"
         showIcon
         message={ t('模板语法: 字段名|规则 控制数量/范围/自增 (如 list|1-10, age|18-60, id|+1, score|60-100.1-2); 值里的 @占位符 生成随机数据 (如 @cname / @email / @integer(1,100) / @date("yyyy-MM-dd") / @pick([...])); 模板按 JSON5 解析, 支持单引号、注释与尾逗号, 不支持函数与正则。') }
-        description={ t('生成数量与默认格式 / 默认表名可在「设置 → 其它 → 数据生成」中调整; 数量上限 1000 条。') }
+        description={ t('生成数量与默认格式 / 默认表名可在「设置 → 生成器 → 数据生成」中调整; 数量上限 1000 条。') }
       />
 
       <Divider>{ t('数据生成说明') }</Divider>

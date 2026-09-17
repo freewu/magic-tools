@@ -8,7 +8,7 @@ const zh = `<h2>这个工具做什么</h2>
 <li><p>选择「宫格」: 4 / 6 / 9 宫格 —— 每页会自动排布 4 个 (4 宫)、2 个 (6 宫, 上下排) 或 1 个 (9 宫)</p></li>
 <li><p>选择「难度」: 高 / 中 / 低, 难度越高题目里保留的提示数越少</p></li>
 <li><p>设置「页数」与「打印内容」(仅题目 / 仅答案 (红色) / 题目 + 答案), 右侧 A4 预览会实时刷新</p></li>
-<li><p>点「🔄 重新生成」换一批新题; 点「🖨️ 打印 A4」打开系统打印对话框, 选择打印机 (或「另存为 PDF」) 即可</p></li>
+<li><p>点「🔄 重新生成」换一批新题; 点「🖨️ 打印」打开系统打印对话框, 选择打印机 (或「另存为 PDF」) 即可</p></li>
 </ul>
 
 <h2>版式与难度说明</h2>
@@ -34,7 +34,7 @@ const tw = `<h2>這個工具做什麼</h2>
 <li><p>選擇「宮格」: 4 / 6 / 9 宮格 —— 每頁會自動排布 4 個 (4 宮)、2 個 (6 宮, 上下排) 或 1 個 (9 宮)</p></li>
 <li><p>選擇「難度」: 高 / 中 / 低, 難度越高題目裡保留的提示數越少</p></li>
 <li><p>設定「頁數」與「列印內容」(僅題目 / 僅答案 (紅色) / 題目 + 答案), 右側 A4 預覽會即時更新</p></li>
-<li><p>點「🔄 重新產生」換一批新題; 點「🖨️ 列印 A4」開啟系統列印對話框, 選擇印表機 (或「另存為 PDF」) 即可</p></li>
+<li><p>點「🔄 重新產生」換一批新題; 點「🖨️ 列印」開啟系統列印對話框, 選擇印表機 (或「另存為 PDF」) 即可</p></li>
 </ul>
 
 <h2>版式與難度說明</h2>
@@ -60,7 +60,7 @@ const en = `<h2>What this tool does</h2>
 <li><p>Choose the grid: 4 / 6 / 9 — each A4 page automatically holds 4 (4×4), 2 stacked (6×6) or 1 (9×9) puzzle</p></li>
 <li><p>Choose the difficulty; harder puzzles keep fewer given clues</p></li>
 <li><p>Set the number of pages and what to print (puzzle only / answers only (red) / puzzle + answers); the A4 preview updates instantly</p></li>
-<li><p>Click "🔄 Regenerate" for a fresh set, then "🖨️ Print A4" to open the system print dialog and pick a printer (or "Save as PDF")</p></li>
+<li><p>Click "🔄 Regenerate" for a fresh set, then "🖨️ Print" to open the system print dialog and pick a printer (or "Save as PDF")</p></li>
 </ul>
 
 <h2>Layout and difficulty</h2>

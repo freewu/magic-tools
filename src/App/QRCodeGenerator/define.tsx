@@ -1,6 +1,6 @@
 const AppName = '二维码生成';
 const Icon = '';
-const Type = 'image';
+const Type = 'generator';
 
 export {
   AppName,

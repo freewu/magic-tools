@@ -36,7 +36,7 @@ const zh = `<h2>什么是 Mock 数据生成</h2>
 
 <h2>说明</h2>
 <ul>
-<li><p>生成数量默认 100 条, 上限 1000 条; 默认格式 / 默认表名 / 默认数量可在「设置 → 其它 → 数据生成」中调整</p></li>
+<li><p>生成数量默认 100 条, 上限 1000 条; 默认格式 / 默认表名 / 默认数量可在「设置 → 生成器 → 数据生成」中调整</p></li>
 <li><p>行政区划为精简内置数据 (34 个省级 + 常见城市); 需要完整数据可在源码 <code>lib.ts</code> 中扩展</p></li>
 <li><p>模板按 JSON5 解析, 因此 <b>不支持函数值与正则</b> (Mock.js 的 <code>function()</code> / <code>/regex/</code> 写法)</p></li>
 <li><p>表名会做安全规整 (只保留字母 / 数字 / 下划线 / <code>$</code>, 数字开头补下划线)</p></li>
@@ -78,7 +78,7 @@ const tw = `<h2>什麼是 Mock 資料產生</h2>
 
 <h2>說明</h2>
 <ul>
-<li><p>產生數量預設 100 筆, 上限 1000 筆; 預設格式 / 預設表名 / 預設數量可在「設定 → 其他 → 資料產生」中調整</p></li>
+<li><p>產生數量預設 100 筆, 上限 1000 筆; 預設格式 / 預設表名 / 預設數量可在「設定 → 產生器 → 資料產生」中調整</p></li>
 <li><p>行政區劃為精簡內建資料 (34 個省級 + 常見城市); 需要完整資料可在原始碼 <code>lib.ts</code> 中擴充</p></li>
 <li><p>範本以 JSON5 解析, 因此 <b>不支援函式值與正規式</b> (Mock.js 的 <code>function()</code> / <code>/regex/</code> 寫法)</p></li>
 <li><p>表名會做安全規整 (只保留字母 / 數字 / 底線 / <code>$</code>, 數字開頭補底線)</p></li>
@@ -120,7 +120,7 @@ const en = `<h2>What is mock data generation</h2>
 
 <h2>Notes</h2>
 <ul>
-<li><p>The record count defaults to 100 and is capped at 1000; default format / table name / count can be changed under Settings → Others → Mock Data</p></li>
+<li><p>The record count defaults to 100 and is capped at 1000; default format / table name / count can be changed under Settings → Generators → Mock Data</p></li>
 <li><p>Region data is a compact built-in set (34 province-level entries plus common cities); extend <code>lib.ts</code> if you need the full dataset</p></li>
 <li><p>Templates are JSON5, so <b>function and regex values are not supported</b> (Mock.js <code>function()</code> / <code>/regex/</code> forms)</p></li>
 <li><p>Table names are sanitized (letters, digits, underscore and <code>$</code> only; a leading digit gets an underscore)</p></li>

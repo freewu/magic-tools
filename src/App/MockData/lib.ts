@@ -3,7 +3,7 @@
 import JSON5 from 'json5';
 import { COUNT_MAX, COUNT_MIN, DEFAULT_COUNT, DEFAULT_FORMAT, DEFAULT_TABLE, FORMAT_LIST, type MockFormat } from './data';
 
-// ---------------- 设置存取 (设置 → 其它 → 数据生成) ----------------
+// ---------------- 设置存取 (设置 → 生成器 → 数据生成) ----------------
 const KEY_FORMAT = 'mock-data.format';
 const KEY_TABLE = 'mock-data.table';
 const KEY_COUNT = 'mock-data.count';

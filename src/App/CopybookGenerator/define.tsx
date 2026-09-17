@@ -1,6 +1,6 @@
 const AppName = '字帖生成器';
 const Icon = '';
-const Type = 'misc';
+const Type = 'generator';
 
 export {
   AppName,

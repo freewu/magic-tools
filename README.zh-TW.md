@@ -2,7 +2,7 @@
 
 # 🧰 Magic Tools
 
-**全能開發工具箱 —— 8 大分類、118 個實用工具，桌面 + Web 雙端。**
+**全能開發工具箱 —— 9 大分類、118 個實用工具，桌面 + Web 雙端。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
@@ -16,7 +16,7 @@
 
 ## ✨ 亮點
 
-- **100+ 常用開發工具**，依 8 大分類組織：編解碼、類型轉換、加解密、值計算、格式化、圖片、站長工具與實用工具。
+- **100+ 常用開發工具**，依 9 大分類組織：編解碼、類型轉換、加解密、值計算、格式化、圖片、產生器、站長工具與實用工具。
 - **完整的密碼學套件** —— 對稱加密（AES / DES / 3DES / SM4 / ChaCha20 / Blowfish / Rabbit / RC2–RC6 / TEA / XTEA / XXTEA）、非對稱（RSA / SM2 國密）、古典密碼（凱撒 / 柵欄 / 維吉尼亞 / 希爾），以及 Cisco Type 7。
 - **雜湊與 MAC** —— MD5、SHA-1/2、SHA-3、Keccak、SM3、BCrypt、Scrypt、PBKDF2、HKDF、HMAC、CMAC、KMAC，以及 BCC / LRC / CRC 檢查碼。
 - **批次 QR Code / 條碼** —— 一次產生多筆並預覽，桌面版可一鍵選取資料夾匯出全部 PNG。
@@ -30,26 +30,29 @@
 ### 🔐 加解密 *(21)*
 AES 加解密 · RSA 加解密 · SM2 加解密 · SM4 加解密 · 凱撒加解密 · 柵欄加解密 · 維吉尼亞加解密 · 希爾加解密 · Cisco Type 7 · DES 加解密 · Blowfish 加解密 · Rabbit 加解密 · RC2 加解密 · RC4 加解密 · RC5 加解密 · RC6 加解密 · ChaCha20 加解密 · 3DES 加解密 · TEA 加解密 · XTEA 加解密 · XXTEA 加解密
 
-### 🧮 值計算 *(16)*
-Hash 值計算 · HmacHash 值計算 · SHA3 Hash 值計算 · Keccak Hash 值計算 · BCrypt · Scrypt · PBKDF2 值計算 · CMAC 計算 · HKDF 計算 · KMAC 計算 · PPI 計算 · 原碼/反碼/補碼計算 · IP 轉換 · BCC 校驗 · LRC 校驗 · CRC 校驗
+### 🧮 值計算 *(15)*
+Hash 值計算 · HmacHash 值計算 · SHA3 Hash 值計算 · Keccak Hash 值計算 · BCrypt · Scrypt · PBKDF2 值計算 · CMAC 計算 · HKDF 計算 · KMAC 計算 · PPI 計算 · 原碼/反碼/補碼計算 · BCC 校驗 · LRC 校驗 · CRC 校驗
 
 ### 🔄 編解碼 *(13)*
 Base64 編解碼 · URL 編解碼 · Unicode 編解碼 · Punycode 編解碼 · UUencode 編解碼 · XXencode 編解碼 · BCD 編解碼 · 摩斯密碼編解碼 · JWT 解碼器 · HTTP Basic Auth 編解碼 · BaseX 編解碼 · Base58 編解碼 · Gzip 編解碼
 
-### ⚖️ 類型轉換 *(18)*
-時間戳轉換 · 顏色格式轉換 · 進制轉換 · 樹形和路徑轉換 · GPS 座標轉換 · 下載連結轉換 · JSONL 轉換 · 人民幣大寫 · 位元組轉換 · 中文拼音 · 溫度轉換 · 距離轉換 · 配置轉換 · 字幕格式轉換 · 速度轉換 · 容量轉換 · 面積轉換 · 重量轉換
+### ⚖️ 類型轉換 *(19)*
+時間戳轉換 · 顏色格式轉換 · 進制轉換 · 樹形和路徑轉換 · GPS 座標轉換 · IP 轉換(IPv4/IPv6 ↔ 十進位/十六進位/二進位) · 下載連結轉換 · JSONL 轉換 · 人民幣大寫 · 位元組轉換 · 中文拼音 · 溫度轉換 · 距離轉換 · 配置轉換 · 字幕格式轉換 · 速度轉換 · 容量轉換 · 面積轉換 · 重量轉換
 
 ### 🛠️ 格式化 *(9)*
 Markdown 編輯器 · Mermaid 編輯器(即時預覽, 內建 30+ 圖形類型範例, 匯出 SVG/PNG/WebP) · JSON 格式化 · JSON5 格式化 · SQL 格式化 · XML 格式化 · HTML 格式化 · SVG 格式化 · 中英文自動排版
 
-### 🖼️ 圖片 *(13)*
-二維碼生成 · 條碼生成 · Base64 圖片 · ASCII 圖片 · 程式碼截圖 · ICO 生成 · App Icon 生成 · 圖片主題色(合併相近色 + 佔比) · 圖片分割(2/3/4/6/9 份) · 圖片調整(依比例/依像素縮放 + 旋轉 90°·180°·270°, PNG·JPEG·WebP) · 圖片浮水印(文字/logo, 九宮格·平鋪 + 旋轉·透明度) · 佔位圖片 · Shield Badge 生成
+### 🖼️ 圖片 *(11)*
+Base64 圖片 · ASCII 圖片 · 程式碼截圖 · ICO 生成 · App Icon 生成 · 圖片主題色(合併相近色 + 佔比) · 圖片分割(2/3/4/6/9 份) · 圖片調整(依比例/依像素縮放 + 旋轉 90°·180°·270°, PNG·JPEG·WebP) · 圖片浮水印(文字/logo, 九宮格·平鋪 + 旋轉·透明度) · 佔位圖片 · Shield Badge 生成
+
+### 🎲 產生器 *(10)*
+二維碼生成(批次, logo/標籤) · 條碼生成(CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · 密碼生成(強度分析) · OTP 密碼產生器(TOTP/HOTP, 二維碼匯出) · htpasswd 生成 · 資料產生(JSON/CSV/SQL) · 點陣字產生器 · 數獨產生器(4/6/9 宮格, 唯一解, A4 列印) · 字帖產生器(米字格/田字格/回宮格/作文格, A4 列印) · Cron 規則產生(解析 + 下次執行時間)
 
 ### 🌐 站長工具 *(10)*
 HTML 標籤去除 · 瀏覽器指紋 · CSR 申請文件(本機產生 RSA 私鑰 + PKCS#10 請求, 支援 SAN) · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 檢查 · 關鍵詞密度 · 網頁TDK 資訊檢測 · robots.txt 生成
 
-### 🧩 其他 *(18)*
-CSS 配色 · 行數統計 · htpasswd 生成 · 正則表達式 · 檔案比較 · 點陣字生成器 · 鍵盤按鍵資訊 · Chmod 權限 · OTP 密碼生成器 · ASCII 文字 · Cron 規則生成 · CIDR 計算器 · 密碼生成 · 資料產生 · WebSocket 偵錯 · 數獨產生器(4/6/9 宮格, 唯一解, A4 列印) · 字帖產生器(米字格/田字格/回宮格/作文格, A4 列印) · 提詞器(調速/淡入淡出/全螢幕, 空格 開始·暫停)
+### 🧩 其他 *(10)*
+CSS 配色 · 行數統計 · 正則表達式 · 檔案比較 · 鍵盤按鍵資訊 · Chmod 權限 · ASCII 文字 · CIDR 計算器 · WebSocket 偵錯 · 提詞器(調速/淡入淡出/逐行高亮/全螢幕, 空格 開始·暫停)
 
 > 另有內建頁面：**應用中心**、**說明與更新日誌**、**設定**。
 
@@ -111,19 +114,21 @@ magic-tools
 
 **🔐 加解密 *(21)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
 
-**🧮 值計算 *(16)*** — `BCCCheck` · `BcryptCalc` · `CMACCalc` · `CRCCheck` · `ComplementCalc` · `HKDFCalc` · `Hash` · `HmacHash` · `IPConvert` · `KMACCalc` · `KeccakHash` · `LRCCheck` · `PBKDF2Calc` · `PPICalc` · `SHA3Hash` · `ScryptCalc`
+**🧮 值計算 *(15)*** — `BCCCheck` · `BcryptCalc` · `CMACCalc` · `CRCCheck` · `ComplementCalc` · `HKDFCalc` · `Hash` · `HmacHash` · `KMACCalc` · `KeccakHash` · `LRCCheck` · `PBKDF2Calc` · `PPICalc` · `SHA3Hash` · `ScryptCalc`
 
 **🔄 編解碼 *(13)*** — `BCDCodec` · `Base58Codec` · `Base64` · `BaseXCodec` · `BasicAuthCodec` · `GzipCodec` · `JWTDecoder` · `MorseCodec` · `Punycode` · `URL` · `UUencode` · `Unicode` · `XXencode`
 
-**⚖️ 類型轉換 *(18)*** — `AreaConvert` · `ByteConvert` · `ColorConvert` · `ConfigConvert` · `DistanceConvert` · `DownloadLinkConvert` · `GPSConvert` · `JSONLConvert` · `NumberConvert` · `PinyinConvert` · `RMBConvert` · `SpeedConvert` · `SubtitleConvert` · `TemperatureConvert` · `Time` · `TreePathConvert` · `VolumeConvert` · `WeightConvert`
+**⚖️ 類型轉換 *(19)*** — `AreaConvert` · `ByteConvert` · `ColorConvert` · `ConfigConvert` · `DistanceConvert` · `DownloadLinkConvert` · `GPSConvert` · `IPConvert` · `JSONLConvert` · `NumberConvert` · `PinyinConvert` · `RMBConvert` · `SpeedConvert` · `SubtitleConvert` · `TemperatureConvert` · `Time` · `TreePathConvert` · `VolumeConvert` · `WeightConvert`
 
 **🛠️ 格式化 *(9)*** — `CnEnSpacing` · `HtmlFormat` · `JSON5Formatter` · `JsonFormatter` · `MarkdownEditor` · `MermaidEditor` · `SQLFormatter` · `SvgFormat` · `XmlFormatter`
 
-**🖼️ 圖片 *(13)*** — `AppIconGenerator` · `AsciiImageGenerator` · `BarcodeGenerator` · `Base64Image` · `CodeShot` · `IcoGenerator` · `ImageColor` · `ImageResize` · `ImageSplit` · `ImageWatermark` · `PlaceholderImage` · `QRCodeGenerator` · `ShieldBadgeGenerator`
+**🖼️ 圖片 *(11)*** — `AppIconGenerator` · `AsciiImageGenerator` · `Base64Image` · `CodeShot` · `IcoGenerator` · `ImageColor` · `ImageResize` · `ImageSplit` · `ImageWatermark` · `PlaceholderImage` · `ShieldBadgeGenerator`
+
+**🎲 產生器 *(10)*** — `BarcodeGenerator` · `CopybookGenerator` · `CronRules` · `DotMatrixFont` · `HtpasswdGenerator` · `MockData` · `OTPGenerator` · `PasswordGenerator` · `QRCodeGenerator` · `SudokuGenerator`
 
 **🌐 站長工具 *(10)*** — `BrowserFingerprint` · `CSRGenerator` · `CookieAnalyzer` · `HtmlStripText` · `KeywordDensity` · `RobotsTxtGenerator` · `SitemapCheck` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck`
 
-**🧩 其他 *(18)*** — `AsciiTextArt` · `CIDRCalc` · `Chmod` · `Color` · `CopybookGenerator` · `CronRules` · `DotMatrixFont` · `FileDiff` · `HtpasswdGenerator` · `KeyboardKeyInfo` · `LineCount` · `MockData` · `OTPGenerator` · `PasswordGenerator` · `RegexTester` · `SudokuGenerator` · `WebSocketDebug` · `Teleprompter`
+**🧩 其他 *(10)*** — `AsciiTextArt` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `RegexTester` · `Teleprompter` · `WebSocketDebug`
 
 > 內建頁面 `AppStore`(應用中心) / `Help` / `Setting` 也位於 `src/App/` 下 (註冊 `Type = 'misc'`), 但屬固定頁面而非工具。
 
