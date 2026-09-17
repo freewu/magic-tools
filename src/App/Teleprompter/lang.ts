@@ -22,6 +22,11 @@ const uilangRows: Record<string, [string, string]> = {
   '字号': ['字號', 'Font size'],
   '行距': ['行距', 'Line height'],
   '淡入淡出': ['淡入淡出', 'Fade edges'],
+  '逐行高亮': ['逐行高亮', 'Line focus'],
+  '逐行焦点: 只高亮当前阅读行, 离它越远的行越透明、颜色越淡': [
+    '逐行焦點: 只高亮目前閱讀行, 離它越遠的行越透明、顏色越淡',
+    'Only the line at the reading point is highlighted — the further away a line is, the more transparent and dimmer it becomes',
+  ],
   '边缘淡入淡出: 文字在上下边缘渐隐, 更接近真实提词器': [
     '邊緣淡入淡出: 文字在上下邊緣漸隱, 更接近真實提詞器',
     'Fade the top and bottom edges so lines dissolve in and out, like a real teleprompter',

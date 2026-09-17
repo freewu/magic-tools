@@ -23,9 +23,21 @@ export const PAD_RATIO = 0.6;
 /** 上下边缘淡入淡出 (渐隐) 默认开启 */
 export const FADE_DEFAULT = true;
 
+/** 逐行焦点高亮 (只高亮当前阅读行, 越远越淡) 默认开启 */
+export const FOCUS_DEFAULT = true;
+
+/** 阅读基准线: 视线停留位置占视口高度的比例 (略高于正中, 给下方留出预告行) */
+export const READ_RATIO = 0.42;
+
+/** 非当前行的最低可见度 / 每远离一行衰减到的比例 (越小衰减越快) */
+export const FOCUS_MIN_OPACITY = 0.12;
+export const FOCUS_DECAY = 0.62;
+
 /** 滚动区域配色 (提词器惯例: 深底浅字, 长时间观看不刺眼) */
 export const STAGE_BG = '#101114';
 export const STAGE_FG = '#f2f3f5';
+/** 当前阅读行的强调色 (其余行由透明度向下衰减) */
+export const STAGE_FOCUS_FG = '#ffffff';
 
 /** 选项记忆 key (速度 / 字号 / 行距 / 淡入淡出, 下次打开沿用) */
 export const OPTIONS_STORAGE_KEY = 'teleprompter-options';

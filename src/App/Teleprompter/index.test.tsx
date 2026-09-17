@@ -1,19 +1,25 @@
 import '@testing-library/jest-dom';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import Teleprompter from './index';
-import { OPTIONS_STORAGE_KEY, SAMPLE_SCRIPTS } from './data';
-import { splitScript } from './lib';
+import { OPTIONS_STORAGE_KEY, PAD_RATIO, READ_RATIO, SAMPLE_SCRIPTS } from './data';
+import { focusOpacity, splitScript } from './lib';
 import { LocaleProvider } from '../../hook/locale-context';
 
 /** 默认语言 (zh-CN) 下打开时随机取到的第一首示例诗 (Mock 里的 Math.random 固定为 0) */
 const SAMPLE = SAMPLE_SCRIPTS['zh-CN'][0];
 const SAMPLE_LINES = splitScript(SAMPLE).length;
 
-// ---- jsdom 不做排版, clientHeight / offsetHeight 恒为 0, 这里按类名给出稳定尺寸 ----
+// ---- jsdom 不做排版, clientHeight / offsetHeight / offsetTop 恒为 0, 这里按类名给出稳定尺寸 ----
 // 视口 400, 文本 600 → 滚动距离 = 600 + 2 * 0.6 * 400 - 400 = 680
 const VIEW_H = 400;
 const TEXT_H = 600;
 const DISTANCE = 680;
+/** 行高 = 字号 40 × 行距 1.8 = 72 (与实际设定的 40px / 1.8 一致) */
+const LINE_STEP = 72;
+/** 首行顶部 = 轨道上留白 = 视口 × 0.6 */
+const LINE_TOP = Math.round(VIEW_H * PAD_RATIO);
+/** 阅读基准线 */
+const READ_Y = VIEW_H * READ_RATIO;
 
 Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
   configurable: true,
@@ -21,7 +27,19 @@ Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
 });
 Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
   configurable: true,
-  get() { return this.classList?.contains('tp-text') ? TEXT_H : 0; },
+  get() {
+    if (this.classList?.contains('tp-text')) return TEXT_H;
+    return this.classList?.contains('tp-line') ? LINE_STEP : 0;
+  },
+});
+/** 每行按行高依次排下去 (把轨道上留白算进去, 与真实布局一致) */
+Object.defineProperty(HTMLElement.prototype, 'offsetTop', {
+  configurable: true,
+  get() {
+    if (!this.classList?.contains('tp-line')) return 0;
+    const siblings = Array.prototype.slice.call(this.parentElement?.children ?? []);
+    return LINE_TOP + LINE_STEP * siblings.indexOf(this);
+  },
 });
 
 // ---- requestAnimationFrame 队列: 手动推进帧, 让滚动位置可预期 ----
@@ -98,6 +116,21 @@ const handleOf = (label: string): HTMLElement => {
   if (!handle) throw new Error(`未找到滑块: ${label}`);
   return handle as HTMLElement;
 };
+/** 标签对应的开关 (淡入淡出 / 逐行高亮) */
+const switchOf = (label: string): HTMLButtonElement => {
+  const item = screen.getByText(label).closest('.ant-space-item');
+  const sw = item?.parentElement?.querySelector('button[role="switch"]');
+  if (!sw) throw new Error(`未找到开关: ${label}`);
+  return sw as HTMLButtonElement;
+};
+/** 逐行渲染的行元素 */
+const lineEls = () => Array.from(document.querySelectorAll('.tp-line')) as HTMLElement[];
+/** 当前高亮的行 (只应有一行) */
+const activeEls = () => lineEls().filter((el) => el.classList.contains('tp-line-active'));
+/** 第 i 行的透明度 */
+const opacityAt = (i: number) => Number(lineEls()[i].style.opacity);
+/** 第 i 行中心线到阅读线的距离 (单位: 行) */
+const centerGap = (i: number, offset: number) => Math.abs(LINE_TOP + LINE_STEP * i + LINE_STEP / 2 - offset - READ_Y) / LINE_STEP;
 
 describe('Teleprompter 初始界面', () => {
   test('渲染脚本编辑区 / 提词舞台与播放控制', () => {
@@ -119,6 +152,19 @@ describe('Teleprompter 初始界面', () => {
     expect(screen.getByText('1.8 x')).toBeInTheDocument();
     expect(stage().className).toContain('tp-fade');
     expect(stageCss()).toContain('mask-image');
+    expect(stageCss()).toContain('.tp-line-active');
+
+    // 逐行高亮: 只高亮一行, 其余行按距离衰减透明度
+    const lines = lineEls();
+    expect(lines).toHaveLength(SAMPLE_LINES);
+    expect(activeEls()).toHaveLength(1);
+    expect(activeEls()[0]).toBe(lines[0]); // 未滚动时最近的是第一行
+    expect(opacityAt(0)).toBe(1);
+    expect(opacityAt(1)).toBeCloseTo(focusOpacity(centerGap(1, 0)), 5);
+    expect(opacityAt(1)).toBeLessThan(1);
+    expect(opacityAt(2)).toBeLessThan(opacityAt(1));
+    // 上下对称: 越远越淡 (上下两侧距离相同的行透明度一致)
+    expect(opacityAt(3)).toBeCloseTo(focusOpacity(centerGap(3, 0)), 5);
 
     // 首个文本块按设定字号与行距渲染, 滚动起点为 0
     expect(textBlock().style.fontSize).toBe('40px');
@@ -221,18 +267,47 @@ describe('Teleprompter 设置', () => {
     expect(screen.getByText('1.9 x')).toBeInTheDocument();
     expect(textBlock().style.lineHeight).toBe('1.9');
 
-    fireEvent.click(screen.getByRole('switch'));
+    fireEvent.click(switchOf('淡入淡出'));
     expect(stage().className).not.toContain('tp-fade');
   });
 
-  test('打开时沿用上次记忆的速度 / 字号 / 行距 / 淡入淡出', () => {
-    localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify({ speed: 120, fontSize: 52, lineHeight: 2.2, fade: false }));
+  test('逐行高亮: 当前行随滚动下移, 越远越淡; 关闭后所有行同样清晰', () => {
+    render(<Teleprompter />);
+
+    expect(activeEls()).toHaveLength(1);
+    expect(activeEls()[0]).toBe(lineEls()[0]);
+    const firstOpacity = opacityAt(1);
+
+    // 滚动约一行 (14 帧 → 13 帧推进 × 12px = 156px > 一个行高 72px) 后高亮行跟着下移
+    fireEvent.click(btn('开始'));
+    advanceFrames(14);
+    expect(activeEls()).toHaveLength(1);
+    expect(activeEls()[0]).toBe(lineEls()[1]);
+    expect(opacityAt(1)).toBe(1);
+    // 刚经过的那一行开始变淡
+    expect(opacityAt(0)).toBeLessThan(1);
+    expect(opacityAt(0)).toBeCloseTo(focusOpacity(centerGap(0, 156)), 5);
+    expect(opacityAt(1)).toBeGreaterThan(firstOpacity);
+    expect(opacityAt(2)).toBeLessThan(opacityAt(1));
+
+    // 关掉后: 没有高亮行, 所有行都是全不透明
+    fireEvent.click(switchOf('逐行高亮'));
+    expect(activeEls()).toHaveLength(0);
+    lineEls().forEach((el) => expect(Number(el.style.opacity)).toBe(1));
+  });
+
+  test('打开时沿用上次记忆的速度 / 字号 / 行距 / 淡入淡出 / 逐行高亮', () => {
+    localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify({ speed: 120, fontSize: 52, lineHeight: 2.2, fade: false, focus: false }));
     render(<Teleprompter />);
 
     expect(screen.getByText('120 px/s')).toBeInTheDocument();
     expect(screen.getByText('52 px')).toBeInTheDocument();
     expect(screen.getByText('2.2 x')).toBeInTheDocument();
     expect(stage().className).not.toContain('tp-fade');
+    // 逐行高亮被关掉 → 不再有高亮行, 所有行全不透明
+    expect(activeEls()).toHaveLength(0);
+    expect(opacityAt(0)).toBe(1);
+    expect(opacityAt(1)).toBe(1);
   });
 
   test('清空后禁用播放并提示, 载入示例可恢复', () => {

@@ -6,14 +6,14 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocale } from '../../hook/locale-context';
 import {
-  FONT_SIZE_MAX, FONT_SIZE_MIN, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN, PAD_RATIO,
-  SPEED_MAX, SPEED_MIN, SPEED_STEP, STAGE_BG, STAGE_FG,
+  FONT_SIZE_MAX, FONT_SIZE_MIN, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN, PAD_RATIO, READ_RATIO,
+  SPEED_MAX, SPEED_MIN, SPEED_STEP, STAGE_BG, STAGE_FG, STAGE_FOCUS_FG,
 } from './data';
 import {
-  advance, clampFontSize, clampLineHeight, clampSpeed, formatClock, getStoredOptions,
-  isSliderTarget, isToggleKey, isTypingTarget, nextSampleScript, pickSampleScript,
-  progressOf, remainingSeconds, scrollDistance, setStoredOptions, splitScript,
-  type PrompterOptions,
+  activeLineIndex, advance, clampFontSize, clampLineHeight, clampSpeed, focusOpacity,
+  formatClock, getStoredOptions, isSliderTarget, isToggleKey, isTypingTarget, lineCentersOf,
+  lineStepOf, nextSampleScript, pickSampleScript, progressOf, remainingSeconds,
+  scrollDistance, setStoredOptions, splitScript, type PrompterOptions,
 } from './lib';
 import { u, uT } from './lang';
 import TeleprompterIntro from './intro';
@@ -30,6 +30,8 @@ const STAGE_CSS = `
 .tp-view { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; }
 .tp-track { will-change: transform; }
 .tp-text { white-space: pre-wrap; word-break: break-word; font-weight: 600; color: ${STAGE_FG}; }
+.tp-line { padding: 0 8px; margin: 0 -8px; border-radius: 6px; }
+.tp-line-active { color: ${STAGE_FOCUS_FG}; background: rgba(255,255,255,0.05); text-shadow: 0 2px 16px rgba(255,255,255,0.18); }
 .tp-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 8px 12px; background: rgba(255,255,255,0.06); border-top: 1px solid rgba(255,255,255,0.12); }
 .tp-fade { -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%); }
 `;
@@ -52,11 +54,13 @@ const Teleprompter: React.FC = () => {
   const [ playing, setPlaying ] = useState(false);
   const [ offset, setOffset ] = useState(0);
   const [ box, setBox ] = useState({ vh: 0, th: 0 }); // 视口高度 / 文本高度 (测量所得)
+  const [ centers, setCenters ] = useState<number[]>([]); // 每行中心线位置 (逐行高亮用)
   const [ full, setFull ] = useState(false);
 
   const stageRef = useRef<HTMLDivElement | null>(null);
   const viewRef = useRef<HTMLDivElement | null>(null);
   const textRef = useRef<HTMLDivElement | null>(null);
+  const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
   const offsetRef = useRef(0);
   const distanceRef = useRef(0);
   const speedRef = useRef(opts.speed);
@@ -69,6 +73,30 @@ const Teleprompter: React.FC = () => {
   const progress = progressOf(offset, distance);
   const left = remainingSeconds(offset, distance, opts.speed);
   const done = distance > 0 && offset >= distance;
+
+  // ---- 逐行焦点: 阅读线附近那一行高亮, 其余行按与它的距离衰减透明度 ----
+  const readY = box.vh * READ_RATIO;
+  // 还没测到行位置时 (首帧 / 无法测量) 按 字号 × 行距 推一个行距出来
+  const focusCenters = useMemo(() => {
+    const step = Math.max(1, opts.fontSize * opts.lineHeight);
+    const fallback = lines.map((_, i) => pad + step * i + step / 2);
+    return centers.length === lines.length && centers.some((v) => v > 0) ? centers : fallback;
+  }, [ centers, lines, pad, opts.fontSize, opts.lineHeight ]);
+  const activeIndex = useMemo(
+    () => activeLineIndex(focusCenters, offset, readY),
+    [ focusCenters, offset, readY ],
+  );
+  const lineStep = useMemo(
+    () => lineStepOf(focusCenters, opts.fontSize * opts.lineHeight),
+    [ focusCenters, opts.fontSize, opts.lineHeight ],
+  );
+  /** 当前行的强调度: 焦点行 1, 其余行按距离 (单位: 行) 衰减 */
+  const opacityOf = useCallback((i: number): number => {
+    if (!opts.focus) return 1;
+    if (i === activeIndex) return 1;
+    const center = focusCenters[i] ?? pad;
+    return focusOpacity(Math.abs(center - offset - readY) / lineStep);
+  }, [ opts.focus, activeIndex, focusCenters, offset, readY, lineStep, pad ]);
 
   const patch = useCallback((next: Partial<PrompterOptions>) => {
     setOpts((prev) => ({ ...prev, ...next }));
@@ -96,10 +124,20 @@ const Teleprompter: React.FC = () => {
       const next = scrollDistance(th, vh);
       distanceRef.current = next;
       setBox({ vh, th });
+      // 每行中心线位置 (相对舞台; 轨道 padding 已包含在 offsetTop 里)
+      const rects = lineRefs.current
+        .slice(0, lines.length)
+        .map((el) => ({ top: el?.offsetTop ?? 0, height: el?.offsetHeight ?? 0 }));
+      const measured = lineCentersOf(rects);
+      setCenters((prev) => (
+        prev.length === measured.length && prev.every((v, i) => Math.abs(v - measured[i]) < 0.5)
+          ? prev
+          : measured
+      ));
       if (offsetRef.current > next) commit(next);
     };
     measure();
-    const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(measure) : null;
+      const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(measure) : null;
     if (ro) {
       if (viewRef.current) ro.observe(viewRef.current);
       if (textRef.current) ro.observe(textRef.current);
@@ -261,6 +299,12 @@ const Teleprompter: React.FC = () => {
               <span style={{ color: '#888' }}>{t('淡入淡出')}</span>
             </Tooltip>
           </Space>
+          <Space size={8}>
+            <Switch size="small" checked={opts.focus} onChange={(v) => patch({ focus: v })} />
+            <Tooltip title={t('逐行焦点: 只高亮当前阅读行, 离它越远的行越透明、颜色越淡')}>
+              <span style={{ color: '#888' }}>{t('逐行高亮')}</span>
+            </Tooltip>
+          </Space>
         </Space>
       </Card>
 
@@ -274,7 +318,16 @@ const Teleprompter: React.FC = () => {
             <div className="tp-track" style={{ transform: `translateY(${-offset}px)`, padding: `${pad}px 0` }}>
               <div className="tp-text" ref={textRef} style={{ fontSize: opts.fontSize, lineHeight: opts.lineHeight }}>
                 {hasScript
-                  ? lines.map((line, i) => <div key={i}>{line === '' ? '\u00A0' : line}</div>)
+                  ? lines.map((line, i) => (
+                    <div
+                      key={i}
+                      ref={(el) => { lineRefs.current[i] = el; }}
+                      className={`tp-line${opts.focus && i === activeIndex ? ' tp-line-active' : ''}`}
+                      style={{ opacity: opacityOf(i) }}
+                    >
+                      {line === '' ? '\u00A0' : line}
+                    </div>
+                  ))
                   : <div style={{ color: '#777' }}>{t('请先在上方输入提词脚本')}</div>}
               </div>
             </div>

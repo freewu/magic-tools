@@ -1,13 +1,13 @@
 import {
-  DEFAULT_OPTIONS, advance, clampFontSize, clampLineHeight, clampSpeed, formatClock,
-  getStoredOptions, isSliderTarget, isToggleKey, isTypingTarget, nextSampleScript,
-  normalizeOptions, pickSampleScript, progressOf, remainingSeconds, sampleScriptsOf,
-  scrollDistance, setStoredOptions, splitScript,
+  DEFAULT_OPTIONS, activeLineIndex, advance, clampFontSize, clampLineHeight, clampSpeed,
+  focusOpacity, formatClock, getStoredOptions, isSliderTarget, isToggleKey, isTypingTarget,
+  lineCentersOf, lineStepOf, nextSampleScript, normalizeOptions, pickSampleScript, progressOf,
+  remainingSeconds, sampleScriptsOf, scrollDistance, setStoredOptions, splitScript,
 } from './lib';
 import {
-  FADE_DEFAULT, FONT_SIZE_DEFAULT, FONT_SIZE_MAX, FONT_SIZE_MIN, LINE_HEIGHT_DEFAULT,
-  LINE_HEIGHT_MAX, LINE_HEIGHT_MIN, OPTIONS_STORAGE_KEY, PAD_RATIO, SAMPLE_SCRIPTS,
-  SPEED_DEFAULT, SPEED_MAX, SPEED_MIN,
+  FADE_DEFAULT, FOCUS_DEFAULT, FOCUS_MIN_OPACITY, FONT_SIZE_DEFAULT, FONT_SIZE_MAX,
+  FONT_SIZE_MIN, LINE_HEIGHT_DEFAULT, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN, OPTIONS_STORAGE_KEY,
+  PAD_RATIO, SAMPLE_SCRIPTS, SPEED_DEFAULT, SPEED_MAX, SPEED_MIN,
 } from './data';
 
 beforeEach(() => {
@@ -42,9 +42,12 @@ describe('选项校验', () => {
     expect(normalizeOptions('nope')).toEqual(DEFAULT_OPTIONS);
     expect(normalizeOptions({ fade: 'yes' })).toEqual(DEFAULT_OPTIONS);
     expect(normalizeOptions({ speed: 120, fade: false })).toEqual({
-      speed: 120, fontSize: FONT_SIZE_DEFAULT, lineHeight: LINE_HEIGHT_DEFAULT, fade: false,
+      speed: 120, fontSize: FONT_SIZE_DEFAULT, lineHeight: LINE_HEIGHT_DEFAULT, fade: false, focus: FOCUS_DEFAULT,
     });
+    expect(normalizeOptions({ focus: 'on' }).focus).toBe(FOCUS_DEFAULT);
+    expect(normalizeOptions({ focus: false }).focus).toBe(false);
     expect(DEFAULT_OPTIONS.fade).toBe(FADE_DEFAULT);
+    expect(DEFAULT_OPTIONS.focus).toBe(FOCUS_DEFAULT);
     expect(DEFAULT_OPTIONS.speed).toBe(SPEED_DEFAULT);
   });
 });
@@ -56,11 +59,11 @@ describe('选项记忆', () => {
   });
 
   test('写入后可读回 (非法规整后再存)', () => {
-    setStoredOptions({ speed: 999, fontSize: 52, lineHeight: 2.04, fade: false });
+    setStoredOptions({ speed: 999, fontSize: 52, lineHeight: 2.04, fade: false, focus: false });
     expect(JSON.parse(localStorage.getItem(OPTIONS_STORAGE_KEY) as string)).toEqual({
-      speed: SPEED_MAX, fontSize: 52, lineHeight: 2, fade: false,
+      speed: SPEED_MAX, fontSize: 52, lineHeight: 2, fade: false, focus: false,
     });
-    expect(getStoredOptions()).toEqual({ speed: SPEED_MAX, fontSize: 52, lineHeight: 2, fade: false });
+    expect(getStoredOptions()).toEqual({ speed: SPEED_MAX, fontSize: 52, lineHeight: 2, fade: false, focus: false });
   });
 
   test('记忆内容损坏 / 越界时回退 (不抛异常)', () => {
@@ -69,7 +72,7 @@ describe('选项记忆', () => {
 
     localStorage.setItem(OPTIONS_STORAGE_KEY, JSON.stringify({ speed: 1, fontSize: 9999, lineHeight: -3 }));
     expect(getStoredOptions()).toEqual({
-      speed: SPEED_MIN, fontSize: FONT_SIZE_MAX, lineHeight: LINE_HEIGHT_MIN, fade: FADE_DEFAULT,
+      speed: SPEED_MIN, fontSize: FONT_SIZE_MAX, lineHeight: LINE_HEIGHT_MIN, fade: FADE_DEFAULT, focus: FOCUS_DEFAULT,
     });
   });
 
@@ -134,6 +137,53 @@ describe('示例脚本', () => {
         expect(splitScript(script).length).toBeGreaterThan(8);
       });
     });
+  });
+});
+
+describe('逐行焦点', () => {
+  test('focusOpacity: 当前行 1, 越远越淡且单调递减, 最远处收敛到下限', () => {
+    expect(focusOpacity(0)).toBe(1);
+    expect(focusOpacity(-0)).toBe(1);
+    expect(focusOpacity(1)).toBeLessThan(1);
+    expect(focusOpacity(2)).toBeLessThan(focusOpacity(1));
+    expect(focusOpacity(5)).toBeLessThan(focusOpacity(4));
+    expect(focusOpacity(50)).toBeCloseTo(FOCUS_MIN_OPACITY, 6);
+    expect(focusOpacity(2)).toBe(focusOpacity(-2)); // 取绝对值, 上下对称
+    expect(focusOpacity(0.5)).toBeGreaterThan(focusOpacity(1)); // 连续衰减, 可用于逐帧插值
+    expect(focusOpacity(NaN)).toBe(1);
+    expect(focusOpacity(undefined as unknown as number)).toBe(1);
+  });
+
+  test('lineCentersOf: 取每行的中心线 (折行的高行也居中)', () => {
+    expect(lineCentersOf([])).toEqual([]);
+    expect(lineCentersOf([{ top: 100, height: 40 }, { top: 140, height: 80 }])).toEqual([ 120, 180 ]);
+    // 非法值当 0 处理
+    expect(lineCentersOf([{ top: NaN, height: NaN }])).toEqual([ 0 ]);
+  });
+
+  test('activeLineIndex: 取离阅读线最近的一行, 随偏移量下移', () => {
+    const centers = [ 120, 180, 240, 300 ];
+    expect(activeLineIndex([], 0, 100)).toBe(-1);
+    expect(activeLineIndex(centers, 0, 100)).toBe(0); // 120 最近
+    expect(activeLineIndex(centers, 0, 200)).toBe(1); // 180 最近
+    expect(activeLineIndex(centers, 0, 210)).toBe(1); // 与 180/240 等距 → 取靠前一行
+    expect(activeLineIndex(centers, 0, 211)).toBe(2);
+    expect(activeLineIndex(centers, 0, 270)).toBe(2); // 与 240/300 等距 → 取靠前一行
+    expect(activeLineIndex(centers, 0, 271)).toBe(3);
+    // 向上滚动 (偏移量增加) 时阅读线在轨道内向下走
+    expect(activeLineIndex(centers, 60, 100)).toBe(1);
+    expect(activeLineIndex(centers, 120, 100)).toBe(2);
+    expect(activeLineIndex(centers, 1000, 100)).toBe(3);
+  });
+
+  test('lineStepOf: 取相邻行中心间距的中位数, 测不到时用兜底值', () => {
+    expect(lineStepOf([], 72)).toBe(72);
+    expect(lineStepOf([ 0, 0, 0 ], 72)).toBe(72); // 全等 → 无有效间距
+    expect(lineStepOf([ 0, 72, 144 ], 72)).toBe(72);
+    // 中间夹了一行折行的长行 (144), 中位数忽略它
+    expect(lineStepOf([ 0, 72, 216, 288 ], 72)).toBe(72);
+    expect(lineStepOf([ 0, 72 ], NaN)).toBe(72);
+    expect(lineStepOf([], NaN)).toBe(1);
   });
 });
 

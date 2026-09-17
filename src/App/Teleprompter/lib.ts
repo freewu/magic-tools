@@ -2,7 +2,8 @@
 // 设计: 与 DOM 解耦 —— 组件负责测量"视口高度"与"文本高度"后注入,
 //       滚动推进 / 进度 / 剩余时间等计算都放在这里, 便于单元测试覆盖
 import {
-  FADE_DEFAULT, FONT_SIZE_DEFAULT, FONT_SIZE_MAX, FONT_SIZE_MIN,
+  FADE_DEFAULT, FOCUS_DECAY, FOCUS_DEFAULT, FOCUS_MIN_OPACITY,
+  FONT_SIZE_DEFAULT, FONT_SIZE_MAX, FONT_SIZE_MIN,
   LINE_HEIGHT_DEFAULT, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN,
   OPTIONS_STORAGE_KEY, PAD_RATIO, SAMPLE_SCRIPTS, SPEED_DEFAULT, SPEED_MAX, SPEED_MIN,
 } from './data';
@@ -17,6 +18,8 @@ export interface PrompterOptions {
   lineHeight: number;
   /** 上下边缘淡入淡出 */
   fade: boolean;
+  /** 逐行焦点高亮 (只高亮当前阅读行, 越远越淡) */
+  focus: boolean;
 }
 
 /** 默认可选项 */
@@ -25,6 +28,7 @@ export const DEFAULT_OPTIONS: PrompterOptions = {
   fontSize: FONT_SIZE_DEFAULT,
   lineHeight: LINE_HEIGHT_DEFAULT,
   fade: FADE_DEFAULT,
+  focus: FOCUS_DEFAULT,
 };
 
 // ==================== 取值校验 ====================
@@ -62,6 +66,7 @@ export const normalizeOptions = (raw: unknown): PrompterOptions => {
     fontSize: clampFontSize(src.fontSize),
     lineHeight: clampLineHeight(src.lineHeight),
     fade: typeof src.fade === 'boolean' ? src.fade : FADE_DEFAULT,
+    focus: typeof src.focus === 'boolean' ? src.focus : FOCUS_DEFAULT,
   };
 };
 
@@ -167,6 +172,46 @@ export const formatClock = (seconds: number): string => {
   const n = toNum(seconds);
   const total = Math.max(0, Math.round(Number.isFinite(n) ? n : 0));
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
+};
+
+// ==================== 渐近高亮 ====================
+/** 逐行焦点透明度: 以阅读行为中心, 每远离 1 行衰减 FOCUS_DECAY, 最远处收敛到 FOCUS_MIN_OPACITY */
+export const focusOpacity = (distanceLines: number): number => {
+  const d = Math.abs(toNum(distanceLines) || 0);
+  return FOCUS_MIN_OPACITY + (1 - FOCUS_MIN_OPACITY) * Math.pow(FOCUS_DECAY, d);
+};
+
+/** 每行中心线在轨道坐标系里的位置 (行内折行时行高更大, 中心线仍然居中) */
+export const lineCentersOf = (rects: readonly { top: number; height: number }[]): number[] =>
+  rects.map((r) => (toNum(r?.top) || 0) + (toNum(r?.height) || 0) / 2);
+
+/** 距阅读线最近的一行下标 (阅读线屏幕坐标 = 轨道内位置 - 偏移量); 无行时返回 -1 */
+export const activeLineIndex = (centers: readonly number[], offset: number, readY: number): number => {
+  if (!centers.length) return -1;
+  const target = (toNum(readY) || 0) + (toNum(offset) || 0);
+  let best = 0;
+  let bestGap = Infinity;
+  centers.forEach((c, i) => {
+    const gap = Math.abs((toNum(c) || 0) - target);
+    if (gap < bestGap) {
+      bestGap = gap;
+      best = i;
+    }
+  });
+  return best;
+};
+
+/** 行距基准 (相邻行中心间距的中位数, 折行的长行不会把基准拉大); 测不到时用字号 × 行距兜底 */
+export const lineStepOf = (centers: readonly number[], fallback: number): number => {
+  const fallbackStep = Math.max(1, toNum(fallback) || 1);
+  const diffs: number[] = [];
+  for (let i = 1; i < centers.length; i += 1) {
+    const d = (toNum(centers[i]) || 0) - (toNum(centers[i - 1]) || 0);
+    if (d > 0) diffs.push(d);
+  }
+  if (!diffs.length) return fallbackStep;
+  diffs.sort((a, b) => a - b);
+  return diffs[Math.floor(diffs.length / 2)] || fallbackStep;
 };
 
 // ==================== 快捷键 ====================
