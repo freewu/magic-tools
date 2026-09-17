@@ -1,4 +1,4 @@
-import { Alert, Button, Card, Input, Radio, Space, Typography } from 'antd';
+import { Button, Card, Input, Radio, Space, Typography } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 import { useMemo, useState } from 'react';
 import { formatHtml, getHtmlIndent } from './lib';
@@ -37,12 +37,6 @@ const HtmlFormat: React.FC = () => {
 
   return (
     <Space direction="vertical" size={16} style={{ width: '100%' }}>
-      <Alert
-        type="info"
-        showIcon
-        message={t('HTML 格式化')}
-        description={t('美化格式化 HTML 代码: 块级元素缩进换行、行内元素保留在一行、文本空白自动折叠。script / style / pre / textarea 内容原样保留。缩进空格数可在右侧或「设置 → 格式化」中切换 2 / 4 空格。')}
-      />
       <Card size="small" title={t('HTML 源码')} extra={
         <Space size={8}>
           <Radio.Group

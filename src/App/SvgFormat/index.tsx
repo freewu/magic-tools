@@ -79,12 +79,6 @@ const SvgFormat: React.FC = () => {
 
   return (
     <Space direction="vertical" size={16} style={{ width: '100%' }}>
-      <Alert
-        type="info"
-        showIcon
-        message={t('SVG 格式化 / 压缩')}
-        description={t('基于 SVGO 引擎处理 SVG: 去除注释、冗余属性、多余分组并优化路径等。可「美化」为多行缩进或「压缩」为单行最小体积, 适合发布到网页前瘦身。')}
-      />
       <Card size="small" title={t('SVG 源码')} extra={
         <Space size={8}>
           <input

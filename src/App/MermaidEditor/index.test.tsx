@@ -87,6 +87,14 @@ const pickSample = async (label: string) => {
   });
   fireEvent.click(option);
 };
+/** 组件注入的预览样式表内容 (通过 SSR 无关的 style 标签读取) */
+const previewCss = (): string => {
+  const hit = Array.from(document.querySelectorAll('style'))
+    .map((el) => el.textContent ?? '')
+    .find((text) => text.includes('.mmd-preview'));
+  if (!hit) throw new Error('未找到预览样式');
+  return hit;
+};
 /** 源码编辑框 */
 const codeArea = () => screen.getByPlaceholderText('在此输入 Mermaid 代码…') as HTMLTextAreaElement;
 /** 等待首次渲染完成 (200ms 防抖) */
@@ -113,11 +121,14 @@ beforeEach(() => {
 describe('MermaidEditor 初始界面', () => {
   test('渲染编辑器 / 示例选择 / 预览与导出按钮, 并自动渲染首个示例', async () => {
     render(<MermaidEditor />);
-    expect(screen.getByText('Mermaid 编辑器')).toBeInTheDocument();
     expect(screen.getByText('Mermaid 源码')).toBeInTheDocument();
     expect(screen.getByText('预览')).toBeInTheDocument();
     expect(screen.getByText('缩放')).toBeInTheDocument();
     expect(screen.getByText('背景')).toBeInTheDocument();
+    // 顶部 Info 说明已移除, 仅保留面板开关
+    expect(screen.queryByText('Mermaid 编辑器')).toBeNull();
+    expect(btn('隐藏输入')).toBeInTheDocument();
+    expect(btn('隐藏预览')).toBeInTheDocument();
     expect(codeArea().value).toBe(SAMPLES[0].code);
 
     await waitRendered();
@@ -202,6 +213,61 @@ describe('MermaidEditor 初始界面', () => {
   });
 });
 
+describe('MermaidEditor 面板与视图', () => {
+  test('预览底色跟随「背景」实时切换 (透明为棋盘格)', async () => {
+    render(<MermaidEditor />);
+    await waitRendered();
+    expect(previewCss()).toContain('.mmd-preview svg');
+    const pane = () => document.querySelector('.mmd-preview') as HTMLElement;
+    expect(getComputedStyle(pane()).backgroundColor).toBe('rgb(255, 255, 255)');
+
+    fireEvent.click(screen.getByText('深色'));
+    expect(getComputedStyle(pane()).backgroundColor).toBe('rgb(31, 31, 31)');
+
+    fireEvent.click(screen.getByText('透明'));
+    expect(pane().className).toContain('mmd-preview-checker');
+    expect(previewCss()).toContain('linear-gradient');
+    expect(getComputedStyle(pane()).backgroundColor).toBe('');
+  });
+
+  test('缩放切换实时改变预览尺寸 (1x 自适应, 更大倍率按原图放大)', async () => {
+    render(<MermaidEditor />);
+    await waitRendered();
+    const css = previewCss;
+    // 默认 1x: 预览自适应卡片宽度 (不写死像素宽度)
+    expect(css()).toContain('max-width: 100%');
+
+    fireEvent.click(screen.getByText('3x'));
+    await waitFor(() => expect(css()).toContain('width: 720px'));
+    expect(css()).toContain('max-width: none');
+
+    fireEvent.click(screen.getByText('1x (自适应)'));
+    await waitFor(() => expect(css()).toContain('max-width: 100%'));
+    expect(css()).not.toContain('width: 720px');
+  });
+
+  test('可隐藏输入 / 隐藏预览, 并可随时恢复', async () => {
+    render(<MermaidEditor />);
+    await waitRendered();
+
+    fireEvent.click(btn('隐藏输入'));
+    expect(screen.queryByText('Mermaid 源码')).toBeNull();
+    expect(btn('显示输入')).toBeInTheDocument();
+    expect(document.querySelector('.mmd-preview svg')).not.toBeNull();
+
+    fireEvent.click(btn('隐藏预览'));
+    expect(document.querySelector('.mmd-preview')).toBeNull();
+    expect(screen.queryByRole('button', { name: '导出 PNG' })).toBeNull();
+    expect(btn('显示预览')).toBeInTheDocument();
+
+    fireEvent.click(btn('显示输入'));
+    fireEvent.click(btn('显示预览'));
+    expect(screen.getByText('Mermaid 源码')).toBeInTheDocument();
+    expect(screen.getByText('预览')).toBeInTheDocument();
+    expect(document.querySelector('.mmd-preview svg')).not.toBeNull();
+  });
+});
+
 describe('MermaidEditor 导出', () => {
   test('导出 SVG: 固定宽高后写入文件', async () => {
     render(<MermaidEditor />);
@@ -221,7 +287,7 @@ describe('MermaidEditor 导出', () => {
     expect(ctxCalls).toHaveLength(0);
   });
 
-  test('导出 PNG: 默认 2x + 白底', async () => {
+  test('导出 PNG: 默认 1x (原图尺寸) + 白底', async () => {
     render(<MermaidEditor />);
     await waitRendered();
     fireEvent.click(btn('导出 PNG'));
@@ -229,8 +295,8 @@ describe('MermaidEditor 导出', () => {
     await waitFor(() => expect(savePngFile).toHaveBeenCalledTimes(1));
     expect((savePngFile as jest.Mock).mock.calls[0]).toEqual([ 'mermaid-flowchart.png', pngUrl ]);
     expect(ctxCalls).toEqual([
-      { op: 'fillRect', args: [ 0, 0, 480, 240 ] },
-      { op: 'drawImage', args: [ 0, 0, 480, 240 ] },
+      { op: 'fillRect', args: [ 0, 0, 240, 120 ] },
+      { op: 'drawImage', args: [ 0, 0, 240, 120 ] },
     ]);
     await waitFor(() => expect(screen.getByText('已导出 mermaid-flowchart.png')).toBeInTheDocument());
   });

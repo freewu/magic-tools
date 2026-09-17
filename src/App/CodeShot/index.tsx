@@ -101,12 +101,6 @@ const CodeShot: React.FC = () => {
 
   return (
     <div style={{ width: '100%' }}>
-      <Alert
-        type="info"
-        showIcon
-        message={t('代码截图')}
-        description={t('Shiki 语法高亮 + 一键导出 PNG。支持全部内置语言（常用语言置顶），编辑器风格可选 Mac / VSCode / IntelliJ / Sublime / Vim / Emacs，明暗自适应配色，默认值均可在「设置 → 图片」中调整。')}
-      />
       <Row gutter={16} wrap align="stretch" style={{ marginTop: 16 }}>
         <Col xs={24} lg={13} xxl={12}>
           <Card size="small" title={t('代码与外观')} style={{ height: '100%' }} extra={

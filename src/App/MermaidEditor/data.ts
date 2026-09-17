@@ -552,10 +552,10 @@ export const BACKGROUND_OPTIONS: Array<{ value: RasterBackground; label: string;
   { value: 'transparent', label: '透明', color: null },
 ];
 
-/** 位图导出倍率 (SVG 为矢量, 不受影响) */
+/** 缩放倍率: 同时作用于预览与位图导出 (SVG 为矢量, 不受倍率影响); 1x = 原图尺寸 (预览自适应卡片宽度) */
 export const SCALE_OPTIONS = [ 1, 2, 3, 4 ];
 
-export const DEFAULT_SCALE = 2;
+export const DEFAULT_SCALE = 1;
 
 /** 位图导出质量 (WebP 有损压缩) */
 export const RASTER_QUALITY = 0.92;

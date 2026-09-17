@@ -1,4 +1,4 @@
-import { Alert, Button, Card, Input, Space, Typography } from 'antd';
+import { Button, Card, Input, Space, Typography } from 'antd';
 import { CopyOutlined, SwapOutlined } from '@ant-design/icons';
 import { useMemo, useState } from 'react';
 import { spaceCnEn } from './lib';
@@ -32,12 +32,6 @@ const CnEnSpacing: React.FC = () => {
 
   return (
     <Space direction="vertical" size={16} style={{ width: '100%' }}>
-      <Alert
-        type="info"
-        showIcon
-        message={t('中英文自动排版')}
-        description={t('自动在中文与英文字母、数字之间插入空格（如 “使用HTML” → “使用 HTML”）。仅处理紧邻的混排边界：已存在的空格不会重复添加；标点符号、换行与段落结构不会被修改。')}
-      />
       <Card size="small" title={t('待排版文本')} extra={
         <Space size={8}>
           <Button size="small" onClick={() => { setRaw(SAMPLE); }}>{t('载入示例')}</Button>

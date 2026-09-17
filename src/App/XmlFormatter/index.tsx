@@ -80,12 +80,6 @@ const XmlFormatter: React.FC = () => {
 
   return (
     <Space direction="vertical" size={16} style={{ width: '100%' }}>
-      <Alert
-        type="info"
-        showIcon
-        message={t('XML 格式化')}
-        description={t('XML / XAML / SVG / plist / 配置文件美化缩进，支持 XML 声明、注释、CDATA 与处理指令的保留。标签未闭合、交叉嵌套或多余闭合会给出带行号的错误提示。')}
-      />
       <Card size="small" title={<Space><FileTextOutlined /> {t('原始 XML')}</Space>} extra={
         <Space size={8}>
           <Segmented

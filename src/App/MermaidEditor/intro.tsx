@@ -8,7 +8,8 @@ const zh = `<h2>这个工具做什么</h2>
 <li><p>从「示例」下拉里选一个内置模板 (按 <b>基础图 / 数据图表 / 流程与排期 / 语法图</b> 分组, 覆盖 mermaid 内置的全部可预览图形: 流程图、时序图、类图、状态图、ER 图、思维导图、用户旅程图、C4 图、架构图、块图、需求图、饼图、象限图、XY 图、桑基图、雷达图、矩形树图、韦恩图、数据包图、甘特图、Git 分支图、时间线、看板、鱼骨图、Cynefin 框架、Wardley 地图、事件建模、目录树、铁路语法图), 下拉框里可直接输入关键字筛选, 选完在此基础上改</p></li>
 <li><p>在「Mermaid 源码」里编辑, 右侧预览会自动刷新 (输入停顿约 200ms 后渲染, 避免频繁重绘)</p></li>
 <li><p>语法有误时预览区上方会显示具体错误行与提示, 修正后自动恢复</p></li>
-<li><p>导出位图前可先选「缩放」(1x ~ 4x) 与「背景」: 缩放大 = 高清大图 (适合打印 / 高分屏), 透明背景适合叠到深色文档上</p></li>
+<li><p>「缩放」(1x ~ 4x) 与「背景」同时作用于预览与位图导出: <code>1x</code> 自适应卡片宽度, <code>2x</code> ~ <code>4x</code> 按原图倍率放大 (超出时可滚动查看), 缩放大 = 高清大图 (适合打印 / 高分屏), 背景选「透明」时预览区显示棋盘格, 便于叠到深色文档上</p></li>
+<li><p>顶部的面板开关可单独收起左右两栏: 只看渲染结果时收起源码栏, 专注改代码时收起预览栏, 再次点击即可恢复</p></li>
 <li><p>点「导出 SVG / PNG / WebP」保存文件; 也可用「复制源码 / 复制 SVG」直接粘贴到别处</p></li>
 </ul>
 
@@ -32,7 +33,7 @@ const zh = `<h2>这个工具做什么</h2>
 <ul>
 <li><p><b>SVG</b> 是矢量格式: 导出时会写入固定的 <code>width</code> / <code>height</code> 与 <code>viewBox</code>, 可直接放进网页或用 Illustrator / Figma / Inkscape 再编辑, 背景保持透明</p></li>
 <li><p><b>PNG</b> 适合文档与 IM, <b>WebP</b> 体积更小; 两者都按「缩放」倍率放大后另存, 曲线与文字边缘更清晰</p></li>
-<li><p>深色模式下预览会用 mermaid 的 dark 主题, 导出前建议切回浅色模式, 否则深色文字在浅色文档里不易阅读; 位图导出的「背景」只影响位图, 深色主题图配「深色」背景更协调</p></li>
+<li><p>深色模式下预览会用 mermaid 的 dark 主题, 导出前建议切回浅色模式, 否则深色文字在浅色文档里不易阅读; 「背景」只改变图面底色 (预览与位图一致), 深色主题图配「深色」背景更协调</p></li>
 <li><p>出于安全考虑, 图表中的 HTML 标签 (<code>htmlLabels</code>) 已被关闭: 文本会按纯文本渲染, 避免粘贴来源不明的代码在预览时执行脚本</p></li>
 <li><p>少数图形受 mermaid 词法限制: <code>sankey</code> 的节点标签只能是 ASCII (可用 front-matter 的 <code>title</code> 写中文标题), <code>wardley-beta</code> 的中文节点名与关系两端需要加引号</p></li>
 <li><p>mermaid 的 <code>Use Case</code> 与 <code>ZenUML</code> 图需要额外外挂插件 (<code>@mermaid-js/mermaid-zenuml</code> 等), <code>flowchart-elk</code> 需要 ELK 布局插件, 本工具未内置, 因此示例列表中不提供</p></li>
@@ -47,7 +48,8 @@ const tw = `<h2>這個工具做什麼</h2>
 <li><p>從「範例」下拉裡選一個內建模板 (按 <b>基礎圖 / 資料圖表 / 流程與排期 / 語法圖</b> 分組, 涵蓋 mermaid 內建的全部可預覽圖形: 流程圖、時序圖、類別圖、狀態圖、ER 圖、思維導圖、使用者旅程圖、C4 圖、架構圖、區塊圖、需求圖、圓餅圖、象限圖、XY 圖、桑基圖、雷達圖、矩形樹狀圖、韋恩圖、封包圖、甘特圖、Git 分支圖、時間軸、看板、魚骨圖、Cynefin 框架、Wardley 地圖、事件建模、目錄樹、鐵路語法圖), 下拉框裡可直接輸入關鍵字篩選, 選完在此基礎上改</p></li>
 <li><p>在「Mermaid 原始碼」裡編輯, 右側預覽會自動更新 (輸入停頓約 200ms 後渲染, 避免頻繁重繪)</p></li>
 <li><p>語法有誤時預覽區上方會顯示具體錯誤行與提示, 修正後自動恢復</p></li>
-<li><p>匯出位圖前可先選「縮放」(1x ~ 4x) 與「背景」: 縮放大 = 高解析大圖 (適合列印 / 高解析螢幕), 透明背景適合疊到深色文件上</p></li>
+<li><p>「縮放」(1x ~ 4x) 與「背景」同時作用於預覽與點陣匯出: <code>1x</code> 自動適應卡片寬度, <code>2x</code> ~ <code>4x</code> 按原圖倍率放大 (超出時可捲動檢視), 縮放大 = 高解析大圖 (適合列印 / 高解析螢幕), 背景選「透明」時預覽區顯示棋盤格, 便於疊到深色文件上</p></li>
+<li><p>頂部的面板開關可單獨收合左右兩欄: 只看渲染結果時收起源碼欄, 專心改程式碼時收起預覽欄, 再次點擊即可還原</p></li>
 <li><p>點「匯出 SVG / PNG / WebP」儲存檔案; 也可用「複製原始碼 / 複製 SVG」直接貼到別處</p></li>
 </ul>
 
@@ -71,7 +73,7 @@ const tw = `<h2>這個工具做什麼</h2>
 <ul>
 <li><p><b>SVG</b> 是向量格式: 匯出時會寫入固定的 <code>width</code> / <code>height</code> 與 <code>viewBox</code>, 可直接放進網頁或用 Illustrator / Figma / Inkscape 再編輯, 背景保持透明</p></li>
 <li><p><b>PNG</b> 適合文件與 IM, <b>WebP</b> 體積更小; 兩者都按「縮放」倍率放大後另存, 曲線與文字邊緣更清晰</p></li>
-<li><p>深色模式下預覽會用 mermaid 的 dark 主題, 匯出前建議切回淺色模式, 否則深色文字在淺色文件裡不易閱讀; 位圖匯出的「背景」只影響位圖, 深色主題圖配「深色」背景更協調</p></li>
+<li><p>深色模式下預覽會用 mermaid 的 dark 主題, 匯出前建議切回淺色模式, 否則深色文字在淺色文件裡不易閱讀; 「背景」只改變圖面底色 (預覽與點陣一致), 深色主題圖配「深色」背景更協調</p></li>
 <li><p>出於安全考量, 圖表中的 HTML 標籤 (<code>htmlLabels</code>) 已關閉: 文字會按純文字渲染, 避免貼上來源不明的程式碼在預覽時執行腳本</p></li>
 <li><p>少數圖形受 mermaid 詞法限制: <code>sankey</code> 的節點標籤只能是 ASCII (可用 front-matter 的 <code>title</code> 寫中文標題), <code>wardley-beta</code> 的中文節點名與關係兩端需要加引號</p></li>
 <li><p>mermaid 的 <code>Use Case</code> 與 <code>ZenUML</code> 圖需要額外外掛 (<code>@mermaid-js/mermaid-zenuml</code> 等), <code>flowchart-elk</code> 需要 ELK 佈局外掛, 本工具未內建, 因此範例清單中不提供</p></li>
@@ -86,7 +88,8 @@ const en = `<h2>What this tool does</h2>
 <li><p>Pick a built-in template in the “Sample” dropdown (grouped into <b>basic diagrams / data charts / process &amp; planning / syntax diagrams</b>, covering everything mermaid can preview: flowchart, sequence, class, state, ER, mindmap, user journey, C4, architecture, block, requirement, pie, quadrant, XY, sankey, radar, treemap, Venn, packet, gantt, git graph, timeline, kanban, Ishikawa, Cynefin, Wardley map, event modeling, tree view and the railroad syntax diagrams). Type in the dropdown to filter, then edit from there</p></li>
 <li><p>Edit the code in “Mermaid source”; the preview refreshes automatically (about 200 ms after you stop typing, to avoid constant re-rendering)</p></li>
 <li><p>Syntax errors are shown above the preview with the offending line — fix the code and the preview recovers automatically</p></li>
-<li><p>Before exporting a bitmap choose “Scale” (1x – 4x) and “Background”: a larger scale gives a high-resolution image, while a transparent background is handy for dark documents</p></li>
+<li><p>“Scale” (1x – 4x) and “Background” apply to both the preview and the bitmap export: <code>1x</code> fits the card width, <code>2x</code> – <code>4x</code> magnify the original size (scroll when it overflows) and give a higher-resolution image, and “Transparent” shows a checkerboard in the preview area — handy for dark documents</p></li>
+<li><p>The panel buttons at the top collapse either column on its own: put the source away to inspect the result, or hide the preview column to focus on the code — click again to bring it back</p></li>
 <li><p>Click “Export SVG / PNG / WebP” to save a file, or use “Copy source / Copy SVG” to paste the result elsewhere</p></li>
 </ul>
 
@@ -110,7 +113,7 @@ const en = `<h2>What this tool does</h2>
 <ul>
 <li><p><b>SVG</b> is a vector format: the export writes a fixed <code>width</code> / <code>height</code> and a <code>viewBox</code>, so the file can go straight into a page or be re-edited in Illustrator / Figma / Inkscape; the background stays transparent</p></li>
 <li><p><b>PNG</b> suits documents and chat, <b>WebP</b> is smaller; both are rasterised at the selected scale so curves and text stay crisp</p></li>
-<li><p>In dark mode the preview uses mermaid’s dark theme — switch back to light before exporting, otherwise dark text is hard to read on light documents; the bitmap “Background” only affects bitmaps (dark theme diagrams look best on the dark background)</p></li>
+<li><p>In dark mode the preview uses mermaid’s dark theme — switch back to light before exporting, otherwise dark text is hard to read on light documents; “Background” only paints the diagram background (identical in the preview and the bitmap), and dark theme diagrams look best on the dark background</p></li>
 <li><p>For safety, HTML labels (<code>htmlLabels</code>) are disabled: text is rendered as plain text so pasted code cannot execute scripts in the preview</p></li>
 <li><p>A couple of diagram types are limited by mermaid’s own lexer: <code>sankey</code> node labels must be ASCII (use a front-matter <code>title</code> for a localised heading), and <code>wardley-beta</code> needs quotes around non-ASCII node names and around both ends of a relation</p></li>
 <li><p>mermaid’s <code>Use Case</code> and <code>ZenUML</code> diagrams require extra plugins (<code>@mermaid-js/mermaid-zenuml</code> and friends) and <code>flowchart-elk</code> needs the ELK layout plugin; none of them ship with this tool, so they are absent from the sample list</p></li>

@@ -7,13 +7,11 @@ export default {
 
 // 界面文案词条 (zh 短语即 key; 缺 zh-CN 时回退原文)
 const uilangRows: Record<string, [string, string]> = {
-  // 顶部说明
-  'Mermaid 编辑器': ['Mermaid 編輯器', 'Mermaid Editor'],
-  '左侧编写 Mermaid 代码, 右侧实时渲染, 全部在本地完成 (不联网); 可导出': [
-    '左側編寫 Mermaid 程式碼, 右側即時渲染, 全部在本機完成 (不連網); 可匯出',
-    'Write Mermaid on the left, preview it live on the right — everything runs locally; export ',
-  ],
-  ' 图片。': [' 圖片。', ' images.'],
+  // 顶部面板开关
+  '隐藏输入': ['隱藏輸入', 'Hide source'],
+  '显示输入': ['顯示輸入', 'Show source'],
+  '隐藏预览': ['隱藏預覽', 'Hide preview'],
+  '显示预览': ['顯示預覽', 'Show preview'],
 
   // 示例 (按图形家族分组, 覆盖 mermaid 内置的全部可预览图形)
   '示例': ['範例', 'Sample'],
@@ -70,13 +68,14 @@ const uilangRows: Record<string, [string, string]> = {
   '导出 PNG': ['匯出 PNG', 'Export PNG'],
   '导出 WebP': ['匯出 WebP', 'Export WebP'],
   '缩放': ['縮放', 'Scale'],
+  '1x (自适应)': ['1x (自動適應)', '1x (fit)'],
   '背景': ['背景', 'Background'],
   '白色': ['白色', 'White'],
   '深色': ['深色', 'Dark'],
   '透明': ['透明', 'Transparent'],
-  'SVG 为矢量格式, 始终透明背景, 不受「背景 / 缩放」影响': [
-    'SVG 為向量格式, 固定透明背景, 不受「背景 / 縮放」影響',
-    'SVG is vector and always keeps a transparent background — “Background / Scale” do not apply',
+  '「背景 / 缩放」同时作用于预览与位图导出; SVG 为矢量格式, 导出时始终透明背景': [
+    '「背景 / 縮放」同時作用於預覽與點陣匯出; SVG 為向量格式, 匯出時固定透明背景',
+    '“Background / Scale” apply to both the preview and raster exports; SVG is vector and always exports with a transparent background',
   ],
   '当前浏览器不支持 WebP 导出, 请改用 PNG': [
     '目前瀏覽器不支援 WebP 匯出, 請改用 PNG',

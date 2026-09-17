@@ -1,4 +1,4 @@
-import { Alert, Button, Card, Input, Segmented, Space, Tooltip, Typography, message } from 'antd';
+import { Button, Card, Input, Segmented, Space, Tooltip, Typography, message } from 'antd';
 import { CopyOutlined, DownloadOutlined, EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { useMemo, useRef, useState } from 'react';
 import { renderMarkdown, wrapExportHtml, MD_DARK_CSS, MD_EXPORT_CSS } from './lib';
@@ -141,16 +141,6 @@ const MarkdownEditor: React.FC = () => {
 
   return (
     <Space direction="vertical" size={16} style={{ width: '100%' }}>
-      <Alert
-        type="info"
-        showIcon
-        message={t('Markdown 编辑器')}
-        description={
-          <>
-            {t('左侧编写')} <Text code>Markdown</Text>{t(', 右侧实时预览(支持常用语法与行内 / 块级 LaTeX 公式子集); 可导出')} <Text code>.md</Text>{t(' 源文件或自带样式的独立 ')} <Text code>.html</Text>{t(' 文档。')}
-          </>
-        }
-      />
       <Card
         size="small"
         title={t('工具栏 (光标处插入)')}
