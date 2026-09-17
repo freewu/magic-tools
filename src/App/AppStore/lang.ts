@@ -6,17 +6,20 @@ export default {
     all: '全部分类',
     count: '共 {n} 个应用',
     defaultApp: '默认展示应用',
+    desktopOnly: '仅桌面版',
   },
   'zh-TW': {
     appName: '應用中心',
     all: '全部分類',
     count: '共 {n} 個應用',
     defaultApp: '預設展示應用',
+    desktopOnly: '僅桌面版',
   },
   en: {
     appName: 'App Store',
     all: 'All',
     count: '{n} apps',
     defaultApp: 'Default App',
+    desktopOnly: 'Desktop only',
   },
 } as const;

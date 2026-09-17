@@ -18,7 +18,7 @@ const AppType = ({ uri, name, children } :AppTypeProps ) => {
       {
         children?.map((item,i) => {
           return (
-            <AppItem key={ item.key + i }  uri={ item.key } icon={ item.icon } label={ item.label } />
+            <AppItem key={ item.key + i }  uri={ item.key } icon={ item.icon } label={ item.label } desktop={ item.desktop } />
           )
         })
       }

@@ -39,6 +39,8 @@ const webmasterlangRows: Record<string, [string, string]> = {
   '检测失败: {msg}': ['檢測失敗: {msg}', 'Check failed: {msg}'],
   '网页 TDK 信息检测说明': ['網頁 TDK 資訊檢測說明', 'About TDK checking'],
   '输入网址后点击「检测」, 将解析网页 <title> 与 keywords / description 两个 meta 标签并给出长度建议': ['輸入網址後點擊「檢測」, 將解析網頁 <title> 與 keywords / description 兩個 meta 標籤並給出長度建議', 'Enter a URL and click "Check": the page <title> and the keywords / description meta tags are parsed and length suggestions are given'],
+  '该功能仅在桌面应用中可用': ['該功能僅在桌面應用程式可用', 'This feature is only available in the desktop app'],
+  '下载桌面版': ['下載桌面版', 'Download desktop app'],
 };
 
 // 取词: 无命中回退 zh 原文 (与共享 webmaster-lang 行为一致)

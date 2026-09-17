@@ -114,6 +114,9 @@ import UserAgentParser from './UserAgentParser/lang';
 import SitemapCheck from './SitemapCheck/lang';
 import KeywordDensity from './KeywordDensity/lang';
 import WebTDKCheck from './WebTDKCheck/lang';
+import DnsQuery from './DnsQuery/lang';
+import WhoisQuery from './WhoisQuery/lang';
+import MtrQuery from './MtrQuery/lang';
 import RobotsTxtGenerator from './RobotsTxtGenerator/lang';
 import CSRGenerator from './CSRGenerator/lang';
 import AppStore from './AppStore/lang';
@@ -241,6 +244,9 @@ export const langPacks = {
   SitemapCheck: SitemapCheck,
   KeywordDensity: KeywordDensity,
   WebTDKCheck: WebTDKCheck,
+  DnsQuery: DnsQuery,
+  WhoisQuery: WhoisQuery,
+  MtrQuery: MtrQuery,
   RobotsTxtGenerator: RobotsTxtGenerator,
   CSRGenerator: CSRGenerator,
   AppStore,

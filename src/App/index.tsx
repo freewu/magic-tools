@@ -121,6 +121,9 @@ const list = [
   'SitemapCheck',
   'KeywordDensity',
   'WebTDKCheck',
+  'DnsQuery',
+  'WhoisQuery',
+  'MtrQuery',
   'RobotsTxtGenerator',
   'CSRGenerator',
   'WebSocketDebug',
@@ -131,12 +134,18 @@ const list = [
 import { defineLoader } from './app-modules';
 
 // 加载 App 的定义 名称 / icon 
-type DefineModule = { AppName :string; Icon :string; Type :string };
+// Desktop: 仅桌面版可用的应用 (浏览器演示版下页面内提示并禁用请求按钮, 应用中心展示「仅桌面版」标识)
+type DefineModule = { AppName :string; Icon :string; Type :string; Desktop :boolean };
 const loadAppDefine = async (app :string) :Promise<DefineModule | null> => {
   try {
     const m = await defineLoader(app)?.();
     if (!m) return null;
-    return { AppName: String(m.AppName ?? ''), Icon: String(m.Icon ?? ''), Type: String(m.Type ?? '') };
+    return {
+      AppName: String(m.AppName ?? ''),
+      Icon: String(m.Icon ?? ''),
+      Type: String(m.Type ?? ''),
+      Desktop: m.Desktop === true,
+    };
   } catch (err) {
     console.log(err);
     return null;
@@ -148,6 +157,7 @@ export type AppItem = {
   icon: any, //  app icon 图标
   "label": string, // app 名称
   type: string, // app 类型 
+  desktop: boolean, // 是否仅桌面版可用
 }
 
 // 获取 App 列表: 并行加载所有 define, 全部就绪后按 list 顺序返回。
@@ -158,7 +168,7 @@ const getAppList = async () :Promise<Array<AppItem>> => {
   mods.forEach((m, i) => {
     if(m) {
       //const img = (m.Icon === "")? '' : <Icon component={ m.Icon } />;
-      result.push({ key: list[i], icon: m.Icon, label: m.AppName, type: m.Type });
+      result.push({ key: list[i], icon: m.Icon, label: m.AppName, type: m.Type, desktop: m.Desktop });
     }
   });
   return result;

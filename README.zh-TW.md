@@ -2,7 +2,7 @@
 
 # 🧰 Magic Tools
 
-**全能開發工具箱 —— 9 大分類、122 個實用工具，桌面 + Web 雙端。**
+**全能開發工具箱 —— 9 大分類、125 個實用工具，桌面 + Web 雙端。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
@@ -48,8 +48,8 @@ Base64 圖片 · ASCII 圖片 · 程式碼截圖 · ICO 生成 · App Icon 生�
 ### 🎲 產生器 *(10)*
 二維碼生成(批次, logo/標籤) · 條碼生成(CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · 密碼生成(強度分析) · OTP 密碼產生器(TOTP/HOTP, 二維碼匯出) · htpasswd 生成 · 資料產生(JSON/CSV/SQL) · 點陣字產生器 · 數獨產生器(4/6/9 宮格, 唯一解, A4 列印) · 字帖產生器(米字格/田字格/回宮格/作文格, A4 列印) · Cron 規則產生(解析 + 下次執行時間)
 
-### 🌐 站長工具 *(10)*
-HTML 標籤去除 · 瀏覽器指紋 · CSR 申請文件(本機產生 RSA 私鑰 + PKCS#10 請求, 支援 SAN) · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 檢查 · 關鍵詞密度 · 網頁TDK 資訊檢測 · robots.txt 生成
+### 🌐 站長工具 *(13)*
+HTML 標籤去除 · 瀏覽器指紋 · CSR 申請文件(本機產生 RSA 私鑰 + PKCS#10 請求, 支援 SAN) · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 檢查 · 關鍵詞密度 · 網頁TDK 資訊檢測 · DNS 查詢(僅桌面版) · Whois 查詢(僅桌面版) · MTR 查詢(僅桌面版: traceroute + ping, 逐跳丟包/RTT/抖動) · robots.txt 生成
 
 ### 🧩 其他 *(10)*
 CSS 配色 · 行數統計 · 正則表達式 · 檔案比較 · 鍵盤按鍵資訊 · Chmod 權限 · ASCII 文字 · CIDR 計算器 · WebSocket 偵錯 · 提詞器(調速/淡入淡出/逐行高亮/全螢幕, 空格 開始·暫停, 預設值可在設定裡改/頁面一鍵儲存)
@@ -91,7 +91,7 @@ magic-tools
 │   │   ├── app-modules.ts    # 建置期用 import.meta.glob 靜態收集 (取代 webpack context 動態匯入)
 │   │   ├── app-i18n.ts       # 應用註冊表: appNameOf() 等取各工具/固定頁三語名稱
 │   │   ├── lang-packs.ts     # 彙總各工具 lang.ts 的預設語言包 (default 匯出)
-│   │   └── <工具>/           # 每工具一個目錄 (目前 122 個, 清單見下) — 兩步註冊
+│   │   └── <工具>/           # 每工具一個目錄 (目前 125 個, 清單見下) — 兩步註冊
 │   │       ├── define.tsx    # 註冊中繼資料: AppName(zh-CN 預設名) / Icon / Type(分組)
 │   │       ├── index.tsx     # 工具頁面元件 (預設匯出, 懶載入)
 │   │       ├── lang.ts       # 預設語言包 + 三語詞條 (zh 短語即 key, 值=[zh-TW, en]) + 本地取詞函式
@@ -110,7 +110,7 @@ magic-tools
 
 ### `src/App/` 現有工具清單
 
-[`src/App/`](src/App/) 下現有 **122** 個工具目錄, 每個目錄 = 一個工具, 由其中 `define.tsx` 宣告。**新增工具需兩步登記**：(1) 把目錄名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 陣列 (該陣列決定側邊欄/應用中心選單順序與路由; `import.meta.glob` 只負責發現頁面元件, 不決定選單); (2) 把其 `lang.ts` 預設匯出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名稱與介面文案才能隨語言切換。按下表 `Type` 分組列出 (與側邊欄/上方功能總覽一致), 括號內為目錄數。除下列公共檔案外, 個別工具另有私有檔案 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
+[`src/App/`](src/App/) 下現有 **125** 個工具目錄, 每個目錄 = 一個工具, 由其中 `define.tsx` 宣告。**新增工具需兩步登記**：(1) 把目錄名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 陣列 (該陣列決定側邊欄/應用中心選單順序與路由; `import.meta.glob` 只負責發現頁面元件, 不決定選單); (2) 把其 `lang.ts` 預設匯出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名稱與介面文案才能隨語言切換。按下表 `Type` 分組列出 (與側邊欄/上方功能總覽一致), 括號內為目錄數。除下列公共檔案外, 個別工具另有私有檔案 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
 
 **🔐 加解密 *(21)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
 
@@ -126,7 +126,7 @@ magic-tools
 
 **🎲 產生器 *(10)*** — `BarcodeGenerator` · `CopybookGenerator` · `CronRules` · `DotMatrixFont` · `HtpasswdGenerator` · `MockData` · `OTPGenerator` · `PasswordGenerator` · `QRCodeGenerator` · `SudokuGenerator`
 
-**🌐 站長工具 *(10)*** — `BrowserFingerprint` · `CSRGenerator` · `CookieAnalyzer` · `HtmlStripText` · `KeywordDensity` · `RobotsTxtGenerator` · `SitemapCheck` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck`
+**🌐 站長工具 *(13)*** — `BrowserFingerprint` · `CSRGenerator` · `CookieAnalyzer` · `DnsQuery` · `HtmlStripText` · `KeywordDensity` · `MtrQuery` · `RobotsTxtGenerator` · `SitemapCheck` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck` · `WhoisQuery`
 
 **🧩 其他 *(10)*** — `AsciiTextArt` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `RegexTester` · `Teleprompter` · `WebSocketDebug`
 

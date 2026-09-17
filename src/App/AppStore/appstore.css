@@ -53,6 +53,7 @@
 }
 
 .app {
+  position: relative;
   width: 168px;
   height: 64px;
   border: 1px solid #424c50;
@@ -63,4 +64,22 @@
   padding-top:20px;
   opacity: 0.9;
   border-radius: 4px;
+}
+
+/* 仅桌面版标识: 卡片右上角小图标 + 文案 (悬停显示完整提示) */
+.app-desktop-badge {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 11px;
+  line-height: 1;
+  opacity: 0.55;
+  color: inherit;
+}
+
+.app-desktop-badge-text {
+  letter-spacing: 0;
 }

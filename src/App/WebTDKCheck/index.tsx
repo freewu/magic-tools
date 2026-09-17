@@ -6,6 +6,7 @@ import {
 } from '@ant-design/icons';
 import { copyTextToClipboard } from '../../lib';
 import { isTauri } from '../../lib/tauri';
+import DesktopOnlyNotice from '../../lib/desktop';
 import { checkTdkField, parseTdk, TDK_FIELDS, type TdkResult } from './lib';
 import { fetchPageHtml } from './fetch';
 import { useLocale } from '../../hook/locale-context';
@@ -25,8 +26,11 @@ const WebTDKCheck = () => {
   const [ finalUrl, setFinalUrl ] = useState(''); // 最终地址
   const [ notice, contextHolder ] = message.useMessage();
 
+  const desktop = isTauri(); // 桌面版可绕过 CORS 直接抓取网页
+
   // 检测
   const check = async () => {
+    if (!desktop) return;
     if (url.trim() === '') {
       notice.warning(t('请先输入要检测的网址'));
       return;
@@ -68,13 +72,16 @@ const WebTDKCheck = () => {
         <Button
           type="primary"
           loading={ loading }
+          disabled={ !desktop }
           onClick={ check }
         >{t('检测')}</Button>
       </Space.Compact>
-      { !isTauri() && (
-        <div style={ { marginTop: 6, color: token.colorTextTertiary, fontSize: 12 } }>
-          {t('浏览器演示版受 CORS 限制, 多数外部站点无法抓取; 桌面版 (Tauri) 无此限制')}
-        </div>
+      { !desktop && (
+        <DesktopOnlyNotice
+          text={ t('该功能仅在桌面应用中可用') }
+          download={ t('下载桌面版') }
+          hint={ t('浏览器演示版受 CORS 限制, 多数外部站点无法抓取; 桌面版 (Tauri) 无此限制') }
+        />
       ) }
 
       { finalUrl !== '' && (

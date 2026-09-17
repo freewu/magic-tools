@@ -13,7 +13,11 @@ use tauri::{
     Emitter, Listener, Manager, WindowEvent,
 };
 
+mod dns_query;
+mod mtr_engine;
+mod mtr_probe;
 mod web_fetch;
+mod whois_query;
 
 /// 用系统默认浏览器打开项目主页
 fn open_github() {
@@ -158,7 +162,14 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         // 网页 TDK 检测: Rust 侧抓取网页源码 (绕过浏览器 CORS)
-        .invoke_handler(tauri::generate_handler![web_fetch::fetch_url_body])
+        .invoke_handler(tauri::generate_handler![
+            web_fetch::fetch_url_body,
+            dns_query::dns_query,
+            dns_query::reverse_dns,
+            whois_query::whois_query,
+            mtr_probe::mtr_resolve,
+            mtr_probe::mtr_probe
+        ])
         .setup(|app| {
             let version = app.package_info().version.to_string();
 

@@ -33,3 +33,20 @@ log = "0.4"
 # 网页抓取 (TDK 检测), rustls 避免引入 OpenSSL
 reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "gzip"] }
 base64 = "0.22"
+# DNS 查询: 纯 Rust 递归/系统解析器 (提供 A/AAAA/CNAME/MX/TXT/SRV/NS 等记录)
+# 注: 该 crate 0.23 后更名为 hickory-resolver 并停止功能更新, 此处沿用其最后版本, 后续可整体替换
+# (default = ["system-config", "tokio-runtime"]: 读取系统 DNS 配置 + tokio 运行时, 不引入 TLS 依赖)
+trust-dns-resolver = "0.23"
+# Whois (TCP 43) / MTR (异步等待与超时)
+tokio = { version = "1", features = ["net", "time", "io-util"] }
+
+# MTR 探测: Windows 用系统 IP Helper API (无需管理员权限), 其它平台用原始套接字
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_NetworkManagement_IpHelper"] }
+
+[target.'cfg(unix)'.dependencies]
+socket2 = { version = "0.6", features = ["all"] }
+
+[dev-dependencies]
+# 单元测试中的 #[tokio::test] 需要宏与运行时特性
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "time", "io-util"] }
