@@ -1,7 +1,13 @@
 import '@testing-library/jest-dom';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import Teleprompter from './index';
-import { OPTIONS_STORAGE_KEY, SAMPLE_SCRIPT } from './data';
+import { OPTIONS_STORAGE_KEY, SAMPLE_SCRIPTS } from './data';
+import { splitScript } from './lib';
+import { LocaleProvider } from '../../hook/locale-context';
+
+/** 默认语言 (zh-CN) 下打开时随机取到的第一首示例诗 (Mock 里的 Math.random 固定为 0) */
+const SAMPLE = SAMPLE_SCRIPTS['zh-CN'][0];
+const SAMPLE_LINES = splitScript(SAMPLE).length;
 
 // ---- jsdom 不做排版, clientHeight / offsetHeight 恒为 0, 这里按类名给出稳定尺寸 ----
 // 视口 400, 文本 600 → 滚动距离 = 600 + 2 * 0.6 * 400 - 400 = 680
@@ -31,8 +37,20 @@ beforeEach(() => {
     return frames.length;
   });
   jest.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => undefined);
+  // 示例诗是随机取一首的, 固定 Math.random 以便断言具体文本
+  jest.spyOn(Math, 'random').mockReturnValue(0);
   localStorage.clear();
 });
+
+afterEach(() => {
+  jest.restoreAllMocks();
+});
+
+/** 指定界面语言渲染 (LocaleProvider 从 localStorage('app-locale') 取初始值) */
+const renderWithLocale = (locale: string) => {
+  localStorage.setItem('app-locale', locale);
+  return render(<LocaleProvider><Teleprompter /></LocaleProvider>);
+};
 
 /** 推进一帧 (默认 200ms) */
 const step = (ms = 200) => {
@@ -56,6 +74,8 @@ const btn = (name: string): HTMLButtonElement => {
 };
 /** 脚本编辑框 */
 const scriptArea = () => screen.getByPlaceholderText('在此粘贴或输入提词脚本…') as HTMLTextAreaElement;
+/** 脚本编辑框 (不依赖文案, 用于切换语言后定位) */
+const scriptAreaAny = () => document.querySelector('textarea') as HTMLTextAreaElement;
 /** 舞台 / 滚动层 / 文本块 */
 const stage = () => document.querySelector('.tp-stage') as HTMLElement;
 const track = () => document.querySelector('.tp-track') as HTMLElement;
@@ -85,9 +105,9 @@ describe('Teleprompter 初始界面', () => {
 
     expect(screen.getByText('提词脚本')).toBeInTheDocument();
     expect(screen.getByText('提词器')).toBeInTheDocument();
-    expect(scriptArea().value).toBe(SAMPLE_SCRIPT);
+    expect(scriptArea().value).toBe(SAMPLE);
     // 行 / 字符 / 全文总时长 (680px / 60px 每秒 ≈ 11 秒), 与剩余时间一致
-    expect(screen.getByText(`9 行 / ${SAMPLE_SCRIPT.length} 字符 / 全文约 0:11`)).toBeInTheDocument();
+    expect(screen.getByText(`${SAMPLE_LINES} 行 / ${SAMPLE.length} 字符 / 全文约 0:11`)).toBeInTheDocument();
 
     expect(btn('开始')).toBeEnabled();
     expect(btn('回到开头')).toBeDisabled();
@@ -224,8 +244,34 @@ describe('Teleprompter 设置', () => {
     expect(screen.getByText('请先在上方输入提词脚本')).toBeInTheDocument();
 
     fireEvent.click(btn('载入示例'));
-    expect(scriptArea().value).toBe(SAMPLE_SCRIPT);
+    expect(scriptArea().value).toBe(SAMPLE);
     expect(btn('开始')).toBeEnabled();
+  });
+
+  test('载入示例随机换一首 (不会重复当前稿件)', () => {
+    render(<Teleprompter />);
+    expect(scriptArea().value).toBe(SAMPLE);
+
+    fireEvent.click(btn('载入示例'));
+    expect(scriptArea().value).toBe(SAMPLE_SCRIPTS['zh-CN'][1]);
+    expect(scriptArea().value).not.toBe(SAMPLE);
+
+    // 再点一次换回来
+    fireEvent.click(btn('载入示例'));
+    expect(scriptArea().value).toBe(SAMPLE);
+  });
+
+  test('默认示例稿随界面语言切换: 繁體用繁體组, English 用英文组', () => {
+    const { unmount } = renderWithLocale('zh-TW');
+    expect(scriptAreaAny().value).toBe(SAMPLE_SCRIPTS['zh-TW'][0]);
+    expect(scriptAreaAny().value).not.toBe(SAMPLE);
+    unmount();
+
+    renderWithLocale('en');
+    expect(scriptAreaAny().value).toBe(SAMPLE_SCRIPTS.en[0]);
+    expect(scriptAreaAny().value).toContain('Rage, rage against the dying of the light.');
+    expect(screen.getByText('Script')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Paste or type your script here…')).toBeInTheDocument();
   });
 });
 

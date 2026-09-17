@@ -1,11 +1,13 @@
 import {
   DEFAULT_OPTIONS, advance, clampFontSize, clampLineHeight, clampSpeed, formatClock,
-  getStoredOptions, isSliderTarget, isToggleKey, isTypingTarget, normalizeOptions, progressOf,
-  remainingSeconds, scrollDistance, setStoredOptions, splitScript,
+  getStoredOptions, isSliderTarget, isToggleKey, isTypingTarget, nextSampleScript,
+  normalizeOptions, pickSampleScript, progressOf, remainingSeconds, sampleScriptsOf,
+  scrollDistance, setStoredOptions, splitScript,
 } from './lib';
 import {
   FADE_DEFAULT, FONT_SIZE_DEFAULT, FONT_SIZE_MAX, FONT_SIZE_MIN, LINE_HEIGHT_DEFAULT,
-  LINE_HEIGHT_MAX, LINE_HEIGHT_MIN, OPTIONS_STORAGE_KEY, PAD_RATIO, SPEED_DEFAULT, SPEED_MAX, SPEED_MIN,
+  LINE_HEIGHT_MAX, LINE_HEIGHT_MIN, OPTIONS_STORAGE_KEY, PAD_RATIO, SAMPLE_SCRIPTS,
+  SPEED_DEFAULT, SPEED_MAX, SPEED_MIN,
 } from './data';
 
 beforeEach(() => {
@@ -78,6 +80,60 @@ describe('选项记忆', () => {
     expect(() => setStoredOptions(DEFAULT_OPTIONS)).not.toThrow();
     spy.mockRestore();
     setSpy.mockRestore();
+  });
+});
+
+describe('示例脚本', () => {
+  test('按语言分组: 中文简繁各两组, 英文两组, 组内都是完整成篇的稿件', () => {
+    expect(sampleScriptsOf('zh-CN')).toEqual(SAMPLE_SCRIPTS['zh-CN']);
+    expect(sampleScriptsOf('zh-TW')).toEqual(SAMPLE_SCRIPTS['zh-TW']);
+    expect(sampleScriptsOf('en')).toEqual(SAMPLE_SCRIPTS.en);
+    // 未知语言回退简体组 (与界面文案回退 zh-CN 一致)
+    expect(sampleScriptsOf('fr')).toEqual(SAMPLE_SCRIPTS['zh-CN']);
+
+    Object.values(SAMPLE_SCRIPTS).forEach((group) => {
+      expect(group).toHaveLength(2);
+      group.forEach((script) => {
+        expect(script.split('\n').length).toBeGreaterThan(8); // 至少是成篇的诗/讲稿
+        expect(script.trim()).toBe(script);
+      });
+    });
+    // 中文/英文示例不相同, 且简繁两组内容不同 (逐首对照)
+    expect(SAMPLE_SCRIPTS['zh-CN'][0]).not.toBe(SAMPLE_SCRIPTS['zh-CN'][1]);
+    expect(SAMPLE_SCRIPTS['zh-CN'][0]).not.toBe(SAMPLE_SCRIPTS['zh-TW'][0]);
+    expect(SAMPLE_SCRIPTS.en).toContain(SAMPLE_SCRIPTS.en[0]);
+  });
+
+  test('pickSampleScript: 按 rand 在组内取一首, 非法 rand 不报错也不返回空', () => {
+    const zh = SAMPLE_SCRIPTS['zh-CN'];
+    expect(pickSampleScript('zh-CN', 0)).toBe(zh[0]);
+    expect(pickSampleScript('zh-CN', 0.4999)).toBe(zh[0]);
+    expect(pickSampleScript('zh-CN', 0.5)).toBe(zh[1]);
+    expect(pickSampleScript('zh-CN', 0.999)).toBe(zh[1]);
+    expect(pickSampleScript('zh-CN', 1)).toBe(zh[1]);
+    expect(pickSampleScript('en', 0)).toBe(SAMPLE_SCRIPTS.en[0]);
+    expect(pickSampleScript('en', 0.7)).toBe(SAMPLE_SCRIPTS.en[1]);
+    expect(pickSampleScript('zh-TW', 0)).toBe(SAMPLE_SCRIPTS['zh-TW'][0]);
+    expect(pickSampleScript('zh-CN', NaN)).toBe(zh[0]);
+    // 默认参数走 Math.random, 结果必须是组内某一首
+    expect(zh).toContain(pickSampleScript('zh-CN'));
+  });
+
+  test('nextSampleScript: 换一首与当前不同的, 没有别的可选时返回组内唯一那首', () => {
+    const zh = SAMPLE_SCRIPTS['zh-CN'];
+    expect(nextSampleScript('zh-CN', zh[0], 0)).toBe(zh[1]);
+    expect(nextSampleScript('zh-CN', zh[1], 0)).toBe(zh[0]);
+    expect(nextSampleScript('zh-CN', '自己写的稿子', 0)).toBe(zh[0]);
+    expect(nextSampleScript('en', SAMPLE_SCRIPTS.en[1], 0.9)).toBe(SAMPLE_SCRIPTS.en[0]);
+    expect(zh).toContain(nextSampleScript('zh-CN', '自己写的稿子'));
+  });
+
+  test('示例稿切行后每行都不会只剩空白 (可直接逐行渲染)', () => {
+    Object.values(SAMPLE_SCRIPTS).forEach((group) => {
+      group.forEach((script) => {
+        expect(splitScript(script).length).toBeGreaterThan(8);
+      });
+    });
   });
 });
 

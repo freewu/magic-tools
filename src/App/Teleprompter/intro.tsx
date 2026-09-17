@@ -5,7 +5,7 @@ const zh = `<h2>这个工具做什么</h2>
 
 <h2>使用步骤</h2>
 <ul>
-<li><p>把讲稿粘贴到「提词脚本」里 (点「载入示例」可先看看效果), 空行会当成段落间距保留</p></li>
+<li><p>把讲稿粘贴到「提词脚本」里 (打开时会按当前语言随机载入一首示范诗: 中文为《沁园春·长沙》《再别康桥》, 英文为 <em>Do not go gentle into that good night</em> / <em>When You Are Old</em>; 点「载入示例」可再随机换一首), 空行会当成段落间距保留</p></li>
 <li><p>按需要调「字号」「行距」与「淡入淡出」: 字号大适合站远一点看, 行距大更容易用手指跟读</p></li>
 <li><p>点「全屏」进入全屏提词, 再按<strong>空格</strong>开始滚动; 滚动中随时按空格暂停, 调整语速后继续</p></li>
 <li><p>底部工具条上的「速度」可以边播边调, 右侧显示进度条与剩余时间; 「回到开头」可重新开始</p></li>
@@ -32,7 +32,7 @@ const tw = `<h2>這個工具做什麼</h2>
 
 <h2>使用步驟</h2>
 <ul>
-<li><p>把講稿貼到「提詞腳本」裡 (點「載入範例」可先看看效果), 空行會當成段落間距保留</p></li>
+<li><p>把講稿貼到「提詞腳本」裡 (打開時會按目前語言隨機載入一首示範詩: 中文為《沁園春·長沙》《再別康橋》, 英文為 <em>Do not go gentle into that good night</em> / <em>When You Are Old</em>; 點「載入範例」可再隨機換一首), 空行會當成段落間距保留</p></li>
 <li><p>按需要調「字號」「行距」與「淡入淡出」: 字號大適合站遠一點看, 行距大更容易用手指跟讀</p></li>
 <li><p>點「全屏」進入全螢幕提詞, 再按<strong>空格</strong>開始捲動; 捲動中隨時按空格暫停, 調整語速後繼續</p></li>
 <li><p>底部工具條上的「速度」可以邊播邊調, 右側顯示進度條與剩餘時間; 「回到開頭」可重新開始</p></li>
@@ -59,7 +59,7 @@ const en = `<h2>What this tool does</h2>
 
 <h2>How to use</h2>
 <ul>
-<li><p>Paste the script into “Script” (hit “Load sample” for a quick demo). Blank lines are kept as paragraph spacing</p></li>
+<li><p>Paste the script into “Script”. A demo poem is picked at random for the current language on open (Chinese: 《沁園春·長沙》/《再別康橋》; English: <em>Do not go gentle into that good night</em> / <em>When You Are Old</em>) — hit “Load sample” to shuffle to the other one. Blank lines are kept as paragraph spacing</p></li>
 <li><p>Tune “Font size”, “Line height” and “Fade edges”: a bigger font helps when you stand further away, more line height makes it easier to track the text with a finger</p></li>
 <li><p>Click “Fullscreen”, then press <strong>Space</strong> to start scrolling. Press Space again any time to pause, adjust your pace and carry on</p></li>
 <li><p>The “Speed” slider in the bottom bar can be changed while playing; the bar also shows a progress bar and time left, and “Back to start” rewinds to the beginning</p></li>

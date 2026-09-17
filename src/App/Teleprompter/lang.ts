@@ -11,6 +11,10 @@ const uilangRows: Record<string, [string, string]> = {
   '提词脚本': ['提詞腳本', 'Script'],
   '在此粘贴或输入提词脚本…': ['在此貼上或輸入提詞腳本…', 'Paste or type your script here…'],
   '载入示例': ['載入範例', 'Load sample'],
+  '随机换一首示例 (中英文各有两首示范诗)': [
+    '隨機換一首範例 (中英文各有兩首示範詩)',
+    'Load another sample (two demo poems per language)',
+  ],
   '清空': ['清空', 'Clear'],
   '{l} 行 / {c} 字符 / 全文约 {time}': ['{l} 行 / {c} 字元 / 全文約 {time}', '{l} lines / {c} chars / about {time} in total'],
 

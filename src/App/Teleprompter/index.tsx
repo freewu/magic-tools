@@ -7,12 +7,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocale } from '../../hook/locale-context';
 import {
   FONT_SIZE_MAX, FONT_SIZE_MIN, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN, PAD_RATIO,
-  SAMPLE_SCRIPT, SPEED_MAX, SPEED_MIN, SPEED_STEP, STAGE_BG, STAGE_FG,
+  SPEED_MAX, SPEED_MIN, SPEED_STEP, STAGE_BG, STAGE_FG,
 } from './data';
 import {
   advance, clampFontSize, clampLineHeight, clampSpeed, formatClock, getStoredOptions,
-  isSliderTarget, isToggleKey, isTypingTarget, progressOf, remainingSeconds, scrollDistance, setStoredOptions,
-  splitScript, type PrompterOptions,
+  isSliderTarget, isToggleKey, isTypingTarget, nextSampleScript, pickSampleScript,
+  progressOf, remainingSeconds, scrollDistance, setStoredOptions, splitScript,
+  type PrompterOptions,
 } from './lib';
 import { u, uT } from './lang';
 import TeleprompterIntro from './intro';
@@ -46,7 +47,8 @@ const Teleprompter: React.FC = () => {
   const tt = (zh: string, vars?: Record<string, string | number>) => uT(locale, zh, vars);
 
   const [ opts, setOpts ] = useState<PrompterOptions>(() => getStoredOptions());
-  const [ text, setText ] = useState(SAMPLE_SCRIPT);
+  // 首次打开的默认稿件: 按当前语言随机取一首示例诗
+  const [ text, setText ] = useState(() => pickSampleScript(locale));
   const [ playing, setPlaying ] = useState(false);
   const [ offset, setOffset ] = useState(0);
   const [ box, setBox ] = useState({ vh: 0, th: 0 }); // 视口高度 / 文本高度 (测量所得)
@@ -213,7 +215,9 @@ const Teleprompter: React.FC = () => {
         title={t('提词脚本')}
         extra={
           <Space size={8}>
-            <Button size="small" icon={<FileTextOutlined />} onClick={() => setText(SAMPLE_SCRIPT)}>{t('载入示例')}</Button>
+            <Tooltip title={t('随机换一首示例 (中英文各有两首示范诗)')}>
+              <Button size="small" icon={<FileTextOutlined />} onClick={() => setText((cur) => nextSampleScript(locale, cur))}>{t('载入示例')}</Button>
+            </Tooltip>
             <Button size="small" danger icon={<ClearOutlined />} disabled={!text} onClick={() => setText('')}>{t('清空')}</Button>
           </Space>
         }

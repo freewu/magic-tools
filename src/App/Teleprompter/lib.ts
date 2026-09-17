@@ -4,7 +4,7 @@
 import {
   FADE_DEFAULT, FONT_SIZE_DEFAULT, FONT_SIZE_MAX, FONT_SIZE_MIN,
   LINE_HEIGHT_DEFAULT, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN,
-  OPTIONS_STORAGE_KEY, PAD_RATIO, SPEED_DEFAULT, SPEED_MAX, SPEED_MIN,
+  OPTIONS_STORAGE_KEY, PAD_RATIO, SAMPLE_SCRIPTS, SPEED_DEFAULT, SPEED_MAX, SPEED_MIN,
 } from './data';
 
 /** 提词器选项 (会记忆到本地, 下次打开沿用) */
@@ -82,6 +82,33 @@ export const setStoredOptions = (opts: PrompterOptions): void => {
   } catch {
     /* 忽略 */
   }
+};
+
+// ==================== 示例脚本 ====================
+/** 取当前语言的示例脚本组 (zh-TW 用繁体组, 其余非 en 一律回退简体组) */
+export const sampleScriptsOf = (locale: string): readonly string[] => {
+  if (locale === 'en') return SAMPLE_SCRIPTS.en;
+  if (locale === 'zh-TW') return SAMPLE_SCRIPTS['zh-TW'];
+  return SAMPLE_SCRIPTS['zh-CN'];
+};
+
+/** 随机取一首示例脚本; rand 可注入 (0 ~ 1) 便于测试与固定行为 */
+export const pickSampleScript = (locale: string, rand: number = Math.random()): string => {
+  const list = sampleScriptsOf(locale);
+  const r = Number.isFinite(rand) ? rand : 0;
+  const i = Math.min(list.length - 1, Math.max(0, Math.floor(r * list.length)));
+  return list[i] ?? '';
+};
+
+/** 换一首示例: 优先挑与当前稿件不同的一首 (组内只有一首时则返回它本身) */
+export const nextSampleScript = (locale: string, current: string, rand: number = Math.random()): string => {
+  const list = sampleScriptsOf(locale);
+  const pool = list.filter((item) => item !== current);
+  const source = pool.length ? pool : list;
+  if (!source.length) return '';
+  const r = Number.isFinite(rand) ? rand : 0;
+  const i = Math.min(source.length - 1, Math.max(0, Math.floor(r * source.length)));
+  return source[i];
 };
 
 // ==================== 脚本 ====================
