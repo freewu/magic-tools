@@ -121,6 +121,7 @@ const list = [
   'SudokuGenerator',
   'CopybookGenerator',
   'JSONLConvert',
+  'Teleprompter',
 ];
 
 import { defineLoader } from './app-modules';

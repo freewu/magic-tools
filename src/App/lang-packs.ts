@@ -120,6 +120,7 @@ import WebSocketDebug from './WebSocketDebug/lang';
 import SudokuGenerator from './SudokuGenerator/lang';
 import CopybookGenerator from './CopybookGenerator/lang';
 import JSONLConvert from './JSONLConvert/lang';
+import Teleprompter from './Teleprompter/lang';
 
 export const langPacks = {
   Hash: Hash,
@@ -242,4 +243,5 @@ export const langPacks = {
   SudokuGenerator,
   CopybookGenerator,
   JSONLConvert,
+  Teleprompter,
 };

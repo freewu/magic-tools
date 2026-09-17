@@ -2,7 +2,7 @@
 
 # 🧰 Magic Tools
 
-**全能開發工具箱 —— 8 大分類、117 個實用工具，桌面 + Web 雙端。**
+**全能開發工具箱 —— 8 大分類、118 個實用工具，桌面 + Web 雙端。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
@@ -48,8 +48,8 @@ Markdown 編輯器 · Mermaid 編輯器(即時預覽, 內建 30+ 圖形類型範
 ### 🌐 站長工具 *(10)*
 HTML 標籤去除 · 瀏覽器指紋 · CSR 申請文件(本機產生 RSA 私鑰 + PKCS#10 請求, 支援 SAN) · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 檢查 · 關鍵詞密度 · 網頁TDK 資訊檢測 · robots.txt 生成
 
-### 🧩 其他 *(17)*
-CSS 配色 · 行數統計 · htpasswd 生成 · 正則表達式 · 檔案比較 · 點陣字生成器 · 鍵盤按鍵資訊 · Chmod 權限 · OTP 密碼生成器 · ASCII 文字 · Cron 規則生成 · CIDR 計算器 · 密碼生成 · 資料產生 · WebSocket 偵錯 · 數獨產生器(4/6/9 宮格, 唯一解, A4 列印) · 字帖產生器(米字格/田字格/回宮格/作文格, A4 列印)
+### 🧩 其他 *(18)*
+CSS 配色 · 行數統計 · htpasswd 生成 · 正則表達式 · 檔案比較 · 點陣字生成器 · 鍵盤按鍵資訊 · Chmod 權限 · OTP 密碼生成器 · ASCII 文字 · Cron 規則生成 · CIDR 計算器 · 密碼生成 · 資料產生 · WebSocket 偵錯 · 數獨產生器(4/6/9 宮格, 唯一解, A4 列印) · 字帖產生器(米字格/田字格/回宮格/作文格, A4 列印) · 提詞器(調速/淡入淡出/全螢幕, 空格 開始·暫停)
 
 > 另有內建頁面：**應用中心**、**說明與更新日誌**、**設定**。
 
@@ -88,15 +88,15 @@ magic-tools
 │   │   ├── app-modules.ts    # 建置期用 import.meta.glob 靜態收集 (取代 webpack context 動態匯入)
 │   │   ├── app-i18n.ts       # 應用註冊表: appNameOf() 等取各工具/固定頁三語名稱
 │   │   ├── lang-packs.ts     # 彙總各工具 lang.ts 的預設語言包 (default 匯出)
-│   │   └── <工具>/           # 每工具一個目錄 (目前 117 個, 清單見下) — 兩步註冊
+│   │   └── <工具>/           # 每工具一個目錄 (目前 118 個, 清單見下) — 兩步註冊
 │   │       ├── define.tsx    # 註冊中繼資料: AppName(zh-CN 預設名) / Icon / Type(分組)
 │   │       ├── index.tsx     # 工具頁面元件 (預設匯出, 懶載入)
 │   │       ├── lang.ts       # 預設語言包 + 三語詞條 (zh 短語即 key, 值=[zh-TW, en]) + 本地取詞函式
 │   │       ├── lib.ts        # 純函式邏輯, 頁面與單測共用 (絕大多數工具)
-│   │       ├── lib.test.ts   # jest 單測 (89 個工具)
-│   │       ├── data.ts       # 選項/常數表與型別 (53 個工具)
+│   │       ├── lib.test.ts   # jest 單測 (90 個工具)
+│   │       ├── data.ts       # 選項/常數表與型別 (54 個工具)
 │   │       ├── setting.tsx   # 設定中心內本工具的設定面板 (63 個工具)
-│   │       └── intro.tsx     # About/說明 三語內容 (40 個工具)
+│   │       └── intro.tsx     # About/說明 三語內容 (41 個工具)
 │   ├── layout/           # 主框架: 側邊欄/內容區
 │   ├── hook/             # 全域狀態: 主題/應用上下文
 │   └── lib/              # 共用工具庫
@@ -107,7 +107,7 @@ magic-tools
 
 ### `src/App/` 現有工具清單
 
-[`src/App/`](src/App/) 下現有 **117** 個工具目錄, 每個目錄 = 一個工具, 由其中 `define.tsx` 宣告。**新增工具需兩步登記**：(1) 把目錄名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 陣列 (該陣列決定側邊欄/應用中心選單順序與路由; `import.meta.glob` 只負責發現頁面元件, 不決定選單); (2) 把其 `lang.ts` 預設匯出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名稱與介面文案才能隨語言切換。按下表 `Type` 分組列出 (與側邊欄/上方功能總覽一致), 括號內為目錄數。除下列公共檔案外, 個別工具另有私有檔案 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
+[`src/App/`](src/App/) 下現有 **118** 個工具目錄, 每個目錄 = 一個工具, 由其中 `define.tsx` 宣告。**新增工具需兩步登記**：(1) 把目錄名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 陣列 (該陣列決定側邊欄/應用中心選單順序與路由; `import.meta.glob` 只負責發現頁面元件, 不決定選單); (2) 把其 `lang.ts` 預設匯出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名稱與介面文案才能隨語言切換。按下表 `Type` 分組列出 (與側邊欄/上方功能總覽一致), 括號內為目錄數。除下列公共檔案外, 個別工具另有私有檔案 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
 
 **🔐 加解密 *(21)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
 
@@ -123,7 +123,7 @@ magic-tools
 
 **🌐 站長工具 *(10)*** — `BrowserFingerprint` · `CSRGenerator` · `CookieAnalyzer` · `HtmlStripText` · `KeywordDensity` · `RobotsTxtGenerator` · `SitemapCheck` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck`
 
-**🧩 其他 *(17)*** — `AsciiTextArt` · `CIDRCalc` · `Chmod` · `Color` · `CopybookGenerator` · `CronRules` · `DotMatrixFont` · `FileDiff` · `HtpasswdGenerator` · `KeyboardKeyInfo` · `LineCount` · `MockData` · `OTPGenerator` · `PasswordGenerator` · `RegexTester` · `SudokuGenerator` · `WebSocketDebug`
+**🧩 其他 *(18)*** — `AsciiTextArt` · `CIDRCalc` · `Chmod` · `Color` · `CopybookGenerator` · `CronRules` · `DotMatrixFont` · `FileDiff` · `HtpasswdGenerator` · `KeyboardKeyInfo` · `LineCount` · `MockData` · `OTPGenerator` · `PasswordGenerator` · `RegexTester` · `SudokuGenerator` · `WebSocketDebug` · `Teleprompter`
 
 > 內建頁面 `AppStore`(應用中心) / `Help` / `Setting` 也位於 `src/App/` 下 (註冊 `Type = 'misc'`), 但屬固定頁面而非工具。
 
