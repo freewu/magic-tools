@@ -16,6 +16,10 @@ import {
   buildIptablesScript, buildRulePlan, emptyRuleConfig, parseIptables, ruleToConfig,
   TARGET_ARG_FLAGS, type IpOp, type IpRule, type ParseResult, type RuleConfig,
 } from './lib';
+import {
+  buildSimplePlan, buildSimpleScript, emptySimpleConfig, SIMPLE_SCENES,
+  type SimpleConfig, type SimpleScene,
+} from './simple';
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -42,6 +46,16 @@ const ERROR_TEXT: Record<string, string> = {
   'limit-burst': '突发包数必须是数字',
   comment: '备注不能超过 256 个字符',
   'log-prefix': '日志前缀不能超过 29 个字符',
+  'simple-port-required': '请填写端口',
+  'simple-port-format': '端口格式不正确 (如 80 / 8000:8010 / 80,443)',
+  'simple-ip-required': '请填写要封禁的 IP 地址',
+  'simple-ip-format': 'IP 地址格式不正确 (如 203.0.113.10, 不支持主机名)',
+  'simple-net-required': '请填写要封禁的网段',
+  'simple-net-format': '网段格式不正确 (如 203.0.113.0/24)',
+  'simple-target-ip-required': '请填写转发目标 IP',
+  'simple-target-ip-format': '转发目标 IP 格式不正确',
+  'simple-target-port-required': '请填写转发目标端口',
+  'simple-target-port-format': '转发目标端口必须是 1-65535 的单个端口',
 };
 
 /** 提示码 -> 文案 */
@@ -50,6 +64,11 @@ const WARN_TEXT: Record<string, string> = {
   'append-last': '追加规则会放在链末尾, 若前面已有 DROP 规则可能不生效',
   forward: 'NAT 转发需要开启内核转发 (net.ipv4.ip_forward=1)',
   'custom-chain-table': '清空 / 删除链只在对应表内生效, 请确认表名',
+  'simple-open-established': '若 INPUT 默认策略为 DROP, 还需放行 ESTABLISHED,RELATED 连接, 否则现有连接会中断',
+  'simple-open-ssh': '放行 22 端口时请先确认规则已生效再断开当前连接 (可用 screen / nohup 执行)',
+  'simple-block-existing': 'DROP 只拦截新建连接, 已建立的连接需要手动断开 (ss -K)',
+  'simple-block-inbound': '本工具只封禁入方向 (INPUT), 需要限制出方向请用「生成」页签',
+  'simple-forward-iface': '未填出口网卡时 MASQUERADE 由路由决定出口, 多网卡机器建议填写',
 };
 
 /** 动作参数键 -> 界面标签 */
@@ -116,16 +135,21 @@ const IptablesRules = () => {
   const tt = (zh: string, v?: Record<string, string | number>) => irT(locale, zh, v);
   const [ messageApi, contextHolder ] = message.useMessage();
 
-  const [ tab, setTab ] = useState('parse');                 // 当前页签
+  const [ tab, setTab ] = useState('simple');                // 当前页签
   const [ text, setText ] = useState('');                   // 待解析文本
   const [ parsed, setParsed ] = useState<ParseResult | null>(null);
   const [ cfg, setCfg ] = useState<RuleConfig>(emptyRuleConfig);
+  const [ sc, setSc ] = useState<SimpleConfig>(emptySimpleConfig);
 
   const plan = useMemo(() => buildRulePlan(cfg), [ cfg ]);
   const script = useMemo(() => buildIptablesScript(plan), [ plan ]);
 
+  const simplePlan = useMemo(() => buildSimplePlan(sc), [ sc ]);
+  const simpleScript = useMemo(() => buildSimpleScript(simplePlan), [ simplePlan ]);
+
   const upd = (patch: Partial<RuleConfig>) => setCfg((c) => ({ ...c, ...patch }));
   const updArg = (key: string, v: string) => setCfg((c) => ({ ...c, args: { ...c.args, [ key ]: v } }));
+  const updS = (patch: Partial<SimpleConfig>) => setSc((c) => ({ ...c, ...patch }));
 
   const copy = (value: string) => {
     if (value === '') return;
@@ -166,6 +190,13 @@ const IptablesRules = () => {
 
   const saveSh = async () => {
     const ok = await saveTextFile('iptables-rules.sh', script, t('保存为 .sh'), {
+      filterName: t('Shell 脚本'), extensions: [ 'sh' ],
+    });
+    if (ok) messageApi.success(t('保存成功'));
+  };
+
+  const saveSimpleSh = async () => {
+    const ok = await saveTextFile(simplePlan.fileName, simpleScript, t('保存为 .sh'), {
       filterName: t('Shell 脚本'), extensions: [ 'sh' ],
     });
     if (ok) messageApi.success(t('保存成功'));
@@ -226,6 +257,113 @@ const IptablesRules = () => {
           <div key={line} title={t('点击复制')} style={{ cursor: 'pointer' }} onClick={() => copy(line)}>{line}</div>
         ))}
       </div>
+    </div>
+  );
+
+  const simpleScene = SIMPLE_SCENES.find((s) => s.value === sc.scene) ?? SIMPLE_SCENES[0];
+  const simpleAllText = [
+    ...simplePlan.commands, ...simplePlan.extra, ...simplePlan.view, ...simplePlan.remove, ...simplePlan.persist,
+  ].filter((x) => x !== '').join('\n');
+
+  const simplePane = (
+    <div>
+      <Space wrap size={[ 12, 12 ]} align="start">
+        <Field label={t('使用场景')}>
+          <Select
+            value={sc.scene}
+            onChange={(v) => updS({ scene: v as SimpleScene })}
+            options={SIMPLE_SCENES.map((s) => ({ value: s.value, label: t(s.label) }))}
+          />
+        </Field>
+        {(sc.scene === 'open' || sc.scene === 'forward') && (
+          <Field label={t('协议')}>
+            <Select
+              value={sc.protocol}
+              onChange={(v) => updS({ protocol: v })}
+              options={[ 'tcp', 'udp' ].map((x) => ({ value: x, label: x }))}
+            />
+          </Field>
+        )}
+        {sc.scene === 'open' && (
+          <Field label={t('端口')}>
+            <Input value={sc.port} onChange={(e) => updS({ port: e.target.value })} placeholder="80,443" />
+          </Field>
+        )}
+        {sc.scene === 'block-ip' && (
+          <Field label={t('IP 地址')}>
+            <Input value={sc.sourceIp} onChange={(e) => updS({ sourceIp: e.target.value })} placeholder="203.0.113.10" />
+          </Field>
+        )}
+        {sc.scene === 'block-net' && (
+          <Field label={t('网段')}>
+            <Input value={sc.sourceNet} onChange={(e) => updS({ sourceNet: e.target.value })} placeholder="203.0.113.0/24" />
+          </Field>
+        )}
+        {sc.scene === 'forward' && (
+          <>
+            <Field label={t('对外端口')}>
+              <Input value={sc.port} onChange={(e) => updS({ port: e.target.value })} placeholder="8080" />
+            </Field>
+            <Field label={t('转发目标 IP')}>
+              <Input value={sc.targetIp} onChange={(e) => updS({ targetIp: e.target.value })} placeholder="10.0.0.5" />
+            </Field>
+            <Field label={t('转发目标端口')}>
+              <Input value={sc.targetPort} onChange={(e) => updS({ targetPort: e.target.value })} placeholder="8080" />
+            </Field>
+            <Field label={t('出口网卡')}>
+              <Input value={sc.outIface} onChange={(e) => updS({ outIface: e.target.value })} placeholder="eth0" />
+            </Field>
+          </>
+        )}
+        <Field label={t('备注')}>
+          <Input value={sc.comment} onChange={(e) => updS({ comment: e.target.value })} placeholder="SSH" />
+        </Field>
+      </Space>
+
+      <div style={{ marginTop: 6 }}>
+        <Text type="secondary" style={{ fontSize: 12 }}>{t(simpleScene.hint)}</Text>
+      </div>
+
+      <Space wrap style={{ marginTop: 12 }}>
+        <Button icon={<ClearOutlined />} onClick={() => setSc(emptySimpleConfig())}>{t('恢复默认')}</Button>
+        <Button icon={<CopyOutlined />} disabled={simplePlan.commands.length === 0} onClick={() => copy(simpleAllText)}>{t('复制全部')}</Button>
+        <Button icon={<SaveOutlined />} disabled={simplePlan.commands.length === 0} onClick={saveSimpleSh}>{t('保存为 .sh')}</Button>
+      </Space>
+
+      <Divider dashed style={{ margin: '12px 0' }} />
+
+      {simplePlan.errors.length > 0 ? (
+        <Alert
+          type="error"
+          showIcon
+          message={t('校验未通过, 请检查以下问题:')}
+          description={(
+            <ul style={{ margin: 0, paddingLeft: 18 }}>
+              {simplePlan.errors.map((code) => <li key={code}>{t(ERROR_TEXT[code] ?? code)}</li>)}
+            </ul>
+          )}
+        />
+      ) : (
+        <div>
+          {simplePlan.warnings.length > 0 && (
+            <Alert
+              style={{ marginBottom: 10 }}
+              type="warning"
+              showIcon
+              message={(
+                <ul style={{ margin: 0, paddingLeft: 18 }}>
+                  {simplePlan.warnings.map((code) => <li key={code}>{t(WARN_TEXT[code] ?? code)}</li>)}
+                </ul>
+              )}
+            />
+          )}
+          {codeBlock(t('生效指令 (iptables 命令)'), simplePlan.commands)}
+          {simplePlan.extra.length > 0 && codeBlock(t('附加系统指令 (内核转发)'), simplePlan.extra)}
+          {codeBlock(t('查看与验证'), simplePlan.view)}
+          {codeBlock(t('删除指令'), simplePlan.remove)}
+          {codeBlock(t('保存与持久化'), simplePlan.persist)}
+        </div>
+      )}
     </div>
   );
 
@@ -450,25 +588,12 @@ const IptablesRules = () => {
   return (
     <div>
       {contextHolder}
-      <Alert
-        type="info"
-        showIcon
-        style={{ marginBottom: 12 }}
-        message={t('iptables 规则说明')}
-        description={(
-          <ul style={{ margin: 0, paddingLeft: 18 }}>
-            <li>{t('「解析」页签支持粘贴 iptables 命令 (含 sudo 前缀) 或 iptables-save 输出, 自动识别表 / 链 / 匹配条件与动作')}</li>
-            <li>{t('「生成」页签按表单生成 iptables 命令, 并同时给出 iptables-save 规则行 / 查看命令 / 删除命令 / 持久化命令')}</li>
-            <li>{t('解析结果中每行可点击「载入到生成」, 直接带入生成表单继续修改')}</li>
-            <li>{t('所有解析与生成均在本地完成, 不会执行任何命令, 也不会连接目标机器')}</li>
-          </ul>
-        )}
-      />
       <Tabs
         size="small"
         activeKey={tab}
         onChange={setTab}
         items={[
+          { key: 'simple', label: <Text style={{ fontSize: 13 }}>{t('简单配置')}</Text>, children: simplePane },
           { key: 'parse', label: <Text style={{ fontSize: 13 }}>{t('解析')}</Text>, children: parsePane },
           { key: 'generate', label: <Text style={{ fontSize: 13 }}>{t('生成')}</Text>, children: generatePane },
         ]}

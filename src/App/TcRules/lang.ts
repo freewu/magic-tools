@@ -84,11 +84,6 @@ const tclangRows: Record<string, [string, string]> = {
   '入口限速需要 ifb 内核模块, 重定向会略微增加 CPU 开销': ['入口限速需要 ifb 核心模組, 重定向會略微增加 CPU 開銷', 'Ingress shaping needs the ifb kernel module; redirection adds a little CPU overhead'],
   '只有 HTB 支持按条件分流, 其余方式只能限制整卡': ['只有 HTB 支援依條件分流, 其餘方式只能限制整卡', 'Only HTB can classify traffic; the other modes shape the whole interface'],
   'tc 规则重启后失效, 需写入开机脚本或 systemd 服务': ['tc 規則重開機後失效, 需寫入開機指令碼或 systemd 服務', 'tc rules are lost on reboot — add them to a startup script or systemd unit'],
-  'tc 规则说明': ['tc 規則說明', 'About tc rules'],
-  '填写网卡与限速参数后, 下方会实时生成 tc 指令, 同时给出查看与清除指令': ['填寫網路卡與限速參數後, 下方會即時產生 tc 指令, 同時給出查看與清除指令', 'Fill in the interface and shaping parameters — the tc commands plus inspect/cleanup commands are generated live below'],
-  '支持 HTB 分层限速 (可按端口 / IP / 协议分流)、TBF 令牌桶与 netem 网络损伤模拟 (延迟 / 抖动 / 丢包 / 乱序)': ['支援 HTB 分層限速 (可依連接埠 / IP / 協定分流)、TBF 令牌桶與 netem 網路損傷模擬 (延遲 / 抖動 / 丟包 / 亂序)', 'Supports HTB classful shaping (by port / IP / protocol), TBF token bucket and netem impairment (delay / jitter / loss / reorder)'],
-  '入口方向会先生成 ifb 设备准备与 mirred 重定向指令, 再把限速规则作用到 ifb 上': ['入口方向會先產生 ifb 裝置準備與 mirred 重定向指令, 再把限速規則作用到 ifb 上', 'Ingress mode first prepares an ifb device with a mirred redirect, then shapes on the ifb'],
-  '生成的指令仅作参考, 本工具不会执行任何命令, 也不会连接目标机器': ['產生的指令僅作參考, 本工具不會執行任何命令, 也不會連線目標機器', 'Generated commands are for reference — this tool runs nothing and contacts no host'],
 };
 
 // 取词: 无命中回退 zh 原文 (与项目其它语言包行为一致)

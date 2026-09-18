@@ -158,21 +158,6 @@ const TcRules = () => {
   return (
     <div>
       {contextHolder}
-      <Alert
-        type="info"
-        showIcon
-        style={{ marginBottom: 12 }}
-        message={t('tc 规则说明')}
-        description={(
-          <ul style={{ margin: 0, paddingLeft: 18 }}>
-            <li>{t('填写网卡与限速参数后, 下方会实时生成 tc 指令, 同时给出查看与清除指令')}</li>
-            <li>{t('支持 HTB 分层限速 (可按端口 / IP / 协议分流)、TBF 令牌桶与 netem 网络损伤模拟 (延迟 / 抖动 / 丢包 / 乱序)')}</li>
-            <li>{t('入口方向会先生成 ifb 设备准备与 mirred 重定向指令, 再把限速规则作用到 ifb 上')}</li>
-            <li>{t('生成的指令仅作参考, 本工具不会执行任何命令, 也不会连接目标机器')}</li>
-          </ul>
-        )}
-      />
-
       <Space wrap size={[ 12, 12 ]} align="start">
         <Field label={t('场景示例')}>
           <Select

@@ -50,7 +50,7 @@ describe('TcRules 页面交互', () => {
   test('默认 HTB 配置生成根类 / 限速类 / sfq 与提示', () => {
     setup();
     const all = view();
-    expect(all).toContain('tc 规则说明');
+    expect(document.querySelector('.ant-alert-info')).toBeNull();
     expect(all).toContain('tc qdisc add dev eth0 root handle 1: htb default 10');
     expect(all).toContain('tc class add dev eth0 parent 1: classid 1:1 htb rate 100mbit ceil 100mbit');
     expect(all).toContain('tc class add dev eth0 parent 1:1 classid 1:10 htb rate 10mbit ceil 10mbit prio 1');

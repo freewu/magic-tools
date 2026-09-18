@@ -49,7 +49,7 @@ Base64 圖片 · ASCII 圖片 · 程式碼截圖 · ICO 生成 · App Icon 生�
 二維碼生成(批次, logo/標籤) · 條碼生成(CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · 密碼生成(強度分析) · OTP 密碼產生器(TOTP/HOTP, 二維碼匯出) · htpasswd 生成 · 資料產生(JSON/CSV/SQL) · 點陣字產生器 · 數獨產生器(4/6/9 宮格, 唯一解, A4 列印) · 字帖產生器(米字格/田字格/回宮格/作文格, A4 列印) · Cron 規則產生(解析 + 下次執行時間)
 
 ### 🌐 站長工具 *(16)*
-HTML 標籤去除 · 瀏覽器指紋 · CSR 申請文件(本機產生 RSA 私鑰 + PKCS#10 請求, 支援 SAN) · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 檢查 · 關鍵詞密度 · 網頁TDK 資訊檢測 · DNS 查詢(僅桌面版) · Whois 查詢(僅桌面版) · MTR 查詢(僅桌面版: traceroute + ping, 逐跳丟包/RTT/抖動) · robots.txt 生成 · iptables 規則(解析現有規則 / 產生指令, 支援 iptables-save) · tc 規則(HTB / TBF / netem 限速與弱網模擬, 入口限速走 ifb) · nginx 設定(靜態站點 / SPA / PHP / 反向代理, 含 TLS、gzip、靜態快取、限流、防盜連, 直接產生 vhost 設定檔)
+HTML 標籤去除 · 瀏覽器指紋 · CSR 申請文件(本機產生 RSA 私鑰 + PKCS#10 請求, 支援 SAN) · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 檢查 · 關鍵詞密度 · 網頁TDK 資訊檢測 · DNS 查詢(僅桌面版) · Whois 查詢(僅桌面版) · MTR 查詢(僅桌面版: traceroute + ping, 逐跳丟包/RTT/抖動) · robots.txt 生成 · iptables 規則(日常情境一鍵產生: 開放連接埠 / 封鎖 IP / 封鎖網段 / 連接埠轉發; 也可解析現有規則或依表單產生指令, 支援 iptables-save) · tc 規則(HTB / TBF / netem 限速與弱網模擬, 入口限速走 ifb) · nginx 設定(靜態站點 / SPA / PHP / 反向代理, 含 TLS、gzip、靜態快取、限流、防盜連, 直接產生 vhost 設定檔)
 
 ### 🧩 其他 *(10)*
 CSS 配色 · 行數統計 · 正則表達式 · 檔案比較 · 鍵盤按鍵資訊 · Chmod 權限 · ASCII 文字 · CIDR 計算器 · WebSocket 偵錯 · 提詞器(調速/淡入淡出/逐行高亮/全螢幕, 空格 開始·暫停, 預設值可在設定裡改/頁面一鍵儲存)

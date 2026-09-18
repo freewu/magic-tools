@@ -49,7 +49,7 @@ Base64图片 · ASCII 图片 · 代码截图 · ICO 生成 · App Icon 生成 ·
 二维码生成(批量, logo/标签) · 条形码生成(CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · 密码生成(强度分析) · OTP 密码生成器(TOTP/HOTP, 二维码导出) · htpasswd 生成 · 数据生成(JSON/CSV/SQL) · 点阵字生成器 · 数独生成器(4/6/9 宫格, 唯一解, A4 打印) · 字帖生成器(米字格/田字格/回宫格/作文格, A4 打印) · Cron 规则生成(解析 + 下次运行时间)
 
 ### 🌐 站长工具 *(16)*
-HTML 标签去除 · 浏览器指纹 · CSR 申请文件(本机生成 RSA 私钥 + PKCS#10 请求, 支持 SAN) · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 检查 · 关键词密度 · 网页TDK信息检测 · DNS 查询(仅桌面版) · Whois 查询(仅桌面版) · MTR 查询(仅桌面版: traceroute + ping, 逐跳丢包/RTT/抖动) · robots.txt 生成 · iptables 规则(解析已有规则 / 生成命令, 支持 iptables-save) · tc 规则(HTB / TBF / netem 限速与弱网模拟, 入口限速走 ifb) · nginx 配置(静态站点 / SPA / PHP / 反向代理, 含 TLS、gzip、静态缓存、限流、防盗链, 直接生成 vhost 配置文件)
+HTML 标签去除 · 浏览器指纹 · CSR 申请文件(本机生成 RSA 私钥 + PKCS#10 请求, 支持 SAN) · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 检查 · 关键词密度 · 网页TDK信息检测 · DNS 查询(仅桌面版) · Whois 查询(仅桌面版) · MTR 查询(仅桌面版: traceroute + ping, 逐跳丢包/RTT/抖动) · robots.txt 生成 · iptables 规则(日常场景一键生成: 开放端口 / 封禁 IP / 封禁网段 / 端口转发; 也可解析已有规则或按表单生成命令, 支持 iptables-save) · tc 规则(HTB / TBF / netem 限速与弱网模拟, 入口限速走 ifb) · nginx 配置(静态站点 / SPA / PHP / 反向代理, 含 TLS、gzip、静态缓存、限流、防盗链, 直接生成 vhost 配置文件)
 
 ### 🧩 其它 *(10)*
 CSS 配色 · 行数统计 · 正则表达式 · 文件比较 · 键盘按键信息 · Chmod 权限 · ASCII 文字 · CIDR 计算器 · WebSocket 调试 · 提词器(调速/淡入淡出/逐行高亮/全屏, 空格 开始·暂停, 默认值可在设置里改/页面一键保存)
