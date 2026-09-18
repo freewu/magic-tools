@@ -130,6 +130,7 @@ const list = [
   'WebSocketDebug',
   'IptablesRules',
   'TcRules',
+  'NginxConfig',
   'JSONLConvert',
   'Teleprompter',
 ];
