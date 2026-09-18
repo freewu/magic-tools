@@ -129,6 +129,8 @@ import SudokuGenerator from './SudokuGenerator/lang';
 import CopybookGenerator from './CopybookGenerator/lang';
 import JSONLConvert from './JSONLConvert/lang';
 import Teleprompter from './Teleprompter/lang';
+import IptablesRules from './IptablesRules/lang';
+import TcRules from './TcRules/lang';
 
 export const langPacks = {
   Hash: Hash,
@@ -260,4 +262,6 @@ export const langPacks = {
   CopybookGenerator,
   JSONLConvert,
   Teleprompter,
+  IptablesRules,
+  TcRules,
 };

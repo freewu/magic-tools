@@ -128,6 +128,8 @@ const list = [
   'RobotsTxtGenerator',
   'CSRGenerator',
   'WebSocketDebug',
+  'IptablesRules',
+  'TcRules',
   'JSONLConvert',
   'Teleprompter',
 ];
