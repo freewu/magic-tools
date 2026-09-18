@@ -31,6 +31,33 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-09-17 V2.13.0 Release", "2026-09-17 V2.13.0 Release", "2026-09-17 V2.13.0 Release"),
+    items: trio(
+      [
+        "新增「JavaScript 格式化」工具 (格式化): 美化 / 压缩 / 混淆打包 / 解密还原四合一, 四种模式共用一个输入框, 结果可一键复制或保存为 .js; 美化按缩进重排 (花括号、逗号换行, 对象字面量每项一行) 并补全运算符空格, 支持 2 空格 / 4 空格 / Tab 与「保留空行」; 压缩去注释与多余空白, 按 ASI 规则保留必要换行 (return 换行、} 后换行等) 不改变语义; 混淆支持词表打包 (标识符换词表下标 + 包进 eval) 与字符串转义 (\\xNN / \\uNNNN); 解密还原自动识别并逐层还原 (本工具词表打包 / Dean Edwards packer / eval(\"...\") 包裹 / 字符串转义), 全程只做字符串解析、绝不执行代码; 美化与压缩完成后用 token 指纹比对输入输出, 一致时提示「语义未变」",
+        "新增「iptables 规则」站长工具: 既能解析已有规则 (含 iptables-save 输出), 也能按表单生成命令; 新增「简单配置」页签 (默认页签) 一键生成四种日常场景 —— 开放端口 / 封禁 IP / 封禁网段 / 端口转发, 输出按「生效指令 / 附加系统指令 (内核转发) / 查看与验证 / 删除指令 / 保存与持久化」分块展示, 每行可点击复制, 也可一键导出 .sh 脚本; 转发场景自动给出 nat 表 DNAT + FORWARD 放行 + MASQUERADE 三条规则与 net.ipv4.ip_forward 内核参数指令",
+        "新增「tc 规则」站长工具: HTB / TBF / netem 限速与弱网模拟, 支持出入口方向, 入口限速自动生成 ifb 前置指令, 边界值 (速率 / 延迟 / 丢包 / 抖动) 带校验, 并给出查看与清理命令",
+        "新增「nginx 配置」站长工具: 静态站点 / SPA / PHP / 反向代理四类站点, 覆盖 TLS (HTTP/2、HSTS、HTTP 跳转)、gzip、静态缓存、请求限流与连接数限制、图片防盗链、CORS、IP 访问控制、Basic Auth, 直接生成可用的 vhost 配置文件 (http 上下文指令排在 server {} 之前, 可直接 include), 并附部署步骤与全局性能优化建议",
+        "「nginx 配置」的所有开关键改为复选框, 一行可排 6-8 个; 桌面端窗口默认尺寸调整为 1200×728; 去掉「iptables 规则」「tc 规则」「nginx 配置」三个工具顶部的说明区",
+      ],
+      [
+        "新增「JavaScript 格式化」工具 (格式化): 美化 / 壓縮 / 混淆打包 / 解密還原四合一, 四種模式共用一個輸入框, 結果可一鍵複製或儲存為 .js; 美化依縮排重排 (大括號、逗號換行, 物件實體每項一行) 並補全運算子空白, 支援 2 空格 / 4 空格 / Tab 與「保留空行」; 壓縮移除註解與多餘空白, 依 ASI 規則保留必要換行 (return 換行、} 之後換行等) 不改變語意; 混淆支援詞表打包 (識別字換詞表下標 + 包進 eval) 與字串轉義 (\\xNN / \\uNNNN); 解密還原自動識別並逐層還原 (本工具詞表打包 / Dean Edwards packer / eval(\"...\") 包裹 / 字串轉義), 全程只做字串解析、絕不執行程式碼; 美化與壓縮完成後用 token 指紋比對輸入輸出, 一致時提示「語意未變」",
+        "新增「iptables 規則」站長工具: 既能解析現有規則 (含 iptables-save 輸出), 也能依表單產生指令; 新增「簡單設定」頁籤 (預設頁籤) 一鍵產生四種日常情境 —— 開放連接埠 / 封鎖 IP / 封鎖網段 / 連接埠轉發, 輸出依「生效指令 / 附加系統指令 (核心轉發) / 檢視與驗證 / 刪除指令 / 儲存與持久化」分塊顯示, 每行可點擊複製, 也可一鍵匯出 .sh 腳本; 轉發情境自動給出 nat 表 DNAT + FORWARD 放行 + MASQUERADE 三條規則與 net.ipv4.ip_forward 核心參數指令",
+        "新增「tc 規則」站長工具: HTB / TBF / netem 限速與弱網模擬, 支援出入口方向, 入口限速自動產生 ifb 前置指令, 邊界值 (速率 / 延遲 / 丟包 / 抖動) 帶驗證, 並給出檢視與清理指令",
+        "新增「nginx 設定」站長工具: 靜態站點 / SPA / PHP / 反向代理四類站點, 涵蓋 TLS (HTTP/2、HSTS、HTTP 跳轉)、gzip、靜態快取、請求限流與連線數限制、圖片防盜連、CORS、IP 存取控制、Basic Auth, 直接產生可用的 vhost 設定檔 (http 上下文指令排在 server {} 之前, 可直接 include), 並附部署步驟與全域效能最佳化建議",
+        "「nginx 設定」的所有開關改為核取方塊, 一行可排 6-8 個; 桌面端視窗預設尺寸調整為 1200×728; 移除「iptables 規則」「tc 規則」「nginx 設定」三個工具頂部的說明區",
+      ],
+      [
+        "New “JavaScript Formatter” tool (Formatter): beautify / minify / obfuscate & pack / unpack in one place, all four modes sharing a single input box, with one-click copy or save as .js. Beautify re-indents the code (braces and commas on new lines, one object property per line) and normalises operator spacing, with 2-space / 4-space / Tab indent and a “keep blank lines” toggle; minify strips comments and redundant whitespace while preserving the newlines ASI requires (after return, after a closing brace, …) so semantics stay intact; obfuscation offers dictionary packing (identifiers replaced by dictionary indexes inside an eval) and string escaping (\\xNN / \\uNNNN); unpack auto-detects and unwraps layer by layer (this tool's dictionary packing, the classic Dean Edwards packer, eval(\"...\") wrapping and string escaping) and never evaluates the restored code; after beautify / minify a token fingerprint compares input and output and reports “semantics unchanged”",
+        "New “iptables Rules” webmaster tool: parse existing rules (including iptables-save output) or build commands from a form; a new “Simple config” tab (the default tab) generates four everyday scenarios — open a port / block an IP / block a subnet / port forwarding — with the output split into apply / extra system commands (kernel forwarding) / verify / delete / persist blocks, every line click-to-copy, plus one-click export to a .sh script; the forwarding scenario emits the nat DNAT rule, the FORWARD accept and the MASQUERADE rule along with the net.ipv4.ip_forward kernel setting",
+        "New “tc Rules” webmaster tool: HTB / TBF / netem rate limiting and weak-network emulation for ingress and egress, with the ifb prologue generated automatically for ingress shaping, validation of the boundary values (rate / delay / loss / jitter) and ready-made inspect and cleanup commands",
+        "New “nginx Config” webmaster tool: static / SPA / PHP / reverse-proxy sites covering TLS (HTTP/2, HSTS, HTTP redirect), gzip, static caching, request rate and connection limits, image hotlink protection, CORS, IP access control and Basic Auth; it emits a ready-to-use vhost file (http-context directives are placed before server {}, so it can be included directly) together with deployment steps and global performance suggestions",
+        "nginx Config: every switch became a checkbox, 6-8 per row; the desktop window now opens at 1200×728; the description panels at the top of the iptables, tc and nginx tools were removed",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-09-17 V2.12.0 Release", "2026-09-17 V2.12.0 Release", "2026-09-17 V2.12.0 Release"),
     items: trio(
       [
