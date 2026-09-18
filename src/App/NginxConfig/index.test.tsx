@@ -49,7 +49,7 @@ const fieldInput = (label: string): HTMLInputElement =>
   field(label).querySelector('input, textarea') as HTMLInputElement;
 const setField = (label: string, value: string) =>
   fireEvent.change(fieldInput(label), { target: { value } });
-const toggle = (label: string) => fireEvent.click(field(label).querySelector('.ant-switch') as HTMLElement);
+const toggle = (label: string) => fireEvent.click(field(label).querySelector('input[type="checkbox"]') as HTMLElement);
 const openSelect = (label: string) =>
   fireEvent.mouseDown(field(label).querySelector('.ant-select-selector') as HTMLElement);
 const pickOption = (label: string | RegExp) => {

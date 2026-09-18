@@ -1,4 +1,4 @@
-import { Alert, Button, Divider, Input, Select, Space, Switch, Tabs, Tooltip, Typography, message } from 'antd';
+import { Alert, Button, Checkbox, Divider, Input, Select, Space, Tabs, Tooltip, Typography, message } from 'antd';
 import { ClearOutlined, CopyOutlined, SaveOutlined } from '@ant-design/icons';
 import { useMemo, useState, type ReactNode } from 'react';
 import { copyTextToClipboard } from '../../lib';
@@ -149,11 +149,14 @@ const NginxConfig = () => {
     </Field>
   );
 
-  /** 开关 */
-  const sw = (label: string, key: keyof NginxConfig) => (
-    <Field label={label}>
-      <Switch checked={Boolean(cfg[key])} onChange={(v) => set(key, v)} />
-    </Field>
+  /** 复选项 (标签在右, 一行可排 6-8 个) */
+  const cb = (label: string, key: keyof NginxConfig) => (
+    <Checkbox checked={Boolean(cfg[key])} onChange={(e) => set(key, e.target.checked)}>{t(label)}</Checkbox>
+  );
+
+  /** 复选组 (按窗口宽度自适应换行) */
+  const cbRow = (items: ReactNode) => (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 18px', marginBottom: 10 }}>{items}</div>
   );
 
   /** 下拉选择 */
@@ -219,89 +222,111 @@ const NginxConfig = () => {
         {txt('网站根目录', 'root', '/var/www/example')}
         {txt('默认首页', 'index', 'index.html index.htm')}
         {txt('字符集', 'charset', 'utf-8')}
-        {sw('访问日志', 'accessLog')}
-        {sw('错误日志', 'errorLog')}
       </Space>
+      {cbRow(<>{cb('访问日志', 'accessLog')}{cb('错误日志', 'errorLog')}</>)}
 
       <Group title={t('HTTPS 与 TLS')} />
+      {cbRow(
+        <>
+          {cb('开启 HTTPS', 'https')}
+          {cfg.https && cb('HTTP 跳转 HTTPS', 'redirectHttps')}
+          {cfg.https && cb('开启 HTTP/2', 'http2')}
+          {cfg.https && cb('开启 HSTS', 'hsts')}
+        </>,
+      )}
       <Space wrap size={[ 12, 12 ]} align="start">
-        {sw('开启 HTTPS', 'https')}
         {cfg.https && txt('证书路径', 'certFile', '/etc/nginx/ssl/example.com.crt')}
         {cfg.https && txt('私钥路径', 'keyFile', '/etc/nginx/ssl/example.com.key')}
-        {cfg.https && sw('HTTP 跳转 HTTPS', 'redirectHttps')}
-        {cfg.https && sw('开启 HTTP/2', 'http2')}
-        {cfg.https && sw('开启 HSTS', 'hsts')}
         {cfg.https && cfg.hsts && txt('HSTS max-age', 'hstsMaxAge', '31536000')}
       </Space>
 
       {(isProxy || isPhp) && <Group title={isProxy ? t('反向代理设置') : t('PHP 设置')} />}
       {isProxy && (
-        <Space wrap size={[ 12, 12 ]} align="start">
-          {area('后端地址', 'upstream', 'http://127.0.0.1:8080', '每行一个, 支持 http://host:port 与 unix:/path')}
-          {sw('透传 Host 头', 'keepHost')}
-          {sw('支持 WebSocket', 'websocket')}
-          {sw('透传真实 IP 头', 'realIp')}
-          {sw('upstream keepalive', 'upstreamKeepalive')}
-          {txt('代理超时', 'proxyTimeout', '60s')}
-          {sw('开启代理缓存', 'proxyCache')}
-          {cfg.proxyCache && txt('代理缓存时间', 'proxyCacheTime', '10m')}
-        </Space>
+        <>
+          {cbRow(
+            <>
+              {cb('透传 Host 头', 'keepHost')}
+              {cb('支持 WebSocket', 'websocket')}
+              {cb('透传真实 IP 头', 'realIp')}
+              {cb('upstream keepalive', 'upstreamKeepalive')}
+              {cb('开启代理缓存', 'proxyCache')}
+            </>,
+          )}
+          <Space wrap size={[ 12, 12 ]} align="start">
+            {area('后端地址', 'upstream', 'http://127.0.0.1:8080', '每行一个, 支持 http://host:port 与 unix:/path')}
+            {txt('代理超时', 'proxyTimeout', '60s')}
+            {cfg.proxyCache && txt('代理缓存时间', 'proxyCacheTime', '10m')}
+          </Space>
+        </>
       )}
       {isPhp && (
-        <Space wrap size={[ 12, 12 ]} align="start">
-          {txt('FastCGI 地址', 'fastcgi', 'unix:/run/php/php-fpm.sock')}
-          {txt('PHP 根目录', 'phpRoot', '/var/www/example')}
-          {sw('开启 PHP 页面缓存', 'fastcgiCache')}
-          {cfg.fastcgiCache && txt('PHP 缓存时间', 'fastcgiCacheTime', '15m')}
-        </Space>
+        <>
+          {cbRow(cb('开启 PHP 页面缓存', 'fastcgiCache'))}
+          <Space wrap size={[ 12, 12 ]} align="start">
+            {txt('FastCGI 地址', 'fastcgi', 'unix:/run/php/php-fpm.sock')}
+            {txt('PHP 根目录', 'phpRoot', '/var/www/example')}
+            {cfg.fastcgiCache && txt('PHP 缓存时间', 'fastcgiCacheTime', '15m')}
+          </Space>
+        </>
       )}
 
       <Group title={t('性能优化')} />
+      {cbRow(
+        <>
+          {cb('开启 gzip 压缩', 'gzip')}
+          {cfg.gzip && cb('压缩常见类型', 'gzipTypes')}
+          {cb('Cache-Control immutable', 'cacheImmutable')}
+          {cb('sendfile 零拷贝', 'sendfile')}
+          {cb('文件句柄缓存', 'openFileCache')}
+          {cb('优先使用 .gz 预压缩文件', 'gzipStatic')}
+        </>,
+      )}
       <Space wrap size={[ 12, 12 ]} align="start">
-        {sw('开启 gzip 压缩', 'gzip')}
         {cfg.gzip && sel('压缩级别', 'gzipLevel', GZIP_LEVELS.map((l) => ({ value: l, label: l })))}
-        {cfg.gzip && sw('压缩常见类型', 'gzipTypes')}
         {sel('静态资源缓存时间', 'expires', [
           { value: '', label: t('不设置') },
           ...EXPIRES_OPTIONS.map((v) => ({ value: v, label: v })),
         ])}
-        {sw('Cache-Control immutable', 'cacheImmutable')}
-        {sw('sendfile 零拷贝', 'sendfile')}
         {txt('长连接超时', 'keepaliveTimeout', '65')}
         {txt('上传体积上限', 'clientMaxBody', '20m')}
-        {sw('文件句柄缓存', 'openFileCache')}
-        {sw('优先使用 .gz 预压缩文件', 'gzipStatic')}
       </Space>
 
       <Group title={t('安全加固')} />
+      {cbRow(
+        <>
+          {cb('隐藏版本号', 'serverTokensOff')}
+          {cb('禁止访问隐藏文件', 'denyHidden')}
+          {cb('禁止访问备份文件', 'denyBackup')}
+          {cb('安全响应头', 'securityHeaders')}
+          {cb('拦截采集 UA', 'denyUa')}
+          {cb('只放行 GET/POST/HEAD', 'limitMethods')}
+          {cb('开启 Basic Auth', 'basicAuth')}
+        </>,
+      )}
       <Space wrap size={[ 12, 12 ]} align="start">
-        {sw('隐藏版本号', 'serverTokensOff')}
-        {sw('禁止访问隐藏文件', 'denyHidden')}
-        {sw('禁止访问备份文件', 'denyBackup')}
-        {sw('安全响应头', 'securityHeaders')}
-        {sw('拦截采集 UA', 'denyUa')}
-        {sw('只放行 GET/POST/HEAD', 'limitMethods')}
-        {sw('开启 Basic Auth', 'basicAuth')}
         {cfg.basicAuth && txt('htpasswd 文件', 'authFile', '/etc/nginx/.htpasswd')}
         {sel('IP 访问控制', 'ipMode', IP_MODES.map((m) => ({ value: m.value, label: m.label })))}
         {cfg.ipMode !== 'off' && area('IP 列表', 'ipList', '10.0.0.0/8\n1.2.3.4', '每行一个, 支持 CIDR / IPv6 / all')}
       </Space>
 
       <Group title={t('限流与连接限制')} />
+      {cbRow(
+        <>
+          {cb('请求限流', 'limitReq')}
+          {cfg.limitReq && cb('超限直接拒绝 (nodelay)', 'limitNoDelay')}
+          {cb('连接数限制', 'limitConn')}
+        </>,
+      )}
       <Space wrap size={[ 12, 12 ]} align="start">
-        {sw('请求限流', 'limitReq')}
         {cfg.limitReq && txt('限流速率', 'limitRate', '10r/s')}
         {cfg.limitReq && txt('突发请求数', 'limitBurst', '20')}
-        {cfg.limitReq && sw('超限直接拒绝 (nodelay)', 'limitNoDelay')}
-        {sw('连接数限制', 'limitConn')}
         {cfg.limitConn && txt('单 IP 连接数', 'limitConnNum', '20')}
       </Space>
 
       <Group title={t('防盗链与跨域')} />
+      {cbRow(<>{cb('图片防盗链', 'antiLeech')}{cb('允许跨域 (CORS)', 'cors')}</>)}
       <Space wrap size={[ 12, 12 ]} align="start">
-        {sw('图片防盗链', 'antiLeech')}
         {cfg.antiLeech && txt('允许的来源域名', 'antiLeechDomains', 'example.com www.example.com')}
-        {sw('允许跨域 (CORS)', 'cors')}
         {cfg.cors && txt('允许的跨域来源', 'corsOrigin', 'https://a.com')}
       </Space>
 
