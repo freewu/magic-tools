@@ -72,11 +72,10 @@ describe('NginxConfig 页面交互', () => {
     Object.assign(navigator, { clipboard: { writeText: jest.fn().mockResolvedValue(undefined) } });
   });
 
-  test('默认渲染配置页签与站点说明', () => {
+  test('默认渲染配置页签', () => {
     setup();
     const all = view();
-    expect(all).toContain('nginx 配置说明');
-    expect(all).toContain('生成的配置请保存为 <站点>.conf 放入 vhost 目录');
+    expect(document.querySelector('.ant-alert-info')).toBeNull();
     expect(all).toContain('基础站点');
     expect(all).toContain('HTTPS 与 TLS');
     expect(all).toContain('性能优化');

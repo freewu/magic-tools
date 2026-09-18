@@ -22,13 +22,6 @@ const nginxlangRows: Record<string, [string, string]> = {
   '部署到 vhost 目录的步骤': ['部署到 vhost 目錄的步驟', 'Deploy steps for the vhost directory'],
   '校验未通过, 请检查以下问题:': ['驗證未通過, 請檢查以下問題:', 'Validation failed, please check:'],
 
-  // 说明
-  'nginx 配置说明': ['nginx 設定說明', 'About nginx config'],
-  '填写站点参数后, 切换到「生成的配置」页签即可看到可直接使用的 nginx 站点配置': ['填寫站點參數後, 切換到「產生的設定」頁籤即可看到可直接使用的 nginx 站點設定', 'Fill in the site parameters, then switch to the "Generated config" tab to see a ready-to-use nginx site config'],
-  '生成的配置请保存为 <站点>.conf 放入 vhost 目录 (如 /etc/nginx/vhost/), 再由主配置 include 引入': ['產生的設定請儲存為 <站點>.conf 放入 vhost 目錄 (如 /etc/nginx/vhost/), 再由主設定 include 引入', 'Save the generated config as <site>.conf into your vhost directory (e.g. /etc/nginx/vhost/) and include it from the main config'],
-  '覆盖静态站点 / SPA / PHP / 反向代理, 以及 gzip、静态缓存、TLS、限流、防盗链等性能与安全优化': ['涵蓋靜態站點 / SPA / PHP / 反向代理, 以及 gzip、靜態快取、TLS、限流、防盜連等效能與安全最佳化', 'Covers static sites / SPA / PHP / reverse proxy, plus gzip, static caching, TLS, rate limiting and hotlink protection'],
-  '生成的配置仅作参考, 本工具不会执行任何命令, 也不会连接服务器': ['產生的設定僅供參考, 本工具不會執行任何命令, 也不會連線伺服器', 'Generated config is for reference — this tool runs nothing and contacts no server'],
-
   // 基础
   '场景示例': ['場景範例', 'Preset'],
   '请选择场景示例': ['請選擇場景範例', 'Select a preset'],

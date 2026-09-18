@@ -360,21 +360,6 @@ const NginxConfig = () => {
   return (
     <div>
       {contextHolder}
-      <Alert
-        type="info"
-        showIcon
-        style={{ marginBottom: 12 }}
-        message={t('nginx 配置说明')}
-        description={(
-          <ul style={{ margin: 0, paddingLeft: 18 }}>
-            <li>{t('填写站点参数后, 切换到「生成的配置」页签即可看到可直接使用的 nginx 站点配置')}</li>
-            <li>{t('生成的配置请保存为 <站点>.conf 放入 vhost 目录 (如 /etc/nginx/vhost/), 再由主配置 include 引入')}</li>
-            <li>{t('覆盖静态站点 / SPA / PHP / 反向代理, 以及 gzip、静态缓存、TLS、限流、防盗链等性能与安全优化')}</li>
-            <li>{t('生成的配置仅作参考, 本工具不会执行任何命令, 也不会连接服务器')}</li>
-          </ul>
-        )}
-      />
-
       {invalid && (
         <Alert
           style={{ marginBottom: 12 }}
