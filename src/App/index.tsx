@@ -27,6 +27,7 @@ const list = [
   'SudokuGenerator',
   'CopybookGenerator',
   'CronRules',
+  'GitignoreGenerator',
   'AESCrypto',
   'RSACrypto',
   'SM2Crypto',

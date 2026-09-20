@@ -132,6 +132,7 @@ import Teleprompter from './Teleprompter/lang';
 import IptablesRules from './IptablesRules/lang';
 import TcRules from './TcRules/lang';
 import NginxConfig from './NginxConfig/lang';
+import GitignoreGenerator from './GitignoreGenerator/lang';
 
 export const langPacks = {
   Hash: Hash,
@@ -266,4 +267,5 @@ export const langPacks = {
   IptablesRules,
   TcRules,
   NginxConfig,
+  GitignoreGenerator,
 };
