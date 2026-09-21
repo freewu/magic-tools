@@ -42,6 +42,30 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-09-21 V2.14.0 Release", "2026-09-21 V2.14.0 Release", "2026-09-21 V2.14.0 Release"),
+    items: trio(
+      [
+        "新增「.gitignore 生成」工具 (生成器): 内置 64 个现成模板 (语言 22 / 框架与工具 20 / 编辑器·IDE 9 / 操作系统 3 / 其它 10), 勾选即生成可直接保存到仓库根目录的 .gitignore; 11 个常用技术栈组合一键套用 (前端 Node+Vite / Python 后端 / Java·Maven / Android·Kotlin / Go 服务 / Rust 项目 / C·C++(CMake) / PHP·Laravel / 移动端 (Flutter·原生) / 机器学习·数据科学 / 通用基础); 支持自定义追加 (支持 # 注释与 ! 例外) 与跨模板自动去重; 4 个生成选项 (顶部说明注释 / 分组注释 / 按模板库顺序 / 自动去重); 结果逐行可点击复制, 也可复制全部或保存为 .gitignore",
+        "新增「即时渲染 Markdown」工具 (格式化): 基于 Vditor 的所见即所得 Markdown 编辑器, 支持即时渲染 / 分屏预览 / 所见即所得三种模式与亮暗主题, 内置示例文档, 支持 KaTeX 数学公式与代码高亮; 可复制 Markdown / HTML, 导出 .md 与自带样式的 .html, 一键插入目录并实时统计字数",
+        "「.gitignore 生成」模板库分类内选项超过 5 个时改用下拉多选, 少量选项仍平铺复选框; 「常用组合」由 11 个按钮改为下拉 select 一键套用 (选中后回显, 手动增删模板后回到占位符); 去掉页面级搜索框, 搜索改由各下拉自带; 统计与批量操作行靠左对齐",
+        "帮助页「使用组件」补充 Vditor / Mermaid / Shiki / SVGO / JsBarcode / figlet.js / html-to-image / JSON5 / fast-xml-parser / bcryptjs / React Router 等 11 个实际使用的第三方组件",
+      ],
+      [
+        "新增「.gitignore 產生」工具 (產生器): 內建 64 個現成範本 (語言 22 / 框架與工具 20 / 編輯器·IDE 9 / 作業系統 3 / 其他 10), 勾選即產生可直接儲存到倉庫根目錄的 .gitignore; 11 個常用技術棧組合一鍵套用 (前端 Node+Vite / Python 後端 / Java·Maven / Android·Kotlin / Go 服務 / Rust 專案 / C·C++(CMake) / PHP·Laravel / 行動端 (Flutter·原生) / 機器學習·資料科學 / 通用基礎); 支援自訂追加 (支援 # 註解與 ! 例外) 與跨範本自動去重; 4 個產生選項 (頂部說明註解 / 分組註解 / 依範本庫順序 / 自動去重); 結果逐行可點擊複製, 也可複製全部或儲存為 .gitignore",
+        "新增「即時渲染 Markdown」工具 (格式化): 以 Vditor 為基礎的所見即所得 Markdown 編輯器, 支援即時渲染 / 分割預覽 / 所見即所得三種模式與亮暗主題, 內建範例文件, 支援 KaTeX 數學公式與程式碼高亮; 可複製 Markdown / HTML, 匯出 .md 與自帶樣式的 .html, 一鍵插入目錄並即時統計字數",
+        "「.gitignore 產生」範本庫分類內選項超過 5 個時改用下拉多選, 少量選項仍平鋪核取方塊; 「常用組合」由 11 個按鈕改為下拉選單一鍵套用 (選中後回顯, 手動調整範本後回到佔位符); 移除頁面層級搜尋框, 搜尋改由各下拉自帶; 統計與批次操作列靠左對齊",
+        "說明頁「使用元件」補充 Vditor / Mermaid / Shiki / SVGO / JsBarcode / figlet.js / html-to-image / JSON5 / fast-xml-parser / bcryptjs / React Router 等 11 個實際使用的第三方元件",
+      ],
+      [
+        "New “.gitignore Generator” tool (Generator): 64 ready-made templates (22 languages / 20 frameworks & tools / 9 editors & IDEs / 3 operating systems / 10 misc) — tick what you use and get a .gitignore you can save straight into the repository root; 11 common stack presets applied in one click (frontend Node + Vite / Python backend / Java & Maven / Android & Kotlin / Go service / Rust project / C & C++ (CMake) / PHP & Laravel / mobile (Flutter & native) / machine learning & data science / baseline); custom lines (# comments and ! negations supported) and cross-template dedupe; four output options (header comment / section comments / library order / auto dedupe); every result line is click-to-copy, and the whole file can be copied or saved as .gitignore",
+        "New “Instant Render Markdown” tool (Formatter): a Vditor-powered WYSIWYG Markdown editor with instant-render / split-preview / WYSIWYG modes and light & dark themes, built-in samples, KaTeX maths and code highlighting; copy Markdown or HTML, export .md and a self-styled .html, insert a table of contents and watch live word counts",
+        "Gitignore Generator: template groups with more than five options now use a multi-select dropdown (fewer options stay as checkboxes); the 11 stack presets became a single one-click dropdown that reflects the active preset and resets to the placeholder after manual edits; the page-level search box was removed because every dropdown searches on its own; the stats and bulk-action row is now left-aligned",
+        "The Help page's “Components” card now lists the third-party libraries actually in use, including Vditor, Mermaid, Shiki, SVGO, JsBarcode, figlet.js, html-to-image, JSON5, fast-xml-parser, bcryptjs and React Router",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-09-17 V2.13.0 Release", "2026-09-17 V2.13.0 Release", "2026-09-17 V2.13.0 Release"),
     items: trio(
       [
