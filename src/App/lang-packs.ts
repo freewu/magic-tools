@@ -84,6 +84,7 @@ import HtpasswdGenerator from './HtpasswdGenerator/lang';
 import RegexTester from './RegexTester/lang';
 import MarkdownEditor from './MarkdownEditor/lang';
 import MermaidEditor from './MermaidEditor/lang';
+import VditorMarkdown from './VditorMarkdown/lang';
 import JsonFormatter from './JsonFormatter/lang';
 import JSON5Formatter from './JSON5Formatter/lang';
 import JsFormatter from './JsFormatter/lang';
@@ -219,6 +220,7 @@ export const langPacks = {
   RegexTester: RegexTester,
   MarkdownEditor: MarkdownEditor,
   MermaidEditor: MermaidEditor,
+  VditorMarkdown: VditorMarkdown,
   JsonFormatter: JsonFormatter,
   JSON5Formatter: JSON5Formatter,
   JsFormatter: JsFormatter,

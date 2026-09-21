@@ -88,6 +88,7 @@ const list = [
   'RegexTester',
   'MarkdownEditor',
   'MermaidEditor',
+  'VditorMarkdown',
   'JsonFormatter',
   'JSON5Formatter',
   'JsFormatter',
