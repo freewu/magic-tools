@@ -1,32 +1,67 @@
 // Help 页数据: 使用组件 / 开发者 / 开发时间线
 // 开发时间线 (eventList) 三语: zh-CN 与 update.md 各版本节同步 (发布说明原文), zh-TW / en 为译文
-export const compomentList = [
-  { name: "Tauri 2", url: "https://tauri.app/" },
-  { name: "React 18", url: "https://react.dev/" },
-  { name: "React Router", url: "https://reactrouter.com/" },
-  { name: "Ant Design 5", url: "https://ant.design/" },
-  { name: "CryptoJS", url: "https://github.com/brix/crypto-js" },
-  { name: "bcryptjs", url: "https://github.com/dcodeIO/bcrypt.js" },
-  { name: "js-base64", url: "https://github.com/dankogai/js-base64" },
-  { name: "base-x", url: "https://github.com/cryptocoinjs/base-x" },
-  { name: "color-convert", url: "https://github.com/Qix-/color-convert" },
-  { name: "SQL Formatter", url: "https://github.com/sql-formatter-org/sql-formatter" },
-  { name: "highlight.js", url: "https://highlightjs.org/" },
-  { name: "Shiki", url: "https://shiki.style/" },
-  { name: "Mermaid", url: "https://mermaid.js.org/" },
-  { name: "Vditor", url: "https://github.com/Vanessa219/vditor" },
-  { name: "SVGO", url: "https://github.com/svg/svgo" },
-  { name: "JsBarcode", url: "https://github.com/lindell/JsBarcode" },
-  { name: "figlet.js", url: "https://github.com/patorjk/figlet.js" },
-  { name: "html-to-image", url: "https://github.com/bubkoo/html-to-image" },
-  { name: "JSON5", url: "https://json5.org/" },
-  { name: "fast-xml-parser", url: "https://github.com/NaturalIntelligence/fast-xml-parser" },
-  { name: "pinyin-pro", url: "https://pinyin-pro.cn/" },
-  { name: "js-ini", url: "https://github.com/Sdju/js-ini" },
-  { name: "yaml", url: "https://github.com/eemeli/yaml" },
-  { name: "toml-patch", url: "https://github.com/timhall/toml-patch" },
-  { name: "deepmerge", url: "https://github.com/TehShrike/deepmerge" },
+/** 使用组件: 以 shields.io badge 展示 (名称 + 版本号) */
+export interface HelpComponent {
+  /** 组件名 (badge 左侧文案) */
+  name: string;
+  /** 当前实际使用的版本号 (badge 右侧文案): node_modules 安装版本 / Rust crate 版本 */
+  version: string;
+  url: string;
+  /** 版本号底色 (十六进制, 不带 #), 缺省用 DEFAULT_BADGE_COLOR */
+  color?: string;
+  /** simple-icons 图标名, 见 https://simpleicons.org */
+  logo?: string;
+  /** 图标颜色 (十六进制, 不带 #), 缺省白色 */
+  logoColor?: string;
+}
+
+/** badge 缺省底色 (indigo) */
+export const DEFAULT_BADGE_COLOR = "4F46E5";
+
+// 版本号 = 当前实际使用的版本, 升级依赖时请同步更新
+// (可执行 node -p "require('./node_modules/<pkg>/package.json').version" 查看安装版本)
+export const compomentList: HelpComponent[] = [
+  { name: "Tauri", version: "2.11.1", url: "https://tauri.app/", color: "0E7490", logo: "tauri" },
+  { name: "React", version: "18.3.1", url: "https://react.dev/", color: "087EA4", logo: "react" },
+  { name: "React Router", version: "6.30.6", url: "https://reactrouter.com/", color: "CA4245", logo: "reactrouter" },
+  { name: "Ant Design", version: "5.29.3", url: "https://ant.design/", color: "0170FE", logo: "antdesign" },
+  { name: "CryptoJS", version: "4.1.1", url: "https://github.com/brix/crypto-js", logo: "javascript" },
+  { name: "bcryptjs", version: "3.0.2", url: "https://github.com/dcodeIO/bcrypt.js" },
+  { name: "js-base64", version: "3.9.3", url: "https://github.com/dankogai/js-base64" },
+  { name: "base-x", version: "4.0.1", url: "https://github.com/cryptocoinjs/base-x" },
+  { name: "color-convert", version: "2.0.1", url: "https://github.com/Qix-/color-convert" },
+  { name: "SQL Formatter", version: "12.2.4", url: "https://github.com/sql-formatter-org/sql-formatter" },
+  { name: "highlight.js", version: "11.12.0", url: "https://highlightjs.org/" },
+  { name: "Shiki", version: "4.4.3", url: "https://shiki.style/" },
+  { name: "Mermaid", version: "11.17.2", url: "https://mermaid.js.org/", color: "FF3670", logo: "mermaid" },
+  { name: "Vditor", version: "4.0.0", url: "https://github.com/Vanessa219/vditor" },
+  { name: "SVGO", version: "4.1.0", url: "https://github.com/svg/svgo", logo: "svg" },
+  { name: "JsBarcode", version: "3.12.3", url: "https://github.com/lindell/JsBarcode" },
+  { name: "figlet.js", version: "1.11.4", url: "https://github.com/patorjk/figlet.js" },
+  { name: "html-to-image", version: "1.11.13", url: "https://github.com/bubkoo/html-to-image" },
+  { name: "JSON5", version: "2.2.3", url: "https://json5.org/", color: "000000", logo: "json" },
+  { name: "fast-xml-parser", version: "4.5.7", url: "https://github.com/NaturalIntelligence/fast-xml-parser", color: "005FAD", logo: "xml" },
+  { name: "pinyin-pro", version: "3.29.3", url: "https://pinyin-pro.cn/" },
+  { name: "js-ini", version: "1.6.0", url: "https://github.com/Sdju/js-ini" },
+  { name: "yaml", version: "2.9.0", url: "https://github.com/eemeli/yaml", color: "CB171E", logo: "yaml" },
+  { name: "toml-patch", version: "0.2.3", url: "https://github.com/timhall/toml-patch", color: "9C4121", logo: "toml" },
+  { name: "deepmerge", version: "4.3.1", url: "https://github.com/TehShrike/deepmerge" },
 ];
+
+// shields.io 静态 badge 文本转义: - -> --, _ -> __, 空格 -> _
+const badgeText = (value: string) =>
+  encodeURIComponent(value.replace(/-/g, "--").replace(/_/g, "__").replace(/\s+/g, "_"));
+
+/** 拼接 shields.io badge 地址: 名称-版本号-底色 + simple-icons 图标 */
+export const componentBadgeUrl = (item: HelpComponent) => {
+  const params = new URLSearchParams({ style: "flat-square", labelColor: "24292F" });
+  if (item.logo) {
+    params.set("logo", item.logo);
+    params.set("logoColor", item.logoColor || "fff");
+  }
+  const color = item.color || DEFAULT_BADGE_COLOR;
+  return `https://img.shields.io/badge/${badgeText(item.name)}-${badgeText(item.version)}-${color}?${params.toString()}`;
+};
 
 // 开发者列表
 export const developerList = [

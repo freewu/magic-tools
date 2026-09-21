@@ -1,3 +1,21 @@
 .help-card {
   margin: 5px;
 }
+
+/* 使用组件: shields.io badge 流式换行排列 */
+.help-components {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.help-components a {
+  display: inline-flex;
+  line-height: 0;
+}
+
+.help-badge {
+  height: 20px;
+  display: block;
+}

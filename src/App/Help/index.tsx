@@ -1,7 +1,7 @@
 // Help 页面
 import { Layout,Card, Avatar, Space,Row, Col,Timeline } from 'antd';
 import { GithubOutlined, BugOutlined } from '@ant-design/icons';
-import { compomentList, developerList, eventList } from "./data"
+import { compomentList, componentBadgeUrl, developerList, eventList } from "./data"
 import type { LKey } from "./data"
 import { useLocale } from "../../hook/locale-context";
 import { tr } from "../../i18n/lang";
@@ -32,15 +32,18 @@ const Help = () => {
       <Row>
         <Col span={ 8 }>
           <Card title={ t('comp', '使用组件') } className='help-card'>
-          {
-            compomentList.map((item, index) => {
-              return (
-                <p key={ item.name + index } >
-                  <a target="_blank" href={ item.url }>{ item.name }</a>
-                </p>   
-              );
-            })
-          }
+            <div className='help-components'>
+            {
+              compomentList.map((item, index) => {
+                const title = `${ item.name } ${ item.version }`;
+                return (
+                  <a key={ item.name + index } target="_blank" rel="noreferrer" href={ item.url } title={ title } >
+                    <img className='help-badge' src={ componentBadgeUrl(item) } alt={ title } loading='lazy' />
+                  </a>
+                );
+              })
+            }
+            </div>
           </Card>
           <Card title={ t('proj', '项目') } className='help-card'>
             <p>
