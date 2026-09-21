@@ -3,11 +3,13 @@ import {
   GITIGNORE_CATEGORIES,
   GITIGNORE_PRESETS,
   GITIGNORE_TEMPLATES,
+  MAX_INLINE_OPTIONS,
   allTemplateIds,
   applyPresetSelection,
   buildGitignore,
   countHiddenSelected,
   emptyGitignoreOptions,
+  mergeGroupSelection,
   normalizeLines,
   parseCustom,
   searchTemplates,
@@ -119,6 +121,26 @@ describe('勾选辅助', () => {
   it('countHiddenSelected 统计被搜索隐藏的已选模板', () => {
     expect(countHiddenSelected([ 'node', 'go' ], searchTemplates('node'))).toBe(1);
     expect(countHiddenSelected([ 'node' ], searchTemplates(''))).toBe(0);
+  });
+  it('mergeGroupSelection 只替换该分类的勾选, 其它分类与顺序不变', () => {
+    const langIds = GITIGNORE_TEMPLATES.filter((t) => t.category === 'lang').map((t) => t.id);
+    // 替换语言分类: 保留 misc 的 cache, 新选项追加到末尾
+    expect(mergeGroupSelection([ 'cache', 'node' ], langIds, [ 'go', 'rust' ])).toEqual([ 'cache', 'go', 'rust' ]);
+    // 分组内全部取消
+    expect(mergeGroupSelection([ 'cache', 'node' ], langIds, [])).toEqual([ 'cache' ]);
+    // 替换语言分类不影响其它分类的已选项
+    expect(mergeGroupSelection([ 'cache', 'go', 'logs' ], langIds, [ 'rust' ])).toEqual([ 'cache', 'logs', 'rust' ]);
+  });
+  it('分类选项数超过阈值时改用下拉多选 (语言/框架/编辑器/其它为多选, 操作系统为复选框)', () => {
+    const sizes = GITIGNORE_CATEGORIES.map((c) => ({
+      key: c.key,
+      size: GITIGNORE_TEMPLATES.filter((t) => t.category === c.key).length,
+    }));
+    const many = sizes.filter((s) => s.size > MAX_INLINE_OPTIONS).map((s) => s.key);
+    const few = sizes.filter((s) => s.size <= MAX_INLINE_OPTIONS).map((s) => s.key);
+    expect(MAX_INLINE_OPTIONS).toBe(5);
+    expect(many).toEqual([ 'lang', 'framework', 'editor', 'misc' ]);
+    expect(few).toEqual([ 'os' ]);
   });
 });
 

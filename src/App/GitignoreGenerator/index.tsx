@@ -1,4 +1,4 @@
-import { Button, Checkbox, Divider, Input, Space, Typography, message } from 'antd';
+import { Button, Checkbox, Divider, Input, Select, Space, Typography, message } from 'antd';
 import { useMemo, useState } from 'react';
 import { CopyOutlined, ReloadOutlined, SaveOutlined, SearchOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from '../../lib';
@@ -11,12 +11,14 @@ import {
   GITIGNORE_TEMPLATES,
 } from './data';
 import {
+  MAX_INLINE_OPTIONS,
   allTemplateIds,
   type GitignoreOptions,
   applyPresetSelection,
   buildGitignore,
   countHiddenSelected,
   emptyGitignoreOptions,
+  mergeGroupSelection,
   searchTemplates,
   toggleTemplate,
 } from './lib';
@@ -64,6 +66,10 @@ const GitignoreGenerator = () => {
   const hidden = countHiddenSelected(selected, visible);
 
   const patchOptions = (patch: Partial<GitignoreOptions>) => setOptions((prev) => ({ ...prev, ...patch }));
+
+  // 分类内选项超过 5 个时改用下拉多选: 复选框平铺会占满整屏, 下拉更紧凑且自带搜索
+  // 选项不多的分类 (≤5) 仍平铺复选框, 一眼可见、点一下即勾
+  const tooMany = (count: number) => count > MAX_INLINE_OPTIONS;
 
   // 复制
   const copy = (value: string) => {
@@ -130,15 +136,33 @@ const GitignoreGenerator = () => {
           <div style={ { color: '#666', marginBottom: 4 } }>
             { g.label } <Text type="secondary" style={ { fontSize: 12 } }>({ g.items.length })</Text>
           </div>
-          <div style={ { display: 'flex', flexWrap: 'wrap', gap: '6px 18px', marginLeft: 2 } }>
-            { g.items.map((tp) => (
-              <Checkbox
-                key={ tp.id }
-                checked={ selected.includes(tp.id) }
-                onChange={ () => { setSelected(toggleTemplate(selected, tp.id)); } }
-              >{ tp.label }</Checkbox>
-            )) }
-          </div>
+          { tooMany(g.items.length) ? (
+            <Select
+              mode="multiple"
+              allowClear
+              showSearch
+              maxTagCount="responsive"
+              optionFilterProp="label"
+              aria-label={ g.label }
+              style={ { width: '100%', maxWidth: 760 } }
+              placeholder={ t('选择模板 (可多选)') }
+              value={ g.items.filter((tp) => selected.includes(tp.id)).map((tp) => tp.id) }
+              options={ g.items.map((tp) => ({ value: tp.id, label: tp.label })) }
+              onChange={ (ids: string[]) => {
+                setSelected(mergeGroupSelection(selected, g.items.map((tp) => tp.id), ids));
+              } }
+            />
+          ) : (
+            <div style={ { display: 'flex', flexWrap: 'wrap', gap: '6px 18px', marginLeft: 2 } }>
+              { g.items.map((tp) => (
+                <Checkbox
+                  key={ tp.id }
+                  checked={ selected.includes(tp.id) }
+                  onChange={ () => { setSelected(toggleTemplate(selected, tp.id)); } }
+                >{ tp.label }</Checkbox>
+              )) }
+            </div>
+          ) }
         </div>
       )) }
       { keyword.trim() !== '' && visible.length === 0 && <Text type="secondary">{ t('未找到匹配的模板') }</Text> }

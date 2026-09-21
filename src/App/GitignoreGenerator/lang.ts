@@ -19,6 +19,7 @@ const gitignorelangRows: Record<string, [string, string]> = {
   '全选': ['全選', 'Select all'],
   '恢复默认': ['恢復預設', 'Restore defaults'],
   '搜索模板': ['搜尋範本', 'Search templates'],
+  '选择模板 (可多选)': ['選擇範本 (可多選)', 'Select templates (multiple)'],
   '搜索结果': ['搜尋結果', 'Search results'],
   '共 {n} 个模板可选': ['共 {n} 個範本可選', '{n} templates available'],
   '已选 {n} 个模板': ['已選 {n} 個範本', '{n} templates selected'],

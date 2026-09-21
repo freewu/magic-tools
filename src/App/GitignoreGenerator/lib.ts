@@ -82,6 +82,18 @@ export const toggleTemplate = (selected: string[], id: string): string[] => (
   selected.includes(id) ? selected.filter((v) => v !== id) : [ ...selected, id ]
 );
 
+// 界面阈值: 分类内选项超过此值时改用下拉多选 (否则平铺复选框)
+export const MAX_INLINE_OPTIONS = 5;
+
+/**
+ * 分组多选回写: 用某个分类的新选择替换该分类原有的勾选, 其它分类保持不变。
+ * 新选项追加在末尾, 与逐项勾选的行为一致 (「按模板库顺序」开关关闭时输出顺序即勾选顺序)。
+ */
+export const mergeGroupSelection = (selected: string[], groupIds: string[], nextIds: string[]): string[] => {
+  const group = new Set(groupIds);
+  return [ ...selected.filter((id) => !group.has(id)), ...nextIds ];
+};
+
 // 搜索模板: 命中 id / 名称 / 关键词 (大小写不敏感)
 export const searchTemplates = (keyword: string, list: GitignoreTemplate[] = GITIGNORE_TEMPLATES): GitignoreTemplate[] => {
   const kw = keyword.trim().toLowerCase();
