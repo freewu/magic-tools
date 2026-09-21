@@ -22,12 +22,13 @@ const box = (label: string): HTMLElement => {
   return hit as HTMLElement;
 };
 const toggle = (label: string) => fireEvent.click(box(label).querySelector('input[type="checkbox"]') as HTMLElement);
-/** 下拉多选 (分类内选项 > 5 个时启用): 按分组 aria-label 打开并点选/取消某个模板 */
+/** 按 aria-label 取组件内的下拉 (模板分类多选 / 常用组合单选) */
 const groupSelect = (group: string): HTMLElement => {
   const hit = container.querySelector(`[aria-label="${group}"]`);
-  if (!hit) throw new Error(`未找到分组下拉: ${group}`);
+  if (!hit) throw new Error(`未找到下拉: ${group}`);
   return hit as HTMLElement;
 };
+/** 下拉 select (单选/多选通用): 按 aria-label 打开并点选某个选项 */
 const pick = (group: string, label: string) => {
   fireEvent.mouseDown(groupSelect(group).querySelector('.ant-select-selector') as HTMLElement);
   const option = screen.getAllByText(label).find((el) => el.closest('.ant-select-item-option'));
@@ -116,12 +117,34 @@ describe('GitignoreGenerator 页面交互', () => {
     expect(view()).toContain('未找到匹配的模板');
   });
 
-  test('常用组合一键勾选', () => {
+  test('常用组合一键套用 (下拉 select)', () => {
     setup();
-    fireEvent.click(screen.getByText('通用基础 (系统 + 编辑器 + 密钥)'));
+    expect(view()).toContain('共 11 个常用组合');
+    // 查看全部组合需要展开下拉
+    pick('常用组合', '通用基础 (系统 + 编辑器 + 密钥)');
     expect(view()).toContain('已选 8 个模板');
     expect(view()).toContain('.DS_Store');
     expect(view()).toContain('Thumbs.db');
+    // 选中后回显组合名
+    expect(groupSelect('常用组合').textContent).toContain('通用基础 (系统 + 编辑器 + 密钥)');
+  });
+
+  test('常用组合下拉一次展开全部 11 个组合 (无需滚动)', () => {
+    setup();
+    fireEvent.mouseDown(groupSelect('常用组合').querySelector('.ant-select-selector') as HTMLElement);
+    expect(document.querySelectorAll('.ant-select-item-option')).toHaveLength(11);
+  });
+
+  test('手动增删模板后常用组合不再回显', () => {
+    setup();
+    pick('常用组合', 'Python 后端');
+    expect(view()).toContain('已选 10 个模板');
+    expect(groupSelect('常用组合').textContent).toContain('Python 后端');
+    pick('语言', 'Node.js');
+    expect(groupSelect('常用组合').textContent).not.toContain('Python 后端');
+    // 手动改动后不回显组合; 再次选择同一个组合仍能一键套用
+    pick('常用组合', 'Python 后端');
+    expect(view()).toContain('已选 10 个模板');
   });
 
   test('全选与清空', () => {

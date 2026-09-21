@@ -71,6 +71,12 @@ const GitignoreGenerator = () => {
   // 选项不多的分类 (≤5) 仍平铺复选框, 一眼可见、点一下即勾
   const tooMany = (count: number) => count > MAX_INLINE_OPTIONS;
 
+  // 当前选择与某个常用组合完全一致时回显该组合; 手动增删模板后自动回到占位符
+  const currentPreset = GITIGNORE_PRESETS.find((p) => {
+    const ids = applyPresetSelection(p);
+    return ids.length > 0 && ids.length === selected.length && ids.every((id) => selected.includes(id));
+  });
+
   // 复制
   const copy = (value: string) => {
     if (value === '') return;
@@ -104,12 +110,24 @@ const GitignoreGenerator = () => {
 
       <Text type="secondary">{t('勾选需要的技术栈, 生成的 .gitignore 可直接保存到仓库根目录')}</Text>
 
-      {/* 常用组合 */}
+      {/* 常用组合: 选项超过 5 个, 同样改用下拉 select 一键套用 */}
       <div style={ { display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center', margin: '10px 0' } }>
         <Text style={ { color: '#666', width: 70, textAlign: 'right' } }>{t('常用组合')}</Text>
-        { GITIGNORE_PRESETS.map((p) => (
-          <Button key={ p.id } size="small" onClick={ () => { setSelected(applyPresetSelection(p)); } }>{ t(p.name) }</Button>
-        )) }
+        <Select
+          showSearch
+          optionFilterProp="label"
+          listHeight={ 400 }
+          aria-label={ t('常用组合') }
+          style={ { minWidth: 260, maxWidth: 420 } }
+          placeholder={ t('选择常用组合 (一键套用)') }
+          value={ currentPreset?.id }
+          options={ GITIGNORE_PRESETS.map((p) => ({ value: p.id, label: t(p.name) })) }
+          onChange={ (id: string) => {
+            const hit = GITIGNORE_PRESETS.find((p) => p.id === id);
+            if (hit) setSelected(applyPresetSelection(hit));
+          } }
+        />
+        <Text type="secondary" style={ { fontSize: 12 } }>{ tt('共 {n} 个常用组合', { n: GITIGNORE_PRESETS.length }) }</Text>
       </div>
 
       {/* 搜索 + 统计 + 批量操作 */}

@@ -27,6 +27,8 @@ const gitignorelangRows: Record<string, [string, string]> = {
   '未找到匹配的模板': ['找不到符合的範本', 'No matching template'],
   '模板库': ['範本庫', 'Template library'],
   '常用组合': ['常用組合', 'Common stacks'],
+  '选择常用组合 (一键套用)': ['選擇常用組合 (一鍵套用)', 'Pick a common stack (one click)'],
+  '共 {n} 个常用组合': ['共 {n} 個常用組合', '{n} common stacks'],
   '自定义追加': ['自訂追加', 'Custom lines'],
   '选项': ['選項', 'Options'],
   '生成结果': ['產生結果', 'Result'],
