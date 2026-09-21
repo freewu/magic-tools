@@ -1,6 +1,6 @@
 import { Button, Checkbox, Divider, Input, Select, Space, Typography, message } from 'antd';
 import { useMemo, useState } from 'react';
-import { CopyOutlined, ReloadOutlined, SaveOutlined, SearchOutlined } from '@ant-design/icons';
+import { CopyOutlined, ReloadOutlined, SaveOutlined } from '@ant-design/icons';
 import { copyTextToClipboard } from '../../lib';
 import { saveTextFile } from '../../lib/tauri';
 import { useLocale } from '../../hook/locale-context';
@@ -16,10 +16,8 @@ import {
   type GitignoreOptions,
   applyPresetSelection,
   buildGitignore,
-  countHiddenSelected,
   emptyGitignoreOptions,
   mergeGroupSelection,
-  searchTemplates,
   toggleTemplate,
 } from './lib';
 
@@ -45,7 +43,6 @@ const GitignoreGenerator = () => {
   const t = (zh: string) => gg(locale, zh);
   const tt = (zh: string, v?: Record<string, string | number>) => ggT(locale, zh, v);
 
-  const [ keyword, setKeyword ] = useState('');           // 搜索关键词
   const [ selected, setSelected ] = useState<string[]>([]); // 已勾选模板 (按勾选顺序)
   const [ custom, setCustom ] = useState('');              // 自定义追加
   const [ options, setOptions ] = useState<GitignoreOptions>(() => emptyGitignoreOptions());
@@ -54,16 +51,12 @@ const GitignoreGenerator = () => {
   const plan = useMemo(() => buildGitignore(selected, custom, options), [ selected, custom, options ]);
   const invalid = plan.errors.length > 0;
 
-  // 分组: 有搜索词时只显示命中结果
-  const visible = useMemo(() => searchTemplates(keyword), [ keyword ]);
-  const groups = keyword.trim() === ''
-    ? GITIGNORE_CATEGORIES.map((c) => ({
-        key: c.key as string,
-        label: t(c.label),
-        items: GITIGNORE_TEMPLATES.filter((x) => x.category === c.key),
-      }))
-    : [ { key: 'search', label: t('搜索结果'), items: visible } ];
-  const hidden = countHiddenSelected(selected, visible);
+  // 模板库分组: 分类内选项超过 5 个的下拉自带搜索
+  const groups = GITIGNORE_CATEGORIES.map((c) => ({
+    key: c.key as string,
+    label: t(c.label),
+    items: GITIGNORE_TEMPLATES.filter((x) => x.category === c.key),
+  }));
 
   const patchOptions = (patch: Partial<GitignoreOptions>) => setOptions((prev) => ({ ...prev, ...patch }));
 
@@ -98,7 +91,6 @@ const GitignoreGenerator = () => {
     setSelected([]);
     setCustom('');
     setOptions(emptyGitignoreOptions());
-    setKeyword('');
   };
 
   // 结果逐行视图 (去掉末尾换行产生的空行)
@@ -130,19 +122,10 @@ const GitignoreGenerator = () => {
         <Text type="secondary" style={ { fontSize: 12 } }>{ tt('共 {n} 个常用组合', { n: GITIGNORE_PRESETS.length }) }</Text>
       </div>
 
-      {/* 搜索 + 统计 + 批量操作 */}
-      <div style={ { display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', marginBottom: 10 } }>
-        <Input
-          allowClear
-          style={ { width: 220 } }
-          prefix={ <SearchOutlined /> }
-          value={ keyword }
-          placeholder={ t('搜索模板') }
-          onChange={ (e) => { setKeyword(e.target.value); } }
-        />
+      {/* 统计 + 批量操作 (搜索由各下拉自带) */}
+      <div style={ { display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', margin: '0 0 10px 78px' } }>
         <Text type="secondary">{ tt('共 {n} 个模板可选', { n: allTemplateIds().length }) }</Text>
         <Text strong>{ tt('已选 {n} 个模板', { n: selected.length }) }</Text>
-        { hidden > 0 && <Text type="warning">{ tt('{n} 个已选模板被搜索条件隐藏', { n: hidden }) }</Text> }
         <Button size="small" onClick={ () => { setSelected(allTemplateIds()); } }>{ t('全选') }</Button>
         <Button size="small" onClick={ () => { setSelected([]); } }>{ t('清空') }</Button>
         <Button size="small" icon={ <ReloadOutlined /> } onClick={ reset }>{ t('恢复默认') }</Button>
@@ -183,7 +166,6 @@ const GitignoreGenerator = () => {
           ) }
         </div>
       )) }
-      { keyword.trim() !== '' && visible.length === 0 && <Text type="secondary">{ t('未找到匹配的模板') }</Text> }
 
       {/* 自定义追加 */}
       <div style={ { marginTop: 12 } }>

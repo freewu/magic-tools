@@ -7,12 +7,10 @@ import {
   allTemplateIds,
   applyPresetSelection,
   buildGitignore,
-  countHiddenSelected,
   emptyGitignoreOptions,
   mergeGroupSelection,
   normalizeLines,
   parseCustom,
-  searchTemplates,
   toggleTemplate,
 } from './lib';
 
@@ -87,28 +85,6 @@ describe('parseCustom', () => {
   });
 });
 
-describe('searchTemplates', () => {
-  it('空关键词返回全部模板', () => {
-    expect(searchTemplates('').length).toBe(GITIGNORE_TEMPLATES.length);
-  });
-  it('按 id 命中 (大小写不敏感)', () => {
-    expect(searchTemplates('GO').map((t) => t.id)).toEqual(searchTemplates('go').map((t) => t.id));
-    expect(searchTemplates('typescript').map((t) => t.id)).toEqual([ 'typescript' ]);
-  });
-  it('按名称命中', () => {
-    expect(searchTemplates('Laravel').map((t) => t.id)).toEqual([ 'laravel' ]);
-  });
-  it('按关键词命中多个模板', () => {
-    const ids = searchTemplates('python').map((t) => t.id);
-    expect(ids).toContain('python');
-    expect(ids).toContain('django');
-    expect(ids).toContain('virtualenv');
-  });
-  it('无命中返回空数组', () => {
-    expect(searchTemplates('不存在的模板')).toEqual([]);
-  });
-});
-
 describe('勾选辅助', () => {
   it('toggleTemplate 追加 / 移除并保持顺序', () => {
     expect(toggleTemplate([], 'node')).toEqual([ 'node' ]);
@@ -117,10 +93,6 @@ describe('勾选辅助', () => {
   });
   it('applyPresetSelection 过滤未知 id', () => {
     expect(applyPresetSelection({ id: 'x', name: 'x', ids: [ 'node', 'not-exist' ] })).toEqual([ 'node' ]);
-  });
-  it('countHiddenSelected 统计被搜索隐藏的已选模板', () => {
-    expect(countHiddenSelected([ 'node', 'go' ], searchTemplates('node'))).toBe(1);
-    expect(countHiddenSelected([ 'node' ], searchTemplates(''))).toBe(0);
   });
   it('mergeGroupSelection 只替换该分类的勾选, 其它分类与顺序不变', () => {
     const langIds = GITIGNORE_TEMPLATES.filter((t) => t.category === 'lang').map((t) => t.id);

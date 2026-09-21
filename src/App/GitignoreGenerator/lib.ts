@@ -94,27 +94,10 @@ export const mergeGroupSelection = (selected: string[], groupIds: string[], next
   return [ ...selected.filter((id) => !group.has(id)), ...nextIds ];
 };
 
-// 搜索模板: 命中 id / 名称 / 关键词 (大小写不敏感)
-export const searchTemplates = (keyword: string, list: GitignoreTemplate[] = GITIGNORE_TEMPLATES): GitignoreTemplate[] => {
-  const kw = keyword.trim().toLowerCase();
-  if (kw === '') return list;
-  return list.filter((t) => {
-    if (t.id.toLowerCase().includes(kw)) return true;
-    if (t.label.toLowerCase().includes(kw)) return true;
-    return t.tags.some((tag) => tag.includes(kw));
-  });
-};
-
 // 应用组合预设: 返回新的勾选集合 (按预设顺序)
 export const applyPresetSelection = (preset: GitignorePreset): string[] => (
   preset.ids.filter((id) => TEMPLATE_MAP[id] !== undefined)
 );
-
-// 统计已勾选但被搜索过滤掉的模板数 (界面提示用)
-export const countHiddenSelected = (selected: string[], visible: GitignoreTemplate[]): number => {
-  const visibleIds = new Set(visible.map((t) => t.id));
-  return selected.filter((id) => !visibleIds.has(id)).length;
-};
 
 // 生成 .gitignore
 export const buildGitignore = (

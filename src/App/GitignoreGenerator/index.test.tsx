@@ -41,8 +41,6 @@ const tagCount = (group: string): number => groupSelect(group).querySelectorAll(
 const btns = (name: string): HTMLElement[] =>
   screen.getAllByRole('button', { name: new RegExp(name.split('').map((c) => (c === ' ' ? '\\s+' : c)).join('\\s*')) });
 const btn = (name: string): HTMLElement => btns(name)[0];
-/** 搜索框 */
-const search = (value: string) => fireEvent.change(screen.getByPlaceholderText('搜索模板'), { target: { value } });
 /** 自定义追加输入框 */
 const setCustom = (value: string) => fireEvent.change(
   screen.getByPlaceholderText('每行一条, 直接追加到结果末尾 (支持 # 注释与 ! 例外)'),
@@ -107,16 +105,6 @@ describe('GitignoreGenerator 页面交互', () => {
     expect(view()).not.toContain('已自动去重');
   });
 
-  test('搜索过滤模板库', () => {
-    setup();
-    search('jetbrains');
-    expect(view()).toContain('搜索结果');
-    expect(view()).toContain('JetBrains');
-    expect(view()).not.toContain('Node.js');
-    search('zzzz-不存在');
-    expect(view()).toContain('未找到匹配的模板');
-  });
-
   test('常用组合一键套用 (下拉 select)', () => {
     setup();
     expect(view()).toContain('共 11 个常用组合');
@@ -164,6 +152,18 @@ describe('GitignoreGenerator 页面交互', () => {
     // 操作系统只有 3 个模板, 仍平铺复选框
     expect(box('macOS')).toBeInTheDocument();
     expect(view()).toContain('选择模板 (可多选)');
+    // 已去掉页面级搜索框, 搜索由各下拉自带
+    expect(screen.queryByPlaceholderText('搜索模板')).toBeNull();
+  });
+
+  test('下拉内可搜索模板 (页面级搜索框已移除)', () => {
+    setup();
+    fireEvent.mouseDown(groupSelect('语言').querySelector('.ant-select-selector') as HTMLElement);
+    const input = groupSelect('语言').querySelector('.ant-select-selection-search-input') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'go' } });
+    const shown = Array.from(document.querySelectorAll('.ant-select-item-option')).map((el) => el.textContent);
+    expect(shown).toContain('Go');
+    expect(shown).not.toContain('Node.js');
   });
 
   test('下拉多选可选取与取消模板', () => {
