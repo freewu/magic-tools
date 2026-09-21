@@ -123,7 +123,7 @@ const GitignoreGenerator = () => {
       </div>
 
       {/* 统计 + 批量操作 (搜索由各下拉自带) */}
-      <div style={ { display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', margin: '0 0 10px 78px' } }>
+      <div style={ { display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', margin: '0 0 10px' } }>
         <Text type="secondary">{ tt('共 {n} 个模板可选', { n: allTemplateIds().length }) }</Text>
         <Text strong>{ tt('已选 {n} 个模板', { n: selected.length }) }</Text>
         <Button size="small" onClick={ () => { setSelected(allTemplateIds()); } }>{ t('全选') }</Button>
