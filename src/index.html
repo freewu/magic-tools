@@ -2,9 +2,13 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <!-- CSP: WebAssembly (矢量化 / 其它 wasm 模块) 需要 'wasm-unsafe-eval' (CSP3);
+         旧版 WebKit (macOS 12 / 部分 Linux WebKitGTK) 不识别该关键字, 仍要 'unsafe-eval' 才能编译 wasm, 因此两者都写上
+         (不写会出现 "Compiling or instantiating WebAssembly module violates the
+         following Content Security policy directive") -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="script-src 'self' 'unsafe-inline'"
+      content="script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' 'unsafe-eval'"
     />
     <link rel="icon" type="image/png" href="/logo.png" />
     <title>Magic Tools</title>

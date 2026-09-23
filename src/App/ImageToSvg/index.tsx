@@ -163,7 +163,13 @@ const ImageToSvg = () => {
         .catch((e) => {
           if (runId.current !== id) return;
           setResult(null);
-          setErr(t('矢量化失败, 请重试或把「处理尺寸」调小') + (e instanceof Error && e.message ? ` (${e.message})` : ''));
+          const detail = e instanceof Error && e.message ? ` (${e.message})` : '';
+          // WebAssembly 被 CSP 拦住时给明确指向（否则用户只会看到「处理尺寸调小」这类误导提示）
+          const msg = e instanceof Error ? e.message : '';
+          const blocked = /webassembly|content security policy|unsafe-eval|wasm-unsafe-eval/i.test(msg);
+          setErr(blocked
+            ? t('当前环境禁止运行 WebAssembly (CSP 限制), 无法矢量化; 请更新应用或改用浏览器版') + detail
+            : t('矢量化失败, 请重试或把「处理尺寸」调小') + detail);
         })
         .finally(() => {
           if (runId.current === id) setBusy(false);

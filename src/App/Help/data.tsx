@@ -78,6 +78,24 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-09-23 V2.15.1 Release", "2026-09-23 V2.15.1 Release", "2026-09-23 V2.15.1 Release"),
+    items: trio(
+      [
+        "修复「图片转 SVG」在桌面端无法矢量化: 页面 CSP 未放行 WebAssembly, 导致 VTracer 编译 wasm 时被拦截并报错 Compiling or instantiating WebAssembly module violates the following Content Security policy directive; 现补充 'wasm-unsafe-eval' (CSP3, Chrome / Edge / Safari 16.4+) 与 'unsafe-eval' (旧版 WebKit 不识别前者)",
+        "矢量化失败时, 若错误来自 WebAssembly 被 CSP 拦截, 改提示「当前环境禁止运行 WebAssembly (CSP 限制)」并保留原始报错, 不再让用户误以为是「处理尺寸太大」",
+      ],
+      [
+        "修正「圖片轉 SVG」在桌面端無法向量化的問題: 頁面 CSP 未放行 WebAssembly, 導致 VTracer 編譯 wasm 時被攔截並報錯 Compiling or instantiating WebAssembly module violates the following Content Security policy directive; 現補充 'wasm-unsafe-eval' (CSP3, Chrome / Edge / Safari 16.4+) 與 'unsafe-eval' (舊版 WebKit 不識別前者)",
+        "向量化失敗時, 若錯誤來自 WebAssembly 被 CSP 攔截, 改提示「目前環境禁止執行 WebAssembly (CSP 限制)」並保留原始報錯, 不再讓使用者誤以為是「處理尺寸太大」",
+      ],
+      [
+        "Fixed “Image to SVG” failing to vectorize in the desktop app: the page CSP did not allow WebAssembly, so compiling the VTracer wasm module was blocked with “Compiling or instantiating WebAssembly module violates the following Content Security policy directive”. The policy now includes 'wasm-unsafe-eval' (CSP3, Chrome / Edge / Safari 16.4+) together with 'unsafe-eval' (older WebKit engines do not understand the former)",
+        "When tracing fails because WebAssembly is blocked by the CSP, the tool now says so explicitly (keeping the original error) instead of suggesting a smaller trace size",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-09-23 V2.15.0 Release", "2026-09-23 V2.15.0 Release", "2026-09-23 V2.15.0 Release"),
     items: trio(
       [

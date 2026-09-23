@@ -1,3 +1,15 @@
+# MagicTools v2.15.1
+
+## 更新内容
+
+### 🐛 修复
+
+- 修复「**图片转 SVG**」在桌面端**无法矢量化**的问题：`index.html` 的 CSP `script-src` 未放行 WebAssembly，导致 VTracer 编译 wasm 时被拦截并报错 `Compiling or instantiating WebAssembly module violates the following Content Security policy directive ...`。现补充 `'wasm-unsafe-eval'`（CSP3，Chrome / Edge / Safari 16.4+）与 `'unsafe-eval'`（旧版 WebKit，如 macOS 12 / 部分 Linux WebKitGTK 不识别前者）
+
+### 🛠 体验优化
+
+- 「图片转 SVG」矢量化失败时，若错误来自 **WebAssembly 被 CSP 拦截**，改提示「当前环境禁止运行 WebAssembly (CSP 限制)」并保留原始报错，不再让用户误以为是「处理尺寸太大」
+
 # MagicTools v2.15.0
 
 ## 更新内容

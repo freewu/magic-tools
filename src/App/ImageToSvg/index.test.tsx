@@ -235,4 +235,15 @@ describe('ImageToSvg 导出', () => {
     await waitFor(() => expect(screen.getByText(/矢量化失败/)).toBeInTheDocument(), { timeout: 4000 });
     expect(btn('保存 SVG')).toBeDisabled();
   });
+
+  test('WebAssembly 被 CSP 拦截时给出专门的提示', async () => {
+    (rasterToSvg as jest.Mock).mockRejectedValueOnce(new Error(
+      'Compiling or instantiating WebAssembly module violates the following Content Security policy directive',
+    ));
+    const { container } = render(<ImageToSvg />);
+    const zone = container.querySelector('div[style*="dashed"]') as HTMLElement;
+    fireEvent.drop(zone, { dataTransfer: { files: [ new File([ 'x' ], 'csp.png', { type: 'image/png' }) ] } });
+    await waitFor(() => expect(screen.getByText(/禁止运行 WebAssembly/)).toBeInTheDocument(), { timeout: 4000 });
+    expect(screen.queryByText(/矢量化失败/)).toBeNull();
+  });
 });

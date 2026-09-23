@@ -24,6 +24,7 @@ const rows: Record<string, [string, string]> = {
   '图片解析失败': ['圖片解析失敗', 'Failed to decode the image'],
   '当前环境不支持 Canvas, 无法处理图片': ['目前環境不支援 Canvas, 無法處理圖片', 'Canvas is unavailable in this environment, so the image cannot be processed'],
   '矢量化失败, 请重试或把「处理尺寸」调小': ['向量化失敗, 請重試或把「處理尺寸」調小', 'Vectorization failed; retry or lower the trace size'],
+  '当前环境禁止运行 WebAssembly (CSP 限制), 无法矢量化; 请更新应用或改用浏览器版': ['目前環境禁止執行 WebAssembly (CSP 限制), 無法向量化; 請更新應用程式或改用瀏覽器版', 'WebAssembly is blocked in this environment (CSP restriction), so vectorization is unavailable; please update the app or use the browser version'],
 
   // 选择 / 预览
   '拖拽图片到此处, 或点击「选择图片」': ['拖曳圖片到此處, 或點擊「選擇圖片」', 'Drop an image here, or click "Choose image"'],
