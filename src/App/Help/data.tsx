@@ -36,6 +36,7 @@ export const compomentList: HelpComponent[] = [
   { name: "Mermaid", version: "11.17.2", url: "https://mermaid.js.org/", color: "FF3670", logo: "mermaid" },
   { name: "Vditor", version: "4.0.0", url: "https://github.com/Vanessa219/vditor" },
   { name: "SVGO", version: "4.1.0", url: "https://github.com/svg/svgo", logo: "svg" },
+  { name: "VTracer", version: "0.1.0", url: "https://github.com/visioncortex/vtracer", color: "B7410E", logo: "rust" },
   { name: "JsBarcode", version: "3.12.3", url: "https://github.com/lindell/JsBarcode" },
   { name: "figlet.js", version: "1.11.4", url: "https://github.com/patorjk/figlet.js" },
   { name: "html-to-image", version: "1.11.13", url: "https://github.com/bubkoo/html-to-image" },
@@ -75,6 +76,24 @@ const tri = (zh: string, tw: string, en: string) => ({ 'zh-CN': zh, 'zh-TW': tw,
 const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-TW': tw, en });
 
 export const eventList: HelpEvent[] = [
+  {
+    color: "green",
+    title: tri("2026-09-23 V2.15.0 Release", "2026-09-23 V2.15.0 Release", "2026-09-23 V2.15.0 Release"),
+    items: trio(
+      [
+        "新增「图片转 SVG」工具 (图片): 基于 VTracer (Rust 编写的矢量化引擎, 编译为 WebAssembly) 把位图描线成矢量 SVG —— 相近颜色聚成色块, 轮廓拟合成贝塞尔曲线或多边形, 放大不糊、可直接用 CSS 缩放; 支持彩色分层 (照片 / 插画) 与黑白二值 (线稿 / 印章 / 扫描件) 两种颜色模式, 黑白二值会先把像素转灰度再判定, 判定符合直觉; 曲线拟合可选平滑曲线 / 直线多边形 / 像素方块 (像素画专用), 层叠可选叠加 (文件更小) 与镂空 (每块互不重叠, 便于逐块改色); 13 项参数 (斑点过滤 / 颜色精度 / 层间色差 / 棱角阈值 / 曲线细分长度 / 平滑迭代 / 拼接阈值 / 坐标精度等) 支持滑块 + 数字框微调, 并内置 7 组预设 (默认 / 照片 / 扁平插画 / 海报色块 / 线稿手绘 / 印章文字 / 像素风); 「处理尺寸」可选原尺寸 / 2048 / 1024 / 512 px (先缩小再描线可快数倍, 矢量图与分辨率无关, 默认 1024), 原尺寸超大图有像素总量兜底; 自动重算结果为防抖延迟执行, 期间顶部显示处理中; 结果区给出原图尺寸·体积、处理尺寸、路径数量、SVG 体积、体积对比与耗时, 被缩放时附提示; 可展开查看 SVG 源码, 一键复制或保存为 原名_vector.svg; 导出的 SVG 自动补 viewBox, 图片与计算全程留在本机",
+        "图片转 SVG 的 WASM 包装与引擎按需加载 (只有打开该页并开始矢量化时才拉取, 不增加首屏体积), 并新增 Help「使用组件」中的 VTracer",
+      ],
+      [
+        "新增「圖片轉 SVG」工具 (圖片): 以 VTracer (Rust 撰寫的向量化引擎, 編譯為 WebAssembly) 把點陣圖描線成向量 SVG —— 相近顏色聚成色塊, 輪廓擬合成貝茲曲線或多邊形, 放大不糊、可直接用 CSS 縮放; 支援彩色分層 (照片 / 插畫) 與黑白二值 (線稿 / 印章 / 掃描件) 兩種顏色模式, 黑白二值會先把像素轉灰階再判定, 判定符合直覺; 曲線擬合可選平滑曲線 / 直線多邊形 / 像素方塊 (像素畫專用), 層疊可選疊加 (檔案更小) 與鏤空 (每塊互不重疊, 便於逐塊改色); 13 項參數 (斑點過濾 / 顏色精度 / 層間色差 / 稜角閾值 / 曲線細分長度 / 平滑迭代 / 拼接閾值 / 座標精度等) 支援滑桿 + 數字框微調, 並內建 7 組預設 (預設 / 照片 / 扁平插畫 / 海報色塊 / 線稿手繪 / 印章文字 / 像素風); 「處理尺寸」可選原尺寸 / 2048 / 1024 / 512 px (先縮小再描線可快數倍, 向量圖與解析度無關, 預設 1024), 原尺寸超大圖有像素總量兜底; 自動重算結果以防抖延遲執行, 期間頂部顯示處理中; 結果區給出原圖尺寸·體積、處理尺寸、路徑數量、SVG 體積、體積對比與耗時, 被縮放時附提示; 可展開檢視 SVG 原始碼, 一鍵複製或儲存為 原名_vector.svg; 匯出的 SVG 自動補 viewBox, 圖片與計算全程留在本機",
+        "圖片轉 SVG 的 WASM 包裝與引擎採按需載入 (只有開啟該頁並開始向量化時才拉取, 不增加首屏體積), 並新增 Help「使用元件」中的 VTracer",
+      ],
+      [
+        "New “Image to SVG” tool (Image): traces bitmaps into vector SVG with VTracer (a vectorization engine written in Rust and compiled to WebAssembly) — similar colors are merged into shapes and outlines are fitted with Bézier curves or polygons, so the result scales without blurring and can be sized from CSS; two color modes cover color layering (photos, illustrations) and black & white (line art, stamps, scans), and the B&W mode converts pixels to grayscale first so the threshold matches what you see; curve fitting offers smooth splines, straight polygons or pixel blocks (for pixel art), while layering is either stacked (smaller files) or cutout (shapes never overlap, easy to recolor one by one); 13 parameters (speckle filter, color precision, layer difference, corner threshold, segment length, smoothing iterations, splice threshold, coordinate precision, …) come with sliders plus number inputs, backed by 7 presets (Default / Photo / Flat illustration / Poster / Line art / Stamp & text / Pixel art); “Trace size” offers original / 2048 / 1024 / 512 px (tracing a smaller copy is several times faster and vector output is resolution independent, default 1024) with a pixel-count cap as a safety net for huge originals; results are recomputed automatically with a debounce, showing a processing tag meanwhile; the stats panel reports original dimensions and size, traced dimensions, path count, SVG size, size vs. original and time taken, with a note when the image was scaled down; the SVG source can be expanded, copied or saved as name_vector.svg; exported SVGs get a viewBox injected, and both the image and the computation stay on your machine",
+        "The WASM wrapper and engine load on demand (only when this page starts tracing, so the first-screen bundle is unaffected), and VTracer was added to the Help page's “Components” card",
+      ],
+    ),
+  },
   {
     color: "green",
     title: tri("2026-09-21 V2.14.0 Release", "2026-09-21 V2.14.0 Release", "2026-09-21 V2.14.0 Release"),

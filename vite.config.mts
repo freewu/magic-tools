@@ -196,6 +196,11 @@ export default defineConfig({
           if (id.includes('node_modules/svgo/dist/svgo.browser.js')) {
             return undefined;
           }
+          // vtracer-wasm (图片转 SVG 的 WASM 包装, 仅该页动态 import): 同样独立按需加载,
+          // 混入 vendor-misc 会被入口静态预载
+          if (id.includes('node_modules/vtracer-wasm/')) {
+            return undefined;
+          }
           return 'vendor-misc';
         },
       },

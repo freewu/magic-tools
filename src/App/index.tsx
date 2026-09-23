@@ -109,6 +109,7 @@ const list = [
   'ImageGrayscale',
   'ImageSharpen',
   'ImageColorPicker',
+  'ImageToSvg',
   'AsciiTextArt',
   'HtmlStripText',
   'CodeShot',
