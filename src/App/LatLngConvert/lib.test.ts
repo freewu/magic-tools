@@ -9,6 +9,7 @@ import {
   parseCoord,
   splitPair,
 } from './lib';
+import { sampleList } from './data';
 
 const okFormat = (input: string, format: 'AUTO' | 'DD' | 'DMS' | 'DM' | 'NMEA' = 'AUTO', order: 'latlng' | 'lnglat' = 'latlng') => {
   const r = convertCoordinate(input, { format, order });
@@ -163,5 +164,32 @@ describe('经纬度格式: 格式化函数', () => {
     expect(formatNMEA(39.20567, true)).toBe('3912.3402N');
     expect(formatNMEA(116.12345, false)).toBe('11607.4070E');
     expect(formatNMEA(7.5, false)).toBe('00730.0000E');
+  });
+});
+
+describe('经纬度格式: 页面示例', () => {
+  it('每个示例都能被自动识别并算出四种格式', () => {
+    sampleList.forEach((s) => {
+      const r = convertCoordinate(s.text, { format: 'AUTO', order: 'latlng' });
+      expect(r.rows.map((x) => x.key)).toEqual([ 'DD', 'DMS', 'DM', 'NMEA' ]);
+      expect(Math.abs(Number(r.rows[0].lat))).toBeLessThanOrEqual(90);
+      expect(Math.abs(Number(r.rows[0].lng))).toBeLessThanOrEqual(180);
+    });
+  });
+
+  it('「经度在前」示例自动纠正为纬度在前', () => {
+    const s = sampleList.find((x) => x.key === 'lnglat');
+    const r = convertCoordinate(s!.text, { format: 'AUTO', order: 'latlng' });
+    expect(r.rows[0].lat).toBe('39.908722');
+    expect(r.rows[0].lng).toBe('116.3975');
+  });
+
+  it('南纬 / 西经示例输出带 S / W', () => {
+    const s = sampleList.find((x) => x.key === 'south');
+    const r = convertCoordinate(s!.text, { format: 'AUTO', order: 'latlng' });
+    expect(r.rows[0].lat).toBe('-22.906847');
+    expect(r.rows[0].lng).toBe('-43.172896');
+    expect(r.rows[1].lat).toContain('S');
+    expect(r.rows[1].lng).toContain('W');
   });
 });

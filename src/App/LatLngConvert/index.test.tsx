@@ -31,6 +31,15 @@ describe('经纬度格式转换 页面', () => {
     expect(screen.getByText(/纬度超出范围/)).toBeInTheDocument();
   });
 
+  it('点击示例可载入并转换', () => {
+    renderPage();
+    fireEvent.click(screen.getByRole('button', { name: '度分秒' }));
+    expect(screen.getByDisplayValue('39.908722')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('116.3975')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('39°54′31.4″N')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('3954.5233N')).toBeInTheDocument();
+  });
+
   it('清除按钮清空结果', () => {
     const { container } = renderPage();
     const ta = container.querySelector('textarea') as HTMLTextAreaElement;

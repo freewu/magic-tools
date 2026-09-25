@@ -78,6 +78,21 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-09-25 V2.16.1 Release", "2026-09-25 V2.16.1 Release", "2026-09-25 V2.16.1 Release"),
+    items: trio(
+      [
+        "「经纬度格式转换」新增示例坐标一键载入: 提供 6 个示例 (十进制 / 度分秒 / 度分 / 国家标准 / 经度在前 / 南纬·西经), 点击即填入并立即转换, 便于快速了解四种格式的写法差异; 示例均取自同一地点, 方便对照四种格式的对应关系",
+      ],
+      [
+        "「經緯度格式轉換」新增範例座標一鍵載入: 提供 6 個範例 (十進位 / 度分秒 / 度分 / 國家標準 / 經度在前 / 南緯·西經), 點擊即填入並立即轉換, 便於快速了解四種格式的寫法差異; 範例均取自同一地點, 方便對照四種格式的對應關係",
+      ],
+      [
+        "“Latitude / Longitude Format Converter” gained one-click sample coordinates: six examples (decimal / DMS / DM / national standard / longitude first / south · west) fill the box and convert immediately, making the differences between the four notations easy to grasp; all samples come from the same location so the notations can be compared side by side",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-09-25 V2.16.0 Release", "2026-09-25 V2.16.0 Release", "2026-09-25 V2.16.0 Release"),
     items: trio(
       [

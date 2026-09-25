@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Input, Radio, Button, Space, Divider, message, Collapse } from "antd";
 import { copyTextToClipboard } from "./../../lib";
-import { formatList, orderList, type FormatValue, type OrderValue } from "./data";
+import { formatList, orderList, sampleList, type FormatValue, type OrderValue } from "./data";
 import {
   convertCoordinate,
   getDefaultFormat,
@@ -113,6 +113,18 @@ const LatLngConvert = () => {
           style={{ backgroundColor: '#dc3545', color: '#fff' }}
         >{ t('clear', '清除') }</Button>
       </Space>
+
+      <div style={{ margin: '0 0 4px 0', color: '#888', lineHeight: 2 }}>
+        { t('sampleTitle', '示例') }
+        <Space wrap size={[ 12, 0 ]} style={{ marginLeft: 10 }}>
+          { sampleList.map((s) => (
+            <Button
+              key={ s.key } type="link" size="small" style={{ padding: 0, height: 'auto' }}
+              onClick={ () => { setValue(s.text); run(s.text, format, order); } }
+            >{ t('sample_' + s.key, s.key) }</Button>
+          )) }
+        </Space>
+      </div>
 
       <TextArea
         style={{ margin: '2px 0 5px 0' }}

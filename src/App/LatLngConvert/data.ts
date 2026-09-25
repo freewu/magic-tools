@@ -13,5 +13,15 @@ export const orderList = [
   { label: '经度在前', value: 'lnglat' },
 ];
 
+// 示例坐标 (点击载入, 覆盖四种格式与南北/东西半球, 以及经度在前的写法)
+export const sampleList = [
+  { key: 'dd', text: '39.908722, 116.3975' },
+  { key: 'dms', text: '39°54′31.40″N, 116°23′51.00″E' },
+  { key: 'dm', text: '39°54.5233′N, 116°23.85′E' },
+  { key: 'nmea', text: '3954.5233N, 11623.8500E' },
+  { key: 'lnglat', text: '116°23′51.00″E, 39°54′31.40″N' },
+  { key: 'south', text: '-22.906847, -43.172896' },
+];
+
 export type FormatValue = 'AUTO' | 'DD' | 'DMS' | 'DM' | 'NMEA';
 export type OrderValue = 'latlng' | 'lnglat';
