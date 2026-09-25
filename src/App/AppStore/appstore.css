@@ -52,6 +52,15 @@
   opacity: 0.55;
 }
 
+/* 空结果: 关键词/分类筛选后无匹配应用 */
+.appstore-empty {
+  width: 100%;
+  padding: 40px 0;
+  display: flex;
+  justify-content: center;
+  opacity: 0.75;
+}
+
 .app {
   position: relative;
   width: 168px;

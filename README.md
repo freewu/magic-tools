@@ -54,7 +54,7 @@ HTML stripper · Browser fingerprint · CSR request generator (WebCrypto RSA + P
 ### 🧩 Utilities *(10)*
 CSS colors · Line counter · Regex tester (17 presets) · File diff · Keyboard key info · Chmod calculator · ASCII text art · CIDR calculator · WebSocket debugger · Teleprompter (speed / fade / line focus / fullscreen, Space to play·pause, defaults editable in Settings / saveable from the page)
 
-> Plus built-in app pages: **App Center**, **Help & changelog**, **Settings**.
+> Plus built-in app pages: **App Center** (search by app or category name, plus category filter), **Help & changelog**, **Settings**.
 
 ## 💻 Download
 
