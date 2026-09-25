@@ -2,7 +2,7 @@
 
 # 🧰 Magic Tools
 
-**全能開發工具箱 —— 9 大分類、133 個實用工具，桌面 + Web 雙端。**
+**全能開發工具箱 —— 9 大分類、134 個實用工具，桌面 + Web 雙端。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
@@ -27,8 +27,8 @@
 
 > 頂部可切換 **English** 與 **简体中文** 版本。
 
-### 🔐 加解密 *(21)*
-AES 加解密 · RSA 加解密 · SM2 加解密 · SM4 加解密 · 凱撒加解密 · 柵欄加解密 · 維吉尼亞加解密 · 希爾加解密 · Cisco Type 7 · DES 加解密 · Blowfish 加解密 · Rabbit 加解密 · RC2 加解密 · RC4 加解密 · RC5 加解密 · RC6 加解密 · ChaCha20 加解密 · 3DES 加解密 · TEA 加解密 · XTEA 加解密 · XXTEA 加解密
+### 🔐 加解密 *(22)*
+AES 加解密 · RSA 加解密 · SM2 加解密 · SM4 加解密 · SM9 加解密 · 凱撒加解密 · 柵欄加解密 · 維吉尼亞加解密 · 希爾加解密 · Cisco Type 7 · DES 加解密 · Blowfish 加解密 · Rabbit 加解密 · RC2 加解密 · RC4 加解密 · RC5 加解密 · RC6 加解密 · ChaCha20 加解密 · 3DES 加解密 · TEA 加解密 · XTEA 加解密 · XXTEA 加解密
 
 ### 🧮 值計算 *(15)*
 Hash 值計算 · HmacHash 值計算 · SHA3 Hash 值計算 · Keccak Hash 值計算 · BCrypt · Scrypt · PBKDF2 值計算 · CMAC 計算 · HKDF 計算 · KMAC 計算 · PPI 計算 · 原碼/反碼/補碼計算 · BCC 校驗 · LRC 校驗 · CRC 校驗
@@ -91,15 +91,15 @@ magic-tools
 │   │   ├── app-modules.ts    # 建置期用 import.meta.glob 靜態收集 (取代 webpack context 動態匯入)
 │   │   ├── app-i18n.ts       # 應用註冊表: appNameOf() 等取各工具/固定頁三語名稱
 │   │   ├── lang-packs.ts     # 彙總各工具 lang.ts 的預設語言包 (default 匯出)
-│   │   └── <工具>/           # 每工具一個目錄 (目前 133 個, 清單見下) — 兩步註冊
+│   │   └── <工具>/           # 每工具一個目錄 (目前 134 個, 清單見下) — 兩步註冊
 │   │       ├── define.tsx    # 註冊中繼資料: AppName(zh-CN 預設名) / Icon / Type(分組)
 │   │       ├── index.tsx     # 工具頁面元件 (預設匯出, 懶載入)
 │   │       ├── lang.ts       # 預設語言包 + 三語詞條 (zh 短語即 key, 值=[zh-TW, en]) + 本地取詞函式
 │   │       ├── lib.ts        # 純函式邏輯, 頁面與單測共用 (絕大多數工具)
-│   │       ├── lib.test.ts   # jest 單測 (91 個工具)
-│   │       ├── data.ts       # 選項/常數表與型別 (59 個工具)
-│   │       ├── setting.tsx   # 設定中心內本工具的設定面板 (65 個工具)
-│   │       └── intro.tsx     # About/說明 三語內容 (41 個工具)
+│   │       ├── lib.test.ts   # jest 單測 (92 個工具)
+│   │       ├── data.ts       # 選項/常數表與型別 (60 個工具)
+│   │       ├── setting.tsx   # 設定中心內本工具的設定面板 (66 個工具)
+│   │       └── intro.tsx     # About/說明 三語內容 (42 個工具)
 │   ├── layout/           # 主框架: 側邊欄/內容區
 │   ├── hook/             # 全域狀態: 主題/應用上下文
 │   └── lib/              # 共用工具庫
@@ -110,9 +110,9 @@ magic-tools
 
 ### `src/App/` 現有工具清單
 
-[`src/App/`](src/App/) 下現有 **133** 個工具目錄, 每個目錄 = 一個工具, 由其中 `define.tsx` 宣告。**新增工具需兩步登記**：(1) 把目錄名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 陣列 (該陣列決定側邊欄/應用中心選單順序與路由; `import.meta.glob` 只負責發現頁面元件, 不決定選單); (2) 把其 `lang.ts` 預設匯出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名稱與介面文案才能隨語言切換。按下表 `Type` 分組列出 (與側邊欄/上方功能總覽一致), 括號內為目錄數。除下列公共檔案外, 個別工具另有私有檔案 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
+[`src/App/`](src/App/) 下現有 **134** 個工具目錄, 每個目錄 = 一個工具, 由其中 `define.tsx` 宣告。**新增工具需兩步登記**：(1) 把目錄名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 陣列 (該陣列決定側邊欄/應用中心選單順序與路由; `import.meta.glob` 只負責發現頁面元件, 不決定選單); (2) 把其 `lang.ts` 預設匯出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名稱與介面文案才能隨語言切換。按下表 `Type` 分組列出 (與側邊欄/上方功能總覽一致), 括號內為目錄數。除下列公共檔案外, 個別工具另有私有檔案 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
 
-**🔐 加解密 *(21)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
+**🔐 加解密 *(22)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `SM9Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
 
 **🧮 值計算 *(15)*** — `BCCCheck` · `BcryptCalc` · `CMACCalc` · `CRCCheck` · `ComplementCalc` · `HKDFCalc` · `Hash` · `HmacHash` · `KMACCalc` · `KeccakHash` · `LRCCheck` · `PBKDF2Calc` · `PPICalc` · `SHA3Hash` · `ScryptCalc`
 

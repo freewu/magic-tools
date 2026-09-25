@@ -32,6 +32,7 @@ const list = [
   'RSACrypto',
   'SM2Crypto',
   'SM4Crypto',
+  'SM9Crypto',
   'CaesarCrypto',
   'RailFenceCrypto',
   'VigenereCrypto',

@@ -4,6 +4,7 @@ import { AESCryptoSetting } from "../AESCrypto/setting";
 import { RSACryptoSetting } from "../RSACrypto/setting";
 import { SM2CryptoSetting } from "../SM2Crypto/setting";
 import { SM4CryptoSetting } from "../SM4Crypto/setting";
+import { SM9CryptoSetting } from "../SM9Crypto/setting";
 import { CaesarCryptoSetting } from "../CaesarCrypto/setting";
 import { RailFenceCryptoSetting } from "../RailFenceCrypto/setting";
 import { VigenereCryptoSetting } from "../VigenereCrypto/setting";
@@ -29,6 +30,7 @@ export const SettingCrypto = () => {
       <RSACryptoSetting />
       <SM2CryptoSetting />
       <SM4CryptoSetting />
+      <SM9CryptoSetting />
       <CaesarCryptoSetting />
       <RailFenceCryptoSetting />
       <VigenereCryptoSetting />

@@ -2,7 +2,7 @@
 
 # 🧰 Magic Tools
 
-**An all-in-one developer toolbox — 133 utilities in 9 categories, cross-platform desktop & Web.**
+**An all-in-one developer toolbox — 134 utilities in 9 categories, cross-platform desktop & Web.**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
@@ -27,8 +27,8 @@
 
 > Click the language switcher at the top to read this document in **简体中文** or **繁體中文**.
 
-### 🔐 Cryptography *(21)*
-AES · DES · 3DES · RSA · SM2 · SM4 · ChaCha20 · Blowfish · Rabbit · RC2 · RC4 · RC5 · RC6 · TEA · XTEA · XXTEA · Caesar · Rail Fence · Vigenère · Hill · Cisco Type 7
+### 🔐 Cryptography *(22)*
+AES · DES · 3DES · RSA · SM2 · SM4 · SM9 · ChaCha20 · Blowfish · Rabbit · RC2 · RC4 · RC5 · RC6 · TEA · XTEA · XXTEA · Caesar · Rail Fence · Vigenère · Hill · Cisco Type 7
 
 ### 🧮 Hash, MAC & Value Calculators *(15)*
 Hash (MD5/SHA1/SHA2/SM3/…) · HMAC · SHA-3 · Keccak · BCrypt · Scrypt · PBKDF2 · CMAC · HKDF · KMAC · PPI · Complement (sign-magnitude / 1's / 2's) · BCC checksum · LRC checksum · CRC checksum (30+ parameterised standards)
@@ -91,15 +91,15 @@ magic-tools
 │   │   ├── app-modules.ts    # build-time collection via import.meta.glob (replaces webpack context)
 │   │   ├── app-i18n.ts       # app registry: appNameOf() trilingual names for tools & fixed pages
 │   │   ├── lang-packs.ts     # aggregates every tool's default language pack (lang.ts default export)
-│   │   └── <Tool>/           # one folder per tool (133, grouped list below) — 2-step registration
+│   │   └── <Tool>/           # one folder per tool (134, grouped list below) — 2-step registration
 │   │       ├── define.tsx    # registration metadata: AppName (zh-CN default) / Icon / Type (category)
 │   │       ├── index.tsx     # tool page component (default export; lazy-loaded)
 │   │       ├── lang.ts       # default language pack + rows (zh phrase = key → [zh-TW, en]) + lookup helpers
 │   │       ├── lib.ts        # pure logic shared by the page and its unit tests (most tools)
-│   │       ├── lib.test.ts   # jest unit tests (95 tools)
-│   │       ├── data.ts       # option tables / constants / types (59 tools)
-│   │       ├── setting.tsx   # this tool's panel inside the Settings center (65 tools)
-│   │       └── intro.tsx     # About / instructions content, trilingual (45 tools)
+│   │       ├── lib.test.ts   # jest unit tests (96 tools)
+│   │       ├── data.ts       # option tables / constants / types (60 tools)
+│   │       ├── setting.tsx   # this tool's panel inside the Settings center (66 tools)
+│   │       └── intro.tsx     # About / instructions content, trilingual (46 tools)
 │   ├── layout/           # main frame: sidebar / content
 │   ├── hook/             # global state: theme / app context
 │   └── lib/              # shared utilities
@@ -110,9 +110,9 @@ magic-tools
 
 ### Existing tools under `src/App/`
 
-133 tool folders live under [`src/App/`](src/App/) and each holds one tool declared by its `define.tsx`. **Adding a tool takes two steps:** (1) append the folder name to the `list` array in [`src/App/index.tsx`](src/App/index.tsx) — that hand-maintained registry drives the sidebar / App Center menu order and routing, while `import.meta.glob` only discovers the page component; (2) add its `lang.ts` default export to [`src/App/lang-packs.ts`](src/App/lang-packs.ts) so names/UI strings can be translated. Grouped below by the `Type` registered in `define.tsx` (same categories as the sidebar / [feature overview](#-feature-overview)). Some tools add tool-specific files besides the common ones (e.g. `AESCrypto/gcm.ts`, `Hash/sm3.ts`+`keccak.ts`, `CronRules/parse.tsx`, `Setting/setting-*.tsx`):
+134 tool folders live under [`src/App/`](src/App/) and each holds one tool declared by its `define.tsx`. **Adding a tool takes two steps:** (1) append the folder name to the `list` array in [`src/App/index.tsx`](src/App/index.tsx) — that hand-maintained registry drives the sidebar / App Center menu order and routing, while `import.meta.glob` only discovers the page component; (2) add its `lang.ts` default export to [`src/App/lang-packs.ts`](src/App/lang-packs.ts) so names/UI strings can be translated. Grouped below by the `Type` registered in `define.tsx` (same categories as the sidebar / [feature overview](#-feature-overview)). Some tools add tool-specific files besides the common ones (e.g. `AESCrypto/gcm.ts`, `Hash/sm3.ts`+`keccak.ts`, `CronRules/parse.tsx`, `Setting/setting-*.tsx`):
 
-**🔐 Cryptography *(21)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
+**🔐 Cryptography *(22)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `SM9Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
 
 **🧮 Hash, MAC & Value Calculators *(15)*** — `BCCCheck` · `BcryptCalc` · `CMACCalc` · `CRCCheck` · `ComplementCalc` · `HKDFCalc` · `Hash` · `HmacHash` · `KMACCalc` · `KeccakHash` · `LRCCheck` · `PBKDF2Calc` · `PPICalc` · `SHA3Hash` · `ScryptCalc`
 

@@ -19,6 +19,7 @@ import AESCrypto from './AESCrypto/lang';
 import RSACrypto from './RSACrypto/lang';
 import SM2Crypto from './SM2Crypto/lang';
 import SM4Crypto from './SM4Crypto/lang';
+import SM9Crypto from './SM9Crypto/lang';
 import CaesarCrypto from './CaesarCrypto/lang';
 import RailFenceCrypto from './RailFenceCrypto/lang';
 import VigenereCrypto from './VigenereCrypto/lang';
@@ -157,6 +158,7 @@ export const langPacks = {
   RSACrypto: RSACrypto,
   SM2Crypto: SM2Crypto,
   SM4Crypto: SM4Crypto,
+  SM9Crypto: SM9Crypto,
   CaesarCrypto: CaesarCrypto,
   RailFenceCrypto: RailFenceCrypto,
   VigenereCrypto: VigenereCrypto,
