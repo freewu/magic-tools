@@ -1,5 +1,11 @@
-// JWT 解码器 (RFC 7519)
-// 仅做结构与 base64url 解码, 不校验签名
+// JWT 编解码器 (RFC 7519)
+// 解析: 仅做结构与 base64url 解码, 不校验签名
+// 生成: HS256 / HS384 / HS512 (HMAC) 与 none, 签名用 crypto-js 的 HMAC 实现
+
+import HmacSHA256 from 'crypto-js/hmac-sha256';
+import HmacSHA384 from 'crypto-js/hmac-sha384';
+import HmacSHA512 from 'crypto-js/hmac-sha512';
+import Base64url from 'crypto-js/enc-base64url';
 
 export type JwtPart = {
   raw: string;             // base64url 原文
@@ -102,4 +108,121 @@ export const jwtDecode = (token :string) :JwtDecodeResult => {
 export const partText = (p :JwtPart) :string => {
   if (p.json) return JSON.stringify(p.json, null, 2);
   return p.text;
+};
+
+// ---------- 生成 (编码) ----------
+
+/** 支持的签名算法 (HMAC 系列 + 不签名) */
+export type JwtAlg = 'HS256' | 'HS384' | 'HS512' | 'none';
+
+export type JwtEncodeResult = {
+  ok: boolean;
+  token?: string;          // 完整 JWT
+  headerB64?: string;      // 头部 base64url
+  payloadB64?: string;     // 负载 base64url
+  signatureB64?: string;   // 签名 base64url (alg=none 时为空)
+  signatureHex?: string;   // 签名 HEX (alg=none 时为空)
+  error?: string;
+};
+
+// 字节数组 -> base64url (无填充), 与上方 base64UrlToBytes 互为逆向
+const BASE64URL_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+export const base64UrlEncodeBytes = (bytes :Uint8Array) :string => {
+  let out = '';
+  for (let i = 0; i < bytes.length; i += 3) {
+    const b0 = bytes[i];
+    const b1 = i + 1 < bytes.length ? bytes[i + 1] : undefined;
+    const b2 = i + 2 < bytes.length ? bytes[i + 2] : undefined;
+    out += BASE64URL_CHARS[b0 >> 2];
+    out += BASE64URL_CHARS[((b0 & 0x03) << 4) | ((b1 ?? 0) >> 4)];
+    if (b1 === undefined) break;
+    out += BASE64URL_CHARS[((b1 & 0x0f) << 2) | ((b2 ?? 0) >> 6)];
+    if (b2 === undefined) break;
+    out += BASE64URL_CHARS[b2 & 0x3f];
+  }
+  return out;
+};
+
+// UTF-8 文本 -> base64url
+export const base64UrlEncodeText = (text :string) :string =>
+  base64UrlEncodeBytes(new TextEncoder().encode(text));
+
+// 待解析的 JSON 对象文本 -> 对象 (非对象/非法 JSON 抛错)
+const parseJsonObject = (text :string, label :string) :Record<string, unknown> => {
+  const s = text.trim();
+  if (s === '') throw new Error(`${label}不能为空`);
+  let v :unknown;
+  try {
+    v = JSON.parse(s);
+  } catch (err) {
+    throw new Error(`${label}不是合法 JSON: ${(err as Error).message}`);
+  }
+  if (typeof v !== 'object' || v === null || Array.isArray(v)) {
+    throw new Error(`${label}必须是 JSON 对象`);
+  }
+  return v as Record<string, unknown>;
+};
+
+// Base64 / base64url 密钥 -> WordArray (非法返回 null)
+const parseBase64Key = (secret :string) :ReturnType<typeof Base64url.parse> | null => {
+  const s = secret.trim().replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
+  if (s === '' || s.length % 4 === 1 || !/^[A-Za-z0-9_-]+$/.test(s)) return null;
+  return Base64url.parse(s);
+};
+
+/**
+ * 生成 JWT
+ * @param headerText   头部 JSON 文本 (其 alg 会被 alg 参数覆盖)
+ * @param payloadText  负载 JSON 文本
+ * @param secret       签名密钥 (alg=none 时忽略)
+ * @param alg          签名算法
+ * @param secretIsBase64 密钥是否按 Base64 解码为字节
+ */
+export const jwtEncode = (
+  headerText :string,
+  payloadText :string,
+  secret :string,
+  alg :JwtAlg,
+  secretIsBase64 = false,
+) :JwtEncodeResult => {
+  let header :Record<string, unknown>;
+  let payload :Record<string, unknown>;
+  try {
+    header = parseJsonObject(headerText, '头部 (header)');
+    payload = parseJsonObject(payloadText, '负载 (payload)');
+  } catch (err) {
+    return { ok: false, error: (err as Error).message };
+  }
+
+  if (alg !== 'none' && secret === '') {
+    return { ok: false, error: '请输入密钥 (secret)' };
+  }
+
+  const headerB64 = base64UrlEncodeText(JSON.stringify({ ...header, alg }));
+  const payloadB64 = base64UrlEncodeText(JSON.stringify(payload));
+  const signingInput = `${headerB64}.${payloadB64}`;
+
+  let signatureB64 = '';
+  if (alg !== 'none') {
+    let key :string | ReturnType<typeof Base64url.parse> = secret;
+    if (secretIsBase64) {
+      const wa = parseBase64Key(secret);
+      if (wa === null) return { ok: false, error: '密钥不是合法的 Base64' };
+      key = wa;
+    }
+    const hmac =
+      alg === 'HS256' ? HmacSHA256(signingInput, key) :
+      alg === 'HS384' ? HmacSHA384(signingInput, key) :
+      HmacSHA512(signingInput, key);
+    signatureB64 = Base64url.stringify(hmac);
+  }
+
+  return {
+    ok: true,
+    headerB64,
+    payloadB64,
+    signatureB64,
+    signatureHex: signatureB64 === '' ? '' : bytesToHex(base64UrlToBytes(signatureB64)),
+    token: `${signingInput}.${signatureB64}`,
+  };
 };

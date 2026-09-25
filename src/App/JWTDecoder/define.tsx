@@ -1,4 +1,4 @@
-const AppName = 'JWT 解码器';
+const AppName = 'JWT 编解码器';
 const Icon = '';
 const Type = 'codec';
 

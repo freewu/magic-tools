@@ -14,7 +14,8 @@ const zh = `
 <li><p>粘贴完整 JWT 后自动解码并格式化显示头部 / 负载 JSON</p></li>
 <li><p>签名以 <b>HEX</b> 展示 (点击复制), base64url 原文显示于下方</p></li>
 <li><p>头部/负载 JSON 文本区域<strong>双击</strong>复制</p></li>
-<li><p>本工具仅做解码, <strong>不校验签名有效性</strong>；内容均为 base64url, 非加密, 请勿放入敏感凭据</p></li>
+<li><p><b>生成</b>页签可按算法 (HS256 / HS384 / HS512 / none) 生成 JWT: 编辑头部 / 负载 JSON, 填写密钥 (支持 Base64 密钥), 点击生成并复制</p></li>
+<li><p>本工具仅做编解码, <strong>不校验签名有效性</strong>；内容均为 base64url, 非加密, 请勿放入敏感凭据</p></li>
 <li><p>无密钥签名算法 (alg=none) 的 token 签名为空, 属非安全用法, 请谨慎信任</p></li>
 </ul>
 `;
@@ -33,7 +34,8 @@ const tw = `
 <li><p>貼上完整 JWT 後自動解碼並格式化顯示標頭 / 負載 JSON</p></li>
 <li><p>簽章以 <b>HEX</b> 顯示 (點擊複製), base64url 原文顯示於下方</p></li>
 <li><p>標頭/負載 JSON 文字區<strong>雙擊</strong>即可複製</p></li>
-<li><p>本工具僅做解碼, <strong>不驗證簽章有效性</strong>；內容皆為 base64url, 非加密, 請勿放入敏感憑證</p></li>
+<li><p><b>產生</b>頁籤可依演算法 (HS256 / HS384 / HS512 / none) 產生 JWT: 編輯標頭 / 負載 JSON, 填入金鑰 (支援 Base64 金鑰), 點擊產生並複製</p></li>
+<li><p>本工具僅做編解碼, <strong>不驗證簽章有效性</strong>；內容皆為 base64url, 非加密, 請勿放入敏感憑證</p></li>
 <li><p>無金鑰簽章演算法 (alg=none) 的 token 簽章為空, 屬不安全用法, 請謹慎信任</p></li>
 </ul>
 `;
@@ -52,7 +54,8 @@ const en = `
 <li><p>Paste a full JWT — the header / payload JSON is decoded and pretty-printed automatically</p></li>
 <li><p>The signature is shown as <b>HEX</b> (click to copy); the raw base64url text is displayed underneath</p></li>
 <li><p><strong>Double-click</strong> the header / payload JSON box to copy it</p></li>
-<li><p>This tool only decodes — it does <strong>not verify the signature</strong>; the parts are plain base64url, not encrypted, so never paste sensitive credentials</p></li>
+<li><p>The <b>Generate</b> tab signs tokens with HS256 / HS384 / HS512 or none: edit the header / payload JSON, enter a secret (Base64 secrets supported), then generate and copy</p></li>
+<li><p>This tool only encodes and decodes — it does <strong>not verify the signature</strong>; the parts are plain base64url, not encrypted, so never paste sensitive credentials</p></li>
 <li><p>A token signed with the none algorithm (alg=none) has an empty signature and is insecure; treat it with caution</p></li>
 </ul>
 `;

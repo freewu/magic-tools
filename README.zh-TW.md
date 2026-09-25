@@ -34,7 +34,7 @@ AES 加解密 · RSA 加解密 · SM2 加解密 · SM4 加解密 · 凱撒加解
 Hash 值計算 · HmacHash 值計算 · SHA3 Hash 值計算 · Keccak Hash 值計算 · BCrypt · Scrypt · PBKDF2 值計算 · CMAC 計算 · HKDF 計算 · KMAC 計算 · PPI 計算 · 原碼/反碼/補碼計算 · BCC 校驗 · LRC 校驗 · CRC 校驗
 
 ### 🔄 編解碼 *(13)*
-Base64 編解碼 · URL 編解碼 · Unicode 編解碼 · Punycode 編解碼 · UUencode 編解碼 · XXencode 編解碼 · BCD 編解碼 · 摩斯密碼編解碼 · JWT 解碼器 · HTTP Basic Auth 編解碼 · BaseX 編解碼 · Base58 編解碼 · Gzip 編解碼
+Base64 編解碼 · URL 編解碼 · Unicode 編解碼 · Punycode 編解碼 · UUencode 編解碼 · XXencode 編解碼 · BCD 編解碼 · 摩斯密碼編解碼 · JWT 編解碼器 · HTTP Basic Auth 編解碼 · BaseX 編解碼 · Base58 編解碼 · Gzip 編解碼
 
 ### ⚖️ 類型轉換 *(20)*
 時間戳轉換 · 顏色格式轉換 · 進制轉換 · 樹形和路徑轉換 · GPS 座標轉換 · 經緯度格式轉換 · IP 轉換(IPv4/IPv6 ↔ 十進位/十六進位/二進位) · 下載連結轉換 · JSONL 轉換 · 人民幣大寫 · 位元組轉換 · 中文拼音 · 溫度轉換 · 距離轉換 · 配置轉換 · 字幕格式轉換 · 速度轉換 · 容量轉換 · 面積轉換 · 重量轉換

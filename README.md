@@ -34,7 +34,7 @@ AES · DES · 3DES · RSA · SM2 · SM4 · ChaCha20 · Blowfish · Rabbit · RC2
 Hash (MD5/SHA1/SHA2/SM3/…) · HMAC · SHA-3 · Keccak · BCrypt · Scrypt · PBKDF2 · CMAC · HKDF · KMAC · PPI · Complement (sign-magnitude / 1's / 2's) · BCC checksum · LRC checksum · CRC checksum (30+ parameterised standards)
 
 ### 🔄 Codecs & Encoders *(13)*
-Base64 · URL · Unicode · Punycode · UUencode · XXencode · BCD · Morse code (with audio/WAV) · JWT decoder · HTTP Basic Auth · BaseX · Base58 · Gzip
+Base64 · URL · Unicode · Punycode · UUencode · XXencode · BCD · Morse code (with audio/WAV) · JWT decoder & encoder · HTTP Basic Auth · BaseX · Base58 · Gzip
 
 ### ⚖️ Converters *(20)*
 Unix timestamp · Color format · Radix (BIN/OCT/DEC/HEX) · Tree ↔ path · GPS coordinates · Lat/long format · IP converter (IPv4/IPv6 ↔ decimal/hex/binary) · Download-link converter · JSONL · RMB uppercase (CNY) · Byte units · Chinese Pinyin · Temperature · Distance · Config (INI/JSON/YAML/TOML/properties) · Subtitle (SRT/ASS/…) · Speed · Volume · Area · Weight
