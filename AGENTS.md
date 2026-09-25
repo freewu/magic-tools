@@ -5,6 +5,7 @@
 - 每完成一次用户要求的操作（功能实现、修复、文档更新等）后，**自动执行 `git add -A` + `git commit`**，提交信息用简洁中文概括本次改动（如 `feat:` / `fix:` / `docs:` 前缀）
 - 若改动属于同一任务的多个连续步骤，可在任务完成时统一提交一次
 - **commit 完成后自动 `git push origin master`**（默认分支为 `master`）；WSL 侧 git 通常可直接推送，若出现凭据卡认证，改用 Windows 侧执行：`cmd.exe /c "cd /d E:\work\github\magic-tools && git push origin master"`
+- **不要擅自升版本号 / 打 tag / 发 GitHub Release**：日常功能、修复、文档改动只提交并推送代码即可，版本发布见下方「版本发布流程」
 - 构建产物（`release/*.exe`、`src-tauri/target`、`dist/`）已被 `.gitignore` 忽略，无需特殊处理
 
 ## Cloudflare Pages 构建 (npm ci 同步规则)
@@ -24,20 +25,21 @@ Cloudflare Pages 使用 **Node 18 / npm 9.6.7** 构建（本地 Node 24 / npm 11
 
 ## 版本发布流程
 
-发布新版本时按顺序执行：
-
-> **重要：版本修改 → 打 tag → 触发 GitHub Action 发布 是自动流程。**
-> 只要修改了版本号（含仅升版本号、无新功能的维护性升级），提交后**必须立即**打 tag 并推送，**无需再次询问用户**；
-> 仅当用户明确说「暂不发布 / 不要打 tag」时才跳过，并在回复中说明跳过了 tag。
+> **重要：版本发布是「按指令执行」，不是自动流程。**
+> 只有收到用户的**版本发布指令**（如「发布 vX.Y.Z」「升个版本发 release」「打个 tag」「版本更新」等）时，才执行下方流程；
+> 日常开发（功能实现 / 修复 / 文档更新 / 小优化）**只提交代码**（`git commit` + push），
+> **不要**擅自修改版本号、打 tag 或创建 GitHub Release —— 这些改动会一直累积，等用户下次下发布指令时统一并入那一个版本（在 `update.md`/Help 中一起记录）。
+> 收到发布指令后才按顺序执行：
 
 1. 按下表「版本号修改位置清单」**逐一同步所有版本号**为同一新版本号
 2. 在 `update.md` **顶部**新增本版本的发布说明节（格式：`# MagicTools vX.Y.Z` + 更新内容），历史版本节**保留在其下方**；
+   本节应涵盖自上一版本以来累积的全部改动；
    **GitHub Release 说明只取本版本的更新内容**（顶部第一个版本节），不会包含历史版本内容
    - 提交前用与 workflow 同款命令本地验证提取结果头部为新版本号：
 
          awk 'BEGIN { n = 0 } /^# MagicTools v/ { n++; if (n > 1) exit } { print }' update.md | head -3
 3. 提交并推送代码（`git commit` + `git push origin master`）
-4. **自动打 tag 并推送**（无需询问，紧跟第 3 步执行）：
+4. **打 tag 并推送**（紧跟第 3 步执行）：
 
        git tag v2.1.1
        git push origin master
@@ -54,7 +56,7 @@ Cloudflare Pages 使用 **Node 18 / npm 9.6.7** 构建（本地 Node 24 / npm 11
       # 本地提取（与 workflow 同款 awk）后用 gh 或 API 更新: 先 git credential fill 拿 token,
       # 再 PATCH api.github.com/repos/freewu/magic-tools/releases/<id> 的 body 字段 (GET /releases/tags/vX.Y.Z 取 id)
 
-> 记牢：**每次版本发布 = 打 tag → 自动三平台 Release (build-release.yml) + GitHub Pages 部署 (deploy-pages.yml) 双触发**，两步均无需询问用户
+> 记牢：**每次版本发布（收到发布指令后）= 打 tag → 三平台 Release (build-release.yml) + GitHub Pages 部署 (deploy-pages.yml) 双触发**
 
 ### 版本号修改位置清单（升版本时逐一检查，勿遗漏）
 
@@ -71,3 +73,4 @@ Cloudflare Pages 使用 **Node 18 / npm 9.6.7** 构建（本地 Node 24 / npm 11
 
 - 全部改完后验证一遍：`npm test` && `npm run build:renderer`，必要时在 `src-tauri` 下 `cargo check`
 - 发布前建议在应用「帮助」页确认新增的 Vx.y.z 更新日志条目显示正常
+- 若本次仅收到普通的开发需求（未提及发布），**不要**触碰上述清单中的任何版本号文件
