@@ -69,6 +69,7 @@ import ImageSharpen from './ImageSharpen/lang';
 import ImageColorPicker from './ImageColorPicker/lang';
 import ImageToSvg from './ImageToSvg/lang';
 import GPSConvert from './GPSConvert/lang';
+import LatLngConvert from './LatLngConvert/lang';
 import DownloadLinkConvert from './DownloadLinkConvert/lang';
 import RMBConvert from './RMBConvert/lang';
 import ByteConvert from './ByteConvert/lang';
@@ -206,6 +207,7 @@ export const langPacks = {
   ImageColorPicker: ImageColorPicker,
   ImageToSvg: ImageToSvg,
   GPSConvert: GPSConvert,
+  LatLngConvert: LatLngConvert,
   DownloadLinkConvert: DownloadLinkConvert,
   RMBConvert: RMBConvert,
   ByteConvert: ByteConvert,

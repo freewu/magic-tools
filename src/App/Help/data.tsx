@@ -78,6 +78,21 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-09-25 V2.16.0 Release", "2026-09-25 V2.16.0 Release", "2026-09-25 V2.16.0 Release"),
+    items: trio(
+      [
+        "新增「经纬度格式转换」工具 (类型转换): 同一坐标在 十进制 (DD) / 度分秒 (DMS) / 度分 (DM) / 国家标准 (DDMM.mm) 四种书写格式间互转, 结果按「纬度 / 经度」两列列出, 逐格点击即可复制; 默认自动识别输入格式 (按 °′″ 等符号与数值量级判定 39.20567 / 39°12′20.41″N / 3912.34N / 11607.41E 等写法), 也可手动指定; 支持逗号 (含中文) / 空格分隔, 带 N/S/E/W 方向字母时自动按其判定纬度与经度 (如「116°E, 39°N」会自动纠正顺序), 无方向字母时可用「纬度在前 / 经度在前」切换; 十进制以正负表示北南 / 东西, 度分秒等格式输出带 S/W, 超出范围 (纬度 ±90、经度 ±180) 给出提示; 内置「格式说明」",
+      ],
+      [
+        "新增「經緯度格式轉換」工具 (類型轉換): 同一座標在 十進位 (DD) / 度分秒 (DMS) / 度分 (DM) / 國家標準 (DDMM.mm) 四種書寫格式間互轉, 結果依「緯度 / 經度」兩欄列出, 逐格點擊即可複製; 預設自動辨識輸入格式 (依 °′″ 等符號與數值量級判定 39.20567 / 39°12′20.41″N / 3912.34N / 11607.41E 等寫法), 也可手動指定; 支援逗號 (含中文) / 空格分隔, 帶 N/S/E/W 方向字母時自動依其判定緯度與經度 (如「116°E, 39°N」會自動修正順序), 無方向字母時可用「緯度在前 / 經度在前」切換; 十進位以正負表示北南 / 東西, 度分秒等格式輸出帶 S/W, 超出範圍 (緯度 ±90、經度 ±180) 給出提示; 內建「格式說明」",
+      ],
+      [
+        "New “Latitude / Longitude Format Converter” tool (Converters): converts a coordinate between decimal degrees (DD), degrees minutes seconds (DMS), degrees decimal minutes (DM) and the Chinese national format (DDMM.mm), listing latitude and longitude in two columns where every cell is click-to-copy; the input format is auto-detected by default (from °′″ symbols and magnitude for values such as 39.20567 / 39°12′20.41″N / 3912.34N / 11607.41E) but can also be picked manually; comma (including the full-width one) or whitespace separated input is accepted, and N/S/E/W letters decide which value is latitude (so “116°E, 39°N” is reordered automatically) while a latitude-first / longitude-first switch covers inputs without letters; decimal degrees use signs for south/west while DMS and friends carry S/W, and out-of-range values (latitude ±90, longitude ±180) are flagged; a built-in format reference explains all four notations",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-09-23 V2.15.1 Release", "2026-09-23 V2.15.1 Release", "2026-09-23 V2.15.1 Release"),
     items: trio(
       [

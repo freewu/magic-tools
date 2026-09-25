@@ -73,6 +73,7 @@ const list = [
   'CRCCheck',
   'Base64Image',
   'GPSConvert',
+  'LatLngConvert',
   'DownloadLinkConvert',
   'RMBConvert',
   'ByteConvert',

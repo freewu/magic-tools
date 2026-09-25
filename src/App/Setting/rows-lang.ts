@@ -21,6 +21,7 @@ const ROWS: Record<string, Row> = {
   '默认美制单位': ['預設美制單位', 'Default US unit'],
   '默认坐标类型': ['預設座標類型', 'Default coordinate type'],
   '默认输入格式': ['預設輸入格式', 'Default input format'],
+  '默认书写顺序': ['預設書寫順序', 'Default coordinate order'],
   '默认输出格式': ['預設輸出格式', 'Default output format'],
   '默认格式': ['預設格式', 'Default format'],
   '默认尺寸': ['預設尺寸', 'Default size'],
@@ -74,6 +75,7 @@ const ROWS: Record<string, Row> = {
   '默认编辑器风格': ['預設編輯器風格', 'Default editor theme'],
   // ---- 名称式 Divider ----
   'GPS坐标转换': ['GPS 座標轉換', 'GPS Coordinate Convert'],
+  '经纬度格式转换': ['經緯度格式轉換', 'Latitude / Longitude Format Convert'],
   '字节转换': ['位元組轉換', 'Byte Convert'],
   '温度转换': ['溫度轉換', 'Temperature Convert'],
   '距离转换': ['距離轉換', 'Distance Convert'],
