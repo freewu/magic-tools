@@ -78,6 +78,27 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-09-25 V2.17.0 Release", "2026-09-25 V2.17.0 Release", "2026-09-25 V2.17.0 Release"),
+    items: trio(
+      [
+        "新增「SM9 加解密」工具 (加解密): 国密 SM9 标识密码, 由 GmSSL v3.2.0 编译为 WebAssembly 实现, 全部运算在本机完成, 不联网、不上传密钥; 密钥生成一键生成加密 / 签名主密钥对, 由主私钥导出主公钥, 并按用户 ID 提取用户私钥; 加密 / 解密用加密主公钥 (或主私钥) + 用户 ID 加密, 用同一 ID 提取的用户私钥解密 (明文上限 255 字节); 签名 / 验签用签名用户私钥签名, 用签名主公钥 (或主私钥) + ID 验签; 密钥均以 DER (HEX) 展示, 支持复制 / 保存文件 / 拖入导入, 输入框下方自动识别并提示数据类型, 默认用户 ID 与默认密钥可在设置中心配置并保存在浏览器本地",
+        "「JWT 编解码器」(原「JWT 解码器」) 新增「生成」页签: 支持 HS256 / HS384 / HS512 与 none 算法, 可编辑 Header 与 Payload、一键写入 iat / exp, 密钥支持文本或 Base64; 结果给出完整 token 及 Header / Payload / 签名 (Base64、HEX) 并可逐项复制",
+        "「应用中心」支持搜索: 顶部新增搜索框, 可按应用名 (三语) / 目录名 / 分类名搜索, 与分类筛选叠加生效; 多个空格分隔关键词为「与」关系 (如 sm4 加解密), 无匹配时展示空状态提示, 应用总数实时更新",
+      ],
+      [
+        "新增「SM9 加解密」工具 (加解密): 國密 SM9 識別密碼, 由 GmSSL v3.2.0 編譯為 WebAssembly 實作, 全部運算在本機完成, 不連網、不上傳金鑰; 金鑰產生一鍵產生加密 / 簽章主金鑰對, 由主私鑰匯出主公鑰, 並依使用者 ID 提取使用者私鑰; 加密 / 解密用加密主公鑰 (或主私鑰) + 使用者 ID 加密, 用同一 ID 提取的使用者私鑰解密 (明文上限 255 位元組); 簽章 / 驗簽用簽章使用者私鑰簽章, 用簽章主公鑰 (或主私鑰) + ID 驗簽; 金鑰均以 DER (HEX) 呈現, 支援複製 / 儲存檔案 / 拖入匯入, 輸入框下方自動辨識並提示資料類型, 預設使用者 ID 與預設金鑰可在設定中心設定並儲存在瀏覽器本機",
+        "「JWT 編解碼器」(原「JWT 解碼器」) 新增「產生」頁籤: 支援 HS256 / HS384 / HS512 與 none 演算法, 可編輯 Header 與 Payload、一鍵寫入 iat / exp, 金鑰支援文字或 Base64; 結果給出完整 token 及 Header / Payload / 簽章 (Base64、HEX) 並可逐項複製",
+        "「應用中心」支援搜尋: 頂部新增搜尋框, 可按應用名稱 (三語) / 目錄名 / 分類名稱搜尋, 與分類篩選疊加生效; 多個空格分隔關鍵詞為「與」關係 (如 sm4 加解密), 無符合時顯示空狀態提示, 應用總數即時更新",
+      ],
+      [
+        "New “SM9 Encrypt / Decrypt” tool (Cryptography): Chinese SM9 identity-based cryptography, implemented by compiling GmSSL v3.2.0 to WebAssembly, with every operation running locally — no network access and no key upload; key generation creates the encryption / signature master key pairs in one click, derives master public keys from master private keys, and extracts user private keys for a given user ID; encryption / decryption encrypts with the encryption master public key (or master private key) plus the user ID and decrypts with the user private key extracted for the same ID (255-byte plaintext limit); signing / verification signs with the signature user private key and verifies with the signature master public key (or master private key) plus the ID; every key is shown as DER (HEX) with copy / save-to-file / drag-and-drop import, the field hints below each box identify the data type automatically, and the default user ID and default keys can be configured in Settings and are stored in the browser locally",
+        "“JWT Encoder / Decoder” (formerly “JWT Decoder”) gained a “Generate” tab: HS256 / HS384 / HS512 and none algorithms, editable header and payload, one-click iat / exp claims, and a secret given as plain text or Base64; the result includes the full token plus header / payload / signature (Base64 and HEX) with per-field copy buttons",
+        "The App Center now supports search: a search box in the toolbar matches app names (all three locales), folder names and category names, and combines with the category filter; space-separated keywords are ANDed (for example “sm4 encrypt”), a friendly empty state appears when nothing matches, and the app count updates live",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-09-25 V2.16.1 Release", "2026-09-25 V2.16.1 Release", "2026-09-25 V2.16.1 Release"),
     items: trio(
       [
