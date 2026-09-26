@@ -78,6 +78,24 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-09-26 V2.17.1 Release", "2026-09-26 V2.17.1 Release", "2026-09-26 V2.17.1 Release"),
+    items: trio(
+      [
+        "左右两栏宽度可拖动调整: 拖动侧边栏右边缘的分隔条即可改变左侧菜单栏宽度 (180-420 px), 右侧内容区自动跟随; 宽度自动记忆, 下次启动保持一致; 双击分隔条恢复默认 230 px, 分隔条聚焦后可用左右方向键每次微调 10 px; 侧边栏收起时分隔条自动隐藏",
+        "设置中心 -> 系统设置 新增「侧边栏宽度」滑杆, 与拖拽条同源, 调整后立即生效, 无需重启",
+      ],
+      [
+        "左右兩欄寬度可拖曳調整: 拖曳側邊欄右邊緣的分隔條即可改變左側選單寬度 (180-420 px), 右側內容區自動跟隨; 寬度自動記憶, 下次啟動保持一致; 雙擊分隔條恢復預設 230 px, 分隔條聚焦後可用左右方向鍵每次微調 10 px; 側邊欄收起時分隔條自動隱藏",
+        "設定中心 -> 系統設定 新增「側邊欄寬度」滑桿, 與拖曳條同源, 調整後立即生效, 無需重新啟動",
+      ],
+      [
+        "The two panes are now drag-resizable: drag the splitter on the right edge of the sidebar to change the left menu width (180-420 px) and the content pane follows; the width is remembered for next launch; double-click the splitter to restore the default 230 px, or focus it and use the arrow keys for 10 px steps; the splitter is hidden while the sidebar is collapsed",
+        "Settings -> System Settings gained a Sidebar Width slider that shares the same source as the splitter and applies instantly, no restart required",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-09-25 V2.17.0 Release", "2026-09-25 V2.17.0 Release", "2026-09-25 V2.17.0 Release"),
     items: trio(
       [
