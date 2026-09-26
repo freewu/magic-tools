@@ -20,7 +20,7 @@
 - **Full cryptography suite** — symmetric (AES / DES / 3DES / SM4 / ChaCha20 / Blowfish / Rabbit / RC2–RC6 / TEA / XTEA / XXTEA), asymmetric (RSA / SM2), classical ciphers (Caesar / Rail Fence / Vigenère / Hill) plus Cisco Type 7.
 - **Hashing & MACs** — MD5, SHA-1, SHA-2, SHA-3, Keccak, SM3, BCrypt, Scrypt, PBKDF2, HKDF, HMAC, CMAC, KMAC and BCC / LRC / CRC checksums.
 - **Batch QR / barcode** generation — create many codes at once and export every PNG to a folder in one click on desktop.
-- **Local & private** — all computation happens in your browser / device; nothing is uploaded. Dark mode included.
+- **Local & private** — all computation happens in your browser / device; nothing is uploaded. Dark mode included, and the sidebar width is drag-resizable.
 - **Works everywhere** — native desktop app for Windows / macOS / Linux and a pure Web build for instant access.
 
 ## 🧰 Feature Overview

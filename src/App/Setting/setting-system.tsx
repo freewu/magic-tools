@@ -1,6 +1,6 @@
-import { getSiderFlag } from "../../lib/setting";
+import { getSiderFlag, getSiderWidth, setSiderWidth, SIDER_WIDTH_MIN, SIDER_WIDTH_MAX } from "../../lib/setting";
 import { useState } from "react";
-import { Form, Radio, Switch } from "antd";
+import { Form, Radio, Slider, Switch } from "antd";
 import { AppStoreSetting } from "../AppStore/setting";
 import { useTheme } from "../../hook/theme-context";
 import { useLocale, LOCALE_IDS, LOCALE_LABELS } from "../../hook/locale-context";
@@ -14,6 +14,13 @@ export const SettingSystem = () => {
   const onChangeSiderFlag = (checked: boolean) => {
     setSiderFlag(checked);
     localStorage.setItem('sider-flag', checked + "");
+  };
+
+  // 侧边栏宽度 (与拖拽条同源, 修改后通过 sider-width 事件实时生效)
+  const [ siderWidth, setSiderWidthState ] = useState(getSiderWidth());
+  const onChangeSiderWidth = (value: number) => {
+    setSiderWidthState(value);
+    setSiderWidth(value);
   };
 
   // 显示模式 (浅色/深色/系统跟随), 与托盘菜单同步
@@ -50,6 +57,17 @@ export const SettingSystem = () => {
       </Form.Item>
       <Form.Item label={ tr(settingLang, locale, 'sider', '默认展开右边栏') }>
         <Switch checked={ siderFlag } onChange={ onChangeSiderFlag } />
+      </Form.Item>
+      <Form.Item label={ tr(settingLang, locale, 'siderWidth', '侧边栏宽度') }>
+        <Slider
+          min={ SIDER_WIDTH_MIN }
+          max={ SIDER_WIDTH_MAX }
+          step={ 10 }
+          value={ siderWidth }
+          onChange={ onChangeSiderWidth }
+          tooltip={ { formatter: (v) => `${v} px` } }
+          style={ { maxWidth: 260 } }
+        />
       </Form.Item>
       <AppStoreSetting />
     </Form>

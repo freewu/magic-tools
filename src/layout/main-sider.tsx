@@ -7,6 +7,7 @@ import { MenuUnfoldOutlined, MenuFoldOutlined, AppstoreOutlined, SettingOutlined
 import { Badge, Button, Dropdown, Layout, Menu, Space } from "antd";
 import type { MenuProps } from "antd";
 import { SIDER_SUBMENU_PLACEMENTS } from "./submenu-placements";
+import { useSiderWidth } from "./use-sider-width";
 import React, { useMemo, useState, useContext } from "react";
 const { Sider } = Layout;
 import { useNavigate } from "react-router-dom"
@@ -28,7 +29,16 @@ const MainSider: React.FC = () => {
   const { hasUpdate, latest, dismiss } = useUpdate();
   const { locale, setLocale } = useLocale();
   const [ collapsed, setCollapsed ] = useState(!getSiderFlag());
+  // 左右两栏宽度可拖动调整 (宽度持久化在 localStorage, 设置中心也可调整)
+  const { width, dragging, onDragStart, resize, reset } = useSiderWidth();
   const navigate = useNavigate();
+
+  // 拖拽条聚焦时方向键微调 (±10px)
+  const onResizeKeyDown = ( e :React.KeyboardEvent ) => {
+    if ( e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' ) return;
+    e.preventDefault();
+    resize( width + ( e.key === 'ArrowLeft' ? -10 : 10 ) );
+  };
 
   // menu 点击处理
   const menuClick = ( e:any ) => {
@@ -75,7 +85,7 @@ const MainSider: React.FC = () => {
   }, [locale]);
 
   return (
-  <Sider trigger={null} collapsible collapsed={ collapsed } width={230} style={ { height: '100%' } }>
+  <Sider trigger={null} collapsible collapsed={ collapsed } width={ width } style={ { height: '100%' } }>
     <div style={ { display: 'flex', flexDirection: 'column', height: '100%' } }>
       <Space style={ { padding: '4px 8px', flexShrink: 0 } }>
         <Button
@@ -211,6 +221,22 @@ const MainSider: React.FC = () => {
         </div>
       </div>
     </div>
+
+    { /* 左右两栏分隔拖拽条: 拖动调整宽度, 双击恢复默认, 方向键微调 (收起时不显示) */ }
+    { !collapsed && (
+      <div
+        className={ 'sider-resizer' + (dragging ? ' sider-resizer-active' : '') }
+        role="separator"
+        aria-orientation="vertical"
+        aria-label={ tr(shell, locale, 'sider.resizeAria', '调整侧边栏宽度') }
+        title={ tr(shell, locale, 'sider.resize', '拖动调整左右两栏宽度, 双击恢复默认宽度') }
+        tabIndex={ 0 }
+        onMouseDown={ onDragStart }
+        onTouchStart={ onDragStart }
+        onDoubleClick={ reset }
+        onKeyDown={ onResizeKeyDown }
+      />
+    ) }
   </Sider>
   )
 };

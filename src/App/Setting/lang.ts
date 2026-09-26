@@ -11,6 +11,7 @@ export default {
     modeDark: '深色',
     modeSystem: '系统跟随',
     sider: '默认展开右边栏',
+    siderWidth: '侧边栏宽度',
     // 应用中心默认应用 (AppStoreSetting)
     appstoreDivider: '应用中心',
     defaultApp: '默认展示应用',
@@ -23,6 +24,7 @@ export default {
     modeDark: '深色',
     modeSystem: '跟隨系統',
     sider: '預設展開右側欄',
+    siderWidth: '側邊欄寬度',
     appstoreDivider: '應用中心',
     defaultApp: '預設展示應用',
   },
@@ -34,6 +36,7 @@ export default {
     modeDark: 'Dark',
     modeSystem: 'Follow System',
     sider: 'Expand Sidebar by Default',
+    siderWidth: 'Sidebar Width',
     appstoreDivider: 'App Store',
     defaultApp: 'Default App',
   },

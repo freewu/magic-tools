@@ -36,6 +36,41 @@ select {
   min-width: 90px !important;
 }
 
+/* 左右两栏分隔拖拽条: 贴着侧边栏右边缘 (不超出边栏, 避免被裁剪), 拖动改宽度 */
+.sider-resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 6px;
+  z-index: 20;
+  cursor: col-resize;
+  /* 默认一条很淡的分隔线 (提示此处可拖), 悬停/拖动时高亮 */
+  background: rgba(255, 255, 255, 0.10);
+  transition: background 0.15s;
+  /* 触摸拖动时不滚动页面 */
+  touch-action: none;
+}
+
+.sider-resizer:hover,
+.sider-resizer:focus-visible,
+.sider-resizer-active {
+  background: rgba(22, 119, 255, 0.65);
+  outline: none;
+}
+
+/* 拖动中: 全局列宽光标 + 禁止选中文字 */
+body.sider-resizing,
+body.sider-resizing * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+/* 拖动中关闭侧边栏的宽度过渡, 否则跟手会有延迟感 (收起/展开动画不受影响) */
+body.sider-resizing .ant-layout-sider {
+  transition: none !important;
+}
+
 /* 内容区顶部: 最近打开应用标签 + 面包屑 */
 .page-head {
   margin: 12px 12px 0 12px;

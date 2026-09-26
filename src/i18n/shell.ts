@@ -20,6 +20,9 @@ const shell: LangPack = {
     // 侧栏收起/展开
     'sider.expand': '展开',
     'sider.collapse': '收起',
+    // 侧边栏宽度拖拽条 (左右两栏分隔)
+    'sider.resize': '拖动调整左右两栏宽度, 双击恢复默认宽度 (也可用方向键微调)',
+    'sider.resizeAria': '调整侧边栏宽度',
     // 界面语言切换入口 (左下设置旁 / 设置中心)
     lang: '界面语言',
     // 底部版本角标 (有新版本)
@@ -44,6 +47,9 @@ const shell: LangPack = {
     system: '系統設定',
     'sider.expand': '展開',
     'sider.collapse': '收起',
+    // 側邊欄寬度拖曳條 (左右兩欄分隔)
+    'sider.resize': '拖曳調整左右兩欄寬度, 雙擊恢復預設寬度 (也可用方向鍵微調)',
+    'sider.resizeAria': '調整側邊欄寬度',
     lang: '介面語言',
     'update.dot': '有新版本 v{v} 可用，點擊查看更新內容並下載',
     'tabs.left': '關閉左側',
@@ -64,6 +70,9 @@ const shell: LangPack = {
     system: 'System',
     'sider.expand': 'Expand',
     'sider.collapse': 'Collapse',
+    // sidebar width drag handle (left / right panes)
+    'sider.resize': 'Drag to resize the two panes, double-click to restore the default width (arrow keys also work)',
+    'sider.resizeAria': 'Resize the sidebar',
     lang: 'Language',
     'update.dot': 'New version v{v} available, click to view & download',
     'tabs.left': 'Close Left',

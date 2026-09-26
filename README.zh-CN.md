@@ -20,7 +20,7 @@
 - **完整的密码学套件** —— 对称加密（AES / DES / 3DES / SM4 / ChaCha20 / Blowfish / Rabbit / RC2–RC6 / TEA / XTEA / XXTEA）、非对称（RSA / SM2 国密）、古典密码（凯撒 / 栅栏 / 维吉尼亚 / 希尔），以及 Cisco Type 7。
 - **哈希与 MAC** —— MD5、SHA-1/2、SHA-3、Keccak、SM3、BCrypt、Scrypt、PBKDF2、HKDF、HMAC、CMAC、KMAC，以及 BCC / LRC / CRC 校验。
 - **批量二维码 / 条形码** —— 一次生成多条并预览，桌面版一键选择文件夹导出全部 PNG。
-- **本地运算、数据不上传** —— 所有计算都在设备本地完成，支持深色模式。
+- **本地运算、数据不上传** —— 所有计算都在设备本地完成，支持深色模式；左右两栏宽度可拖动调整。
 - **随处可用** —— Windows / macOS / Linux 原生桌面应用，另有纯前端 Web 版免安装即用。
 
 ## 🧰 功能总览

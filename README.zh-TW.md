@@ -20,7 +20,7 @@
 - **完整的密碼學套件** —— 對稱加密（AES / DES / 3DES / SM4 / ChaCha20 / Blowfish / Rabbit / RC2–RC6 / TEA / XTEA / XXTEA）、非對稱（RSA / SM2 國密）、古典密碼（凱撒 / 柵欄 / 維吉尼亞 / 希爾），以及 Cisco Type 7。
 - **雜湊與 MAC** —— MD5、SHA-1/2、SHA-3、Keccak、SM3、BCrypt、Scrypt、PBKDF2、HKDF、HMAC、CMAC、KMAC，以及 BCC / LRC / CRC 檢查碼。
 - **批次 QR Code / 條碼** —— 一次產生多筆並預覽，桌面版可一鍵選取資料夾匯出全部 PNG。
-- **本地運算、資料不上傳** —— 所有計算都在裝置本地完成，支援深色模式。
+- **本地運算、資料不上傳** —— 所有計算都在裝置本地完成，支援深色模式；左右兩欄寬度可拖曳調整。
 - **隨處可用** —— Windows / macOS / Linux 原生桌面應用，另有純前端 Web 版免安裝即用。
 
 ## 🧰 功能總覽
