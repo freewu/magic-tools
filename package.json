@@ -110,6 +110,8 @@
     "js-ini": "^1.6.0",
     "jsbarcode": "^3.12.3",
     "json5": "^2.2.3",
+    "markmap-lib": "^0.18.12",
+    "markmap-view": "^0.18.12",
     "mermaid": "^11.17.2",
     "pinyin-pro": "^3.15.2",
     "react": "^18.2.0",

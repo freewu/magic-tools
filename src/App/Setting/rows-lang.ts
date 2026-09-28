@@ -391,7 +391,17 @@ const ROWS: Record<string, Row> = {
     '工具頁的「儲存為預設設定」按鈕可把目前頁面的參數一鍵存為此處的預設值; 預設值在開啟工具頁時生效, 不影響已開啟的頁面',
     'The “Save as defaults” button on the tool page stores the current page settings here; defaults are applied when the tool page opens and never disturb a page that is already open',
   ],
-
+  // ---- 思维导图 (MindMap) ----
+  '思维导图': ['心智圖', 'Mind map'],
+  '默认配色': ['預設配色', 'Default color'],
+  '默认展开层级': ['預設展開層級', 'Default expand level'],
+  '默认示例': ['預設範例', 'Default sample'],
+  '全部展开': ['全部展開', 'Expand all'],
+  '仅展开 ${n} 层': ['僅展開 ${n} 層', 'Expand ${n} levels'],
+  '空白大纲 (不载入示例)': ['空白大綱 (不載入範例)', 'Blank outline (no sample)'],
+  '打开「思维导图」工具时默认使用的配色方案, 默认 ${d}': ['開啟「心智圖」工具時預設使用的配色方案, 預設 ${d}', 'Color scheme used by default when the Mind Map tool opens (default ${d})'],
+  '打开「思维导图」工具时默认展开的层级, 默认 ${d}; 工具页可随时切换': ['開啟「心智圖」工具時預設展開的層級, 預設 ${d}; 工具頁可隨時切換', 'Expand level used by default when the Mind Map tool opens (default ${d}); switchable on the tool page'],
+  '打开「思维导图」工具时载入的大纲内容; 选「空白大纲」则从零开始写': ['開啟「心智圖」工具時載入的大綱內容; 選「空白大綱」則從零開始寫', 'Outline loaded when the Mind Map tool opens; choose “Blank outline” to start from scratch'],
 };
 
 /**

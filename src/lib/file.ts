@@ -18,3 +18,12 @@ export const openFile = (files: any, callback :Function) => {
   }
   reader.readAsText(files[0]);
 }
+
+/**
+ * 拼一个安全的导出文件名: 路径分隔符与非法字符换成 -, 空白折叠为 -;
+ * 清理后为空时用 fallback (不传则用 untitled)。
+ */
+export const fileNameOf = (base: string, ext: string, fallback = 'untitled'): string => {
+  const safe = base.trim().replace(/[\\/:*?"<>|\s]+/g, '-').replace(/^-+|-+$/g, '');
+  return `${safe || fallback}.${ext}`;
+};

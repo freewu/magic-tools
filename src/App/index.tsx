@@ -90,6 +90,7 @@ const list = [
   'RegexTester',
   'MarkdownEditor',
   'MermaidEditor',
+  'MindMap',
   'VditorMarkdown',
   'JsonFormatter',
   'JSON5Formatter',
