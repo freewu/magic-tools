@@ -112,6 +112,7 @@ const list = [
   'ImageSharpen',
   'ImageColorPicker',
   'ImageToSvg',
+  'PixelArt',
   'AsciiTextArt',
   'HtmlStripText',
   'CodeShot',

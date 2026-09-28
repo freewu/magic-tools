@@ -239,6 +239,12 @@ const ROWS: Record<string, Row> = {
   // ---- 图片主题色 (Image Dominant Color) ----
   '图片主题色': ['圖片主題色', 'Dominant colors'],
   '默认颜色格式': ['預設顏色格式', 'Default color format'],
+  '像素图': ['像素圖', 'Pixel Art'],
+  '默认快捷配置': ['預設快捷設定', 'Default preset'],
+  '打开「像素图」工具时默认应用的快捷配置, 默认 ${d}': [
+    '開啟「像素圖」工具時預設套用的快捷設定, 預設 ${d}',
+    'Preset applied by default when opening the pixel-art tool (default ${d})',
+  ],
   '打开「图片主题色」工具时默认展示的颜色格式, 默认 ${d}; 工具页可随时切换': [
     '開啟「圖片主題色」工具時預設顯示的顏色格式, 預設 ${d}; 工具頁可隨時切換',
     'Default color format shown when opening the dominant-color tool (default ${d}); switchable on the tool page',
