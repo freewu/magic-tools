@@ -8,20 +8,24 @@
 - **不要擅自升版本号 / 打 tag / 发 GitHub Release**：日常功能、修复、文档改动只提交并推送代码即可，版本发布见下方「版本发布流程」
 - 构建产物（`release/*.exe`、`src-tauri/target`、`dist/`）已被 `.gitignore` 忽略，无需特殊处理
 
-## Cloudflare Pages 构建 (npm ci 同步规则)
+## Cloudflare Pages 构建 (Node 版本 + npm ci 同步规则)
 
-Cloudflare Pages 使用 **Node 18 / npm 9.6.7** 构建（本地 Node 24 / npm 11）。本地 npm 11 生成的 `package-lock.json` 会让 CF 的 `npm ci` 报错（`npm ERR! Missing: @emnapi/core@... from lock file`）。因此：
+Cloudflare Pages 的构建环境和本地不同（本地 Node 24 / npm 11），需要留意两点：
+
+**① Node 版本 ≥ 20.19（Vite 8 的 engines 要求）**：CF Pages 默认镜像可能是 Node 18，会在 `vite build` 阶段报引擎不满足。请在 CF Pages 项目设置的**环境变量**里加 `NODE_VERSION=22`（仓库根目录 `.nvmrc` 亦写为 22，两者都保留更稳妥）；本地 Node 24 无需改动。
+
+**② lockfile 必须与 CF 侧 npm 版本兼容**：本地 npm 11 生成的 `package-lock.json` 会让 CF 的 `npm ci` 报错（`npm ERR! Missing: @emnapi/core@... from lock file`）。因此：
 
 - **每次用 npm 安装/删除依赖后**，必须用 npm 9 重新生成并提交 lockfile：
 
       npx --yes npm@9.6.7 install --package-lock-only --ignore-scripts
 
-- 提交前本地验证（退出码 0 才提交）：
+- 提交前本地验证（退出码 0 才提交；注意在**仓库外**的临时目录跑，直接在本仓跑 `npm ci` 会清空 `node_modules`）：
 
       npx --yes npm@9.6.7 ci --dry-run --ignore-scripts
 
 - 只改 `package.json` 版本号（不改依赖）时，lockfile 顶部 `version` 字段也需同步（可同上命令刷新）；
-  可选：在 Cloudflare Pages 项目设置的环境变量里加 `NODE_VERSION=22` 使两侧 npm 版本接近，但**不能代替**上述 npm9 同步步骤
+  设置 `NODE_VERSION=22` 让 CF 侧 npm 升到 10.x 后兼容性更好，但**不能代替**上述 npm9 同步步骤
 
 ## 版本发布流程
 

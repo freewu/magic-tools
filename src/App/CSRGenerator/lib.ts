@@ -478,9 +478,10 @@ export const generateCsr = async (input :CsrInput) :Promise<CsrResult> => {
   const pkcs8 = new Uint8Array(await subtle().exportKey('pkcs8', pair.privateKey));
 
   const cri = buildCertificationRequestInfo(spki, subject, entries);
-  const signature = new Uint8Array(await subtle().sign({ name: 'RSASSA-PKCS1-v1_5' }, pair.privateKey, cri));
+  // TS 5.7 起 Uint8Array 泛型化, WebCrypto 只接受 ArrayBuffer 支撑的视图
+  const signature = new Uint8Array(await subtle().sign({ name: 'RSASSA-PKCS1-v1_5' }, pair.privateKey, cri as Uint8Array<ArrayBuffer>));
   const csrDer = assembleCsrDer(cri, signature);
-  const digest = new Uint8Array(await subtle().digest('SHA-256', csrDer));
+  const digest = new Uint8Array(await subtle().digest('SHA-256', csrDer as Uint8Array<ArrayBuffer>));
 
   return {
     csrPem: derToPem(csrDer, 'CERTIFICATE REQUEST'),

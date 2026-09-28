@@ -143,10 +143,18 @@ export default defineConfig({
         // 框架/UI/工具依赖拆成独立 vendor chunk, 供懒加载页面按需复用
         manualChunks(id) {
           // Vite 注入的 __vitePreload 助手 (\0vite/preload-helper.js) 被入口与所有按需 chunk 共享:
-          // 必须固定到入口已预载的小 chunk, 否则 Rollup 会把它并入某个大按需 chunk
-          // (实测并入 vendor-mermaid), 使该 chunk 变成入口静态依赖 → 首屏被全量预载
+          // 必须固定到入口已预载的小 chunk, 否则打包器会把它并入某个大按需 chunk
+          // (Rollup 实测并入 vendor-mermaid), 使该 chunk 变成入口静态依赖 → 首屏被全量预载
+          // (Vite 8 / Rolldown 同样会下发该模块, 规则继续生效)
           if (id.includes('vite/preload-helper')) {
             return 'vendor-react';
+          }
+          // 各工具的 lang.ts 被入口注册表 (lang-packs) 静态引用, 同时也是对应工具页的依赖:
+          // Rolldown (Vite 8) 会为每个这类共享模块单独出包, 使入口 modulepreload 从十几个
+          // 涨到 150+, 首屏变成上百个并发小请求 (碎片化); 固定成一个 chunk 后仅多一次请求,
+          // 与 Vite 5/Rollup 把 lang 并入入口的行为等价
+          if (/[\\/]src[\\/]App[\\/][^\\/]+[\\/]lang\.ts$/.test(id)) {
+            return 'app-lang';
           }
           if (!id.includes('node_modules')) return undefined;
           if (/node_modules\/(?:react|react-dom|react-router|react-router-dom|scheduler|use-sync-external-store|@remix-run|object-assign|loose-envify|prop-types)\//.test(id)) {

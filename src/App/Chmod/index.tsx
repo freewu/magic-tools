@@ -191,7 +191,7 @@ const Chmod = () => {
         columns={ [
           { title: t('数字'), dataIndex: 'num', width: 80 },
           { title: t('符号'), dataIndex: 'sym', width: 100 },
-          { title: t('含义'), render: (_ :unknown, r :{ num :number }) => {
+          { title: t('含义'), render: (_ :unknown, r :{ num :number; sym :string }) => {
               const b = r.num;
               return [b & 4 ? t('读') : '', b & 2 ? t('写') : '', b & 1 ? t('执行') : ''].filter(Boolean).join('+') || t('无权限');
             } },

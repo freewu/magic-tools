@@ -75,7 +75,7 @@ CSS 配色 · 行数统计 · 正则表达式 · 文件比较 · 键盘按键信
 | 桌面框架 | [Tauri 2](https://tauri.app/)（Rust） |
 | 前端 UI | [React 18](https://react.dev/) |
 | 组件库 | [Ant Design 5](https://ant.design/) |
-| 构建 | Vite 5 |
+| 构建 | Vite 8（Rolldown） |
 | 任务执行 | [just](https://github.com/casey/just) |
 
 其他组件：CryptoJS、js-base64、color-convert、SQL Formatter、highlight.js、base-x、pinyin-pro、js-ini、yaml、toml-patch、deepmerge。

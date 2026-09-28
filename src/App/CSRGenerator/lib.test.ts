@@ -302,7 +302,8 @@ suite('CSR 生成 (WebCrypto)', () => {
 
     const der = pemToDer(r.csrPem, 'CERTIFICATE REQUEST');
     // 指纹 = DER 的 SHA-256
-    const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', der));
+    // TS 5.7 起 Uint8Array 泛型化, WebCrypto 只接受 ArrayBuffer 支撑的视图
+    const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', der as Uint8Array<ArrayBuffer>));
     expect(bytesToHexColon(digest)).toBe(r.fingerprint);
 
     // 签名算法 OID = 1.2.840.113549.1.1.11 (sha256WithRSAEncryption) + NULL
@@ -312,12 +313,12 @@ suite('CSR 生成 (WebCrypto)', () => {
     expect(signature.length).toBe(256); // 2048 位签名
 
     // 用 CSR 里的公钥验证自签名
-    const pub = await crypto.subtle.importKey('spki', spki, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, [ 'verify' ]);
-    expect(await crypto.subtle.verify({ name: 'RSASSA-PKCS1-v1_5' }, pub, signature, cri)).toBe(true);
+    const pub = await crypto.subtle.importKey('spki', spki as Uint8Array<ArrayBuffer>, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, [ 'verify' ]);
+    expect(await crypto.subtle.verify({ name: 'RSASSA-PKCS1-v1_5' }, pub, signature as Uint8Array<ArrayBuffer>, cri as Uint8Array<ArrayBuffer>)).toBe(true);
     // 篡改 CRI 后验证失败
     const tampered = Uint8Array.from(cri);
     tampered[tampered.length - 1] ^= 0xff;
-    expect(await crypto.subtle.verify({ name: 'RSASSA-PKCS1-v1_5' }, pub, signature, tampered)).toBe(false);
+    expect(await crypto.subtle.verify({ name: 'RSASSA-PKCS1-v1_5' }, pub, signature as Uint8Array<ArrayBuffer>, tampered as Uint8Array<ArrayBuffer>)).toBe(false);
   });
 
   it('私钥与公钥配对, PKCS#1 输出为同一把密钥的不同封装', async () => {

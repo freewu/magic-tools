@@ -160,7 +160,8 @@ export async function saveBytesFile(
     }
   }
   // 浏览器回退
-  const blob = new Blob([ bytes ], { type: 'application/octet-stream' });
+  // TS 5.7 起 Uint8Array 泛型化, BlobPart 只接受 ArrayBuffer 支撑的视图 (本项目字节均来自 ArrayBuffer)
+  const blob = new Blob([ bytes as Uint8Array<ArrayBuffer> ], { type: 'application/octet-stream' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;

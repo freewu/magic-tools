@@ -77,7 +77,7 @@ export const cmac = (key :Uint8Array, msg :Uint8Array) :string => {
   const full = blocks.length > 0 && msg.length % 16 === 0;
 
   let last :Uint8Array;
-  let prev = new Uint8Array(16); // CBC 链 Y0 = 0
+  let prev: Uint8Array = new Uint8Array(16); // CBC 链 Y0 = 0
   if (blocks.length === 0) {
     // 空消息: 单补丁块 10*1 padding, 异或 K2
     const pad = new Uint8Array(16); pad[0] = 0x80;

@@ -135,7 +135,8 @@ export const gzipCompress = async (data: Uint8Array): Promise<Uint8Array> => {
   ensureSupport();
   const cs = new CompressionStream('gzip');
   const writer = cs.writable.getWriter();
-  writer.write(data);
+  // TS 5.7 起 Uint8Array 泛型化, Streams 只接受 ArrayBuffer 支撑的视图 (本项目字节均来自 ArrayBuffer)
+  writer.write(data as Uint8Array<ArrayBuffer>);
   writer.close();
   return streamCollect(cs.readable);
 };
@@ -145,7 +146,7 @@ export const gzipDecompress = async (data: Uint8Array): Promise<Uint8Array> => {
   ensureSupport();
   const ds = new DecompressionStream('gzip');
   const writer = ds.writable.getWriter();
-  writer.write(data);
+  writer.write(data as Uint8Array<ArrayBuffer>);
   writer.close();
   return streamCollect(ds.readable);
 };

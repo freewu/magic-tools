@@ -158,7 +158,7 @@ export const romix = (b: Uint8Array, n: number, r: number): Uint8Array => {
   const blockLen = 64;
   const xLen = 128 * r;
   const v = new Uint8Array(n * xLen); // V[0..N-1] 每个 xLen 字节
-  let x = b.slice(0, xLen);
+  let x: Uint8Array = b.slice(0, xLen);
   for (let i = 0; i < n; i++) {
     v.set(x, i * xLen);
     x = blockMix(x, r);

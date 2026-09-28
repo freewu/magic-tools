@@ -75,7 +75,7 @@ CSS colors · Line counter · Regex tester (17 presets) · File diff · Keyboard
 | Desktop shell | [Tauri 2](https://tauri.app/) (Rust) |
 | Frontend UI | [React 18](https://react.dev/) |
 | Component library | [Ant Design 5](https://ant.design/) |
-| Renderer build | Vite 5 |
+| Renderer build | Vite 8 (Rolldown) |
 | Task runner | [just](https://github.com/casey/just) |
 
 Other components: CryptoJS, js-base64, color-convert, SQL Formatter, highlight.js, base-x, pinyin-pro, js-ini, yaml, toml-patch, deepmerge.
