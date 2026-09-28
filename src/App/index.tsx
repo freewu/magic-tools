@@ -138,6 +138,7 @@ const list = [
   'NginxConfig',
   'JSONLConvert',
   'Teleprompter',
+  'BOMCheck',
 ];
 
 import { defineLoader } from './app-modules';

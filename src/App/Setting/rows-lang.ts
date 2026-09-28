@@ -9,6 +9,7 @@ type Row = [tw: string, en: string];
 const ROWS: Record<string, Row> = {
   // ---- 通用词 ----
   '默认类型': ['預設類型', 'Default type'],
+  '默认 BOM 类型': ['預設 BOM 類型', 'Default BOM type'],
   '默认选中类型': ['預設選中類型', 'Default selected type'],
   '默认展示类型': ['預設顯示類型', 'Default display type'],
   '默认码型': ['預設碼型', 'Default code type'],

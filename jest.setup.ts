@@ -10,6 +10,29 @@ if(typeof global.TextEncoder === 'undefined') {
 if(typeof global.TextDecoder === 'undefined') {
   global.TextDecoder = TextDecoder;
 }
+// jsdom 20 未实现 Blob.prototype.arrayBuffer / text (读取上传文件字节的用例需要, 浏览器原生支持)
+if(typeof Blob.prototype.arrayBuffer === 'undefined') {
+  // 以 FileReader 兜底实现 (jsdom 已实现 FileReader)
+  Blob.prototype.arrayBuffer = function(this :Blob) {
+    return new Promise<ArrayBuffer>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as ArrayBuffer);
+      reader.onerror = () => reject(reader.error ?? new Error('FileReader failed'));
+      reader.readAsArrayBuffer(this);
+    });
+  };
+}
+if(typeof Blob.prototype.text === 'undefined') {
+  Blob.prototype.text = function(this :Blob) {
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result ?? ''));
+      reader.onerror = () => reject(reader.error ?? new Error('FileReader failed'));
+      reader.readAsText(this);
+    });
+  };
+}
+
 // jsdom 未实现 window.matchMedia (主题 / 响应式组件需要)
 if(typeof global.matchMedia === 'undefined') {
   global.matchMedia = (query :string) => ({

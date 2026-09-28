@@ -4,6 +4,7 @@ import { ColorSetting } from "../Color/setting";
 import { RegexTesterSetting } from "../RegexTester/setting";
 import { AsciiTextArtSetting } from "../AsciiTextArt/setting";
 import { TeleprompterSetting } from "../Teleprompter/setting";
+import { BOMCheckSetting } from "../BOMCheck/setting";
 
 export const SettingMisc = () => {
 
@@ -13,6 +14,7 @@ export const SettingMisc = () => {
       <RegexTesterSetting />
       <AsciiTextArtSetting />
       <TeleprompterSetting />
+      <BOMCheckSetting />
     </Form>
   )
 }

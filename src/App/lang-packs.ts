@@ -133,6 +133,7 @@ import SudokuGenerator from './SudokuGenerator/lang';
 import CopybookGenerator from './CopybookGenerator/lang';
 import JSONLConvert from './JSONLConvert/lang';
 import Teleprompter from './Teleprompter/lang';
+import BOMCheck from './BOMCheck/lang';
 import IptablesRules from './IptablesRules/lang';
 import TcRules from './TcRules/lang';
 import NginxConfig from './NginxConfig/lang';
@@ -276,4 +277,5 @@ export const langPacks = {
   TcRules,
   NginxConfig,
   GitignoreGenerator,
+  BOMCheck,
 };
