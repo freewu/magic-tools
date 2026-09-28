@@ -8,11 +8,11 @@ import { AppContext } from '../../hook/app-context';
 // App/index.tsx 有顶层 await + import.meta.glob (jest commonjs 不支持), 故打桩成固定应用列表
 jest.mock('../index', () => {
   const appList = [
-    { key: 'AESCrypto', label: 'AES 加解密', type: 'crypto', desktop: false, icon: null },
-    { key: 'SM4Crypto', label: 'SM4 加解密', type: 'crypto', desktop: false, icon: null },
-    { key: 'LatLngConvert', label: '经纬度格式转换', type: 'convert', desktop: false, icon: null },
-    { key: 'QRCodeGenerator', label: '二维码生成', type: 'generator', desktop: false, icon: null },
-    { key: 'DnsQuery', label: 'DNS 查询', type: 'webmaster', desktop: true, icon: null },
+    { key: 'AESCrypto', label: 'AES 加解密', type: 'crypto', desktop: false, web: false, icon: null },
+    { key: 'SM4Crypto', label: 'SM4 加解密', type: 'crypto', desktop: false, web: false, icon: null },
+    { key: 'LatLngConvert', label: '经纬度格式转换', type: 'convert', desktop: false, web: false, icon: null },
+    { key: 'QRCodeGenerator', label: '二维码生成', type: 'generator', desktop: false, web: false, icon: null },
+    { key: 'DnsQuery', label: 'DNS 查询', type: 'webmaster', desktop: true, web: false, icon: null },
   ];
   const cats: Array<[ string, string ]> = [
     [ 'convert', '类型转换' ],

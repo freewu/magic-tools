@@ -75,7 +75,8 @@ const dropImage = async (container: HTMLElement, name = 'photo.png') => {
   fireEvent.drop(zone, { dataTransfer: { files: [ new File([ 'x' ], name, { type: 'image/png' }) ] } });
   // 等画布按原图尺寸铺好, 并冲掉缓存像素的状态更新 (否则紧接着的点击可能读到旧值)
   await waitFor(() => expect(canvasOf(container)?.width).toBe(WIDTH));
-  await act(async () => { await Promise.resolve(); });
+  // 冲掉缓存像素的状态更新: 只 await 一个微任务在并发跑全量用例时可能不够, 让出一个宏任务更稳
+  await act(async () => { await new Promise((resolve) => setTimeout(resolve, 0)); });
 };
 /** 悬停到某个像素中心 */
 const hover = (container: HTMLElement, x: number, y: number) => {

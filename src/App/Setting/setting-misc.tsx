@@ -5,6 +5,8 @@ import { RegexTesterSetting } from "../RegexTester/setting";
 import { AsciiTextArtSetting } from "../AsciiTextArt/setting";
 import { TeleprompterSetting } from "../Teleprompter/setting";
 import { BOMCheckSetting } from "../BOMCheck/setting";
+import { MetronomeSetting } from "../Metronome/setting";
+import { ScreenRecorderSetting } from "../ScreenRecorder/setting";
 
 export const SettingMisc = () => {
 
@@ -15,6 +17,8 @@ export const SettingMisc = () => {
       <AsciiTextArtSetting />
       <TeleprompterSetting />
       <BOMCheckSetting />
+      <MetronomeSetting />
+      <ScreenRecorderSetting />
     </Form>
   )
 }

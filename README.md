@@ -2,7 +2,7 @@
 
 # 🧰 Magic Tools
 
-**An all-in-one developer toolbox — 137 utilities in 9 categories, cross-platform desktop & Web.**
+**An all-in-one developer toolbox — 139 utilities in 9 categories, cross-platform desktop & Web.**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
@@ -39,8 +39,8 @@ Base64 · URL · Unicode · Punycode · UUencode · XXencode · BCD · Morse cod
 ### ⚖️ Converters *(20)*
 Unix timestamp · Color format · Radix (BIN/OCT/DEC/HEX) · Tree ↔ path · GPS coordinates · Lat/long format · IP converter (IPv4/IPv6 ↔ decimal/hex/binary) · Download-link converter · JSONL · RMB uppercase (CNY) · Byte units · Chinese Pinyin · Temperature · Distance · Config (INI/JSON/YAML/TOML/properties) · Subtitle (SRT/ASS/…) · Speed · Volume · Area · Weight
 
-### 🛠️ Formatters & Editors *(11)*
-Markdown editor (live preview + LaTeX subset) · Instant-render Markdown editor (Vditor: instant / split / WYSIWYG modes, KaTeX math, export .md and styled .html) · Mermaid editor (live preview, 30+ built-in diagram samples, export SVG/PNG/WebP) · JSON · JSON5 · JavaScript (beautify / minify / obfuscate / deobfuscate) · SQL · XML · HTML · SVG · CN/EN typography spacing
+### 🛠️ Formatters & Editors *(12)*
+Markdown editor (live preview + LaTeX subset) · Instant-render Markdown editor (Vditor: instant / split / WYSIWYG modes, KaTeX math, export .md and styled .html) · Mermaid editor (live preview, 30+ built-in diagram samples, export SVG/PNG/WebP) · Mind map (Markdown outline → interactive markmap: fold levels, zoom / pan, palettes, font size, export SVG / PNG / WebP) · JSON · JSON5 · JavaScript (beautify / minify / obfuscate / deobfuscate) · SQL · XML · HTML · SVG · CN/EN typography spacing
 
 ### 🖼️ Image Tools *(17)*
 Base64 image · ASCII image · Code screenshot · ICO icon · App icon · Dominant-color palette (merge similar colors + share) · Image split (2/3/4/6/9) · Image adjust (resize percent / pixels, rotate 90°·180°·270°, PNG·JPEG·WebP) · Image watermark (text / logo, nine-grid · tiled, rotation + opacity) · Placeholder image · Shield badge (PNG export ×1–10) · Image negative (blendable invert) · Black & white (gray / binarize, auto Otsu threshold) · Sharpen (USM radius / amount / threshold) · Color picker (magnifier + HEX / RGB / HSL, history) · Raster to SVG (trace bitmaps into vector SVG with VTracer: color layers / black & white, 13 parameters + 7 presets) · Pixel art (image → pixel art; presets for portrait photo / game asset / abstract art, block-size average + grayscale + palette quantization with 4×4 Bayer dithering; adaptive 16–256 colors and classic console palettes: NES · PICO-8 · Game Boy · C64 · CGA · ZX Spectrum · SMS · Mega Drive · SNES)
@@ -51,8 +51,8 @@ QR code (batch, logo/label) · Barcode (CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacod
 ### 🌐 Webmaster Tools *(16)*
 HTML stripper · Browser fingerprint · CSR request generator (WebCrypto RSA + PKCS#10, SAN, key + CSR download) · URL extractor · Cookie analyzer · User-Agent parser · Sitemap checker · Keyword density · TDK checker · DNS lookup (desktop only) · Whois lookup (desktop only) · MTR trace — traceroute + ping per-hop loss / RTT / jitter (desktop only) · robots.txt generator · iptables rule parser / generator (one-click scenarios — open port / block IP / block subnet / port forwarding — plus parse &amp; generate, iptables-save support) · tc traffic-control rule generator (HTB / TBF / netem, ingress via ifb) · nginx config generator (static / SPA / PHP / reverse proxy, TLS, gzip, static caching, rate limiting, hotlink protection — vhost-ready file)
 
-### 🧩 Utilities *(11)*
-CSS colors · Line counter · Regex tester (17 presets) · File diff · Keyboard key info · Chmod calculator · ASCII text art · CIDR calculator · WebSocket debugger · Teleprompter (speed / fade / line focus / fullscreen, Space to play·pause, defaults editable in Settings / saveable from the page) · BOM inspector (detect / strip / add a UTF-8·UTF-16·UTF-32 BOM, encoding guess and text preview)
+### 🧩 Utilities *(13)*
+CSS colors · Line counter · Regex tester (17 presets) · File diff · Keyboard key info · Chmod calculator · ASCII text art · CIDR calculator · WebSocket debugger · Teleprompter (speed / fade / line focus / fullscreen, Space to play·pause, defaults editable in Settings / saveable from the page) · BOM inspector (detect / strip / add a UTF-8·UTF-16·UTF-32 BOM, encoding guess and text preview) · Metronome (20–300 BPM, time signature + beat subdivision, 3 click timbres, volume, fullscreen flashing dot, tap tempo) · Screen recorder (Web-only: capture screen / window / tab, optional system audio + microphone, frame rate · bitrate · resolution, one-click save as WebM / MP4)
 
 > Plus built-in app pages: **App Center** (search by app or category name, plus category filter), **Help & changelog**, **Settings**.
 
@@ -91,7 +91,7 @@ magic-tools
 │   │   ├── app-modules.ts    # build-time collection via import.meta.glob (replaces webpack context)
 │   │   ├── app-i18n.ts       # app registry: appNameOf() trilingual names for tools & fixed pages
 │   │   ├── lang-packs.ts     # aggregates every tool's default language pack (lang.ts default export)
-│   │   └── <Tool>/           # one folder per tool (137, grouped list below) — 2-step registration
+│   │   └── <Tool>/           # one folder per tool (139, grouped list below) — 2-step registration
 │   │       ├── define.tsx    # registration metadata: AppName (zh-CN default) / Icon / Type (category)
 │   │       ├── index.tsx     # tool page component (default export; lazy-loaded)
 │   │       ├── lang.ts       # default language pack + rows (zh phrase = key → [zh-TW, en]) + lookup helpers
@@ -110,7 +110,7 @@ magic-tools
 
 ### Existing tools under `src/App/`
 
-137 tool folders live under [`src/App/`](src/App/) and each holds one tool declared by its `define.tsx`. **Adding a tool takes two steps:** (1) append the folder name to the `list` array in [`src/App/index.tsx`](src/App/index.tsx) — that hand-maintained registry drives the sidebar / App Center menu order and routing, while `import.meta.glob` only discovers the page component; (2) add its `lang.ts` default export to [`src/App/lang-packs.ts`](src/App/lang-packs.ts) so names/UI strings can be translated. Grouped below by the `Type` registered in `define.tsx` (same categories as the sidebar / [feature overview](#-feature-overview)). Some tools add tool-specific files besides the common ones (e.g. `AESCrypto/gcm.ts`, `Hash/sm3.ts`+`keccak.ts`, `CronRules/parse.tsx`, `Setting/setting-*.tsx`):
+139 tool folders live under [`src/App/`](src/App/) and each holds one tool declared by its `define.tsx`. **Adding a tool takes two steps:** (1) append the folder name to the `list` array in [`src/App/index.tsx`](src/App/index.tsx) — that hand-maintained registry drives the sidebar / App Center menu order and routing, while `import.meta.glob` only discovers the page component; (2) add its `lang.ts` default export to [`src/App/lang-packs.ts`](src/App/lang-packs.ts) so names/UI strings can be translated. Grouped below by the `Type` registered in `define.tsx` (same categories as the sidebar / [feature overview](#-feature-overview)). Some tools add tool-specific files besides the common ones (e.g. `AESCrypto/gcm.ts`, `Hash/sm3.ts`+`keccak.ts`, `CronRules/parse.tsx`, `Setting/setting-*.tsx`):
 
 **🔐 Cryptography *(22)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `SM9Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
 
@@ -128,7 +128,7 @@ magic-tools
 
 **🌐 Webmaster Tools *(16)*** — `BrowserFingerprint` · `CSRGenerator` · `CookieAnalyzer` · `DnsQuery` · `HtmlStripText` · `IptablesRules` · `KeywordDensity` · `MtrQuery` · `NginxConfig` · `RobotsTxtGenerator` · `SitemapCheck` · `TcRules` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck` · `WhoisQuery`
 
-**🧩 Utilities *(11)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `RegexTester` · `Teleprompter` · `WebSocketDebug`
+**🧩 Utilities *(13)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `Metronome` · `RegexTester` · `ScreenRecorder` · `Teleprompter` · `WebSocketDebug`
 
 > Built-in pages `AppStore`（App Center）/ `Help` / `Setting` also live in `src/App/` (registered with `Type = 'misc'`), but are fixed pages rather than tools.
 

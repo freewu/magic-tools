@@ -3,7 +3,7 @@ import React,{ useState, useContext } from "react";
 import { useNavigate } from "react-router-dom"
 import "./appstore.css"
 import Icon from '@ant-design/icons';
-import { DesktopOutlined } from "@ant-design/icons";
+import { DesktopOutlined, GlobalOutlined } from "@ant-design/icons";
 import { AppContext } from "../../hook/app-context";
 import { useLocale } from "../../hook/locale-context";
 import { tr } from "../../i18n/lang";
@@ -14,9 +14,10 @@ export type AppItemProps = {
   icon: any,
   label: string,
   desktop?: boolean, // 仅桌面版可用 (浏览器演示版无法提供该能力)
+  web?: boolean, // 仅 Web 版可用 (桌面版内嵌 WebView 无法提供该能力)
 }
 
-const AppItem = ({ uri, label, icon, desktop } :AppItemProps) => {
+const AppItem = ({ uri, label, icon, desktop, web } :AppItemProps) => {
 
   const navigate = useNavigate();
   const { app, setApp } = useContext(AppContext)!
@@ -37,6 +38,15 @@ const AppItem = ({ uri, label, icon, desktop } :AppItemProps) => {
           <span className="app-desktop-badge">
             <DesktopOutlined />
             <span className="app-desktop-badge-text">{ tr(appstoreLang, locale, 'desktopOnly', '仅桌面版') }</span>
+          </span>
+        </Tooltip>
+      ) }
+      {/* 仅 Web 标识 (桌面版内嵌 WebView 无法提供该能力, 页面内会给出提示并禁用录制按钮) */}
+      { web && (
+        <Tooltip title={ tr(appstoreLang, locale, 'webOnly', '仅 Web') }>
+          <span className="app-web-badge">
+            <GlobalOutlined />
+            <span className="app-web-badge-text">{ tr(appstoreLang, locale, 'webOnly', '仅 Web') }</span>
           </span>
         </Tooltip>
       ) }

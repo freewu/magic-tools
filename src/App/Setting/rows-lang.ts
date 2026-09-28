@@ -402,6 +402,32 @@ const ROWS: Record<string, Row> = {
   '打开「思维导图」工具时默认使用的配色方案, 默认 ${d}': ['開啟「心智圖」工具時預設使用的配色方案, 預設 ${d}', 'Color scheme used by default when the Mind Map tool opens (default ${d})'],
   '打开「思维导图」工具时默认展开的层级, 默认 ${d}; 工具页可随时切换': ['開啟「心智圖」工具時預設展開的層級, 預設 ${d}; 工具頁可隨時切換', 'Expand level used by default when the Mind Map tool opens (default ${d}); switchable on the tool page'],
   '打开「思维导图」工具时载入的大纲内容; 选「空白大纲」则从零开始写': ['開啟「心智圖」工具時載入的大綱內容; 選「空白大綱」則從零開始寫', 'Outline loaded when the Mind Map tool opens; choose “Blank outline” to start from scratch'],
+  // ---- 节拍器 ----
+  '节拍器': ['節拍器', 'Metronome'],
+  '默认速度 (BPM)': ['預設速度 (BPM)', 'Default tempo (BPM)'],
+  '默认拍号': ['預設拍號', 'Default time signature'],
+  '默认细分': ['預設細分', 'Default subdivision'],
+  '默认音量': ['預設音量', 'Default volume'],
+  '默认音色': ['預設音色', 'Default timbre'],
+  '默认首拍重音': ['預設首拍重音', 'Default accent on first beat'],
+  '打开「节拍器」时使用的初始速度, 默认 ${n}; 工具页可随时调整': ['開啟「節拍器」時使用的初始速度, 預設 ${n}; 工具頁可隨時調整', 'Initial tempo used when the Metronome opens (default ${n}); adjustable on the page'],
+  '每小节的拍数, 默认 ${n} 拍': ['每小節的拍數, 預設 ${n} 拍', 'Beats per bar, default ${n}'],
+  '每拍再打几下, 默认不细分': ['每拍再打幾下, 預設不細分', 'Sub-clicks per beat; none by default'],
+  '打点音量 (0 即静音), 默认 ${n}': ['打點音量 (0 即靜音), 預設 ${n}', 'Click volume (0 = muted), default ${n}'],
+  '三种本地合成音, 不加载任何音频文件': ['三種本機合成音, 不載入任何音訊檔', 'Three locally synthesised sounds — no audio files are loaded'],
+  '开启后每小节第一拍更响, 便于听出小节线': ['開啟後每小節第一拍更響, 便於聽出小節線', 'Makes the first beat of each bar louder so the bar line is audible'],
+  // ---- 屏幕录制 ----
+  '屏幕录制': ['螢幕錄製', 'Screen recorder'],
+  '默认帧率': ['預設影格率', 'Default frame rate'],
+  '默认画质': ['預設畫質', 'Default quality'],
+  '默认声音': ['預設聲音', 'Default audio'],
+  '默认分辨率上限': ['預設解析度上限', 'Default resolution cap'],
+  '默认文件名前缀': ['預設檔名前綴', 'Default filename prefix'],
+  '30 fps 通用; 文字演示可用 15, 游戏 / 动画用 60': ['30 fps 通用; 文字簡報可用 15, 遊戲 / 動畫用 60', '30 fps in general; 15 for text slides, 60 for games/animation'],
+  '码率越高越清晰, 文件也越大; 每分钟体积 = 码率 ÷ 8 × 60': ['位元率越高越清晰, 檔案也越大; 每分鐘體積 = 位元率 ÷ 8 × 60', 'Higher bitrate means a sharper but larger file; size per minute = bitrate ÷ 8 × 60'],
+  '系统声音需在共享选择器里勾选「分享音频」; 麦克风会额外申请权限': ['系統聲音需在共用選擇器裡勾選「分享音訊」; 麥克風會額外申請權限', 'System audio needs “Share audio” ticked in the share picker; the microphone asks for extra permission'],
+  '「原始分辨率」不缩放; 其余只限制上限, 不会放大画面': ['「原始解析度」不縮放; 其餘只限制上限, 不會放大畫面', '“Source resolution” never scales; the others only cap the capture and never upscale'],
+  '保存时的文件名前缀, 默认 ${p}; 实际文件名会追加时间戳 (非法字符会被去掉)': ['儲存時的檔名前綴, 預設 ${p}; 實際檔名會附加時間戳 (非法字元會被移除)', 'Filename prefix used when saving (default ${p}); a timestamp is appended and illegal characters are stripped'],
 };
 
 /**

@@ -9,6 +9,7 @@ export default {
     empty: '没有匹配的应用',
     defaultApp: '默认展示应用',
     desktopOnly: '仅桌面版',
+    webOnly: '仅 Web',
   },
   'zh-TW': {
     appName: '應用中心',
@@ -18,6 +19,7 @@ export default {
     empty: '沒有符合的應用',
     defaultApp: '預設展示應用',
     desktopOnly: '僅桌面版',
+    webOnly: '僅 Web',
   },
   en: {
     appName: 'App Store',
@@ -27,5 +29,6 @@ export default {
     empty: 'No matching app',
     defaultApp: 'Default App',
     desktopOnly: 'Desktop only',
+    webOnly: 'Web only',
   },
 } as const;

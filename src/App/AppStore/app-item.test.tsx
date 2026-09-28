@@ -11,7 +11,7 @@ jest.mock('../../hook/app-context', () => ({
 
 const setApp = jest.fn();
 
-const renderItem = (desktop?: boolean) => render(
+const renderItem = (desktop?: boolean, web?: boolean) => render(
   <MemoryRouter initialEntries={ [ '/' ] }>
     <AppContext.Provider value={ {
       app: '',
@@ -22,7 +22,7 @@ const renderItem = (desktop?: boolean) => render(
       closeRight: jest.fn(),
       closeOthers: jest.fn(),
     } }>
-      <AppItem uri="DnsQuery" icon="" label="DNS 查询" desktop={ desktop } />
+      <AppItem uri="DnsQuery" icon="" label="DNS 查询" desktop={ desktop } web={ web } />
     </AppContext.Provider>
   </MemoryRouter>
 );
@@ -38,6 +38,14 @@ describe('AppStore 应用卡片', () => {
 
   test('普通应用不展示标识', () => {
     renderItem(false);
+    expect(screen.queryByText('仅桌面版')).not.toBeInTheDocument();
+    expect(screen.queryByText('仅 Web')).not.toBeInTheDocument();
+  });
+
+  test('仅 Web 版应用展示「仅 Web」标识', () => {
+    renderItem(false, true);
+    expect(screen.getByText('DNS 查询')).toBeInTheDocument();
+    expect(screen.getByText('仅 Web')).toBeInTheDocument();
     expect(screen.queryByText('仅桌面版')).not.toBeInTheDocument();
   });
 

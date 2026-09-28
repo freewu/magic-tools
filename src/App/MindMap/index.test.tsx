@@ -121,8 +121,17 @@ const cardTitle = (text: string): Element | null =>
   screen.queryAllByText(text).find((el) => el.classList.contains('ant-card-head-title')) ?? null;
 const pane = () => document.querySelector('.mindmap-preview') as HTMLElement;
 const codeArea = () => screen.getByPlaceholderText('在此输入 Markdown 大纲…') as HTMLTextAreaElement;
-/** 等待首次渲染完成 (250ms 防抖 + 异步加载 markmap) */
-const waitRendered = () => waitFor(() => expect(mockInstances).toHaveLength(1));
+/** 全量测试并行跑时定时器会被拖慢, 关键等待放宽到 5s */
+const WAIT = { timeout: 5000 };
+/**
+ * 等待首次渲染完成: 实例已创建 **且** 渲染收尾 (setBox) 后导出按钮解禁。
+ * 只等实例个数会踩到「实例已建但 canExport 仍为 false」的窗口 —— 此时点导出/适应窗口
+ * 是点在 disabled 按钮上, 全量并发跑测试时定时器被拖慢就会偶发失败。
+ */
+const waitRendered = () => waitFor(() => {
+  expect(mockInstances).toHaveLength(1);
+  expect(btn('导出 PNG')).toBeEnabled();
+}, WAIT);
 /** 最近一次传给 markmap 的 options */
 const lastOptions = () => mockInstances[mockInstances.length - 1].options;
 const styleCss = () => String((lastOptions().style as () => string)());
@@ -352,7 +361,7 @@ describe('MindMap 导出', () => {
     await waitRendered();
     fireEvent.click(btn('导出 PNG'));
 
-    await waitFor(() => expect(savePngFile).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(savePngFile).toHaveBeenCalledTimes(1), WAIT);
     expect((savePngFile as jest.Mock).mock.calls[0]).toEqual([ 'mindmap-project.png', pngUrl ]);
     expect(ctxCalls).toEqual([
       { op: 'fillRect', args: [ 0, 0, BOX_W, BOX_H ] },
@@ -368,7 +377,7 @@ describe('MindMap 导出', () => {
     fireEvent.click(screen.getByText('透明'));
     fireEvent.click(btn('导出 PNG'));
 
-    await waitFor(() => expect(savePngFile).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(savePngFile).toHaveBeenCalledTimes(1), WAIT);
     expect(ctxCalls).toEqual([{ op: 'drawImage', args: [ 0, 0, BOX_W * 2, BOX_H * 2 ] }]);
   });
 
@@ -377,7 +386,7 @@ describe('MindMap 导出', () => {
     await waitRendered();
     fireEvent.click(btn('导出 WebP'));
 
-    await waitFor(() => expect(saveBytesFile).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(saveBytesFile).toHaveBeenCalledTimes(1), WAIT);
     const [ name, bytes, opts ] = (saveBytesFile as jest.Mock).mock.calls[0];
     expect(name).toBe('mindmap-project.webp');
     expect(Array.from(bytes as Uint8Array)).toEqual(Array.from(new TextEncoder().encode('webp')));
@@ -410,7 +419,7 @@ describe('MindMap 导出', () => {
     render(<MindMap />);
     await waitRendered();
     fireEvent.click(btn('导出 PNG'));
-    await waitFor(() => expect(screen.getByText('导出失败: 磁盘已满')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('导出失败: 磁盘已满')).toBeInTheDocument(), WAIT);
   });
 
   test('复制大纲 / 复制 SVG 写入粘贴板', async () => {

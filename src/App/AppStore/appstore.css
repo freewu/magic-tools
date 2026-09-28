@@ -75,8 +75,9 @@
   border-radius: 4px;
 }
 
-/* 仅桌面版标识: 卡片右上角小图标 + 文案 (悬停显示完整提示) */
-.app-desktop-badge {
+/* 仅桌面版 / 仅 Web 标识: 卡片右上角小图标 + 文案 (悬停显示完整提示) */
+.app-desktop-badge,
+.app-web-badge {
   position: absolute;
   top: 2px;
   right: 4px;
@@ -89,6 +90,7 @@
   color: inherit;
 }
 
-.app-desktop-badge-text {
+.app-desktop-badge-text,
+.app-web-badge-text {
   letter-spacing: 0;
 }

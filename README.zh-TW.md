@@ -2,7 +2,7 @@
 
 # 🧰 Magic Tools
 
-**全能開發工具箱 —— 9 大分類、137 個實用工具，桌面 + Web 雙端。**
+**全能開發工具箱 —— 9 大分類、139 個實用工具，桌面 + Web 雙端。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
@@ -39,8 +39,8 @@ Base64 編解碼 · URL 編解碼 · Unicode 編解碼 · Punycode 編解碼 · 
 ### ⚖️ 類型轉換 *(20)*
 時間戳轉換 · 顏色格式轉換 · 進制轉換 · 樹形和路徑轉換 · GPS 座標轉換 · 經緯度格式轉換 · IP 轉換(IPv4/IPv6 ↔ 十進位/十六進位/二進位) · 下載連結轉換 · JSONL 轉換 · 人民幣大寫 · 位元組轉換 · 中文拼音 · 溫度轉換 · 距離轉換 · 配置轉換 · 字幕格式轉換 · 速度轉換 · 容量轉換 · 面積轉換 · 重量轉換
 
-### 🛠️ 格式化 *(11)*
-Markdown 編輯器 · 即時渲染 Markdown 編輯器(Vditor: 即時渲染/分割/所見即所得三種模式, KaTeX 公式, 匯出 .md 與自帶樣式的 .html) · Mermaid 編輯器(即時預覽, 內建 30+ 圖形類型範例, 匯出 SVG/PNG/WebP) · JSON 格式化 · JSON5 格式化 · JavaScript 格式化(美化/壓縮/混淆加密/解密還原) · SQL 格式化 · XML 格式化 · HTML 格式化 · SVG 格式化 · 中英文自動排版
+### 🛠️ 格式化 *(12)*
+Markdown 編輯器 · 即時渲染 Markdown 編輯器(Vditor: 即時渲染/分割/所見即所得三種模式, KaTeX 公式, 匯出 .md 與自帶樣式的 .html) · Mermaid 編輯器(即時預覽, 內建 30+ 圖形類型範例, 匯出 SVG/PNG/WebP) · 心智圖(Markdown 大綱轉 markmap 互動式心智圖, 折疊層級/縮放平移, 配色與字號, 匯出 SVG/PNG/WebP) · JSON 格式化 · JSON5 格式化 · JavaScript 格式化(美化/壓縮/混淆加密/解密還原) · SQL 格式化 · XML 格式化 · HTML 格式化 · SVG 格式化 · 中英文自動排版
 
 ### 🖼️ 圖片 *(17)*
 Base64 圖片 · ASCII 圖片 · 程式碼截圖 · ICO 生成 · App Icon 生成 · 圖片主題色(合併相近色 + 佔比) · 圖片分割(2/3/4/6/9 份) · 圖片調整(依比例/依像素縮放 + 旋轉 90°·180°·270°, PNG·JPEG·WebP) · 圖片浮水印(文字/logo, 九宮格·平鋪 + 旋轉·透明度) · 佔位圖片 · Shield Badge 生成 · 圖片負片(可調強度反相) · 圖片黑白化(灰階/二值, 支援大津法自動閾值) · 圖片銳化(USM 半徑/強度/閾值) · 圖片取色(放大鏡 + HEX/RGB/HSL, 歷史色) · 圖片轉 SVG(點陣圖描線成向量, VTracer 彩色分層/黑白二值, 13 項參數 + 7 組預設) · 像素圖(圖片轉像素風: 快捷設定「人像照片 / 遊戲素材 / 抽象創作」, 像素塊平均 + 灰階 + 調色板量化 + 4×4 Bayer 抖動; 自適應 16~256 色與經典主機色板 NES·PICO-8·Game Boy·C64·CGA·ZX·SMS·MD·SFC)
@@ -51,8 +51,8 @@ Base64 圖片 · ASCII 圖片 · 程式碼截圖 · ICO 生成 · App Icon 生�
 ### 🌐 站長工具 *(16)*
 HTML 標籤去除 · 瀏覽器指紋 · CSR 申請文件(本機產生 RSA 私鑰 + PKCS#10 請求, 支援 SAN) · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 檢查 · 關鍵詞密度 · 網頁TDK 資訊檢測 · DNS 查詢(僅桌面版) · Whois 查詢(僅桌面版) · MTR 查詢(僅桌面版: traceroute + ping, 逐跳丟包/RTT/抖動) · robots.txt 生成 · iptables 規則(日常情境一鍵產生: 開放連接埠 / 封鎖 IP / 封鎖網段 / 連接埠轉發; 也可解析現有規則或依表單產生指令, 支援 iptables-save) · tc 規則(HTB / TBF / netem 限速與弱網模擬, 入口限速走 ifb) · nginx 設定(靜態站點 / SPA / PHP / 反向代理, 含 TLS、gzip、靜態快取、限流、防盜連, 直接產生 vhost 設定檔)
 
-### 🧩 其他 *(11)*
-CSS 配色 · 行數統計 · 正則表達式 · 檔案比較 · 鍵盤按鍵資訊 · Chmod 權限 · ASCII 文字 · CIDR 計算器 · WebSocket 偵錯 · 提詞器(調速/淡入淡出/逐行高亮/全螢幕, 空格 開始·暫停, 預設值可在設定裡改/頁面一鍵儲存) · BOM 檢查(偵測 / 移除 / 新增 UTF-8·UTF-16·UTF-32 BOM, 編碼推測與文字預覽)
+### 🧩 其他 *(13)*
+CSS 配色 · 行數統計 · 正則表達式 · 檔案比較 · 鍵盤按鍵資訊 · Chmod 權限 · ASCII 文字 · CIDR 計算器 · WebSocket 偵錯 · 提詞器(調速/淡入淡出/逐行高亮/全螢幕, 空格 開始·暫停, 預設值可在設定裡改/頁面一鍵儲存) · BOM 檢查(偵測 / 移除 / 新增 UTF-8·UTF-16·UTF-32 BOM, 編碼推測與文字預覽) · 節拍器(20~300 BPM, 拍號與拍內細分, 3 種音色 + 音量, 全螢幕閃爍圓點, 連擊測速) · 螢幕錄製(瀏覽器專享: 擷取螢幕/視窗/分頁, 可選系統聲音與麥克風, 影格率·位元率·解析度可選, 一鍵儲存 WebM/MP4)
 
 > 另有內建頁面：**應用中心**(支援按應用名稱 / 分類名稱搜尋 + 分類篩選)、**說明與更新日誌**、**設定**。
 
@@ -91,7 +91,7 @@ magic-tools
 │   │   ├── app-modules.ts    # 建置期用 import.meta.glob 靜態收集 (取代 webpack context 動態匯入)
 │   │   ├── app-i18n.ts       # 應用註冊表: appNameOf() 等取各工具/固定頁三語名稱
 │   │   ├── lang-packs.ts     # 彙總各工具 lang.ts 的預設語言包 (default 匯出)
-│   │   └── <工具>/           # 每工具一個目錄 (目前 137 個, 清單見下) — 兩步註冊
+│   │   └── <工具>/           # 每工具一個目錄 (目前 139 個, 清單見下) — 兩步註冊
 │   │       ├── define.tsx    # 註冊中繼資料: AppName(zh-CN 預設名) / Icon / Type(分組)
 │   │       ├── index.tsx     # 工具頁面元件 (預設匯出, 懶載入)
 │   │       ├── lang.ts       # 預設語言包 + 三語詞條 (zh 短語即 key, 值=[zh-TW, en]) + 本地取詞函式
@@ -110,7 +110,7 @@ magic-tools
 
 ### `src/App/` 現有工具清單
 
-[`src/App/`](src/App/) 下現有 **137** 個工具目錄, 每個目錄 = 一個工具, 由其中 `define.tsx` 宣告。**新增工具需兩步登記**：(1) 把目錄名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 陣列 (該陣列決定側邊欄/應用中心選單順序與路由; `import.meta.glob` 只負責發現頁面元件, 不決定選單); (2) 把其 `lang.ts` 預設匯出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名稱與介面文案才能隨語言切換。按下表 `Type` 分組列出 (與側邊欄/上方功能總覽一致), 括號內為目錄數。除下列公共檔案外, 個別工具另有私有檔案 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
+[`src/App/`](src/App/) 下現有 **139** 個工具目錄, 每個目錄 = 一個工具, 由其中 `define.tsx` 宣告。**新增工具需兩步登記**：(1) 把目錄名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 陣列 (該陣列決定側邊欄/應用中心選單順序與路由; `import.meta.glob` 只負責發現頁面元件, 不決定選單); (2) 把其 `lang.ts` 預設匯出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名稱與介面文案才能隨語言切換。按下表 `Type` 分組列出 (與側邊欄/上方功能總覽一致), 括號內為目錄數。除下列公共檔案外, 個別工具另有私有檔案 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
 
 **🔐 加解密 *(22)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `SM9Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
 
@@ -128,7 +128,7 @@ magic-tools
 
 **🌐 站長工具 *(16)*** — `BrowserFingerprint` · `CSRGenerator` · `CookieAnalyzer` · `DnsQuery` · `HtmlStripText` · `IptablesRules` · `KeywordDensity` · `MtrQuery` · `NginxConfig` · `RobotsTxtGenerator` · `SitemapCheck` · `TcRules` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck` · `WhoisQuery`
 
-**🧩 其他 *(11)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `RegexTester` · `Teleprompter` · `WebSocketDebug`
+**🧩 其他 *(13)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `Metronome` · `RegexTester` · `ScreenRecorder` · `Teleprompter` · `WebSocketDebug`
 
 > 內建頁面 `AppStore`(應用中心) / `Help` / `Setting` 也位於 `src/App/` 下 (註冊 `Type = 'misc'`), 但屬固定頁面而非工具。
 

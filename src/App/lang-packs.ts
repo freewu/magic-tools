@@ -136,6 +136,8 @@ import CopybookGenerator from './CopybookGenerator/lang';
 import JSONLConvert from './JSONLConvert/lang';
 import Teleprompter from './Teleprompter/lang';
 import BOMCheck from './BOMCheck/lang';
+import Metronome from './Metronome/lang';
+import ScreenRecorder from './ScreenRecorder/lang';
 import IptablesRules from './IptablesRules/lang';
 import TcRules from './TcRules/lang';
 import NginxConfig from './NginxConfig/lang';
@@ -282,4 +284,6 @@ export const langPacks = {
   NginxConfig,
   GitignoreGenerator,
   BOMCheck,
+  Metronome,
+  ScreenRecorder,
 };
