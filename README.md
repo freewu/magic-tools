@@ -96,10 +96,10 @@ magic-tools
 │   │       ├── index.tsx     # tool page component (default export; lazy-loaded)
 │   │       ├── lang.ts       # default language pack + rows (zh phrase = key → [zh-TW, en]) + lookup helpers
 │   │       ├── lib.ts        # pure logic shared by the page and its unit tests (most tools)
-│   │       ├── lib.test.ts   # jest unit tests (96 tools)
-│   │       ├── data.ts       # option tables / constants / types (60 tools)
-│   │       ├── setting.tsx   # this tool's panel inside the Settings center (66 tools)
-│   │       └── intro.tsx     # About / instructions content, trilingual (46 tools)
+│   │       ├── lib.test.ts   # jest unit tests (112 tools)
+│   │       ├── data.ts       # option tables / constants / types (74 tools)
+│   │       ├── setting.tsx   # this tool's panel inside the Settings center (71 tools)
+│   │       └── intro.tsx     # About / instructions content, trilingual (56 tools)
 │   ├── layout/           # main frame: sidebar / content
 │   ├── hook/             # global state: theme / app context
 │   └── lib/              # shared utilities
