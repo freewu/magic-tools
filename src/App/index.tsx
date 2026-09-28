@@ -143,6 +143,7 @@ const list = [
   'BOMCheck',
   'Metronome',
   'ScreenRecorder',
+  'QrDecode',
 ];
 
 import { defineLoader } from './app-modules';

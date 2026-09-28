@@ -2,7 +2,7 @@
 
 # 🧰 Magic Tools
 
-**全能開發工具箱 —— 9 大分類、139 個實用工具，桌面 + Web 雙端。**
+**全能開發工具箱 —— 9 大分類、140 個實用工具，桌面 + Web 雙端。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
@@ -51,8 +51,8 @@ Base64 圖片 · ASCII 圖片 · 程式碼截圖 · ICO 生成 · App Icon 生�
 ### 🌐 站長工具 *(16)*
 HTML 標籤去除 · 瀏覽器指紋 · CSR 申請文件(本機產生 RSA 私鑰 + PKCS#10 請求, 支援 SAN) · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 檢查 · 關鍵詞密度 · 網頁TDK 資訊檢測 · DNS 查詢(僅桌面版) · Whois 查詢(僅桌面版) · MTR 查詢(僅桌面版: traceroute + ping, 逐跳丟包/RTT/抖動) · robots.txt 生成 · iptables 規則(日常情境一鍵產生: 開放連接埠 / 封鎖 IP / 封鎖網段 / 連接埠轉發; 也可解析現有規則或依表單產生指令, 支援 iptables-save) · tc 規則(HTB / TBF / netem 限速與弱網模擬, 入口限速走 ifb) · nginx 設定(靜態站點 / SPA / PHP / 反向代理, 含 TLS、gzip、靜態快取、限流、防盜連, 直接產生 vhost 設定檔)
 
-### 🧩 其他 *(13)*
-CSS 配色 · 行數統計 · 正則表達式 · 檔案比較 · 鍵盤按鍵資訊 · Chmod 權限 · ASCII 文字 · CIDR 計算器 · WebSocket 偵錯 · 提詞器(調速/淡入淡出/逐行高亮/全螢幕, 空格 開始·暫停, 預設值可在設定裡改/頁面一鍵儲存) · BOM 檢查(偵測 / 移除 / 新增 UTF-8·UTF-16·UTF-32 BOM, 編碼推測與文字預覽) · 節拍器(20~300 BPM, 拍號與拍內細分, 3 種音色 + 音量, 全螢幕閃爍圓點, 連擊測速) · 螢幕錄製(瀏覽器專享: 擷取螢幕/視窗/分頁, 可選系統聲音與麥克風, 影格率·位元率·解析度可選, 一鍵儲存 WebM/MP4)
+### 🧩 其他 *(14)*
+CSS 配色 · 行數統計 · 正則表達式 · 檔案比較 · 鍵盤按鍵資訊 · Chmod 權限 · ASCII 文字 · CIDR 計算器 · WebSocket 偵錯 · 提詞器(調速/淡入淡出/逐行高亮/全螢幕, 空格 開始·暫停, 預設值可在設定裡改/頁面一鍵儲存) · BOM 檢查(偵測 / 移除 / 新增 UTF-8·UTF-16·UTF-32 BOM, 編碼推測與文字預覽) · 節拍器(20~300 BPM, 拍號與拍內細分, 3 種音色 + 音量, 全螢幕閃爍圓點, 連擊測速) · 螢幕錄製(瀏覽器專享: 擷取螢幕/視窗/分頁, 可選系統聲音與麥克風, 影格率·位元率·解析度可選, 一鍵儲存 WebM/MP4) · 二維碼解析(上傳/拖曳/貼上二維碼圖片, 用 jsQR 讀出內容: 網址·WiFi 配網·名片·郵件·電話·簡訊·座標·動態密碼, 結構化欄位顯示, 預覽圖上框出二維碼位置, 反色策略可調, 本機歷史記錄)
 
 > 另有內建頁面：**應用中心**(支援按應用名稱 / 分類名稱搜尋 + 分類篩選)、**說明與更新日誌**、**設定**。
 
@@ -91,7 +91,7 @@ magic-tools
 │   │   ├── app-modules.ts    # 建置期用 import.meta.glob 靜態收集 (取代 webpack context 動態匯入)
 │   │   ├── app-i18n.ts       # 應用註冊表: appNameOf() 等取各工具/固定頁三語名稱
 │   │   ├── lang-packs.ts     # 彙總各工具 lang.ts 的預設語言包 (default 匯出)
-│   │   └── <工具>/           # 每工具一個目錄 (目前 139 個, 清單見下) — 兩步註冊
+│   │   └── <工具>/           # 每工具一個目錄 (目前 140 個, 清單見下) — 兩步註冊
 │   │       ├── define.tsx    # 註冊中繼資料: AppName(zh-CN 預設名) / Icon / Type(分組)
 │   │       ├── index.tsx     # 工具頁面元件 (預設匯出, 懶載入)
 │   │       ├── lang.ts       # 預設語言包 + 三語詞條 (zh 短語即 key, 值=[zh-TW, en]) + 本地取詞函式
@@ -110,7 +110,7 @@ magic-tools
 
 ### `src/App/` 現有工具清單
 
-[`src/App/`](src/App/) 下現有 **139** 個工具目錄, 每個目錄 = 一個工具, 由其中 `define.tsx` 宣告。**新增工具需兩步登記**：(1) 把目錄名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 陣列 (該陣列決定側邊欄/應用中心選單順序與路由; `import.meta.glob` 只負責發現頁面元件, 不決定選單); (2) 把其 `lang.ts` 預設匯出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名稱與介面文案才能隨語言切換。按下表 `Type` 分組列出 (與側邊欄/上方功能總覽一致), 括號內為目錄數。除下列公共檔案外, 個別工具另有私有檔案 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
+[`src/App/`](src/App/) 下現有 **140** 個工具目錄, 每個目錄 = 一個工具, 由其中 `define.tsx` 宣告。**新增工具需兩步登記**：(1) 把目錄名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 陣列 (該陣列決定側邊欄/應用中心選單順序與路由; `import.meta.glob` 只負責發現頁面元件, 不決定選單); (2) 把其 `lang.ts` 預設匯出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名稱與介面文案才能隨語言切換。按下表 `Type` 分組列出 (與側邊欄/上方功能總覽一致), 括號內為目錄數。除下列公共檔案外, 個別工具另有私有檔案 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
 
 **🔐 加解密 *(22)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `SM9Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
 
@@ -128,7 +128,7 @@ magic-tools
 
 **🌐 站長工具 *(16)*** — `BrowserFingerprint` · `CSRGenerator` · `CookieAnalyzer` · `DnsQuery` · `HtmlStripText` · `IptablesRules` · `KeywordDensity` · `MtrQuery` · `NginxConfig` · `RobotsTxtGenerator` · `SitemapCheck` · `TcRules` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck` · `WhoisQuery`
 
-**🧩 其他 *(13)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `Metronome` · `RegexTester` · `ScreenRecorder` · `Teleprompter` · `WebSocketDebug`
+**🧩 其他 *(14)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `Metronome` · `QrDecode` · `RegexTester` · `ScreenRecorder` · `Teleprompter` · `WebSocketDebug`
 
 > 內建頁面 `AppStore`(應用中心) / `Help` / `Setting` 也位於 `src/App/` 下 (註冊 `Type = 'misc'`), 但屬固定頁面而非工具。
 

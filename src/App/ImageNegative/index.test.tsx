@@ -72,7 +72,8 @@ const images = (container: HTMLElement): HTMLImageElement[] =>
 const dropImage = async (container: HTMLElement, name = 'photo.png') => {
   const zone = container.querySelector('div[style*="dashed"]') as HTMLElement;
   fireEvent.drop(zone, { dataTransfer: { files: [ new File([ 'x' ], name, { type: 'image/png' }) ] } });
-  await waitFor(() => expect(images(container).length).toBeGreaterThan(1));
+  // 结果预览依赖画布处理完成: 并发跑全量用例时可能超过默认 1s, 放宽等待避免偶发失败
+  await waitFor(() => expect(images(container).length).toBeGreaterThan(1), { timeout: 5000 });
 };
 const toDataURL = HTMLCanvasElement.prototype.toDataURL;
 

@@ -428,6 +428,17 @@ const ROWS: Record<string, Row> = {
   '系统声音需在共享选择器里勾选「分享音频」; 麦克风会额外申请权限': ['系統聲音需在共用選擇器裡勾選「分享音訊」; 麥克風會額外申請權限', 'System audio needs “Share audio” ticked in the share picker; the microphone asks for extra permission'],
   '「原始分辨率」不缩放; 其余只限制上限, 不会放大画面': ['「原始解析度」不縮放; 其餘只限制上限, 不會放大畫面', '“Source resolution” never scales; the others only cap the capture and never upscale'],
   '保存时的文件名前缀, 默认 ${p}; 实际文件名会追加时间戳 (非法字符会被去掉)': ['儲存時的檔名前綴, 預設 ${p}; 實際檔名會附加時間戳 (非法字元會被移除)', 'Filename prefix used when saving (default ${p}); a timestamp is appended and illegal characters are stripped'],
+
+  // ---- 二维码解析 ----
+  '二维码解析': ['二維碼解析', 'QR code decoder'],
+  '默认反色策略': ['預設反色策略', 'Default inversion'],
+  '「自动尝试反色」可同时处理普通码与深底浅码 (暗色主题截图)': ['「自動嘗試反色」可同時處理一般碼與深底淺碼 (暗色主題截圖)', '“Try both” handles normal codes and light-on-dark codes (dark-theme screenshots)'],
+  '默认图片最大边长': ['預設圖片最大邊長', 'Default max image edge'],
+  '超过该边长会等比缩小后再解析, 默认 ${n} px; 手机原图等比缩小后既快又常常更准': ['超過該邊長會等比縮小後再解析, 預設 ${n} px; 手機原圖等比縮小後既快又常常更準', 'Images larger than this are scaled down before decoding (default ${n} px); downscaled phone photos decode faster and often more reliably'],
+  '历史记录条数': ['歷史記錄條數', 'History size'],
+  '工具页「历史记录」保留的条数上限, 超出后丢弃最旧的记录': ['工具頁「歷史記錄」保留的條數上限, 超出後丟棄最舊的記錄', 'How many entries the on-page history keeps; the oldest ones are dropped first'],
+  '自动复制解析结果': ['自動複製解析結果', 'Auto-copy the result'],
+  '开启后每次解析成功都会把内容写入剪贴板, 省一次点击': ['開啟後每次解析成功都會把內容寫入剪貼簿, 省一次點擊', 'When enabled, every successful decode is copied to the clipboard automatically'],
 };
 
 /**

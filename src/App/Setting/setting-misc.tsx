@@ -7,6 +7,7 @@ import { TeleprompterSetting } from "../Teleprompter/setting";
 import { BOMCheckSetting } from "../BOMCheck/setting";
 import { MetronomeSetting } from "../Metronome/setting";
 import { ScreenRecorderSetting } from "../ScreenRecorder/setting";
+import { QrDecodeSetting } from "../QrDecode/setting";
 
 export const SettingMisc = () => {
 
@@ -19,6 +20,7 @@ export const SettingMisc = () => {
       <BOMCheckSetting />
       <MetronomeSetting />
       <ScreenRecorderSetting />
+      <QrDecodeSetting />
     </Form>
   )
 }
