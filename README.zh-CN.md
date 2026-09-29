@@ -2,7 +2,7 @@
 
 # 🧰 Magic Tools
 
-**全能开发工具箱 —— 9 大分类、140 个实用工具，桌面 + Web 双端。**
+**全能开发工具箱 —— 9 大分类、141 个实用工具，桌面 + Web 双端。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
@@ -51,8 +51,8 @@ Base64图片 · ASCII 图片 · 代码截图 · ICO 生成 · App Icon 生成 ·
 ### 🌐 站长工具 *(16)*
 HTML 标签去除 · 浏览器指纹 · CSR 申请文件(本机生成 RSA 私钥 + PKCS#10 请求, 支持 SAN) · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 检查 · 关键词密度 · 网页TDK信息检测 · DNS 查询(仅桌面版) · Whois 查询(仅桌面版) · MTR 查询(仅桌面版: traceroute + ping, 逐跳丢包/RTT/抖动) · robots.txt 生成 · iptables 规则(日常场景一键生成: 开放端口 / 封禁 IP / 封禁网段 / 端口转发; 也可解析已有规则或按表单生成命令, 支持 iptables-save) · tc 规则(HTB / TBF / netem 限速与弱网模拟, 入口限速走 ifb) · nginx 配置(静态站点 / SPA / PHP / 反向代理, 含 TLS、gzip、静态缓存、限流、防盗链, 直接生成 vhost 配置文件)
 
-### 🧩 其它 *(14)*
-CSS 配色 · 行数统计 · 正则表达式 · 文件比较 · 键盘按键信息 · Chmod 权限 · ASCII 文字 · CIDR 计算器 · WebSocket 调试 · 提词器(调速/淡入淡出/逐行高亮/全屏, 空格 开始·暂停, 默认值可在设置里改/页面一键保存) · BOM 检查(检测 / 去除 / 添加 UTF-8·UTF-16·UTF-32 BOM, 编码推测与文本预览) · 节拍器(20~300 BPM, 拍号与拍内细分, 3 种音色 + 音量, 全屏闪烁圆点, 连击测速) · 屏幕录制(浏览器专享: 采集屏幕/窗口/标签页, 可选系统声音与麦克风, 帧率·码率·分辨率可选, 一键保存 WebM/MP4) · 二维码解析(上传/拖拽/粘贴二维码图片, 用 jsQR 读出内容: 网址·WiFi 配网·名片·邮件·电话·短信·坐标·动态口令, 结构化字段展示, 预览图上框出二维码位置, 反色策略可调, 本地历史记录)
+### 🧩 其它 *(15)*
+CSS 配色 · 行数统计 · 正则表达式 · 文件比较 · 键盘按键信息 · Chmod 权限 · ASCII 文字 · CIDR 计算器 · WebSocket 调试 · 提词器(调速/淡入淡出/逐行高亮/全屏, 空格 开始·暂停, 默认值可在设置里改/页面一键保存) · BOM 检查(检测 / 去除 / 添加 UTF-8·UTF-16·UTF-32 BOM, 编码推测与文本预览) · 节拍器(20~300 BPM, 拍号与拍内细分, 3 种音色 + 音量, 全屏闪烁圆点, 连击测速) · 屏幕录制(浏览器专享: 采集屏幕/窗口/标签页, 可选系统声音与麦克风, 帧率·码率·分辨率可选, 一键保存 WebM/MP4) · 二维码解析(上传/拖拽/粘贴二维码图片, 用 jsQR 读出内容: 网址·WiFi 配网·名片·邮件·电话·短信·坐标·动态口令, 结构化字段展示, 预览图上框出二维码位置, 反色策略可调, 本地历史记录) · 敏感词检测(Aho–Corasick 扫描, 通用/小红书/微信公众号三套词库: 危险等级、命中位置与替换建议, 一键打码与报告导出, 宽松匹配可揪出「微 信」这类绕过写法)
 
 > 另有内置页面：**应用中心**(支持按应用名 / 分类名搜索 + 分类筛选)、**帮助与更新日志**、**设置**。
 
@@ -91,15 +91,15 @@ magic-tools
 │   │   ├── app-modules.ts    # 构建期用 import.meta.glob 静态收集 (替代 webpack context 动态导入)
 │   │   ├── app-i18n.ts       # 应用注册表: appNameOf() 等取各工具/固定页三语名称
 │   │   ├── lang-packs.ts     # 汇总各工具 lang.ts 的默认语言包 (default 导出)
-│   │   └── <工具>/           # 每工具一个目录 (当前 140 个, 清单见下) — 两步注册
+│   │   └── <工具>/           # 每工具一个目录 (当前 141 个, 清单见下) — 两步注册
 │   │       ├── define.tsx    # 注册元数据: AppName(zh-CN 默认名) / Icon / Type(分组)
 │   │       ├── index.tsx     # 工具页面组件 (默认导出, 懒加载)
 │   │       ├── lang.ts       # 默认语言包 + 三语词条 (zh 短语即 key, 值=[zh-TW, en]) + 本地取词函数
 │   │       ├── lib.ts        # 纯函数逻辑, 页面与单测共用 (绝大多数工具)
-│   │       ├── lib.test.ts   # jest 单测 (112 个工具)
-│   │       ├── data.ts       # 选项/常量表与类型 (74 个工具)
-│   │       ├── setting.tsx   # 设置中心内本工具的设置面板 (71 个工具)
-│   │       └── intro.tsx     # About/说明 三语内容 (56 个工具)
+│   │       ├── lib.test.ts   # jest 单测 (113 个工具)
+│   │       ├── data.ts       # 选项/常量表与类型 (75 个工具)
+│   │       ├── setting.tsx   # 设置中心内本工具的设置面板 (72 个工具)
+│   │       └── intro.tsx     # About/说明 三语内容 (57 个工具)
 │   ├── layout/           # 主框架: 侧边栏/内容区
 │   ├── hook/             # 全局状态: 主题/应用上下文
 │   └── lib/              # 通用工具库
@@ -110,7 +110,7 @@ magic-tools
 
 ### `src/App/` 现有工具清单
 
-[`src/App/`](src/App/) 下现有 **140** 个工具目录, 每个目录 = 一个工具, 由其中 `define.tsx` 声明。**新增工具需两步登记**：(1) 把目录名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 数组 (该数组决定侧边栏/应用中心菜单顺序与路由; `import.meta.glob` 只负责发现页面组件, 不决定菜单); (2) 把其 `lang.ts` 默认导出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名称与界面文案才能随语言切换。按下表 `Type` 分组列出 (与侧边栏/上方功能总览一致), 括号内为目录数。除下列公共文件外, 个别工具另有私有文件 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
+[`src/App/`](src/App/) 下现有 **141** 个工具目录, 每个目录 = 一个工具, 由其中 `define.tsx` 声明。**新增工具需两步登记**：(1) 把目录名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 数组 (该数组决定侧边栏/应用中心菜单顺序与路由; `import.meta.glob` 只负责发现页面组件, 不决定菜单); (2) 把其 `lang.ts` 默认导出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名称与界面文案才能随语言切换。按下表 `Type` 分组列出 (与侧边栏/上方功能总览一致), 括号内为目录数。除下列公共文件外, 个别工具另有私有文件 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
 
 **🔐 加解密 *(22)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `SM9Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
 
@@ -128,7 +128,7 @@ magic-tools
 
 **🌐 站长工具 *(16)*** — `BrowserFingerprint` · `CSRGenerator` · `CookieAnalyzer` · `DnsQuery` · `HtmlStripText` · `IptablesRules` · `KeywordDensity` · `MtrQuery` · `NginxConfig` · `RobotsTxtGenerator` · `SitemapCheck` · `TcRules` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck` · `WhoisQuery`
 
-**🧩 其它 *(14)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `Metronome` · `QrDecode` · `RegexTester` · `ScreenRecorder` · `Teleprompter` · `WebSocketDebug`
+**🧩 其它 *(15)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `Metronome` · `QrDecode` · `RegexTester` · `ScreenRecorder` · `SensitiveWord` · `Teleprompter` · `WebSocketDebug`
 
 > 内置页面 `AppStore`(应用中心) / `Help` / `Setting` 也位于 `src/App/` 下 (注册 `Type = 'misc'`), 但属固定页面而非工具。
 
