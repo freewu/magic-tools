@@ -80,6 +80,36 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-09-29 V2.19.0 Release", "2026-09-29 V2.19.0 Release", "2026-09-29 V2.19.0 Release"),
+    items: trio(
+      [
+        "新增「敏感词检测」工具 (其它): Aho–Corasick 扫描, 通用 / 小红书 / 微信公众号三套词库, 给出危险等级、命中位置与替换建议, 支持一键打码与报告导出 (TXT / HTML); 宽松匹配可忽略间隔符与零宽字符、全角折半角, 揪出「微 信」「ｖｘ」这类绕过写法, 纯拉丁词边界避免误伤英文单词; 全部本地完成",
+        "提词器新增开始前倒计时: 从开头点「开始」时先按设定秒数倒数 (关闭 / 3 / 5 / 10 / 15 / 30 秒, 默认 3 秒), 舞台显示大数字覆盖层, 倒数结束自动开始滚动; 倒计时中再点一次「开始」或按空格可取消、立即开滚; 暂停后恢复播放不倒数; 可在设置中心预设默认值",
+        "节拍器新增开始前倒计时 (预排拍): 可选 关闭 / 1 / 2 / 4 / 8 个预排拍 (默认 2 拍), 开始后先打预排拍 (660Hz 音高 + 琥珀色闪烁, 与正拍区分), 舞台提示剩余倒数拍数, 播完自动进入正拍; 可在设置中心预设默认值",
+        "Windows 发布产物新增 NSIS 安装包, 内置完整 WebView2 离线运行时 —— 没有 WebView2 的机器也能直接安装使用; 原有「单体免安装 exe」继续保留",
+        "修正 docs 页面版本徽章 (旧版本号 v2.10.1 → 当前版本), 同步三语页面",
+        "工具总数 140 → 141 (其它 14 → 15)",
+      ],
+      [
+        "新增「敏感詞檢測」工具 (其他): Aho–Corasick 掃描, 通用 / 小紅書 / 微信公眾號三套詞庫, 給出危險等級、命中位置與替換建議, 支援一鍵打碼與報告匯出 (TXT / HTML); 寬鬆匹配可忽略間隔符與零寬字元、全形折半形, 揪出「微 信」「ｖｘ」這類繞過寫法, 純拉丁詞邊界避免誤傷英文單詞; 全部本機完成",
+        "提詞器新增開始前倒計時: 從開頭點「開始」時先依設定秒數倒數 (關閉 / 3 / 5 / 10 / 15 / 30 秒, 預設 3 秒), 舞台顯示大數字覆蓋層, 倒數結束自動開始捲動; 倒計時中再點一次「開始」或按空白鍵可取消、立即開滾; 暫停後恢復播放不倒數; 可在設定中心預設預設值",
+        "節拍器新增開始前倒計時 (預排拍): 可選 關閉 / 1 / 2 / 4 / 8 個預排拍 (預設 2 拍), 開始後先打預排拍 (660Hz 音高 + 琥珀色閃爍, 與正拍區分), 舞台提示剩餘倒數拍數, 播完自動進入正拍; 可在設定中心預設預設值",
+        "Windows 發行產物新增 NSIS 安裝包, 內建完整 WebView2 離線執行時 —— 沒有 WebView2 的機器也能直接安裝使用; 原有「單一免安裝 exe」繼續保留",
+        "修正 docs 頁面版本徽章 (舊版本號 v2.10.1 → 目前版本), 同步三語頁面",
+        "工具總數 140 → 141 (其他 14 → 15)",
+      ],
+      [
+        "New “Sensitive word check” tool (Utilities): Aho–Corasick scanning with three word lists (General = Xiaohongshu + WeChat combined), reporting risk levels, matched positions and rewrite suggestions with one-click masking and report export (TXT / HTML); loose matching ignores separators and zero-width characters and folds full-width to half-width, catching workarounds like “微 信” or “ｖｘ”, while Latin word boundaries avoid false hits inside English words; fully local",
+        "Teleprompter: new start countdown — pressing Start from the very beginning counts down for the chosen seconds first (off / 3 / 5 / 10 / 15 / 30 s, 3 s by default) with a large number overlaid on the stage, then scrolling starts automatically; press Start or Space again during the countdown to cancel and begin immediately; resuming after a pause skips the countdown; the default can be preset in Settings",
+        "Metronome: new count-in — choose off / 1 / 2 / 4 / 8 leading beats (2 by default) that tick before the regular beat with a different pitch (660 Hz) and an amber flash, while the stage shows how many beats remain; bars restart from bar 1 after the count-in; the default can be preset in Settings",
+        "The Windows release now also ships an NSIS installer with the full WebView2 runtime embedded — machines without WebView2 can install and run it directly; the portable single-file exe remains available",
+        "Fixed the version badge shown in the docs pages (stale v2.10.1 → current version) across the three languages",
+        "Tool count grew from 140 to 141 (Utilities 14 → 15)",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-09-28 V2.18.0 Release", "2026-09-28 V2.18.0 Release", "2026-09-28 V2.18.0 Release"),
     items: trio(
       [

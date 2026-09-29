@@ -23,7 +23,7 @@ header{position:sticky;top:0;z-index:9;background:color-mix(in srgb,var(--bg) 86
 .hero{text-align:center;padding:72px 20px 44px}
 .hero .logo{width:96px;height:96px;border-radius:22px;box-shadow:0 12px 40px rgba(22,119,255,.28)}
 .hero h1{margin:22px 0 6px;font-size:42px;letter-spacing:.5px}
-.ver{display:inline-block;font-size:13px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 12px;margin-bottom:18px;background:var(--card)}
+.ver{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}.badge{display:inline-flex;align-items:center;height:20px;border-radius:4px;overflow:hidden;font-size:11px;font-weight:600;font-family:Verdana,DejaVu Sans,sans-serif;box-shadow:inset 0 0 0 1px rgba(0,0,0,.14)}.bl{background:#24292f;color:#fff;padding:0 7px;line-height:20px}.bv{padding:0 7px;color:#fff;line-height:20px}.bv-blue{background:#007ec6}.bv-teal{background:#0e7490}.bv-react{background:#087ea4}.bv-antd{background:#0170fe}
 .hero p{max-width:760px;margin:0 auto 30px;color:var(--muted);font-size:17px}
 .cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
 .btn{display:inline-block;padding:12px 26px;border-radius:12px;font-weight:600;font-size:15px;transition:.2s}
@@ -68,7 +68,7 @@ footer{border-top:1px solid var(--line);padding:28px 0 40px;text-align:center;co
 <div class="hero">
   <img class="logo" src="logo.png" alt="Magic Tools 图标">
   <h1>Magic Tools</h1>
-  <div class="ver">v2.18.0 · Tauri 2 · React 18 · Ant Design 5</div>
+  <div class="ver"><span class="badge"><span class="bl">version</span><span class="bv bv-blue">v2.19.0</span></span><span class="badge"><span class="bl">Tauri</span><span class="bv bv-teal">2</span></span><span class="badge"><span class="bl">React</span><span class="bv bv-react">18</span></span><span class="badge"><span class="bl">Ant Design</span><span class="bv bv-antd">5</span></span></div>
   <p>全能开发工具箱，内置 <b>9 大分类、141 个实用工具</b>：加解密、哈希校验、编解码、类型转换、格式化、图片、生成器、站长工具与实用小工具。既可安装为 <b>桌面应用</b>（Windows / macOS / Linux），也可在<b>浏览器</b>中直接使用。</p>
   <div class="cta">
     <a class="btn primary" href="https://github.com/freewu/magic-tools/releases/latest">⬇ 下载桌面版</a>
