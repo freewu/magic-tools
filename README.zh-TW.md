@@ -61,6 +61,7 @@ CSS 配色 · 行數統計 · 正則表達式 · 檔案比較 · 鍵盤按鍵資
 | 平台 | 安裝檔 | 說明 |
 | --- | --- | --- |
 | Windows | `MagicTools_x64.exe` | 單一免安裝 exe（需 WebView2，Win10/11 系統內建） |
+| Windows | `MagicTools_x64-setup.exe` | NSIS 安裝包，內建完整 WebView2 執行時（沒有 WebView2 的機器也能安裝） |
 | macOS | `MagicTools_macOS-universal.zip` | 通用包（Apple Silicon + Intel） |
 | Linux | `MagicTools_amd64.AppImage` | AppImage |
 

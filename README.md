@@ -61,6 +61,7 @@ CSS colors · Line counter · Regex tester (17 presets) · File diff · Keyboard
 | Platform | Package | Note |
 | --- | --- | --- |
 | Windows | `MagicTools_x64.exe` | Single portable exe (WebView2 required, built-in on Win10/11) |
+| Windows | `MagicTools_x64-setup.exe` | NSIS installer with the full WebView2 runtime embedded (works on machines without WebView2) |
 | macOS | `MagicTools_macOS-universal.zip` | Universal (Apple Silicon + Intel) |
 | Linux | `MagicTools_amd64.AppImage` | AppImage |
 

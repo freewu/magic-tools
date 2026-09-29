@@ -19,6 +19,9 @@ jobs:
           # Windows: 单体免安装 exe (依赖系统自带 WebView2)
           - platform: 'windows-latest'
             args: '--no-bundle'
+          # Windows: NSIS 安装包, 内置完整 WebView2 离线运行时 (没有 WebView2 的机器也能直接安装)
+          - platform: 'windows-latest'
+            args: '--bundles nsis --config scripts/webview-offline.json'
           # macOS: 免安装 .app (universal — Intel & Apple Silicon 单包, 打包为 zip)
           - platform: 'macos-latest'
           # Linux: 免安装 AppImage
@@ -76,7 +79,8 @@ jobs:
         run: npm run tauri build -- ${{ matrix.args }}
 
       - name: Rename Windows portable exe with version
-        if: matrix.platform == 'windows-latest'
+        # 仅免安装任务改名上传; nsis 任务的安装包保留在 bundle/nsis/ 下 (同名 glob 会互相覆盖)
+        if: matrix.platform == 'windows-latest' && matrix.args == '--no-bundle'
         shell: bash
         run: mv src-tauri/target/release/magic-tools.exe "MagicTools_${VERSION}_x64.exe"
 
@@ -104,5 +108,6 @@ jobs:
           overwrite_files: true
           files: |
             MagicTools_*.exe
+            src-tauri/target/release/bundle/nsis/*.exe
             MagicTools_*_macOS-universal.zip
             src-tauri/target/release/bundle/appimage/*.AppImage
