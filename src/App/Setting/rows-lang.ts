@@ -439,6 +439,17 @@ const ROWS: Record<string, Row> = {
   '工具页「历史记录」保留的条数上限, 超出后丢弃最旧的记录': ['工具頁「歷史記錄」保留的條數上限, 超出後丟棄最舊的記錄', 'How many entries the on-page history keeps; the oldest ones are dropped first'],
   '自动复制解析结果': ['自動複製解析結果', 'Auto-copy the result'],
   '开启后每次解析成功都会把内容写入剪贴板, 省一次点击': ['開啟後每次解析成功都會把內容寫入剪貼簿, 省一次點擊', 'When enabled, every successful decode is copied to the clipboard automatically'],
+
+  // ---- 敏感词检测 ----
+  '敏感词检测': ['敏感詞檢測', 'Sensitive word check'],
+  '默认检测词库': ['預設檢測詞庫', 'Default word list'],
+  '打开工具页时默认选中的词库, 通用 = 小红书 + 微信公众号的并集': ['開啟工具頁時預設選中的詞庫, 通用 = 小紅書 + 微信公眾號的聯集', 'Word list selected when the tool opens; General = Xiaohongshu + WeChat combined'],
+  '宽松匹配': ['寬鬆匹配', 'Loose matching'],
+  '忽略间隔符 / 零宽字符并按全角折半角, 可检出「微 信」「ｖｘ」这类绕过写法': ['忽略間隔符 / 零寬字元並按全角折半角, 可檢出「微 信」「ｖｘ」這類繞過寫法', 'Ignore separators and zero-width characters and fold full-width to half-width, catching tricks such as “微 信” or “ｖｘ”'],
+  '拉丁词边界': ['拉丁詞邊界', 'Latin word boundary'],
+  '纯字母数字词要求左右不是字母, 避免「v」命中 version / VIP 这类英文单词': ['純英數字詞要求左右不是字母, 避免「v」命中 version / VIP 這類英文單詞', 'Pure alphanumeric words must not be surrounded by letters, so “v” no longer matches inside version or VIP'],
+  '默认打码字符': ['預設打碼字元', 'Default mask character'],
+  '「复制打码文本 / 保存打码文本」使用的字符': ['「複製打碼文字 / 儲存打碼文字」使用的字元', 'Character used by Copy / Save masked text'],
 };
 
 /**

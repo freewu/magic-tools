@@ -144,6 +144,7 @@ const list = [
   'Metronome',
   'ScreenRecorder',
   'QrDecode',
+  'SensitiveWord',
 ];
 
 import { defineLoader } from './app-modules';

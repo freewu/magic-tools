@@ -8,6 +8,7 @@ import { BOMCheckSetting } from "../BOMCheck/setting";
 import { MetronomeSetting } from "../Metronome/setting";
 import { ScreenRecorderSetting } from "../ScreenRecorder/setting";
 import { QrDecodeSetting } from "../QrDecode/setting";
+import { SensitiveWordSetting } from "../SensitiveWord/setting";
 
 export const SettingMisc = () => {
 
@@ -21,6 +22,7 @@ export const SettingMisc = () => {
       <MetronomeSetting />
       <ScreenRecorderSetting />
       <QrDecodeSetting />
+      <SensitiveWordSetting />
     </Form>
   )
 }

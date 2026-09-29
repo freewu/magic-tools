@@ -139,6 +139,7 @@ import BOMCheck from './BOMCheck/lang';
 import Metronome from './Metronome/lang';
 import ScreenRecorder from './ScreenRecorder/lang';
 import QrDecode from './QrDecode/lang';
+import SensitiveWord from './SensitiveWord/lang';
 import IptablesRules from './IptablesRules/lang';
 import TcRules from './TcRules/lang';
 import NginxConfig from './NginxConfig/lang';
@@ -288,4 +289,5 @@ export const langPacks = {
   Metronome,
   ScreenRecorder,
   QrDecode,
+  SensitiveWord,
 };
