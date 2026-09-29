@@ -96,6 +96,16 @@ const step = (ms = 200) => {
 };
 /** 推进 n 帧 */
 const advanceFrames = (n: number) => act(() => { for (let i = 0; i < n; i += 1) step(); });
+/** 等待默认倒计时 (3 秒) 走完: 16 帧 × 200ms = 3s (首帧只记时间不扣减) */
+const finishCountdown = () => advanceFrames(16);
+/** 点击倒计时档位 (antd Segmented 需要点内部的 radio) */
+const chooseSegmented = (text: string) => {
+  const norm2 = (s: string) => s.replace(/\s+/g, '');
+  const label = Array.from(document.querySelectorAll('label.ant-segmented-item'))
+    .find((el) => norm2((el as HTMLElement).textContent ?? '') === norm2(text));
+  if (!label) throw new Error(`未找到分段选项: ${text}`);
+  fireEvent.click(label.querySelector('input') ?? label);
+};
 
 /** 按按钮文案定位 (antd 会在两个汉字间插空格, 故比较去掉空白后的文本) */
 const btn = (name: string): HTMLButtonElement => {
@@ -212,28 +222,34 @@ describe('Teleprompter 播放控制', () => {
     render(<Teleprompter />);
 
     fireEvent.keyDown(document, { key: ' ', code: 'Space' });
-    expect(btn('暂停')).toBeInTheDocument();
+    expect(btn('取消倒计时')).toBeInTheDocument(); // 默认 3 秒: 先进入倒计时
     expect(frames.length).toBeGreaterThan(0); // 已启动动画帧
+
+    finishCountdown(); // 倒计时结束 → 自动开始滚动
+    expect(btn('暂停')).toBeInTheDocument();
 
     fireEvent.keyDown(document, { key: ' ', code: 'Space' });
     expect(btn('开始')).toBeInTheDocument();
   });
 
-  test('输入框内空格不误触播放; 播放中空格仍可暂停', () => {
+  test('输入框内空格不误触播放; 倒计时中空格也会取消倒计时', () => {
     render(<Teleprompter />);
 
     fireEvent.keyDown(scriptArea(), { key: ' ', code: 'Space' });
     expect(btn('开始')).toBeInTheDocument(); // 光标在输入框内 → 空格只是输入
 
-    fireEvent.click(btn('开始'));
+    fireEvent.click(btn('开始')); // 进入倒计时
     fireEvent.keyDown(scriptArea(), { key: ' ', code: 'Space' });
-    expect(btn('开始')).toBeInTheDocument(); // 播放中 → 空格暂停
+    expect(document.querySelector('.tp-count')).toBeNull(); // 输入框内空格同样取消倒计时
+    expect(btn('开始')).toBeInTheDocument();
   });
 
   test('按速度推进滚动位置, 到结尾自动停止', () => {
     render(<Teleprompter />);
     fireEvent.click(btn('开始'));
+    expect(btn('取消倒计时')).toBeInTheDocument();
 
+    finishCountdown(); // 默认 3 秒倒计时走完 → 自动开滚
     advanceFrames(6); // 首帧不推进, 之后 5 帧 × 200ms × 60px/s = 60px
     expect(track().style.transform).toBe('translateY(-60px)');
     expect(screen.getByText('剩余 0:10')).toBeInTheDocument();
@@ -243,8 +259,10 @@ describe('Teleprompter 播放控制', () => {
     expect(screen.getByText('播放结束')).toBeInTheDocument();
     expect(btn('重新播放')).toBeInTheDocument();
 
-    // 播完再点一次: 从头开始
+    // 播完再点一次: 从头开始 (默认带 3 秒倒计时)
     fireEvent.click(btn('重新播放'));
+    expect(btn('取消倒计时')).toBeInTheDocument();
+    finishCountdown();
     expect(btn('暂停')).toBeInTheDocument();
     expect(track().style.transform).toBe('translateY(0px)');
   });
@@ -252,6 +270,7 @@ describe('Teleprompter 播放控制', () => {
   test('回到开头重置滚动位置', () => {
     render(<Teleprompter />);
     fireEvent.click(btn('开始'));
+    finishCountdown();
     advanceFrames(6);
     expect(screen.getByText('剩余 0:10')).toBeInTheDocument();
 
@@ -261,13 +280,15 @@ describe('Teleprompter 播放控制', () => {
     expect(btn('回到开头')).toBeDisabled();
   });
 
-  test('改稿后自动回到开头并停止播放', () => {
+  test('改稿后自动回到开头并停止播放 (倒计时一并取消)', () => {
     render(<Teleprompter />);
     fireEvent.click(btn('开始'));
+    expect(btn('取消倒计时')).toBeInTheDocument(); // 先进入倒计时
     advanceFrames(6);
 
     fireEvent.change(scriptArea(), { target: { value: '新的稿件\n第二行' } });
     expect(track().style.transform).toBe('translateY(0px)');
+    expect(document.querySelector('.tp-count')).toBeNull();
     expect(btn('开始')).toBeInTheDocument();
     expect(screen.getByText(`2 行 / 8 字符 / 全文约 0:11`)).toBeInTheDocument();
   });
@@ -302,7 +323,7 @@ describe('Teleprompter 设置', () => {
     fireEvent.click(btn('保存为默认设置'));
 
     expect(JSON.parse(localStorage.getItem(DEFAULTS_STORAGE_KEY) as string)).toEqual({
-      speed: 65, fontSize: 40, lineHeight: 1.8, fade: false, focus: true,
+      speed: 65, fontSize: 40, lineHeight: 1.8, fade: false, focus: true, countdown: 3,
     });
     await waitFor(() => expect(document.querySelector('.ant-message')?.textContent).toContain('已保存为默认设置'));
     // 与默认值一致后按钮重新置灰
@@ -339,6 +360,7 @@ describe('Teleprompter 设置', () => {
 
     // 滚动约一行 (14 帧 → 13 帧推进 × 12px = 156px > 一个行高 72px) 后高亮行跟着下移
     fireEvent.click(btn('开始'));
+    finishCountdown();
     advanceFrames(14);
     expect(activeEls()).toHaveLength(1);
     expect(activeEls()[0]).toBe(lineEls()[1]);
@@ -423,6 +445,7 @@ describe('Teleprompter 逐字高亮', () => {
 
     // 滚过一段后: 首行亮起左侧一段, 两段拼接仍是原文
     fireEvent.click(btn('开始'));
+    finishCountdown();
     advanceFrames(11); // 10 帧推进 × 12px = 120px (阅读线 168 + 120 = 288, 首行 240 起 → 已读 2/3)
     expect(litTextOf(0)).not.toBe('');
     expect(litTextOf(0)).not.toBe(first);
@@ -442,6 +465,7 @@ describe('Teleprompter 逐字高亮', () => {
   test('关掉「逐行高亮」后不再逐字拆段, 卸载时也无需清理', () => {
     render(<Teleprompter />);
     fireEvent.click(btn('开始'));
+    finishCountdown();
     advanceFrames(11);
     expect(litTextOf(0)).not.toBe('');
 
@@ -480,6 +504,8 @@ describe('Teleprompter 口令彩蛋', () => {
 
     fireEvent.change(scriptArea(), { target: { value: '正常稿件' } });
     fireEvent.click(btn('开始'));
+    expect(btn('取消倒计时')).toBeInTheDocument(); // 正常稿件走 3 秒倒计时
+    finishCountdown();
     expect(btn('暂停')).toBeInTheDocument();
   });
 
@@ -489,6 +515,8 @@ describe('Teleprompter 口令彩蛋', () => {
     fireEvent.click(btn('开始'));
 
     expect(eggCanvas()).toBeNull();
+    expect(btn('取消倒计时')).toBeInTheDocument(); // 未触发彩蛋, 走默认倒计时
+    finishCountdown();
     expect(btn('暂停')).toBeInTheDocument();
   });
 
@@ -541,5 +569,74 @@ describe('Teleprompter 全屏', () => {
       delete (document as unknown as Record<string, unknown>).fullscreenElement;
       delete (document as unknown as Record<string, unknown>).exitFullscreen;
     }
+  });
+});
+
+describe('Teleprompter 倒计时', () => {
+  test('从开头点「开始」: 先显示倒计时大数字, 结束自动开始滚动', () => {
+    render(<Teleprompter />);
+    fireEvent.click(btn('开始'));
+
+    // 舞台铺满倒计时层: 大数字 3, 按钮变成「取消倒计时」, 工具条显示剩余秒数
+    expect((document.querySelector('.tp-count-num') as HTMLElement).textContent).toBe('3');
+    expect(btn('取消倒计时')).toBeInTheDocument();
+    // 说明区的「默认会先倒计时 3 秒」也会命中, 取全部匹配断言工具条那处存在
+    expect(screen.getAllByText('倒计时 3 秒').length).toBeGreaterThan(0);
+
+    // 推进约 2 秒 (10 帧): 倒计时显示落到 2
+    advanceFrames(10);
+    expect((document.querySelector('.tp-count-num') as HTMLElement).textContent).toBe('2');
+    expect(track().style.transform).toBe('translateY(0px)'); // 倒计时期间不滚动
+
+    // 倒计时结束: 覆盖层消失, 自动开始滚动
+    finishCountdown();
+    expect(document.querySelector('.tp-count')).toBeNull();
+    expect(btn('暂停')).toBeInTheDocument();
+    advanceFrames(6);
+    expect(track().style.transform).toBe('translateY(-60px)');
+  });
+
+  test('倒计时中再点「开始」取消; 暂停后恢复播放不再倒计时', () => {
+    render(<Teleprompter />);
+    fireEvent.click(btn('开始'));
+    expect(btn('取消倒计时')).toBeInTheDocument();
+    fireEvent.click(btn('取消倒计时'));
+    expect(btn('开始')).toBeInTheDocument();
+    expect(document.querySelector('.tp-count')).toBeNull();
+
+    // 正常开始, 播一段后暂停, 再点开始 → 直接恢复 (不再倒计时)
+    fireEvent.click(btn('开始'));
+    finishCountdown();
+    advanceFrames(6);
+    fireEvent.click(btn('暂停'));
+    expect(track().style.transform).toBe('translateY(-60px)');
+    fireEvent.click(btn('开始'));
+    expect(btn('暂停')).toBeInTheDocument();
+    expect(document.querySelector('.tp-count')).toBeNull();
+  });
+
+  test('倒计时档位切到「关闭」后点「开始」立即滚动', () => {
+    render(<Teleprompter />);
+    chooseSegmented('关闭');
+    fireEvent.click(btn('开始'));
+    expect(btn('暂停')).toBeInTheDocument();
+    expect(document.querySelector('.tp-count')).toBeNull();
+    advanceFrames(6);
+    expect(track().style.transform).toBe('translateY(-60px)');
+  });
+
+  test('倒计时档位 5 秒: 3 秒的帧数内不滚动, 倒完 5 秒自动开始', () => {
+    render(<Teleprompter />);
+    chooseSegmented('5 秒');
+    fireEvent.click(btn('开始'));
+    expect(screen.getByText('倒计时 5 秒')).toBeInTheDocument();
+
+    advanceFrames(16); // 3 秒对应的帧数, 5 秒还差得远
+    expect(btn('取消倒计时')).toBeInTheDocument();
+    expect(track().style.transform).toBe('translateY(0px)');
+
+    advanceFrames(10); // 5 秒 = 26 帧 (首帧不计), 凑满后自动开始
+    expect(btn('暂停')).toBeInTheDocument();
+    expect(document.querySelector('.tp-count')).toBeNull();
   });
 });

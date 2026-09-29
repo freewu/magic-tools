@@ -387,6 +387,12 @@ const ROWS: Record<string, Row> = {
     '開啟「提詞器」時是否預設開啟逐行高亮 (高亮目前閱讀行並依進度由左至右逐字點亮, 離它越遠的行越透明、顏色越淡)',
     'Whether line focus is on by default when opening the teleprompter (the line at the reading point is lit word by word from left to right, and the rest get more transparent the further away they are)',
   ],
+  '默认倒计时': ['預設倒計時', 'Default countdown'],
+  '打开「提词器」后点「开始」时, 从开头播放前先倒数的秒数 (0 = 关闭)': [
+    '開啟「提詞器」後點「開始」時, 從開頭播放前先倒數的秒數 (0 = 關閉)',
+    'Seconds to count down before scrolling starts when pressing Start from the beginning (0 = off)',
+  ],
+  '{n} 秒': ['{n} 秒', '{n} s'],
   '工具页的「保存为默认设置」按钮可把当前页面的参数一键存为这里的默认值; 默认值在打开工具页时生效, 不影响已打开的页面': [
     '工具頁的「儲存為預設設定」按鈕可把目前頁面的參數一鍵存為此處的預設值; 預設值在開啟工具頁時生效, 不影響已開啟的頁面',
     'The “Save as defaults” button on the tool page stores the current page settings here; defaults are applied when the tool page opens and never disturb a page that is already open',
@@ -416,6 +422,12 @@ const ROWS: Record<string, Row> = {
   '打点音量 (0 即静音), 默认 ${n}': ['打點音量 (0 即靜音), 預設 ${n}', 'Click volume (0 = muted), default ${n}'],
   '三种本地合成音, 不加载任何音频文件': ['三種本機合成音, 不載入任何音訊檔', 'Three locally synthesised sounds — no audio files are loaded'],
   '开启后每小节第一拍更响, 便于听出小节线': ['開啟後每小節第一拍更響, 便於聽出小節線', 'Makes the first beat of each bar louder so the bar line is audible'],
+  '默认倒数拍数': ['預設倒數拍數', 'Default count-in beats'],
+  '开始前先打的预排拍数 (0 = 关闭); 预排拍用不同音高提示, 播完进入正拍': [
+    '開始前先打的預排拍數 (0 = 關閉); 預排拍用不同音高提示, 播完進入正拍',
+    'Count-in clicks played before the beat starts (0 = off); they use a different pitch, then the regular beat begins',
+  ],
+  '{n} 拍': ['{n} 拍', '{n} beats'],
   // ---- 屏幕录制 ----
   '屏幕录制': ['螢幕錄製', 'Screen recorder'],
   '默认帧率': ['預設影格率', 'Default frame rate'],

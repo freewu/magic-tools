@@ -10,8 +10,8 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocale } from '../../hook/locale-context';
 import {
-  BEAT_PRESETS, BEATS_MAX, BEATS_MIN, BPM_MAX, BPM_MIN, BPM_STEP, CLOCK_INTERVAL_MS, FLASH_COLOR,
-  FLASH_MS, SCHEDULE_AHEAD_SEC, SCHEDULE_INTERVAL_MS, STAGE_BG, STAGE_DOT_IDLE,
+  BEAT_PRESETS, BEATS_MAX, BEATS_MIN, BPM_MAX, BPM_MIN, BPM_STEP, CLOCK_INTERVAL_MS, COUNTDOWN_OPTIONS,
+  FLASH_COLOR, FLASH_MS, SCHEDULE_AHEAD_SEC, SCHEDULE_INTERVAL_MS, STAGE_BG, STAGE_DOT_IDLE,
   START_DELAY_SEC, SUBDIVISION_OPTIONS, TEMPO_PRESETS, TIMBRE_KEYS, TIMBRES, TONE_FREQ, TONE_GAIN,
   VOLUME_MAX, VOLUME_MIN, type TimbreKey,
 } from './data';
@@ -93,6 +93,7 @@ const playClick = (
 const bgTint = (kind: BeatKind): string => {
   if (kind === 'accent') return 'rgba(255,77,79,0.16)';
   if (kind === 'beat') return 'rgba(22,119,255,0.14)';
+  if (kind === 'prep') return 'rgba(245,166,35,0.12)';
   return 'rgba(140,140,140,0.10)';
 };
 
@@ -108,6 +109,8 @@ const Metronome: React.FC = () => {
   const [ running, setRunning ] = useState(false);
   /** 当前正在闪烁的打点 (null = 处于静默状态) */
   const [ flash, setFlash ] = useState<{ kind: BeatKind; index: number } | null>(null);
+  /** 是否处于倒计时预排拍阶段 (有预排拍且最近一次打的还是 prep) */
+  const [ prep, setPrep ] = useState(false);
   const [ elapsed, setElapsed ] = useState(0);
   const [ taps, setTaps ] = useState(0);
   const [ flashBg, setFlashBg ] = useState(true);
@@ -120,6 +123,8 @@ const Metronome: React.FC = () => {
   const nextTimeRef = useRef(0);
   /** 已排期的打点总数 (闪烁序号) */
   const tickRef = useRef(0);
+  /** 最近一次闪烁的打点序号 (舞台显示剩余预排拍数用) */
+  const lastTickRef = useRef(0);
   const timeoutsRef = useRef<number[]>([]);
   const offTimerRef = useRef<number | null>(null);
   const startedAtRef = useRef(0);
@@ -148,6 +153,8 @@ const Metronome: React.FC = () => {
   /** 让大圆点闪一下 (FLASH_MS 后自动回到静默态) */
   const flashAt = useCallback((kind: BeatKind, index: number) => {
     setFlash({ kind, index });
+    lastTickRef.current = index;
+    setPrep(kind === 'prep');
     if (offTimerRef.current !== null) window.clearTimeout(offTimerRef.current);
     offTimerRef.current = window.setTimeout(() => {
       offTimerRef.current = null;
@@ -177,7 +184,7 @@ const Metronome: React.FC = () => {
     const cur = optsRef.current;
     times.forEach((time, i) => {
       const index = tickRef.current + i;
-      const info = beatInfoAt(index, cur.beats, cur.subdivision, cur.accent);
+      const info = beatInfoAt(index, cur.beats, cur.subdivision, cur.accent, cur.countdown);
       playClick(ctx, time, info.kind, cur);
       scheduleFlash(ctx, time, info.kind, index);
     });
@@ -189,6 +196,7 @@ const Metronome: React.FC = () => {
     runningRef.current = false;
     setRunning(false);
     setFlash(null);
+    setPrep(false);
     clearTimeouts();
   }, [ clearTimeouts ]);
 
@@ -219,7 +227,9 @@ const Metronome: React.FC = () => {
       return;
     }
     tickRef.current = 0;
+    lastTickRef.current = 0;
     setFlash(null);
+    setPrep(optsRef.current.countdown > 0);
     setElapsed(0);
     startedAtRef.current = Date.now();
     nextTimeRef.current = ctx.currentTime + START_DELAY_SEC;
@@ -332,8 +342,10 @@ const Metronome: React.FC = () => {
   };
 
   const dirty = !isSameOptions(opts, defaults);
-  const cur = flash ? beatInfoAt(flash.index, opts.beats, opts.subdivision, opts.accent) : null;
-  const played = flash ? flash.index + 1 : 0;
+  const cur = flash ? beatInfoAt(flash.index, opts.beats, opts.subdivision, opts.accent, opts.countdown) : null;
+  const played = flash ? Math.max(0, flash.index + 1 - opts.countdown) : 0;
+  /** 处于倒计时预排拍时的剩余拍数 (至少显示 1) */
+  const prepLeft = prep && running ? Math.max(1, opts.countdown - lastTickRef.current) : 0;
   const stageBg = flashBg && flash ? bgTint(flash.kind) : STAGE_BG;
 
   const beatsOptions = useMemo(
@@ -447,6 +459,17 @@ const Metronome: React.FC = () => {
           </div>
 
           <div className="mt-field">
+            <span className="mt-label">{t('倒计时')}</span>
+            <Segmented
+              size="small"
+              value={opts.countdown}
+              onChange={(v) => patch({ countdown: Number(v) })}
+              options={COUNTDOWN_OPTIONS.map((n) => ({ value: n, label: n === 0 ? t('关闭') : tt('{n} 拍', { n }) }))}
+            />
+            <span className="mt-hint">{t('开始前先打 N 个预排拍, 再用不同音高提示正拍开始')}</span>
+          </div>
+
+          <div className="mt-field">
             <span className="mt-label">{t('细分')}</span>
             <Segmented
               size="small"
@@ -489,7 +512,10 @@ const Metronome: React.FC = () => {
             {tt('{bpm} BPM · {term}', { bpm: opts.bpm, term: tempoTerm(opts.bpm) })}
           </span>
           <span className="mt-stage-hint">
-            {running ? tt('第 {bar} 小节 · 第 {beat} 拍', { bar: (cur?.bar ?? 0) + 1, beat: (cur?.beat ?? 0) + 1 })
+            {running
+              ? prepLeft > 0
+                ? tt('倒数 {n} 拍', { n: prepLeft })
+                : tt('第 {bar} 小节 · 第 {beat} 拍', { bar: (cur?.bar ?? 0) + 1, beat: (cur?.beat ?? 0) + 1 })
               : t('点击「开始」后这里会跟着节拍闪烁')}
             {full ? ` · ${t('按 Esc 退出全屏')}` : ''}
           </span>
@@ -514,7 +540,9 @@ const Metronome: React.FC = () => {
           </div>
           <span className="mt-stage-clock">
             {running
-              ? tt('已播放 {t} · {n} 拍', { t: formatClock(elapsed), n: played })
+              ? prepLeft > 0
+                ? t('倒数中')
+                : tt('已播放 {t} · {n} 拍', { t: formatClock(elapsed), n: played })
               : t('点击「开始」后这里会跟着节拍闪烁')}
           </span>
         </div>

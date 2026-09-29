@@ -1,12 +1,14 @@
-import { Divider, Form, Slider, Switch, Typography } from 'antd';
+import { Divider, Form, Segmented, Slider, Switch, Typography } from 'antd';
 import { useState } from 'react';
 import { useLocale } from '../../hook/locale-context';
 import { row as _r, rowT } from '../Setting/rows-lang';
+import { uT } from './lang';
 import {
-  FONT_SIZE_DEFAULT, FONT_SIZE_MAX, FONT_SIZE_MIN,
+  COUNTDOWN_OPTIONS, FONT_SIZE_DEFAULT, FONT_SIZE_MAX, FONT_SIZE_MIN,
   LINE_HEIGHT_DEFAULT, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN,
   SPEED_DEFAULT, SPEED_MAX, SPEED_MIN, SPEED_STEP,
 } from './data';
+import { clampCountdown } from './lib';
 import { getDefaultOptions, patchDefaultOptions, type PrompterOptions } from './lib';
 
 /** 提词器默认设置 (挂载到 设置 → 其它) */
@@ -82,6 +84,19 @@ export const TeleprompterSetting: React.FC = () => {
           checkedChildren={ st('开启') }
           unCheckedChildren={ st('关闭') }
           onChange={ (v: boolean) => change({ focus: v }) }
+        />
+      </Form.Item>
+      <Form.Item
+        label={ st('默认倒计时') }
+        extra={ st('打开「提词器」后点「开始」时, 从开头播放前先倒数的秒数 (0 = 关闭)') }
+      >
+        <Segmented
+          value={ opts.countdown }
+          onChange={ (v) => change({ countdown: clampCountdown(v) }) }
+          options={ COUNTDOWN_OPTIONS.map((n) => ({
+            value: n,
+            label: n === 0 ? st('关闭') : uT(locale, '{n} 秒', { n }),
+          })) }
         />
       </Form.Item>
       <Typography.Paragraph type="secondary" style={ { fontSize: 12, marginBottom: 0 } }>

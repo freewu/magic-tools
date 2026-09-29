@@ -1,13 +1,13 @@
-import { Button, Card, Divider, Input, Progress, Slider, Space, Switch, Tooltip, Typography, message } from 'antd';
+import { Button, Card, Divider, Input, Progress, Segmented, Slider, Space, Switch, Tooltip, Typography, message } from 'antd';
 import {
   ClearOutlined, FileTextOutlined, FullscreenExitOutlined, FullscreenOutlined,
-  PauseCircleOutlined, PlayCircleOutlined, ReloadOutlined, SaveOutlined,
+  PauseCircleOutlined, PlayCircleOutlined, ReloadOutlined, SaveOutlined, StopOutlined,
 } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { LocaleId } from '../../i18n/lang';
 import { useLocale } from '../../hook/locale-context';
 import {
-  FONT_SIZE_MAX, FONT_SIZE_MIN, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN, PAD_RATIO, READ_RATIO,
+  COUNTDOWN_OPTIONS, FONT_SIZE_MAX, FONT_SIZE_MIN, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN, PAD_RATIO, READ_RATIO,
   SPEED_MAX, SPEED_MIN, SPEED_STEP, STAGE_BG, STAGE_DIM_FG, STAGE_FG, STAGE_FOCUS_FG,
 } from './data';
 import {
@@ -39,6 +39,9 @@ const STAGE_CSS = `
 .tp-rest { color: ${STAGE_DIM_FG}; }
 .tp-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 8px 12px; background: rgba(255,255,255,0.06); border-top: 1px solid rgba(255,255,255,0.12); }
 .tp-fade { -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%); }
+.tp-count { position: absolute; inset: 0; z-index: 6; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: rgba(16,17,20,0.82); }
+.tp-count-num { font-size: 96px; font-weight: 700; color: #fff; line-height: 1; text-shadow: 0 6px 32px rgba(22,119,255,0.45); }
+.tp-count-label { color: #9aa0a8; font-size: 14px; letter-spacing: 3px; }
 `;
 
 /** 全屏 API 在部分内嵌 webview / 老浏览器上不存在, 统一按可选处理 */
@@ -79,10 +82,14 @@ const Teleprompter: React.FC = () => {
   const [ box, setBox ] = useState({ vh: 0, th: 0 }); // 视口高度 / 文本高度 (测量所得)
   const [ measured, setMeasured ] = useState<LineRect[]>([]); // 每行实测位置 (逐行/逐字高亮用, 未测到时为 0)
   const [ full, setFull ] = useState(false);
+  /** 开始前倒计时: 非 null 表示正在倒数 (值为当前展示的剩余秒数) */
+  const [ counting, setCounting ] = useState<number | null>(null);
 
   const stageRef = useRef<HTMLDivElement | null>(null);
   const viewRef = useRef<HTMLDivElement | null>(null);
   const textRef = useRef<HTMLDivElement | null>(null);
+  /** 倒计时剩余毫秒 (常驻 ref: RAF 帧里按真实时间差扣减, 不依赖 setTimeout) */
+  const countdownMsRef = useRef(0);
   const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
   const eggRef = useRef<(() => void) | null>(null); // 彩蛋的退出函数 (退出/卸载时调用)
   const offsetRef = useRef(0);
@@ -134,6 +141,7 @@ const Teleprompter: React.FC = () => {
 
   const reset = useCallback(() => {
     setPlaying(false);
+    setCounting(null);
     commit(0);
   }, [ commit ]);
 
@@ -178,11 +186,35 @@ const Teleprompter: React.FC = () => {
     };
   }, [ text, opts.fontSize, opts.lineHeight, full, commit ]);
 
-  // 改稿后回到开头
+  // 改稿后回到开头 (正在倒计时也一并取消)
   useEffect(() => {
     setPlaying(false);
+    setCounting(null);
     commit(0);
   }, [ text, commit ]);
+
+  // 倒计时: 从开头点「开始」后先倒数再滚动 (与滚动共用同一条 RAF 时间轴, 测试可手动推进)
+  useEffect(() => {
+    if (counting === null) return;
+    let raf = 0;
+    let last = -1; // 首帧只记时间, 不扣减
+    const tick = (ts: number) => {
+      const dt = last < 0 ? 0 : Math.min(200, Math.max(0, ts - last));
+      last = ts;
+      const ms = countdownMsRef.current - dt;
+      if (ms <= 0) {
+        countdownMsRef.current = 0;
+        setCounting(null);
+        setPlaying(true);
+        return;
+      }
+      countdownMsRef.current = ms;
+      setCounting(Math.ceil(ms / 1000));
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [ counting ]);
 
   // 滚动动画: requestAnimationFrame 推进, 速度实时读 ref (拖动滑块不打断播放)
   useEffect(() => {
@@ -237,9 +269,19 @@ const Teleprompter: React.FC = () => {
       void startEggRain();
       return;
     }
+    if (counting !== null) {
+      setCounting(null); // 倒计时进行中: 再点一次取消
+      return;
+    }
     if (offsetRef.current >= distanceRef.current) commit(0); // 播完后再点: 从头开始
+    // 从开头开始时按设定秒数倒数: 留出时间看向镜头 / 做好准备 (暂停恢复不倒数)
+    if (opts.countdown > 0 && offsetRef.current === 0) {
+      countdownMsRef.current = opts.countdown * 1000;
+      setCounting(opts.countdown);
+      return;
+    }
     setPlaying(true);
-  }, [ hasScript, playing, text, startEggRain, commit ]);
+  }, [ hasScript, playing, counting, text, startEggRain, commit, opts.countdown ]);
 
   // ---- 全屏: 先请求原生全屏, 失败 (内嵌 webview / 非用户手势) 时用窗口内全屏兜底 ----
   const enterFull = useCallback(() => {
@@ -280,7 +322,7 @@ const Teleprompter: React.FC = () => {
       const typing = isTypingTarget(el); // 文本输入框: 空格应保留为普通输入
       const onSlider = isSliderTarget(el); // 滑块手柄: 方向键归滑块
       // 输入框内空格是正常输入, 不抢键; 但正在播放时允许用空格暂停
-      if (isToggleKey(e) && (!typing || playing || full)) {
+      if (isToggleKey(e) && (!typing || playing || counting !== null || full)) {
         e.preventDefault();
         toggle();
         return;
@@ -295,7 +337,7 @@ const Teleprompter: React.FC = () => {
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [ toggle, playing, full, opts.speed, patch, exitFull ]);
+  }, [ toggle, playing, counting, full, opts.speed, patch, exitFull ]);
 
   const stageClass = `tp-stage${full ? ' tp-full' : ''}${opts.fade ? ' tp-fade' : ''}`;
   const estTotal = distance / Math.max(1, opts.speed);
@@ -361,7 +403,18 @@ const Teleprompter: React.FC = () => {
               <span style={{ color: '#888' }}>{t('逐行高亮')}</span>
             </Tooltip>
           </Space>
-          <Tooltip title={t('把当前的速度 / 字号 / 行距 / 淡入淡出 / 逐行高亮存为默认值, 下次打开时沿用; 也可在 设置 → 其它 → 提词器 中修改')}>
+          <Space size={8}>
+            <Tooltip title={t('开始前先倒数, 留出时间看向镜头 / 做好准备; 再点一次「开始」或按空格可取消')}>
+              <span style={{ color: '#888' }}>{t('倒计时')}</span>
+            </Tooltip>
+            <Segmented
+              size="small"
+              value={opts.countdown}
+              onChange={(v) => patch({ countdown: Number(v) })}
+              options={COUNTDOWN_OPTIONS.map((n) => ({ value: n, label: n === 0 ? t('关闭') : tt('{n} 秒', { n }) }))}
+            />
+          </Space>
+          <Tooltip title={t('把当前的速度 / 字号 / 行距 / 淡入淡出 / 逐行高亮 / 倒计时存为默认值, 下次打开时沿用; 也可在 设置 → 其它 → 提词器 中修改')}>
             {/* 按钮 disabled 时自身不响应鼠标, 用 span 包一层保证提示仍可弹出 */}
             <span style={{ display: 'inline-block' }}>
               <Button
@@ -380,7 +433,7 @@ const Teleprompter: React.FC = () => {
       <Card
         size="small"
         title={t('提词器')}
-        extra={<Text type="secondary" style={{ fontSize: 12 }}>{t('空格 开始/暂停 · ↑↓ 调速 · Esc 退出全屏')}</Text>}
+        extra={<Text type="secondary" style={{ fontSize: 12 }}>{t('空格 开始/暂停/取消倒计时 · ↑↓ 调速 · Esc 退出全屏')}</Text>}
       >
         <div ref={stageRef} className={stageClass}>
           <div className="tp-view" ref={viewRef}>
@@ -409,16 +462,22 @@ const Teleprompter: React.FC = () => {
                   : <div style={{ color: '#777' }}>{t('请先在上方输入提词脚本')}</div>}
               </div>
             </div>
+            {counting !== null && (
+              <div className="tp-count">
+                <div className="tp-count-num">{counting}</div>
+                <div className="tp-count-label">{t('倒计时')}</div>
+              </div>
+            )}
           </div>
           <div className="tp-bar">
             <Button
               size="small"
               type="primary"
-              icon={playing ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
+              icon={playing ? <PauseCircleOutlined /> : counting !== null ? <StopOutlined /> : <PlayCircleOutlined />}
               disabled={!hasScript}
               onClick={toggle}
             >
-              {playing ? t('暂停') : done ? t('重新播放') : t('开始')}
+              {playing ? t('暂停') : counting !== null ? t('取消倒计时') : done ? t('重新播放') : t('开始')}
             </Button>
             <Button
               size="small"
@@ -456,7 +515,7 @@ const Teleprompter: React.FC = () => {
               style={{ flex: '1 1 120px', minWidth: 100, margin: 0 }}
             />
             <Text style={{ color: '#aaa', fontSize: 12 }}>
-              {done ? t('播放结束') : tt('剩余 {time}', { time: formatClock(left) })}
+              {done ? t('播放结束') : counting !== null ? tt('倒计时 {n} 秒', { n: counting }) : tt('剩余 {time}', { time: formatClock(left) })}
             </Text>
           </div>
         </div>

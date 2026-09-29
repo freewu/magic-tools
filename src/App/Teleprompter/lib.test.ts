@@ -1,12 +1,12 @@
 import {
-  DEFAULT_OPTIONS, advance, clampFontSize, clampLineHeight, clampSpeed,
+  DEFAULT_OPTIONS, advance, clampCountdown, clampFontSize, clampLineHeight, clampSpeed,
   focusOpacity, formatClock, getDefaultOptions, isSameOptions, isSliderTarget, isToggleKey,
   isTypingTarget, lineCentersOf, lineStepOf, lineUnits, nextSampleScript, normalizeOptions,
   patchDefaultOptions, pickSampleScript, progressOf, remainingSeconds, sampleScriptsOf,
   scrollDistance, setDefaultOptions, splitLineAt, splitScript, sweepOf,
 } from './lib';
 import {
-  DEFAULTS_STORAGE_KEY, FADE_DEFAULT, FOCUS_DEFAULT, FOCUS_MIN_OPACITY, FONT_SIZE_DEFAULT,
+  COUNTDOWN_DEFAULT, DEFAULTS_STORAGE_KEY, FADE_DEFAULT, FOCUS_DEFAULT, FOCUS_MIN_OPACITY, FONT_SIZE_DEFAULT,
   FONT_SIZE_MAX, FONT_SIZE_MIN, LINE_HEIGHT_DEFAULT, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN,
   PAD_RATIO, SAMPLE_SCRIPTS, SPEED_DEFAULT, SPEED_MAX, SPEED_MIN,
 } from './data';
@@ -38,18 +38,33 @@ describe('选项校验', () => {
     expect(clampLineHeight('')).toBe(LINE_HEIGHT_DEFAULT);
   });
 
+  test('倒计时只取预设档位里最接近的一个, 非法值回退默认', () => {
+    expect(clampCountdown(3)).toBe(3);
+    expect(clampCountdown(5)).toBe(5);
+    expect(clampCountdown(4)).toBe(3); // 与 3 / 5 等距时取更小的档位
+    expect(clampCountdown(7)).toBe(5); // |7-5|=2 < |7-10|=3
+    expect(clampCountdown(0)).toBe(0);
+    expect(clampCountdown(-5)).toBe(0);
+    expect(clampCountdown('abc')).toBe(COUNTDOWN_DEFAULT);
+    expect(clampCountdown(undefined)).toBe(COUNTDOWN_DEFAULT);
+  });
+
   test('normalizeOptions: 缺字段 / 类型错误 / 非对象都回退默认', () => {
     expect(normalizeOptions(null)).toEqual(DEFAULT_OPTIONS);
     expect(normalizeOptions('nope')).toEqual(DEFAULT_OPTIONS);
     expect(normalizeOptions({ fade: 'yes' })).toEqual(DEFAULT_OPTIONS);
     expect(normalizeOptions({ speed: 120, fade: false })).toEqual({
-      speed: 120, fontSize: FONT_SIZE_DEFAULT, lineHeight: LINE_HEIGHT_DEFAULT, fade: false, focus: FOCUS_DEFAULT,
+      speed: 120, fontSize: FONT_SIZE_DEFAULT, lineHeight: LINE_HEIGHT_DEFAULT,
+      fade: false, focus: FOCUS_DEFAULT, countdown: COUNTDOWN_DEFAULT,
     });
     expect(normalizeOptions({ focus: 'on' }).focus).toBe(FOCUS_DEFAULT);
     expect(normalizeOptions({ focus: false }).focus).toBe(false);
+    expect(normalizeOptions({ countdown: 99 }).countdown).toBe(COUNTDOWN_DEFAULT + 27); // 夹到最近档位 30
+    expect(normalizeOptions({ countdown: 4 }).countdown).toBe(3); // 与 3 / 5 等距取更小档位
     expect(DEFAULT_OPTIONS.fade).toBe(FADE_DEFAULT);
     expect(DEFAULT_OPTIONS.focus).toBe(FOCUS_DEFAULT);
     expect(DEFAULT_OPTIONS.speed).toBe(SPEED_DEFAULT);
+    expect(DEFAULT_OPTIONS.countdown).toBe(COUNTDOWN_DEFAULT);
   });
 });
 
@@ -60,16 +75,20 @@ describe('默认设置', () => {
   });
 
   test('写入后可读回 (非法规整后再存), 返回落盘内容', () => {
-    const saved = setDefaultOptions({ speed: 999, fontSize: 52, lineHeight: 2.04, fade: false, focus: false });
-    expect(saved).toEqual({ speed: SPEED_MAX, fontSize: 52, lineHeight: 2, fade: false, focus: false });
+    const saved = setDefaultOptions({ speed: 999, fontSize: 52, lineHeight: 2.04, fade: false, focus: false, countdown: COUNTDOWN_DEFAULT });
+    expect(saved).toEqual({
+      speed: SPEED_MAX, fontSize: 52, lineHeight: 2, fade: false, focus: false, countdown: COUNTDOWN_DEFAULT,
+    });
     expect(JSON.parse(localStorage.getItem(DEFAULTS_STORAGE_KEY) as string)).toEqual(saved);
     expect(getDefaultOptions()).toEqual(saved);
   });
 
   test('patchDefaultOptions 只改传入字段, 其余沿用已存值 (无存值时回退内置默认)', () => {
-    setDefaultOptions({ speed: 120, fontSize: 52, lineHeight: 2, fade: false, focus: false });
+    setDefaultOptions({ speed: 120, fontSize: 52, lineHeight: 2, fade: false, focus: false, countdown: COUNTDOWN_DEFAULT });
     const after = patchDefaultOptions({ speed: 90 });
-    expect(after).toEqual({ speed: 90, fontSize: 52, lineHeight: 2, fade: false, focus: false });
+    expect(after).toEqual({
+      speed: 90, fontSize: 52, lineHeight: 2, fade: false, focus: false, countdown: COUNTDOWN_DEFAULT,
+    });
     expect(getDefaultOptions()).toEqual(after);
 
     localStorage.clear();
@@ -84,7 +103,8 @@ describe('默认设置', () => {
     const keys = Object.keys(DEFAULT_OPTIONS) as (keyof typeof DEFAULT_OPTIONS)[];
     keys.forEach((k) => {
       const other: Record<string, unknown> = { ...DEFAULT_OPTIONS };
-      other[k] = typeof other[k] === 'boolean' ? !other[k] : Number(other[k]) + 1;
+      // 倒计时是离散档位: +1 会被夹回默认, 改用 +2 保证与默认不同
+      other[k] = typeof other[k] === 'boolean' ? !other[k] : Number(other[k]) + (k === 'countdown' ? 2 : 1);
       expect(isSameOptions(DEFAULT_OPTIONS, other as unknown as typeof DEFAULT_OPTIONS)).toBe(false);
     });
   });
@@ -95,7 +115,8 @@ describe('默认设置', () => {
 
     localStorage.setItem(DEFAULTS_STORAGE_KEY, JSON.stringify({ speed: 1, fontSize: 9999, lineHeight: -3 }));
     expect(getDefaultOptions()).toEqual({
-      speed: SPEED_MIN, fontSize: FONT_SIZE_MAX, lineHeight: LINE_HEIGHT_MIN, fade: FADE_DEFAULT, focus: FOCUS_DEFAULT,
+      speed: SPEED_MIN, fontSize: FONT_SIZE_MAX, lineHeight: LINE_HEIGHT_MIN,
+      fade: FADE_DEFAULT, focus: FOCUS_DEFAULT, countdown: COUNTDOWN_DEFAULT,
     });
   });
 

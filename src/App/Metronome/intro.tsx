@@ -5,11 +5,12 @@ const zh = `<h2>这个工具做什么</h2>
 
 <h2>使用步骤</h2>
 <ul>
-<li><p>点「<b>开始</b>」即开始打点 (浏览器要求用户手势后才能出声, 所以必须点一下) ; 再点「停止」结束并归零</p></li>
+<li><p>点「<b>开始</b>」即开始打点 (浏览器要求用户手势后才能出声, 所以必须点一下) ; 默认会先打 <b>2 个预排拍</b> (倒计时, 音高与色彩和正拍不同) 再进入正拍 — 合奏或跟练前对齐节奏用; 再点「停止」结束并归零</p></li>
 <li><p>拖动<b>速度</b>滑块、直接输入数字, 或用 <code>−</code> / <code>+</code> 微调; 也可以按键盘 <code>↑</code> <code>↓</code> 调速 (按住 <code>Shift</code> 一次 ±10)</p></li>
 <li><p>不知道速度? 用「<b>连击测速</b>」: 跟着感觉连续点按钮 (至少 2 次), 取最近几次点击的平均值自动填进速度; 停顿超过约 2.5 秒会重新开始测</p></li>
 <li><p><b>拍号</b>决定每小节几拍 (1~12, 也可直接点 4/4、6/8 等常用拍号按钮) ; 「<b>细分</b>」把每拍再等分成 2 / 3 / 4 下 (细分的打点音更轻更暗)</p></li>
 <li><p>「<b>音色</b>」是三种本地合成音 (电子嘀嗒 / 正弦蜂鸣 / 木鱼) , 「<b>音量</b>」拉到 0 即静音; 关掉「首拍重音」后每拍音量相同</p></li>
+<li><p>「<b>倒计时</b>」可选预排拍数 (关闭 / 1 / 2 / 4 / 8 拍) : 开始后先打这么多个倒计时拍, 舞台会提示剩余倒数拍数, 播完自动进入正拍; 不需要可设「关闭」</p></li>
 <li><p>点「<b>全屏</b>」把圆点铺满整屏 (背景也会跟着轻微染色) ; 关掉「背景闪烁」则只闪圆点。全屏下按 <code>Esc</code> 退出</p></li>
 <li><p>把调好的参数点「<b>保存为默认设置</b>」记下来, 下次打开或刷新后依然生效; 也可以在「设置中心 → 其它 → 节拍器」里改</p></li>
 </ul>
@@ -34,11 +35,12 @@ const tw = `<h2>這個工具做什麼</h2>
 
 <h2>使用步驟</h2>
 <ul>
-<li><p>點「<b>開始</b>」即開始打點 (瀏覽器要求使用者手勢後才能出聲, 所以必須點一下) ; 再點「停止」結束並歸零</p></li>
+<li><p>點「<b>開始</b>」即開始打點 (瀏覽器要求使用者手勢後才能出聲, 所以必須點一下) ; 預設會先打 <b>2 個預排拍</b> (倒數, 音高與色彩和正拍不同) 再進入正拍 — 合奏或跟練前對齊節奏用; 再點「停止」結束並歸零</p></li>
 <li><p>拖曳<b>速度</b>滑桿、直接輸入數字, 或用 <code>−</code> / <code>+</code> 微調; 也可以按鍵盤 <code>↑</code> <code>↓</code> 調速 (按住 <code>Shift</code> 一次 ±10)</p></li>
 <li><p>不知道速度? 用「<b>連擊測速</b>」: 跟著感覺連續點按鈕 (至少 2 次), 取最近幾次點擊的平均值自動填入速度; 停頓超過約 2.5 秒會重新開始測</p></li>
 <li><p><b>拍號</b>決定每小節幾拍 (1~12, 也可直接點 4/4、6/8 等常用拍號按鈕) ; 「<b>細分</b>」把每拍再等分成 2 / 3 / 4 下 (細分的打點音更輕更暗)</p></li>
 <li><p>「<b>音色</b>」是三種本機合成音 (電子嘀嗒 / 正弦蜂鳴 / 木魚) , 「<b>音量</b>」拉到 0 即靜音; 關掉「首拍重音」後每拍音量相同</p></li>
+<li><p>「<b>倒計時</b>」可選預排拍數 (關閉 / 1 / 2 / 4 / 8 拍) : 開始後先打這麼多個倒數拍, 舞台會提示剩餘倒數拍數, 播完自動進入正拍; 不需要可設「關閉」</p></li>
 <li><p>點「<b>全螢幕</b>」把圓點鋪滿整個畫面 (背景也會跟著輕微染色) ; 關掉「背景閃爍」則只閃圓點。全螢幕下按 <code>Esc</code> 退出</p></li>
 <li><p>把調好的參數點「<b>儲存為預設設定</b>」記下來, 下次打開或重新整理後依然生效; 也可以在「設定中心 → 其他 → 節拍器」裡改</p></li>
 </ul>
@@ -63,11 +65,12 @@ const en = `<h2>What this tool does</h2>
 
 <h2>How to use</h2>
 <ul>
-<li><p>Press <b>Start</b> to begin (browsers only allow audio after a user gesture, so one click is required); press <b>Stop</b> to end and reset the counters</p></li>
+<li><p>Press <b>Start</b> to begin (browsers only allow audio after a user gesture, so one click is required). By default <b>2 count-in clicks</b> play first (a different pitch and color, i.e. the countdown) before the regular beat begins — handy for ensembles to line up. Press <b>Stop</b> to end and reset the counters</p></li>
 <li><p>Drag the <b>tempo</b> slider, type a value, or nudge with <code>−</code> / <code>+</code>; the <code>↑</code> <code>↓</code> keys also work (hold <code>Shift</code> for ±10)</p></li>
 <li><p>Don't know the tempo? Use <b>Tap tempo</b>: tap the button at least twice and the average of your recent taps is applied. A pause longer than ~2.5 s restarts the measurement</p></li>
 <li><p><b>Time signature</b> sets beats per bar (1–12, or use the 4/4, 6/8 … shortcuts); <b>Subdivision</b> splits each beat into 2 / 3 / 4 clicks (subdivisions are quieter and dimmer)</p></li>
 <li><p><b>Timbre</b> offers three locally synthesised sounds (click / beep / wood block) and <b>Volume</b> goes down to silence; turn off <i>Accent first beat</i> for an even click</p></li>
+<li><p><b>Count-in</b> sets the number of leading clicks (off / 1 / 2 / 4 / 8): those play before the regular beat, with the remaining beats shown on stage — set it to off when you don't need it</p></li>
 <li><p><b>Fullscreen</b> blows the dot up to fill the screen (with a subtle background tint); turn off <i>Flash background</i> to flash the dot only. Press <code>Esc</code> to leave fullscreen</p></li>
 <li><p>Hit <b>Save as defaults</b> to remember your settings for the next visit, or change them in <i>Settings → Misc → Metronome</i></p></li>
 </ul>

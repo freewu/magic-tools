@@ -1,10 +1,11 @@
-import { BEATS_DEFAULT, BPM_DEFAULT, SUBDIVISION_DEFAULT, VOLUME_DEFAULT, TIMBRE_DEFAULT, DEFAULTS_STORAGE_KEY } from './data';
+import { BEATS_DEFAULT, BPM_DEFAULT, COUNTDOWN_DEFAULT, DEFAULTS_STORAGE_KEY, SUBDIVISION_DEFAULT, TIMBRE_DEFAULT, VOLUME_DEFAULT } from './data';
 import {
   DEFAULT_OPTIONS,
   barsPlayed,
   beatInfoAt,
   clampBeats,
   clampBpm,
+  clampCountdown,
   clampSubdivision,
   clampVolume,
   collectTickTimes,
@@ -25,6 +26,7 @@ import {
   tickIntervalMs,
   tickIntervalSec,
 } from './lib';
+
 
 beforeEach(() => {
   localStorage.clear();
@@ -52,6 +54,17 @@ describe('clamp 系列', () => {
     expect(clampBeats(0)).toBe(1);
     expect(clampBeats(100)).toBe(12);
     expect(clampBeats('x')).toBe(BEATS_DEFAULT);
+  });
+
+  it('倒计时预排拍数只取预设档位里最接近的一个', () => {
+    expect(clampCountdown(0)).toBe(0);
+    expect(clampCountdown(2)).toBe(2);
+    expect(clampCountdown(3)).toBe(2); // |3-2|=1 < |3-4|=1 (等距取更小)
+    expect(clampCountdown(6)).toBe(4); // |6-4|=2 < |6-8|=2 (等距取更小)
+    expect(clampCountdown(7)).toBe(8);
+    expect(clampCountdown(-5)).toBe(0);
+    expect(clampCountdown('bad')).toBe(COUNTDOWN_DEFAULT);
+    expect(clampCountdown(undefined)).toBe(COUNTDOWN_DEFAULT);
   });
 
   it('细分只取候选里最接近的值', () => {
@@ -87,7 +100,9 @@ describe('normalizeOptions', () => {
 
   it('非法字段逐项回退, 合法字段保留', () => {
     const out = normalizeOptions({ bpm: 500, beats: 0, subdivision: 4, volume: -1, timbre: 'wood', accent: false });
-    expect(out).toEqual({ bpm: 300, beats: 1, subdivision: 4, volume: 0, timbre: 'wood', accent: false });
+    expect(out).toEqual({ bpm: 300, beats: 1, subdivision: 4, volume: 0, timbre: 'wood', accent: false, countdown: COUNTDOWN_DEFAULT });
+    expect(normalizeOptions({ countdown: 3 }).countdown).toBe(2); // 3 不是档位 → 夹到 2
+    expect(normalizeOptions({ countdown: 7 }).countdown).toBe(8);
   });
 
   it('accent 只有显式 true 才为真', () => {
@@ -125,6 +140,7 @@ describe('默认设置读写', () => {
     expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS })).toBe(true);
     expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS, bpm: 91 })).toBe(false);
     expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS, accent: false })).toBe(false);
+    expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS, countdown: 4 })).toBe(false);
   });
 });
 
@@ -183,6 +199,22 @@ describe('beatInfoAt', () => {
     expect(barsPlayed(7, 4, 1)).toBe(1);
     expect(barsPlayed(8, 4, 1)).toBe(2);
     expect(barsPlayed(0, 4, 1)).toBe(0);
+  });
+
+  it('预排拍 (倒计时): 前 prepBeats 次是 prep (bar = -1), 之后从第 1 小节起算', () => {
+    // 2 个预排拍 + 4/4: 第 0/1 次是 prep, 第 2 次是重音起拍, 第 6 次进入第 2 小节
+    expect(beatInfoAt(0, 4, 1, true, 2)).toEqual({ bar: -1, beat: 0, sub: 0, kind: 'prep' });
+    expect(beatInfoAt(1, 4, 1, true, 2)).toEqual({ bar: -1, beat: 1, sub: 0, kind: 'prep' });
+    expect(beatInfoAt(2, 4, 1, true, 2)).toEqual({ bar: 0, beat: 0, sub: 0, kind: 'accent' });
+    expect(beatInfoAt(6, 4, 1, true, 2)).toEqual({ bar: 1, beat: 0, sub: 0, kind: 'accent' });
+    // 不影响原有行为 (默认 0 个预排拍) 与重音开关
+    expect(beatInfoAt(0, 4, 1)).toEqual({ bar: 0, beat: 0, sub: 0, kind: 'accent' });
+    expect(beatInfoAt(0, 4, 1, false, 2).kind).toBe('prep');
+    expect(beatInfoAt(2, 4, 1, false, 2).kind).toBe('beat');
+    // 细分仍生效: 预排拍按整拍处理, 正拍细分正常
+    expect(beatInfoAt(3, 4, 2, true, 2)).toEqual({ bar: 0, beat: 0, sub: 1, kind: 'sub' });
+    // 非法值按 0 处理
+    expect(beatInfoAt(0, 4, 1, true, -3)).toEqual({ bar: 0, beat: 0, sub: 0, kind: 'accent' });
   });
 
   it('isMainBeat 只对正拍为真', () => {

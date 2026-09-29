@@ -2,6 +2,7 @@
 // 设计: 与 DOM 解耦 —— 组件负责测量"视口高度"与"文本高度"后注入,
 //       滚动推进 / 进度 / 剩余时间等计算都放在这里, 便于单元测试覆盖
 import {
+  COUNTDOWN_DEFAULT, COUNTDOWN_OPTIONS,
   DEFAULTS_STORAGE_KEY,
   FADE_DEFAULT, FOCUS_DECAY, FOCUS_DEFAULT, FOCUS_MIN_OPACITY,
   FONT_SIZE_DEFAULT, FONT_SIZE_MAX, FONT_SIZE_MIN,
@@ -21,6 +22,8 @@ export interface PrompterOptions {
   fade: boolean;
   /** 逐行焦点高亮 (高亮当前阅读行并按阅读进度逐字点亮, 越远越淡) */
   focus: boolean;
+  /** 开始前倒计时 (秒), 0 = 关闭: 从开头点「开始」时先倒数再滚动 */
+  countdown: number;
 }
 
 /** 默认可选项 */
@@ -30,6 +33,7 @@ export const DEFAULT_OPTIONS: PrompterOptions = {
   lineHeight: LINE_HEIGHT_DEFAULT,
   fade: FADE_DEFAULT,
   focus: FOCUS_DEFAULT,
+  countdown: COUNTDOWN_DEFAULT,
 };
 
 // ==================== 取值校验 ====================
@@ -59,6 +63,17 @@ export const clampLineHeight = (v: unknown): number => {
   return Math.round(clamped * 10) / 10;
 };
 
+/** 倒计时秒数: 只取预设档位里最接近的一个, 非法值回退默认 */
+export const clampCountdown = (v: unknown): number => {
+  const n = toNum(v);
+  if (Number.isNaN(n)) return COUNTDOWN_DEFAULT;
+  let best = COUNTDOWN_OPTIONS[0];
+  for (const opt of COUNTDOWN_OPTIONS) {
+    if (Math.abs(opt - n) < Math.abs(best - n)) best = opt;
+  }
+  return best;
+};
+
 /** 把任意来源 (JSON / 旧版本存储值) 规整成合法选项: 缺字段与非法值都回退默认 */
 export const normalizeOptions = (raw: unknown): PrompterOptions => {
   const src = (raw && typeof raw === 'object' ? raw : {}) as Partial<Record<keyof PrompterOptions, unknown>>;
@@ -68,6 +83,7 @@ export const normalizeOptions = (raw: unknown): PrompterOptions => {
     lineHeight: clampLineHeight(src.lineHeight),
     fade: typeof src.fade === 'boolean' ? src.fade : FADE_DEFAULT,
     focus: typeof src.focus === 'boolean' ? src.focus : FOCUS_DEFAULT,
+    countdown: clampCountdown(src.countdown),
   };
 };
 

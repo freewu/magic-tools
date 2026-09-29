@@ -4,6 +4,7 @@ import Metronome from './index';
 import {
   BEATS_DEFAULT, BPM_DEFAULT, DEFAULTS_STORAGE_KEY, FLASH_COLOR, SCHEDULE_INTERVAL_MS, STAGE_BG,
 } from './data';
+import { COUNTDOWN_DEFAULT } from './data';
 
 /** jsdom 会把内联的 #rrggbb 归一化成 rgb(), 断言时统一用后者 */
 const rgb = (hex: string): string => {
@@ -12,6 +13,7 @@ const rgb = (hex: string): string => {
   return `rgb(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255})`;
 };
 const ACCENT_RGB = rgb(FLASH_COLOR.accent);
+const PREP_RGB = rgb(FLASH_COLOR.prep);
 const STAGE_BG_RGB = rgb(STAGE_BG);
 
 // ---- Web Audio 桩: jsdom 没有 AudioContext, 记录每次打点的时刻 ----
@@ -149,20 +151,19 @@ describe('节拍器 页面', () => {
     // 进入运行态: 按钮变成「停止」
     expect(btn(container, '停止')).toBeInTheDocument();
 
-    // 前进 60ms: 首次打点的闪烁到期
+    // 前进 60ms: 首次打点的闪烁到期 —— 默认带 2 个预排拍, 先闪倒数色
     await act(async () => {
       ctx.currentTime += 0.06;
       jest.advanceTimersByTime(60);
     });
-    expect(dotOf(container).className).toContain('mt-dot-accent');
-    expect(dotOf(container).style.background).toBe(ACCENT_RGB);
-    expect(hintTextOf(container)).toContain('第 1 小节 · 第 1 拍');
+    expect(dotOf(container).className).toContain('mt-dot-prep');
+    expect(dotOf(container).style.background).toBe(PREP_RGB);
+    expect(hintTextOf(container)).toContain('倒数 2 拍');
 
-    // 再前进约 2s: 90 BPM -> 每拍 666.7ms, 应至少再排 2 次
-    await tickClock(ctx, 2000);
-    expect(starts.length).toBeGreaterThanOrEqual(3);
-    // 拍点序号递增 (第 index 次打点在第若干小节)
+    // 预排拍走完 (90 BPM × 2 拍 ≈ 1.33s) 进入正拍: 首拍重音, 显示小节/拍
+    await tickClock(ctx, 1500);
     expect(hintTextOf(container)).toMatch(/第 \d+ 小节 · 第 \d+ 拍/);
+    expect(starts.length).toBeGreaterThanOrEqual(3);
   });
 
   it('暂停后不再排期, 已有排期不再发声', async () => {
@@ -186,10 +187,10 @@ describe('节拍器 页面', () => {
       ctx.currentTime += 0.06;
       jest.advanceTimersByTime(60);
     });
-    expect(dotOf(container).className).toContain('mt-dot-accent');
+    expect(dotOf(container).className).toContain('mt-dot-prep');
     await stopTool(container);
-    expect(dotOf(container).className).not.toContain('mt-dot-accent');
-    expect(dotOf(container).style.background).not.toBe(ACCENT_RGB);
+    expect(dotOf(container).className).not.toContain('mt-dot-prep');
+    expect(dotOf(container).style.background).not.toBe(PREP_RGB);
   });
 
   it('点击圆点也能开始 / 停止', async () => {
@@ -320,8 +321,8 @@ describe('节拍器 参数', () => {
       ctx.currentTime += 0.06;
       jest.advanceTimersByTime(60);
     });
-    expect(dotOf(container).className).toContain('mt-dot-accent');
-    expect(dotOf(container).style.background).toBe(ACCENT_RGB);
+    expect(dotOf(container).className).toContain('mt-dot-prep');
+    expect(dotOf(container).style.background).toBe(PREP_RGB);
     expect(stageOf(container).style.background).toBe(STAGE_BG_RGB);
   });
 });
@@ -373,5 +374,63 @@ describe('节拍器 全屏与默认设置', () => {
     localStorage.setItem(DEFAULTS_STORAGE_KEY, 'not-json');
     const { container } = render(<Metronome />);
     expect(tempoTextOf(container)).toBe(`${BPM_DEFAULT} BPM · Andante`);
+  });
+});
+
+describe('节拍器 倒计时 (预排拍)', () => {
+  /** 点击倒计时档位 (antd Segmented 需要点内部的 radio) */
+  const chooseCountdown = (c: HTMLElement, text: string) => {
+    const label = Array.from(c.querySelectorAll('label.ant-segmented-item'))
+      .find((el) => (el.textContent ?? '').replace(/\s+/g, '') === text.replace(/\s+/g, ''));
+    if (!label) throw new Error(`未找到倒计时档位: ${text}`);
+    fireEvent.click(label.querySelector('input') ?? label);
+  };
+
+  it('默认 2 个预排拍: 依次倒数 2 → 1, 之后进入正拍', async () => {
+    const { container } = render(<Metronome />);
+    expect(container.querySelector('.ant-segmented-item-selected')?.textContent?.replace(/\s+/g, '')).toBe('2拍');
+    await startTool(container);
+    const ctx = ctxOf();
+
+    // 第一下预排拍: 倒数剩 2 拍
+    await act(async () => {
+      ctx.currentTime += 0.06;
+      jest.advanceTimersByTime(60);
+    });
+    expect(hintTextOf(container)).toContain('倒数 2 拍');
+
+    // 第二下预排拍 (间隔一拍) : 倒数剩 1 拍
+    await tickClock(ctx, 700);
+    expect(hintTextOf(container)).toContain('倒数 1 拍');
+
+    // 预排拍走完进入正拍
+    await tickClock(ctx, 800);
+    expect(hintTextOf(container)).toMatch(/第 \d+ 小节 · 第 \d+ 拍/);
+  });
+
+  it('关闭倒计时 (countdown: 0) 后开始立即进入正拍', async () => {
+    localStorage.setItem(DEFAULTS_STORAGE_KEY, JSON.stringify({ countdown: 0 }));
+    const { container } = render(<Metronome />);
+    await startTool(container);
+    const ctx = ctxOf();
+    await act(async () => {
+      ctx.currentTime += 0.06;
+      jest.advanceTimersByTime(60);
+    });
+    expect(dotOf(container).className).toContain('mt-dot-accent');
+    expect(dotOf(container).style.background).toBe(ACCENT_RGB);
+    expect(hintTextOf(container)).toContain('第 1 小节 · 第 1 拍');
+  });
+
+  it('倒计时档位可切换预排拍数并计入「保存为默认设置」', async () => {
+    const { container } = render(<Metronome />);
+    // 默认选中 2 拍
+    expect(container.querySelector('.ant-segmented-item-selected')?.textContent?.replace(/\s+/g, '')).toBe('2拍');
+    // 切换到 4 拍: 与默认不一致 → 可保存
+    await act(async () => { chooseCountdown(container, '4 拍'); });
+    expect(saveBtn(container)).toBeEnabled();
+    await act(async () => { fireEvent.click(saveBtn(container)); });
+    expect(JSON.parse(localStorage.getItem(DEFAULTS_STORAGE_KEY) as string)).toMatchObject({ countdown: 4 });
+    expect(COUNTDOWN_DEFAULT).toBe(2);
   });
 });

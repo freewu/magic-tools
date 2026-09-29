@@ -32,9 +32,20 @@ const uilangRows: Record<string, [string, string]> = {
     '已儲存為預設設定, 下次開啟提詞器時生效',
     'Saved as defaults — it will apply next time you open the teleprompter',
   ],
-  '把当前的速度 / 字号 / 行距 / 淡入淡出 / 逐行高亮存为默认值, 下次打开时沿用; 也可在 设置 → 其它 → 提词器 中修改': [
-    '把目前的速度 / 字號 / 行距 / 淡入淡出 / 逐行高亮存為預設值, 下次開啟時沿用; 也可在 設定 → 其他 → 提詞器 中修改',
-    'Store the current speed / font size / line height / fade / line focus as the defaults used next time; they can also be edited in Settings → Utilities → Teleprompter',
+  '把当前的速度 / 字号 / 行距 / 淡入淡出 / 逐行高亮 / 倒计时存为默认值, 下次打开时沿用; 也可在 设置 → 其它 → 提词器 中修改': [
+    '把目前的速度 / 字號 / 行距 / 淡入淡出 / 逐行高亮 / 倒計時存為預設值, 下次開啟時沿用; 也可在 設定 → 其他 → 提詞器 中修改',
+    'Store the current speed / font size / line height / fade / line focus / countdown as the defaults used next time; they can also be edited in Settings → Utilities → Teleprompter',
+  ],
+
+  // 倒计时
+  '倒计时': ['倒計時', 'Countdown'],
+  '关闭': ['關閉', 'Off'],
+  '{n} 秒': ['{n} 秒', '{n} s'],
+  '取消倒计时': ['取消倒計時', 'Cancel countdown'],
+  '倒计时 {n} 秒': ['倒計時 {n} 秒', '{n}s to start'],
+  '开始前先倒数, 留出时间看向镜头 / 做好准备; 再点一次「开始」或按空格可取消': [
+    '開始前先倒數, 留出時間看向鏡頭 / 做好準備; 再點一次「開始」或按空白鍵可取消',
+    'Counts down before scrolling starts, giving you a moment to look at the camera and get ready; press Start or Space again to cancel',
   ],
   '边缘淡入淡出: 文字在上下边缘渐隐, 更接近真实提词器': [
     '邊緣淡入淡出: 文字在上下邊緣漸隱, 更接近真實提詞器',
@@ -53,9 +64,9 @@ const uilangRows: Record<string, [string, string]> = {
   '剩余 {time}': ['剩餘 {time}', '{time} left'],
   '播放结束': ['播放結束', 'Finished'],
   '请先在上方输入提词脚本': ['請先在上方輸入提詞腳本', 'Type a script above to begin'],
-  '空格 开始/暂停 · ↑↓ 调速 · Esc 退出全屏': [
-    '空格 開始/暫停 · ↑↓ 調速 · Esc 退出全屏',
-    'Space: start / pause · ↑↓: speed · Esc: exit fullscreen',
+  '空格 开始/暂停/取消倒计时 · ↑↓ 调速 · Esc 退出全屏': [
+    '空格 開始/暫停/取消倒計時 · ↑↓ 調速 · Esc 退出全屏',
+    'Space: start / pause / cancel countdown · ↑↓: speed · Esc: exit fullscreen',
   ],
 
   // 说明区标题

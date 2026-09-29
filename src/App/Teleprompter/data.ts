@@ -20,6 +20,10 @@ export const LINE_HEIGHT_DEFAULT = 1.8;
 /** 首尾留白占视口高度的比例: 让第一行从下方进入、最后一行停在视线位置 */
 export const PAD_RATIO = 0.6;
 
+/** 开始前倒计时可选的秒数 (0 = 关闭) */
+export const COUNTDOWN_OPTIONS: readonly number[] = [ 0, 3, 5, 10, 15, 30 ];
+export const COUNTDOWN_DEFAULT = 3;
+
 /** 上下边缘淡入淡出 (渐隐) 默认开启 */
 export const FADE_DEFAULT = true;
 
@@ -42,7 +46,7 @@ export const STAGE_FOCUS_FG = '#ffffff';
 export const STAGE_DIM_FG = 'rgba(242,243,245,0.5)';
 
 /**
- * 默认设置 key (速度 / 字号 / 行距 / 淡入淡出 / 逐行高亮)
+ * 默认设置 key (速度 / 字号 / 行距 / 淡入淡出 / 逐行高亮 / 倒计时)
  * 修改入口: 设置中心「其它 → 提词器」, 或工具页的「保存为默认设置」按钮
  */
 export const DEFAULTS_STORAGE_KEY = 'teleprompter-defaults';

@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { TeleprompterSetting } from './setting';
-import { DEFAULTS_STORAGE_KEY } from './data';
+import { COUNTDOWN_DEFAULT, DEFAULTS_STORAGE_KEY } from './data';
 import { DEFAULT_OPTIONS, getDefaultOptions } from './lib';
 
 /** 面板里的滑块手柄 (速度 / 字号 / 行距 三个) */
@@ -12,13 +12,14 @@ const switches = () => screen.getAllByRole('switch') as HTMLButtonElement[];
 describe('TeleprompterSetting 默认设置', () => {
   beforeEach(() => localStorage.clear());
 
-  test('渲染 3 个滑块 + 2 个开关, 初始值即内置默认值', () => {
+  test('渲染 3 个滑块 + 2 个开关 + 倒计时分段, 初始值即内置默认值', () => {
     render(<TeleprompterSetting />);
 
     expect(screen.getByText('提词器')).toBeInTheDocument();
     expect(screen.getByText('默认滚动速度')).toBeInTheDocument();
     expect(screen.getByText('默认字号')).toBeInTheDocument();
     expect(screen.getByText('默认行距')).toBeInTheDocument();
+    expect(screen.getByText('默认倒计时')).toBeInTheDocument();
 
     expect(handles()).toHaveLength(3);
     expect(screen.getByText(`${DEFAULT_OPTIONS.speed} px/s`)).toBeInTheDocument();
@@ -30,7 +31,24 @@ describe('TeleprompterSetting 默认设置', () => {
     // 淡入淡出与逐行高亮都默认开启
     expect(sw[0]).toBeChecked();
     expect(sw[1]).toBeChecked();
+    // 倒计时默认档位: 3 秒被选中
+    const selected = document.querySelector('.ant-segmented-item-selected');
+    expect(selected?.textContent?.replace(/\s+/g, '')).toBe(`${COUNTDOWN_DEFAULT}秒`);
     expect(localStorage.getItem(DEFAULTS_STORAGE_KEY)).toBeNull();
+  });
+
+  test('修改默认倒计时立即写入默认设置', () => {
+    render(<TeleprompterSetting />);
+
+    expect(getDefaultOptions().countdown).toBe(COUNTDOWN_DEFAULT);
+    // 点「5 秒」档位 (antd Segmented 需要点内部的 radio)
+    const label = Array.from(document.querySelectorAll('label.ant-segmented-item'))
+      .find((el) => (el.textContent ?? '').replace(/\s+/g, '') === '5秒');
+    if (!label) throw new Error('未找到「5 秒」档位');
+    fireEvent.click(label.querySelector('input') ?? label);
+
+    expect(getDefaultOptions().countdown).toBe(5);
+    expect(JSON.parse(localStorage.getItem(DEFAULTS_STORAGE_KEY) as string).countdown).toBe(5);
   });
 
   test('滑块拖动 (键盘微调) 与开关都会立即写入默认设置', () => {
@@ -57,6 +75,7 @@ describe('TeleprompterSetting 默认设置', () => {
       lineHeight: 1.9,
       fade: false,
       focus: false,
+      countdown: COUNTDOWN_DEFAULT,
     });
     expect(JSON.parse(localStorage.getItem(DEFAULTS_STORAGE_KEY) as string).fade).toBe(false);
   });

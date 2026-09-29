@@ -7,6 +7,8 @@ import {
   BPM_DEFAULT,
   BPM_MAX,
   BPM_MIN,
+  COUNTDOWN_DEFAULT,
+  COUNTDOWN_OPTIONS,
   DEFAULTS_STORAGE_KEY,
   SUBDIVISION_DEFAULT,
   SUBDIVISION_OPTIONS,
@@ -35,6 +37,8 @@ export interface MetronomeOptions {
   timbre: TimbreKey;
   /** 首拍重音 */
   accent: boolean;
+  /** 开始前的预排拍数 (0 = 关闭): 先打 N 个预排拍 (不同音高), 播完进入正拍 */
+  countdown: number;
 }
 
 export const DEFAULT_OPTIONS: MetronomeOptions = {
@@ -44,6 +48,7 @@ export const DEFAULT_OPTIONS: MetronomeOptions = {
   volume: VOLUME_DEFAULT,
   timbre: TIMBRE_DEFAULT,
   accent: true,
+  countdown: COUNTDOWN_DEFAULT,
 };
 
 /** 任意输入 -> 有限数字 (无法解析时返回 NaN) */
@@ -77,6 +82,17 @@ export const clampSubdivision = (v: unknown): number => {
   return best;
 };
 
+/** 倒计时预排拍数: 只取预设档位里最接近的一个, 非法值回退默认 */
+export const clampCountdown = (v: unknown): number => {
+  const n = toNum(v);
+  if (!Number.isFinite(n)) return COUNTDOWN_DEFAULT;
+  let best = COUNTDOWN_OPTIONS[0];
+  for (const opt of COUNTDOWN_OPTIONS) {
+    if (Math.abs(opt - n) < Math.abs(best - n)) best = opt;
+  }
+  return best;
+};
+
 /** 音量: 0 ~ 100 */
 export const clampVolume = (v: unknown): number => clampInt(v, VOLUME_MIN, VOLUME_MAX, VOLUME_DEFAULT);
 
@@ -92,6 +108,7 @@ export const normalizeOptions = (raw?: Partial<MetronomeOptions> | null): Metron
   volume: clampVolume(raw?.volume),
   timbre: normalizeTimbre(raw?.timbre),
   accent: raw?.accent === undefined ? DEFAULT_OPTIONS.accent : raw.accent === true,
+  countdown: clampCountdown(raw?.countdown),
 });
 
 /** 读取默认设置 (读取失败/非法值一律回退默认) */
@@ -128,7 +145,8 @@ export const isSameOptions = (a: MetronomeOptions, b: MetronomeOptions): boolean
   a.subdivision === b.subdivision &&
   a.volume === b.volume &&
   a.timbre === b.timbre &&
-  a.accent === b.accent;
+  a.accent === b.accent &&
+  a.countdown === b.countdown;
 
 /** 一次打点的间隔 (毫秒): 速度决定拍长, 细分再把拍长等分 */
 export const tickIntervalMs = (bpm: unknown, subdivision: unknown): number =>
@@ -138,8 +156,8 @@ export const tickIntervalMs = (bpm: unknown, subdivision: unknown): number =>
 export const tickIntervalSec = (bpm: unknown, subdivision: unknown): number =>
   tickIntervalMs(bpm, subdivision) / 1000;
 
-/** 打点类型: 首拍重音 / 普通拍 / 细分 */
-export type BeatKind = 'accent' | 'beat' | 'sub';
+/** 打点类型: 预排拍 (倒计时) / 首拍重音 / 普通拍 / 细分 */
+export type BeatKind = 'prep' | 'accent' | 'beat' | 'sub';
 
 /** 某次打点在曲谱中的位置 (index 从 0 开始) */
 export interface BeatInfo {
@@ -152,20 +170,27 @@ export interface BeatInfo {
   kind: BeatKind;
 }
 
-/** 依据第 index 次打点计算它属于第几小节第几拍 */
+/**
+ * 依据第 index 次打点计算它属于第几小节第几拍
+ * prepBeats > 0 时, 前 prepBeats 次打点是「预排拍」(bar = -1, kind = prep), 之后从第 1 小节开始算
+ */
 export const beatInfoAt = (
   index: unknown,
   beats: unknown,
   subdivision: unknown,
-  accent = true
+  accent = true,
+  prepBeats = 0
 ): BeatInfo => {
   const b = clampBeats(beats);
   const s = clampSubdivision(subdivision);
   const n = toNum(index);
   const i = Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
+  const pp = toNum(prepBeats);
+  const prep = Number.isFinite(pp) ? Math.max(0, Math.floor(pp)) : 0;
+  if (i < prep) return { bar: -1, beat: i, sub: 0, kind: 'prep' };
   const perBar = b * s;
-  const bar = Math.floor(i / perBar);
-  const inBar = i % perBar;
+  const bar = Math.floor((i - prep) / perBar);
+  const inBar = (i - prep) % perBar;
   const beat = Math.floor(inBar / s);
   const sub = inBar % s;
   const kind: BeatKind = sub > 0 ? 'sub' : accent && beat === 0 ? 'accent' : 'beat';

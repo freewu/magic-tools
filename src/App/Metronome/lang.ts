@@ -27,6 +27,13 @@ const uilangRows: Record<string, [string, string]> = {
   '音色': ['音色', 'Timbre'],
   '首拍重音': ['首拍重音', 'Accent first beat'],
   '背景闪烁': ['背景閃爍', 'Flash background'],
+  '倒计时': ['倒計時', 'Count-in'],
+  '关闭': ['關閉', 'Off'],
+  '{n} 拍': ['{n} 拍', '{n} beats'],
+  '开始前先打 N 个预排拍, 再用不同音高提示正拍开始': [
+    '開始前先打 N 個預排拍, 再用不同音高提示正拍開始',
+    'Plays N count-in clicks first, then the regular beat starts (with a different pitch)',
+  ],
   '常用速度': ['常用速度', 'Common tempos'],
   '连击测速': ['連擊測速', 'Tap tempo'],
   '点击此处测速 (至少 2 次)': ['點擊此處測速 (至少 2 次)', 'Tap here to measure (2+ taps)'],
@@ -46,6 +53,8 @@ const uilangRows: Record<string, [string, string]> = {
   // 舞台
   '第 {bar} 小节 · 第 {beat} 拍': ['第 {bar} 小節 · 第 {beat} 拍', 'Bar {bar} · beat {beat}'],
   '已播放 {t} · {n} 拍': ['已播放 {t} · {n} 拍', '{t} · {n} beats'],
+  '倒数 {n} 拍': ['倒數 {n} 拍', '{n} beats to start'],
+  '倒数中': ['倒數中', 'Counting in…'],
   '点击「开始」后这里会跟着节拍闪烁': ['點擊「開始」後這裡會跟著節拍閃爍', 'Hit Start and this dot will pulse with the beat'],
   '按 Esc 退出全屏': ['按 Esc 退出全屏', 'Press Esc to exit fullscreen'],
   '{bpm} BPM · {term}': ['{bpm} BPM · {term}', '{bpm} BPM · {term}'],

@@ -28,6 +28,10 @@ export const BEAT_PRESETS: ReadonlyArray<{ beats: number; label: string }> = [
 export const SUBDIVISION_OPTIONS: readonly number[] = [ 1, 2, 3, 4 ];
 export const SUBDIVISION_DEFAULT = 1;
 
+/** 开始前的预排拍数 (倒计时): 0 = 关闭; 预排拍用不同音高与颜色提示, 播完进入正拍 */
+export const COUNTDOWN_OPTIONS: readonly number[] = [ 0, 1, 2, 4, 8 ];
+export const COUNTDOWN_DEFAULT = 2;
+
 /** 音量 0 ~ 100 (0 = 静音) */
 export const VOLUME_MIN = 0;
 export const VOLUME_MAX = 100;
@@ -44,15 +48,15 @@ export const TIMBRES: Record<TimbreKey, { type: OscillatorType; decay: number }>
   wood: { type: 'triangle', decay: 0.1 },
 };
 
-/** 三个重音级别的频率 (Hz): 首拍 / 普通拍 / 细分 */
-export const TONE_FREQ = { accent: 1760, beat: 1174, sub: 880 } as const;
-/** 三个级别的相对音量 */
-export const TONE_GAIN = { accent: 1, beat: 0.66, sub: 0.4 } as const;
+/** 四个打点级别的频率 (Hz): 预排拍 (倒计时) / 首拍 / 普通拍 / 细分 */
+export const TONE_FREQ = { prep: 660, accent: 1760, beat: 1174, sub: 880 } as const;
+/** 四个级别的相对音量 */
+export const TONE_GAIN = { prep: 0.8, accent: 1, beat: 0.66, sub: 0.4 } as const;
 
 /** 单次闪烁时长 (ms) */
 export const FLASH_MS = 100;
-/** 首拍 / 普通拍 / 细分的闪烁色 */
-export const FLASH_COLOR = { accent: '#ff4d4f', beat: '#1677ff', sub: '#8c8c8c' } as const;
+/** 预排拍 / 首拍 / 普通拍 / 细分的闪烁色 */
+export const FLASH_COLOR = { prep: '#f5a623', accent: '#ff4d4f', beat: '#1677ff', sub: '#8c8c8c' } as const;
 /** 舞台配色 (深底: 全屏闪烁时刺眼程度低) */
 export const STAGE_BG = '#101114';
 export const STAGE_DOT_IDLE = '#2b2f36';

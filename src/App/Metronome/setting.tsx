@@ -1,12 +1,12 @@
-import { Divider, Form, InputNumber, Select, Slider, Switch } from 'antd';
+import { Divider, Form, InputNumber, Segmented, Select, Slider, Switch } from 'antd';
 import { useState } from 'react';
 import {
-  BEATS_DEFAULT, BEATS_MAX, BEATS_MIN, BPM_DEFAULT, BPM_MAX, BPM_MIN, SUBDIVISION_OPTIONS,
-  TIMBRE_KEYS, VOLUME_DEFAULT, VOLUME_MAX, VOLUME_MIN, type TimbreKey,
+  BEATS_DEFAULT, BEATS_MAX, BEATS_MIN, BPM_DEFAULT, BPM_MAX, BPM_MIN, COUNTDOWN_OPTIONS,
+  SUBDIVISION_OPTIONS, TIMBRE_KEYS, VOLUME_DEFAULT, VOLUME_MAX, VOLUME_MIN, type TimbreKey,
 } from './data';
 import {
-  clampBeats, clampBpm, clampSubdivision, clampVolume, getDefaultOptions, normalizeTimbre,
-  patchDefaultOptions,
+  clampBeats, clampBpm, clampCountdown, clampSubdivision, clampVolume, getDefaultOptions,
+  normalizeTimbre, patchDefaultOptions,
 } from './lib';
 import { u, uT } from './lang';
 import { useLocale } from '../../hook/locale-context';
@@ -73,6 +73,19 @@ export const MetronomeSetting: React.FC = () => {
           options={ SUBDIVISION_OPTIONS.map((n) => ({
             value: n,
             label: n === 1 ? t('不细分') : uT(locale, '{n} 连音', { n }),
+          })) }
+        />
+      </Form.Item>
+      <Form.Item
+        label={ st('默认倒数拍数') }
+        extra={ st('开始前先打的预排拍数 (0 = 关闭); 预排拍用不同音高提示, 播完进入正拍') }
+      >
+        <Segmented
+          value={ opts.countdown }
+          onChange={ (v) => patch({ countdown: clampCountdown(v) }) }
+          options={ COUNTDOWN_OPTIONS.map((n) => ({
+            value: n,
+            label: n === 0 ? st('关闭') : uT(locale, '{n} 拍', { n }),
           })) }
         />
       </Form.Item>
