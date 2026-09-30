@@ -5,7 +5,7 @@ const zh = `<h2>这个工具做什么</h2>
 
 <h2>使用步骤</h2>
 <ul>
-<li><p>打开即是一张空白画布, 直接绘制即可; 画布尺寸无限, 可拖动平移、滚轮缩放</p></li>
+<li><p>打开即是一张空白画布, 直接绘制即可; 画布尺寸无限, 可拖动平移、滚轮缩放; 想沉浸式作图可点卡片右上角<b>「全屏」</b>, 再按 <code>Esc</code> 退出</p></li>
 <li><p>左侧工具栏选工具 (选择 / 矩形 / 椭圆 / 菱形 / 箭头 / 线段 / 手绘 / 文字 …), 顶部可调颜色 / 粗细 / 填充; 选中元素可拖动、缩放、旋转、复制 (Ctrl/Cmd+C/V), 支持框选多选与编组</p></li>
 <li><p><b>右上角菜单</b>保留本地操作: «打开文件» (读入 .excalidraw / 图片)、«导出图片» (PNG / SVG)、«导出文件» (.excalidraw / SVG + JSON)、«命令面板» (快捷搜索)、«搜索元素»、«清除画布»、«画布背景» 与 «主题» (浅 / 深色); 帮助、社交链接与协作入口已移除</p></li>
 <li><p>画布会在停止操作片刻后<b>自动保存到本机浏览器</b>: 标题处有提示, 下次打开本工具自动恢复上次内容; 想清空重画, 用菜单里的«清除画布»即可</p></li>
@@ -25,7 +25,7 @@ const tw = `<h2>這個工具做什麼</h2>
 
 <h2>使用步驟</h2>
 <ul>
-<li><p>開啟即是一張空白畫布, 直接繪製即可; 畫布尺寸無限, 可拖曳平移、滾輪縮放</p></li>
+<li><p>開啟即是一張空白畫布, 直接繪製即可; 畫布尺寸無限, 可拖曳平移、滾輪縮放; 想沉浸式作圖可點卡片右上角<b>「全屏」</b>, 再按 <code>Esc</code> 退出</p></li>
 <li><p>左側工具列選工具 (選取 / 矩形 / 橢圓 / 菱形 / 箭頭 / 線段 / 手繪 / 文字 …), 頂部可調顏色 / 粗細 / 填滿; 選中元素可拖曳、縮放、旋轉、複製 (Ctrl/Cmd+C/V), 支援框選多選與編組</p></li>
 <li><p><b>右上角選單</b>保留本機操作: «開啟檔案» (讀入 .excalidraw / 圖片)、«匯出圖片» (PNG / SVG)、«匯出檔案» (.excalidraw / SVG + JSON)、«命令面板» (快捷搜尋)、«搜尋元素»、«清除畫布»、«畫布背景» 與 «主題» (淺 / 深色); 說明、社交連結與協作入口已移除</p></li>
 <li><p>畫布會在停止操作片刻後<b>自動儲存到本機瀏覽器</b>: 標題處有提示, 下次開啟本工具自動恢復上次內容; 想清空重畫, 用選單裡的«清除畫布»即可</p></li>
@@ -45,7 +45,7 @@ const en = `<h2>What this tool does</h2>
 
 <h2>How to use</h2>
 <ul>
-<li><p>Open a blank canvas and start drawing; the canvas is unlimited, pan by dragging and zoom with the wheel</p></li>
+<li><p>Open a blank canvas and start drawing; the canvas is unlimited, pan by dragging and zoom with the wheel — hit <b>Fullscreen</b> at the top-right of the card for an immersive canvas and press <code>Esc</code> to leave</p></li>
 <li><p>Pick a tool from the left toolbar (selection / rectangle / ellipse / diamond / arrow / line / freehand / text …) and tune colour, stroke width and fill at the top; selected elements can be dragged, resized, rotated and copied (Ctrl/Cmd+C/V), with multi-select and grouping</p></li>
 <li><p>The <b>menu at the top right</b> keeps only local actions: «Open file» (.excalidraw / images), «Export image» (PNG / SVG), «Export file» (.excalidraw / SVG + JSON), «Command palette» (quick search), «Search element», «Clear canvas», «Canvas background» and «Theme» (light / dark); help, social links and collaboration entries have been removed</p></li>
 <li><p>The canvas <b>autosaves to your browser</b> shortly after you stop drawing (see the note next to the title) and is restored next time; use «Clear canvas» in the menu to start from scratch</p></li>

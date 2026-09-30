@@ -12,6 +12,8 @@ const uilangRows: Record<string, [string, string]> = {
     '畫布自動保存在本機瀏覽器 (localStorage), 不連網、不上傳; 選單列可匯出 PNG / SVG / 畫布檔案, 也可開啟既有檔案',
     'The canvas is autosaved locally in your browser (localStorage) — nothing leaves your machine; the menu exports PNG / SVG / a canvas file and can open existing files',
   ],
+  '全屏': ['全屏', 'Fullscreen'],
+  '退出全屏': ['退出全屏', 'Exit fullscreen'],
   '本地画布': ['本地畫布', 'Local canvas'],
 
   // 说明区标题

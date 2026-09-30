@@ -43,6 +43,7 @@ jest.mock('@excalidraw/excalidraw', () => {
 });
 
 const wbBoard = () => screen.getByTestId('wb-board') as HTMLButtonElement;
+const stage = () => document.querySelector('.wb-stage') as HTMLElement;
 
 describe('白板 页面', () => {
   test('渲染标题 / 说明与懒加载画布, 语言与主题跟随应用设置', async () => {
@@ -57,7 +58,7 @@ describe('白板 页面', () => {
     expect(wbBoard().dataset.lang).toBe('zh-CN');
     expect(wbBoard().dataset.theme).toBe('dark');
     // Excalidraw 的 height:100% 依赖外层有确定高度, 防止画布塌陷成 0 高 (导致白板"渲染不开")
-    expect(wbBoard().parentElement).toHaveStyle({ height: '700px', width: '100%' });
+    expect(stage()).toHaveStyle({ height: '700px' });
     // 说明区
     expect(document.querySelector('.intro')).not.toBeNull();
     expect(screen.getByText('这个工具做什么')).toBeInTheDocument();
@@ -113,5 +114,63 @@ describe('白板 本地保存', () => {
     // 桩组件有 children (本地菜单) 且收到 initialData 函数
     expect(wbBoard().dataset.hasChildren).toBe('true');
     expect(readScene()).not.toBeNull();
+  });
+});
+
+describe('白板 全屏', () => {
+  const fullBtn = () => {
+    const hit = screen.getAllByRole('button').find((b) => (b.textContent ?? '').replace(/\s+/g, '') === '全屏');
+    if (!hit) throw new Error('未找到「全屏」按钮');
+    return hit as HTMLButtonElement;
+  };
+  const exitBtn = () => {
+    const hit = screen.getAllByRole('button').find((b) => (b.textContent ?? '').replace(/\s+/g, '') === '退出全屏');
+    if (!hit) throw new Error('未找到「退出全屏」按钮');
+    return hit as HTMLButtonElement;
+  };
+
+  test('无原生全屏时使用窗口内全屏 (fixed 铺满 + 100vh), Esc 退出', async () => {
+    render(<ThemeProvider><LocaleProvider><Whiteboard /></LocaleProvider></ThemeProvider>);
+    await waitFor(() => expect(wbBoard()).toBeInTheDocument());
+
+    expect(stage().className).not.toContain('wb-stage-full');
+    fireEvent.click(fullBtn());
+    expect(stage().className).toContain('wb-stage-full');
+    expect(stage()).toHaveStyle({ height: '100vh' });
+    expect(exitBtn()).toBeInTheDocument();
+
+    // Esc 退出窗口内全屏 (无 native fullscreen 时)
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(stage().className).not.toContain('wb-stage-full');
+    expect(fullBtn()).toBeInTheDocument();
+    expect(stage()).toHaveStyle({ height: '700px' });
+  });
+
+  test('支持原生全屏时调用 Fullscreen API, 退出时同步', async () => {
+    const request = jest.fn().mockResolvedValue(undefined);
+    const exit = jest.fn().mockResolvedValue(undefined);
+    Object.defineProperty(HTMLElement.prototype, 'requestFullscreen', { configurable: true, value: request });
+    Object.defineProperty(document, 'fullscreenElement', {
+      configurable: true,
+      get: () => document.querySelector('.wb-stage'),
+    });
+    Object.defineProperty(document, 'exitFullscreen', { configurable: true, value: exit });
+
+    try {
+      render(<ThemeProvider><LocaleProvider><Whiteboard /></LocaleProvider></ThemeProvider>);
+      await waitFor(() => expect(wbBoard()).toBeInTheDocument());
+
+      fireEvent.click(fullBtn());
+      expect(request).toHaveBeenCalledTimes(1);
+      expect(stage().className).toContain('wb-stage-full');
+
+      fireEvent.click(exitBtn());
+      expect(exit).toHaveBeenCalledTimes(1);
+      expect(stage().className).not.toContain('wb-stage-full');
+    } finally {
+      delete (HTMLElement.prototype as unknown as Record<string, unknown>).requestFullscreen;
+      delete (document as unknown as Record<string, unknown>).fullscreenElement;
+      delete (document as unknown as Record<string, unknown>).exitFullscreen;
+    }
   });
 });
