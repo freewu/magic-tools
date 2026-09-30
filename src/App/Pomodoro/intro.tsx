@@ -10,6 +10,7 @@ const zh = `<h2>这个工具做什么</h2>
 <li><p>随时可「<b>暂停</b> / <b>重置</b>」; 想提前结束当前阶段就点「<b>跳过当前阶段</b>」, 也可以直接用页签手动切到 <b>专注 / 短休息 / 长休息</b></p></li>
 <li><p>「<b>完成提示音</b>」有 5 种内置合成音 (叮 / 钟声 / 哔哔哔 / 木鱼 / 风铃), 并支持「<b>提示次数</b>」(1~5) 重复提醒; 选「<b>自定义音频</b>」后可点「选择音频文件…」上传你喜欢的 wav / mp3 / ogg —— 文件只在本机用 <code>objectURL</code> 播放、不进任何网络, 切浏览器会话后需重新指定</p></li>
 <li><p>「<b>完成时弹通知</b>」开启后在阶段结束弹窗提醒: <b>桌面版走系统原生通知</b> (tauri-plugin-notification), Web 版走浏览器 Notification (首次会请求权限); 权限被拒绝时自动降级为页面内提示, 不影响计时</p></li>
+<li><p>「<b>背景颜色</b>」可换时钟大屏底色 (深/浅预置色或自定义), 「<b>专注颜色</b>」与「<b>休息颜色</b>」分别设置两种阶段的时间数字颜色; 全屏时同样生效, 调好后可一并「保存为默认设置」</p></li>
 <li><p>调好的时长 / 音色 / 弹窗等参数可「<b>保存为默认设置</b>」, 下次打开自动沿用; 也可在 设置 → 其它 → 番茄时钟 里预设</p></li>
 </ul>
 
@@ -31,6 +32,7 @@ const tw = `<h2>這個工具做什麼</h2>
 <li><p>隨時可「<b>暫停</b> / <b>重置</b>」; 想提前結束目前階段就點「<b>跳過目前階段</b>」, 也可以直接用手頁切到 <b>專注 / 短休息 / 長休息</b></p></li>
 <li><p>「<b>完成提示音</b>」有 5 種內建合成音 (叮 / 鐘聲 / 嗶嗶嗶 / 木魚 / 風鈴), 並支援「<b>提示次數</b>」(1~5) 重複提醒; 選「<b>自訂音訊</b>」後可點「選擇音訊檔…」上傳你喜歡的 wav / mp3 / ogg —— 檔案只在本機用 <code>objectURL</code> 播放、不進任何網路, 切瀏覽器工作階段後需重新指定</p></li>
 <li><p>「<b>完成時彈通知</b>」開啟後在階段結束彈窗提醒: <b>桌面版走系統原生通知</b> (tauri-plugin-notification), Web 版走瀏覽器 Notification (首次會請求權限); 權限被拒絕時自動降級為頁面內提示, 不影響計時</p></li>
+<li><p>「<b>背景顏色</b>」可換時鐘大螢幕底色 (深/淺預設色或自訂), 「<b>專注顏色</b>」與「<b>休息顏色</b>」分別設定兩種階段的時間數字顏色; 全螢幕時同樣生效, 調好後可一併「儲存為預設設定」</p></li>
 <li><p>調好的時長 / 音色 / 彈窗等參數可「<b>儲存為預設設定</b>」, 下次開啟自動沿用; 也可在 設定 → 其他 → 番茄鐘 裡預設</p></li>
 </ul>
 
@@ -52,6 +54,7 @@ const en = `<h2>What this tool does</h2>
 <li><p><b>Pause</b> / <b>Reset</b> are always available; <b>Skip phase</b> ends the current one early and the tabs switch between <b>Focus / Short break / Long break</b> manually</p></li>
 <li><p><b>Alert sound</b> offers 5 built-in synth timbres (ding / bell / beep / wood block / chime) plus a <b>Repeat count</b> (1–5); pick <b>Custom audio</b> and a “Choose audio…” button appears to load your own wav / mp3 / ogg — the file is played locally via <code>objectURL</code> and never uploaded (re-pick it in a new browser session)</p></li>
 <li><p>With <b>Notify on finish</b> on, a notification pops up when a phase ends — the <b>desktop build uses a native system notification</b> (tauri-plugin-notification), while the Web build uses the browser Notification API (permission is requested once); if blocked it falls back to an on-page notice without affecting the timer</p></li>
+<li><p><b>Background color</b> changes the clock backdrop (dark / light presets or any custom colour), while <b>Focus color</b> and <b>Break color</b> set the digits for each phase; both apply in fullscreen too and are saved with the other defaults</p></li>
 <li><p>Save the tuned durations / sound / notification options as defaults; they can also be preset in Settings → Utilities → Pomodoro timer</p></li>
 </ul>
 

@@ -1,9 +1,9 @@
 // 番茄时钟: 纯逻辑 (默认设置校验/存取、时间格式化、阶段轮换)
 import {
-  AUTONEXT_DEFAULT, DEFAULTS_STORAGE_KEY, LONG_MIN_DEFAULT,
-  MINUTES_MAX, MINUTES_MIN, NOTIFY_DEFAULT, REPEAT_DEFAULT, REPEAT_MAX, REPEAT_MIN,
-  ROUNDS_BEFORE_LONG_DEFAULT, SHORT_MIN_DEFAULT, SOUND_KEYS, VOLUME_DEFAULT, VOLUME_MAX,
-  VOLUME_MIN, WORK_MIN_DEFAULT, type PhaseKey, type SoundKey,
+  AUTONEXT_DEFAULT, BACKGROUND_DEFAULT, BREAK_COLOR_DEFAULT, DEFAULTS_STORAGE_KEY,
+  LONG_MIN_DEFAULT, MINUTES_MAX, MINUTES_MIN, NOTIFY_DEFAULT, REPEAT_DEFAULT, REPEAT_MAX,
+  REPEAT_MIN, ROUNDS_BEFORE_LONG_DEFAULT, SHORT_MIN_DEFAULT, SOUND_KEYS, VOLUME_DEFAULT,
+  VOLUME_MAX, VOLUME_MIN, WORK_COLOR_DEFAULT, WORK_MIN_DEFAULT, type PhaseKey, type SoundKey,
 } from './data';
 
 /** 番茄时钟参数 (工具页当前参数与默认设置共用同一结构) */
@@ -20,6 +20,12 @@ export interface PomodoroOptions {
   sound: SoundKey;
   /** 完成时提示音播放次数 (1 ~ 5) */
   repeatCount: number;
+  /** 时钟/全屏背景色 (#RRGGBB) */
+  background: string;
+  /** 专注阶段时间数字颜色 */
+  workColor: string;
+  /** 休息阶段时间数字颜色 */
+  breakColor: string;
   /** 音量 0 ~ 100 */
   volume: number;
   /** 阶段完成时弹系统通知 */
@@ -36,6 +42,9 @@ export const DEFAULT_OPTIONS: PomodoroOptions = {
   sound: 'ding',
   repeatCount: REPEAT_DEFAULT,
   volume: VOLUME_DEFAULT,
+  background: BACKGROUND_DEFAULT,
+  workColor: WORK_COLOR_DEFAULT,
+  breakColor: BREAK_COLOR_DEFAULT,
   notify: NOTIFY_DEFAULT,
   autoNext: AUTONEXT_DEFAULT,
 };
@@ -66,6 +75,13 @@ export const clampVolume = (v: unknown): number => clampInt(v, VOLUME_MIN, VOLUM
 /** 提示音次数: 1 ~ 5 */
 export const clampRepeat = (v: unknown): number => clampInt(v, REPEAT_MIN, REPEAT_MAX, REPEAT_DEFAULT);
 
+/** 颜色: 只接受 #RRGGBB (非法回退 fallback) */
+export const normalizeHex = (v: unknown, fallback: string): string =>
+  typeof v === 'string' && /^#[0-9a-fA-F]{6}$/.test(v.trim()) ? v.trim() : fallback;
+
+/** 背景色: 只接受 #RRGGBB (非法回退默认黑) */
+export const normalizeBackground = (v: unknown): string => normalizeHex(v, BACKGROUND_DEFAULT);
+
 /** 音色: 只接受已知 key */
 export const normalizeSound = (v: unknown): SoundKey =>
   SOUND_KEYS.includes(v as SoundKey) ? (v as SoundKey) : DEFAULT_OPTIONS.sound;
@@ -79,6 +95,9 @@ export const normalizeOptions = (raw?: Partial<PomodoroOptions> | null): Pomodor
   sound: normalizeSound(raw?.sound),
   repeatCount: clampRepeat(raw?.repeatCount),
   volume: clampVolume(raw?.volume),
+  background: normalizeBackground(raw?.background),
+  workColor: normalizeHex(raw?.workColor, WORK_COLOR_DEFAULT),
+  breakColor: normalizeHex(raw?.breakColor, BREAK_COLOR_DEFAULT),
   notify: raw?.notify === undefined ? DEFAULT_OPTIONS.notify : raw.notify === true,
   autoNext: raw?.autoNext === undefined ? DEFAULT_OPTIONS.autoNext : raw.autoNext === true,
 });
@@ -117,6 +136,9 @@ export const isSameOptions = (a: PomodoroOptions, b: PomodoroOptions): boolean =
   a.sound === b.sound &&
   a.repeatCount === b.repeatCount &&
   a.volume === b.volume &&
+  a.background === b.background &&
+  a.workColor === b.workColor &&
+  a.breakColor === b.breakColor &&
   a.notify === b.notify &&
   a.autoNext === b.autoNext;
 

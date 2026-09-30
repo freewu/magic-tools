@@ -1,12 +1,13 @@
-import { Divider, Form, InputNumber, Select, Slider, Switch, Typography } from 'antd';
+import { ColorPicker, Divider, Form, InputNumber, Select, Slider, Switch, Typography } from 'antd';
 import { useState } from 'react';
 import { useLocale } from '../../hook/locale-context';
 import { row as _r, rowT } from '../Setting/rows-lang';
 import {
-  LONG_MIN_DEFAULT, REPEAT_DEFAULT, ROUNDS_BEFORE_LONG_DEFAULT, SHORT_MIN_DEFAULT, SOUND_KEYS,
-  VOLUME_DEFAULT, WORK_MIN_DEFAULT, type SoundKey,
+  BACKGROUND_DEFAULT, BACKGROUND_PRESETS, BREAK_COLOR_DEFAULT, LONG_MIN_DEFAULT, REPEAT_DEFAULT,
+  ROUNDS_BEFORE_LONG_DEFAULT, SHORT_MIN_DEFAULT, SOUND_KEYS, VOLUME_DEFAULT, WORK_COLOR_DEFAULT,
+  WORK_MIN_DEFAULT, type SoundKey,
 } from './data';
-import { clampMinutes, clampRounds, clampRepeat, clampVolume, getDefaultOptions, patchDefaultOptions } from './lib';
+import { clampMinutes, clampRounds, clampRepeat, clampVolume, getDefaultOptions, normalizeHex, patchDefaultOptions } from './lib';
 import { u } from './lang';
 
 const SOUND_TEXT: Record<SoundKey, string> = {
@@ -18,7 +19,18 @@ const SOUND_TEXT: Record<SoundKey, string> = {
   custom: '自定义音频',
 };
 
+/** 颜色选择控件 (预置色板 + 自定义) */
+const ColorItem: React.FC<{ value: string; onChange: (hex: string) => void }> = ({ value, onChange }) => (
+  <ColorPicker
+    value={ value }
+    presets={ BACKGROUND_PRESETS.map((g) => ({ label: g.label, colors: g.colors })) }
+    onChange={ (v) => onChange(v.toHexString()) }
+    showText
+  />
+);
+
 /** 番茄时钟默认设置 (挂载到 设置 → 其它) */
+
 export const PomodoroSetting: React.FC = () => {
   const { locale } = useLocale();
   const st = (zh: string) => _r(locale, zh);
@@ -94,6 +106,27 @@ export const PomodoroSetting: React.FC = () => {
           value={ opts.repeatCount }
           onChange={ (v) => patch({ repeatCount: clampRepeat(v) }) }
         />
+      </Form.Item>
+      <Form.Item
+        label={ st('默认时钟背景') }
+        extra={ st('时钟舞台与全屏模式的背景色, 默认黑色') }
+      >
+        <ColorItem value={ opts.background } onChange={ (hex) => patch({ background: normalizeHex(hex, BACKGROUND_DEFAULT) }) } />
+        { normalizeHex(opts.background, BACKGROUND_DEFAULT) !== opts.background && (
+          <Typography.Text type="warning" style={ { fontSize: 12, marginLeft: 8 } }>{ st('非法颜色已回退默认') }</Typography.Text>
+        ) }
+      </Form.Item>
+      <Form.Item
+        label={ st('默认专注颜色') }
+        extra={ st('专注阶段时间数字的颜色, 默认白色') }
+      >
+        <ColorItem value={ opts.workColor } onChange={ (hex) => patch({ workColor: normalizeHex(hex, WORK_COLOR_DEFAULT) }) } />
+      </Form.Item>
+      <Form.Item
+        label={ st('默认休息颜色') }
+        extra={ st('短休息 / 长休息阶段时间数字的颜色, 默认薄荷绿') }
+      >
+        <ColorItem value={ opts.breakColor } onChange={ (hex) => patch({ breakColor: normalizeHex(hex, BREAK_COLOR_DEFAULT) }) } />
       </Form.Item>
       <Form.Item
         label={ st('默认音量') }

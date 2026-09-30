@@ -1,8 +1,9 @@
 import { DEFAULTS_STORAGE_KEY } from './data';
 import {
   DEFAULT_OPTIONS, clampMinutes, clampRepeat, clampRounds, clampVolume, formatClock,
-  getDefaultOptions, isSameOptions, nextPhaseOf, normalizeOptions, normalizeSound,
-  patchDefaultOptions, phaseSeconds, remainingOf, setDefaultOptions, shouldLongBreak,
+  getDefaultOptions, isSameOptions, nextPhaseOf, normalizeBackground, normalizeHex,
+  normalizeOptions, normalizeSound, patchDefaultOptions, phaseSeconds, remainingOf,
+  setDefaultOptions, shouldLongBreak,
 } from './lib';
 
 describe('番茄时钟 lib', () => {
@@ -39,6 +40,12 @@ describe('番茄时钟 lib', () => {
     });
     expect(normalizeOptions({ sound: 'custom' }).sound).toBe('custom');
     expect(normalizeOptions({ repeatCount: 9 }).repeatCount).toBe(5);
+    expect(normalizeOptions({ background: '#123abc' }).background).toBe('#123abc');
+    expect(normalizeOptions({ background: 'red' }).background).toBe('#000000');
+    expect(normalizeOptions({ workColor: '#ff0000' }).workColor).toBe('#ff0000');
+    expect(normalizeOptions({ workColor: 'bad' }).workColor).toBe('#ffffff');
+    expect(normalizeOptions({ breakColor: '#00ff00' }).breakColor).toBe('#00ff00');
+    expect(normalizeOptions({ breakColor: '' }).breakColor).toBe('#34d399');
   });
 
   test('默认设置: 写入可读回, 损坏回退, patch 局部更新', () => {
@@ -63,6 +70,16 @@ describe('番茄时钟 lib', () => {
     expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS })).toBe(true);
     expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS, notify: false })).toBe(false);
     expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS, volume: 81 })).toBe(false);
+    expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS, background: '#ff0000' })).toBe(false);
+    expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS, workColor: '#112233' })).toBe(false);
+  });
+
+  test('normalizeHex/normalizeBackground 校验', () => {
+    expect(normalizeHex('#AbCdEf', '#000')).toBe('#AbCdEf');
+    expect(normalizeHex('123456', '#000')).toBe('#000');
+    expect(normalizeHex(null, '#fff')).toBe('#fff');
+    expect(normalizeBackground('#010203')).toBe('#010203');
+    expect(normalizeBackground(123)).toBe('#000000');
   });
 
   test('remainingOf 按截止时刻推算, 非正/非法视为 0', () => {

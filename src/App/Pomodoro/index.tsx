@@ -1,7 +1,7 @@
 // 番茄时钟: 专注/短休/长休 轮换计时 · 完成提示音 (Web Audio 本地合成或自定义音频) · 可选系统通知
 // 说明: 计时按「截止时刻」推算, 不依赖 setInterval 累积, 切后台/卡顿回来不会跑偏
 import {
-  Button, Card, Divider, InputNumber, message, Select, Slider, Space, Switch, Tooltip, Typography,
+  Button, Card, ColorPicker, Divider, InputNumber, message, Select, Slider, Space, Switch, Tooltip, Typography,
 } from 'antd';
 import {
   ClockCircleOutlined, FullscreenExitOutlined, FullscreenOutlined, PauseCircleOutlined,
@@ -10,7 +10,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocale } from '../../hook/locale-context';
 import {
-  PHASE_KEYS, SOUND_KEYS, SOUND_PATTERNS, TICK_MS, type PhaseKey, type SoundKey,
+  BACKGROUND_PRESETS, PHASE_KEYS, SOUND_KEYS, SOUND_PATTERNS, TICK_MS, type PhaseKey, type SoundKey,
 } from './data';
 import {
   formatClock, getDefaultOptions, isSameOptions, normalizeOptions, remainingOf, setDefaultOptions,
@@ -30,10 +30,11 @@ const audioCtor = (): AudioCtor | null => {
 
 // 舞台样式: 全屏时 position:fixed 铺满窗口 (原生全屏失败的窗口内全屏兜底)
 const STAGE_CSS = `
-.pt-stage-full { position: fixed; inset: 0; z-index: 1000; background: #fff; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 18px; }
-@media (prefers-color-scheme: dark) { .pt-stage-full { background: #101114; } }
+.pt-stage-full { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 18px; }
 .pt-stage-full .pt-clock-num { font-size: 140px; }
 .pt-stage-full .pt-phase { font-size: 22px; }
+.pt-stage { border-radius: 12px; color: #f2f3f5; }
+.pt-stage .pt-phase { color: rgba(255,255,255,0.72); }
 `;
 type FullscreenElement = HTMLDivElement & { webkitRequestFullscreen?: () => Promise<void> | void };
 type FullscreenDocument = Document & {
@@ -376,11 +377,11 @@ const Pomodoro: React.FC = () => {
         }
       >
         {/* 时钟主体 (全屏时固定铺满) */}
-        <div ref={stageRef} className={full ? 'pt-stage-full' : ''} style={{ textAlign: 'center', padding: '12px 0 4px' }}>
-          <div className="pt-phase" style={{ fontSize: 13, color: '#8a8f98', marginBottom: 4 }}>
+        <div ref={stageRef} className={full ? 'pt-stage-full' : 'pt-stage'} style={{ background: opts.background, color: '#f2f3f5', textAlign: 'center', padding: '16px 12px', borderRadius: full ? 0 : 12 }}>
+          <div className="pt-phase" style={{ fontSize: 13, color: `${phase === 'focus' ? opts.workColor : opts.breakColor}b8`, marginBottom: 4 }}>
             {phaseLabel} · {tt('第 {n} 轮', { n: Math.min(doneRounds + 1, opts.roundsBeforeLong) })}
           </div>
-          <div className="pt-clock-num" style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: full ? 140 : 72, fontWeight: 700, lineHeight: 1.1 }}>
+          <div className="pt-clock-num" style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', color: phase === 'focus' ? opts.workColor : opts.breakColor, fontSize: full ? 140 : 72, fontWeight: 700, lineHeight: 1.1 }}>
             {formatClock(leftSec)}
           </div>
           <div style={{ marginTop: 8 }}>{dots}</div>
@@ -471,6 +472,33 @@ const Pomodoro: React.FC = () => {
             <Tooltip title={t('阶段完成时弹出系统通知; 权限被拒绝则在页面内提示')}>
               <Text type="secondary" style={{ fontSize: 13 }}>{t('完成时弹通知')}</Text>
             </Tooltip>
+          </Space>
+          <Space size={6}>
+            <Text type="secondary" style={{ fontSize: 13 }}>{t('背景颜色')}</Text>
+            <ColorPicker
+              size="small"
+              value={opts.background}
+              presets={BACKGROUND_PRESETS.map((g) => ({ label: g.label, colors: g.colors }))}
+              onChange={(value) => patch({ background: value.toHexString() })}
+            />
+          </Space>
+          <Space size={6}>
+            <Text type="secondary" style={{ fontSize: 13 }}>{t('专注颜色')}</Text>
+            <ColorPicker
+              size="small"
+              value={opts.workColor}
+              presets={BACKGROUND_PRESETS.map((g) => ({ label: g.label, colors: g.colors }))}
+              onChange={(value) => patch({ workColor: value.toHexString() })}
+            />
+          </Space>
+          <Space size={6}>
+            <Text type="secondary" style={{ fontSize: 13 }}>{t('休息颜色')}</Text>
+            <ColorPicker
+              size="small"
+              value={opts.breakColor}
+              presets={BACKGROUND_PRESETS.map((g) => ({ label: g.label, colors: g.colors }))}
+              onChange={(value) => patch({ breakColor: value.toHexString() })}
+            />
           </Space>
           <Space size={6}>
             <Switch size="small" checked={opts.autoNext} onChange={(v) => patch({ autoNext: v })} />

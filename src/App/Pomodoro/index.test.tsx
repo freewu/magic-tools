@@ -78,7 +78,7 @@ const bigClock = () => Array.from(document.querySelectorAll('div')).find((d) => 
 const advance = async (ms: number) => { await act(async () => { jest.advanceTimersByTime(ms); }); };
 
 describe('番茄时钟 页面', () => {
-  test('默认渲染: 专注 25:00, 开始/重置/跳过按钮齐全', () => {
+  test('默认渲染: 专注 25:00, 背景黑色, 数字默认白/休息绿, 控件齐全', () => {
     render(<Pomodoro />);
     expect(screen.getByText('番茄时钟')).toBeInTheDocument();
     expect(bigClock().textContent).toBe('25:00');
@@ -86,6 +86,19 @@ describe('番茄时钟 页面', () => {
     expect(btn('开始')).toBeInTheDocument();
     expect(btn('重置')).toBeInTheDocument();
     expect(btn('跳过当前阶段')).toBeInTheDocument();
+    // 时钟舞台默认黑色背景
+    const stage = document.querySelector('.pt-stage') as HTMLElement;
+    expect(stage).not.toBeNull();
+    expect(stage.style.background).toBe('rgb(0, 0, 0)');
+    // 专注阶段数字默认为白色
+    expect(bigClock().style.color).toBe('rgb(255, 255, 255)');
+    // 背景 / 专注颜色 / 休息颜色 三个取色器
+    expect(document.querySelectorAll('.ant-color-picker-trigger')).toHaveLength(3);
+    // 每个标签旁边就是一个取色器控件 (intros 说明文字里也含同名文字, 因此校验控件归属)
+    [ '背景颜色', '专注颜色', '休息颜色' ].forEach((label) => {
+      const hit = screen.getAllByText(label).find((el) => el.closest('.ant-space')?.querySelector('.ant-color-picker-trigger'));
+      expect(hit).toBeTruthy();
+    });
   });
 
   test('开始后按截止时刻倒计时, 暂停后剩余冻结', async () => {
@@ -192,6 +205,42 @@ describe('番茄时钟 页面', () => {
     // 各遍开始时间错开 (间隔 > 0)
     const sorted = [ ...oscStarts ];
     expect(sorted[2]).toBeGreaterThan(sorted[0]);
+  });
+
+  test('休息阶段数字用休息色; 取色器改色后舞台与数字实时更新', () => {
+    render(<Pomodoro />);
+    // 休息阶段默认薄荷绿
+    fireEvent.click(btn('短休息'));
+    expect(bigClock().textContent).toBe('05:00');
+    expect(bigClock().style.color).toBe('rgb(52, 211, 153)');
+
+    // 三个取色器: 背景 / 专注颜色 / 休息颜色
+    const triggers = Array.from(document.querySelectorAll('.ant-color-picker-trigger')) as HTMLElement[];
+    expect(triggers).toHaveLength(3);
+
+    // 打开「背景颜色」弹出层, 用十六进制输入框改色
+    fireEvent.click(triggers[0]);
+    const hexWrap = document.querySelector('.ant-color-picker-hex-input') as HTMLElement | null;
+    expect(hexWrap).not.toBeNull();
+    const hexInput = (hexWrap?.tagName === 'INPUT' ? hexWrap : hexWrap?.querySelector('input')) as HTMLInputElement;
+    expect(hexInput).not.toBeNull();
+    fireEvent.change(hexInput, { target: { value: '123456' } });
+    const stage = document.querySelector('.pt-stage') as HTMLElement;
+    expect(stage.style.background).toBe('rgb(18, 52, 86)');
+  });
+
+  test('保存默认设置包含背景/配色字段', () => {
+    render(<Pomodoro />);
+    // 参数与默认一致时按钮禁用, 先改专注时长再保存
+    const nums = Array.from(document.querySelectorAll('.ant-input-number input')) as HTMLInputElement[];
+    fireEvent.change(nums[0], { target: { value: '26' } });
+    fireEvent.blur(nums[0]);
+    fireEvent.click(btn('保存为默认设置'));
+    const saved = JSON.parse(localStorage.getItem(DEFAULTS_STORAGE_KEY) as string);
+    expect(saved.workMinutes).toBe(26);
+    expect(saved.background).toBe('#000000');
+    expect(saved.workColor).toBe('#ffffff');
+    expect(saved.breakColor).toBe('#34d399');
   });
 
   test('手动切换长休息显示 15:00, 重置恢复阶段时长', () => {

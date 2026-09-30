@@ -36,6 +36,19 @@ export const PHASE_KEYS: readonly PhaseKey[] = [ 'focus', 'short', 'long' ];
 /** 时钟刷新间隔 (ms) */
 export const TICK_MS = 250;
 
+/** 时钟背景 (默认黑色, 与全屏指挥大屏一致; 可换预置色或自定义) */
+export const BACKGROUND_DEFAULT = '#000000';
+/** 专注阶段时间数字颜色 (默认白色) */
+export const WORK_COLOR_DEFAULT = '#ffffff';
+/** 休息阶段时间数字颜色 (默认薄荷绿, 与专注白字区分) */
+export const BREAK_COLOR_DEFAULT = '#34d399';
+
+/** 预置背景色板: 深色系默认, 也含浅色可选 */
+export const BACKGROUND_PRESETS: ReadonlyArray<{ label: string; colors: string[] }> = [
+  { label: '深色', colors: [ '#000000', '#1f2937', '#111827', '#0f172a', '#1e293b', '#27272a', '#14532d', '#4c1d95' ] },
+  { label: '浅色', colors: [ '#f8fafc', '#e2e8f0', '#ffffff', '#fef3c7' ] },
+];
+
 /**
  * 内置完成音的合成参数: 每个音符 (at 秒时开始, 持续 dur 秒, 指定波形与相对音量)
  * 全部用 Web Audio 在本机合成, 不加载任何音频文件
