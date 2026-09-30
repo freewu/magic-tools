@@ -33,6 +33,19 @@ if(typeof Blob.prototype.text === 'undefined') {
   };
 }
 
+// React 18.3 起弃用 react-dom/test-utils 的 act, 而 @testing-library/react 内部仍经由
+// act-compat 调用它 (开发构建在每次 mounted 渲染时打印 ReactDOMTestUtils.act 弃用警告)。
+// 这是 testing-library 与 React 版本组合的已知噪音, 与测试正确性无关, 全局过滤该条消息
+// (其余 console.error 原样透传)
+const setupConsoleError = console.error.bind(console);
+console.error = (...args: unknown[]) => {
+  const first = typeof args[0] === 'string' ? args[0] : '';
+  if (first.includes('ReactDOMTestUtils.act') || first.includes('react-dom/test-utils')) {
+    return;
+  }
+  setupConsoleError(...args);
+};
+
 // jsdom 未实现 window.matchMedia (主题 / 响应式组件需要)
 if(typeof global.matchMedia === 'undefined') {
   global.matchMedia = (query :string) => ({
