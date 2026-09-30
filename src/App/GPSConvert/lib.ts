@@ -58,7 +58,8 @@ const ee = 0.00669342162296594323; // 椭球的偏心率
 
 // 判断是否在国内，不在国内则不做偏移
 export const outOfChina = (lng :number, lat :number) :boolean => {
-  return ((lng < 72.004 || lng > 137.8347) && (lat < 0.8293 || lat > 55.8271));
+  // 经度或纬度任一项超出中国范围即视为境外 (原实现用 && 逻辑几乎恒为 false, 已修正)
+  return (lng < 72.004 || lng > 137.8347) || (lat < 0.8293 || lat > 55.8271);
 }
 
 const transformLat = (x :number,y :number) :number => {

@@ -97,7 +97,7 @@ magic-tools
 │   │       ├── index.tsx     # 工具页面组件 (默认导出, 懒加载)
 │   │       ├── lang.ts       # 默认语言包 + 三语词条 (zh 短语即 key, 值=[zh-TW, en]) + 本地取词函数
 │   │       ├── lib.ts        # 纯函数逻辑, 页面与单测共用 (绝大多数工具)
-│   │       ├── lib.test.ts   # jest 单测 (113 个工具; 开发时用 `npm test -- src/App/<工具>` 只跑该工具)
+│   │       ├── lib.test.ts   # jest 单测 (136 个工具; 开发时用 `npm test -- src/App/<工具>` 只跑该工具)
 │   │       ├── data.ts       # 选项/常量表与类型 (75 个工具)
 │   │       ├── setting.tsx   # 设置中心内本工具的设置面板 (72 个工具)
 │   │       └── intro.tsx     # About/说明 三语内容 (57 个工具)
