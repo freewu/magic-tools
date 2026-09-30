@@ -144,6 +144,7 @@ import IptablesRules from './IptablesRules/lang';
 import TcRules from './TcRules/lang';
 import NginxConfig from './NginxConfig/lang';
 import GitignoreGenerator from './GitignoreGenerator/lang';
+import Whiteboard from './Whiteboard/lang';
 
 export const langPacks = {
   Hash: Hash,
@@ -285,6 +286,7 @@ export const langPacks = {
   TcRules,
   NginxConfig,
   GitignoreGenerator,
+  Whiteboard,
   BOMCheck,
   Metronome,
   ScreenRecorder,

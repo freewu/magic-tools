@@ -92,6 +92,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.1.0",
+    "@excalidraw/excalidraw": "^0.18.1",
     "@tauri-apps/api": "^2.0.0",
     "@tauri-apps/plugin-dialog": "^2.7.3",
     "@tauri-apps/plugin-fs": "^2.5.2",

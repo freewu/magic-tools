@@ -183,6 +183,15 @@ export default defineConfig({
           if (/node_modules\/pinyin-pro\//.test(id)) {
             return 'vendor-pinyin';
           }
+          // Excalidraw (白板画布, ~2.5MB): 保持独立的动态 chunk, 只在打开「白板」页时拉取。
+          // 不能命名成固定 vendor chunk: 入口与 excalidraw 会共享个别小模块, 命名后共享模块
+          // 被并入该 chunk → 入口静态依赖 → 整包被 modulepreload 预载, 懒加载失去意义
+          // (实测首屏预载 1.4MB gzip)。return undefined 交给打包器自动拆分: 共享小模块抽到
+          // 独立 chunk, excalidraw 主体留在按需 chunk。roughjs 等与 mermaid 共享的依赖仍由
+          // 下方 mermaid 规则收纳 (vendor-mermaid 本就随入口预载, 无额外下载)
+          if (/node_modules\/(?:@excalidraw|@radix-ui|jotai|jotai-scope|fractional-indexing|image-blob-reduce|open-color|perfect-freehand|pako|browser-fs-access|es6-promise-pool|fuzzy|canvas-roundrect-polyfill|i18next|@babel\/runtime|points-on-curve|tunnel-rat|png-chunk-text|png-chunks-encode|png-chunks-extract|use-isomorphic-layout-effect|react-is)\//.test(id)) {
+            return undefined;
+          }
           // mermaid 与其图形依赖 (d3 / cytoscape / katex 等, 合计约 2MB): 独立 chunk 按需加载,
           // 只在打开「Mermaid 编辑器」页时拉取; 混入 vendor-misc 会拖大其余页面的预载体积
           // (注意此规则必须在 vendor-antd 之后: stylis 同时被 @ant-design/cssinjs 使用)

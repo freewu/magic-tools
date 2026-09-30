@@ -28,6 +28,7 @@ const list = [
   'CopybookGenerator',
   'CronRules',
   'GitignoreGenerator',
+  'Whiteboard',
   'AESCrypto',
   'RSACrypto',
   'SM2Crypto',
