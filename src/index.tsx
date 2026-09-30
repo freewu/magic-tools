@@ -1,5 +1,9 @@
 import { createRoot } from 'react-dom/client';
 import {default as App} from './Main';
+// Excalidraw (白板) 样式改为入口级引入: Rolldown 对懒加载 chunk 内的 CSS import 只会
+// 抽出独立 .css 文件却不生成 JS 侧的样式注入, 导致白板页打开时样式丢失、画布/工具栏
+// 无布局 (看起来“没渲染”)——入口静态引入进全局 CSS 后加载确定性最强 (~22KB gzip)
+import '@excalidraw/excalidraw/index.css';
 import { HashRouter } from 'react-router-dom';
 import React from 'react';
 

@@ -4,7 +4,7 @@ import { Card, Divider, Space, Spin, Typography } from 'antd';
 import { lazy, Suspense, useCallback, useEffect, useRef } from 'react';
 import { useLocale } from '../../hook/locale-context';
 import { useTheme } from '../../hook/theme-context';
-import '@excalidraw/excalidraw/index.css';
+// Excalidraw 样式在 src/index.tsx 入口级引入 (懒加载 chunk 内静态 import CSS 不会注入, 见该处注释)
 import { BOARD_HEIGHT } from './data';
 import { excalidrawLangOf, readScene, storeScene } from './lib';
 import { u } from './lang';
@@ -29,18 +29,20 @@ const loadExcalidraw = (): Promise<ExcalidrawModule> => {
 const LazyWhiteboard = lazy(async () => {
   const m = await loadExcalidraw();
   const LocalBoard = (props: React.ComponentPropsWithoutRef<typeof m.Excalidraw>) => (
-    <m.Excalidraw {...props}>
-      <m.MainMenu>
-        <m.MainMenu.DefaultItems.LoadScene />
-        <m.MainMenu.DefaultItems.SaveAsImage />
-        <m.MainMenu.DefaultItems.Export />
-        <m.MainMenu.DefaultItems.CommandPalette />
-        <m.MainMenu.DefaultItems.SearchMenu />
-        <m.MainMenu.DefaultItems.ClearCanvas />
-        <m.MainMenu.DefaultItems.ChangeCanvasBackground />
-        <m.MainMenu.DefaultItems.ToggleTheme />
-      </m.MainMenu>
-    </m.Excalidraw>
+    <div style={{ height: BOARD_HEIGHT, width: '100%' }}>
+      <m.Excalidraw {...props}>
+        <m.MainMenu>
+          <m.MainMenu.DefaultItems.LoadScene />
+          <m.MainMenu.DefaultItems.SaveAsImage />
+          <m.MainMenu.DefaultItems.Export />
+          <m.MainMenu.DefaultItems.CommandPalette />
+          <m.MainMenu.DefaultItems.SearchMenu />
+          <m.MainMenu.DefaultItems.ClearCanvas />
+          <m.MainMenu.DefaultItems.ChangeCanvasBackground />
+          <m.MainMenu.DefaultItems.ToggleTheme />
+        </m.MainMenu>
+      </m.Excalidraw>
+    </div>
   );
   return { default: LocalBoard };
 });

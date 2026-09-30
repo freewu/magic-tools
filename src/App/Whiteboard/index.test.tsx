@@ -56,6 +56,8 @@ describe('白板 页面', () => {
     // 画布收到正确语言与主题 (zh-CN + dark)
     expect(wbBoard().dataset.lang).toBe('zh-CN');
     expect(wbBoard().dataset.theme).toBe('dark');
+    // Excalidraw 的 height:100% 依赖外层有确定高度, 防止画布塌陷成 0 高 (导致白板"渲染不开")
+    expect(wbBoard().parentElement).toHaveStyle({ height: '700px', width: '100%' });
     // 说明区
     expect(document.querySelector('.intro')).not.toBeNull();
     expect(screen.getByText('这个工具做什么')).toBeInTheDocument();
