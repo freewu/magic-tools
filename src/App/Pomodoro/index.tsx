@@ -13,9 +13,11 @@ import {
   BACKGROUND_PRESETS, PHASE_KEYS, SOUND_KEYS, SOUND_PATTERNS, TICK_MS, type PhaseKey, type SoundKey,
 } from './data';
 import {
-  formatClock, getDefaultOptions, isSameOptions, normalizeOptions, remainingOf, setDefaultOptions,
+  formatClock, bgImageOf, getDefaultOptions, isSameOptions, normalizeOptions, remainingOf,
+  trySetDefaultOptions,
   type PomodoroOptions,
 } from './lib';
+import { prepareBackgroundImage, TOO_LARGE } from './bg';
 import { u, uT } from './lang';
 import PomodoroIntro from './intro';
 
@@ -30,11 +32,14 @@ const audioCtor = (): AudioCtor | null => {
 
 // 舞台样式: 全屏时 position:fixed 铺满窗口 (原生全屏失败的窗口内全屏兜底)
 const STAGE_CSS = `
-.pt-stage-full { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 18px; }
+.pt-stage-full { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 18px; overflow: hidden; }
 .pt-stage-full .pt-clock-num { font-size: 140px; }
 .pt-stage-full .pt-phase { font-size: 22px; }
-.pt-stage { border-radius: 12px; color: #f2f3f5; }
+.pt-stage { position: relative; overflow: hidden; border-radius: 12px; color: #f2f3f5; }
 .pt-stage .pt-phase { color: rgba(255,255,255,0.72); }
+.pt-stage-inner { position: relative; z-index: 1; }
+.pt-bg { position: absolute; inset: 0; background-size: cover; background-position: center; background-repeat: no-repeat; pointer-events: none; }
+.pt-bg-dim { position: absolute; inset: 0; pointer-events: none; }
 `;
 type FullscreenElement = HTMLDivElement & { webkitRequestFullscreen?: () => Promise<void> | void };
 type FullscreenDocument = Document & {
@@ -82,6 +87,9 @@ const requestNotify = async (title: string, body: string): Promise<boolean> => {
 
 const Pomodoro: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const bgInputRef = useRef<HTMLInputElement | null>(null);
+  /** 背景图选择的目标槽位: 共用 / 专注 / 休息 */
+  const bgTargetRef = useRef<'shared' | 'focus' | 'break'>('shared');
   const { locale } = useLocale();
 
   // ---- 全屏: 先请求原生全屏, 失败 (内嵌 webview / 非用户手势) 时用窗口内全屏兜底 ----
@@ -321,7 +329,14 @@ const Pomodoro: React.FC = () => {
 
   const canSaveDefaults = !isSameOptions(opts, defaults);
   const saveDefaults = () => {
-    setDefaults(setDefaultOptions(opts));
+    const saved = normalizeOptions(opts);
+    const ok = trySetDefaultOptions(saved);
+    setDefaults(saved);
+    // 背景图较大时 localStorage 可能写满: 明确告知, 不假装已保存
+    if (!ok) {
+      notice.warning(t('默认设置已应用, 但本地存储写入失败 (图片过大?), 重开后可能丢失'));
+      return;
+    }
     notice.success(t('已保存为默认设置'));
   };
 
@@ -338,6 +353,50 @@ const Pomodoro: React.FC = () => {
     });
     patch({ sound: 'custom' });
   };
+
+  /** 打开背景图选择框 (同一个隐藏 input 复用, 用 ref 记住目标槽位) */
+  const openBgPick = (target: 'shared' | 'focus' | 'break') => {
+    bgTargetRef.current = target;
+    bgInputRef.current?.click();
+  };
+
+  /** 选择背景图片: 压缩成 dataURL 后写入对应槽位 (共用 / 专注 / 休息) */
+  const onPickBackground = async (target: 'shared' | 'focus' | 'break', file: File | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      notice.error(t('请选择图片文件…'));
+      return;
+    }
+    const hide = notice.loading(t('正在处理图片…'), 0);
+    try {
+      const { url } = await prepareBackgroundImage(file);
+      if (target === 'focus') patch({ bgFocusImage: url });
+      else if (target === 'break') patch({ bgBreakImage: url });
+      else patch({ bgImage: url });
+      hide();
+    } catch (err) {
+      hide();
+      if ((err as Error)?.message === TOO_LARGE) notice.error(t('图片过大, 请换一张或先压缩'));
+      else if ((err as { code?: string })?.code === 'not-image') notice.error(t('请选择图片文件…'));
+      else notice.error(t('图片读取失败, 请重试'));
+    }
+  };
+
+  /** 切换「专注/休息同一张」: 关掉时把现有图复制到两个槽, 打开时取第一张非空图作为共用图 */
+  const onSameImageChange = (same: boolean) => {
+    if (same) {
+      patch({ bgSameImage: true, bgImage: opts.bgImage || opts.bgFocusImage || opts.bgBreakImage });
+    } else {
+      patch({
+        bgSameImage: false,
+        bgFocusImage: opts.bgFocusImage || opts.bgImage,
+        bgBreakImage: opts.bgBreakImage || opts.bgImage,
+      });
+    }
+  };
+
+  /** 当前阶段实际展示的背景图 (纯色模式为空) */
+  const bgUrl = opts.bgMode === 'image' ? bgImageOf(opts, phase) : '';
 
   // 阶段进度: 已完成番茄 / 每轮圆点
   const dots = Array.from({ length: opts.roundsBeforeLong }, (_, i) => (
@@ -378,6 +437,21 @@ const Pomodoro: React.FC = () => {
       >
         {/* 时钟主体 (全屏时固定铺满) */}
         <div ref={stageRef} className={full ? 'pt-stage-full' : 'pt-stage'} style={{ background: opts.background, color: '#f2f3f5', textAlign: 'center', padding: '16px 12px', borderRadius: full ? 0 : 12 }}>
+          { /* 图片背景: 底层铺图 (可模糊) + 黑色遮罩, 保证时钟数字清晰 */ }
+          { bgUrl !== '' && (
+            <>
+              <div
+                className="pt-bg"
+                style={{
+                  backgroundImage: `url("${bgUrl}")`,
+                  filter: opts.bgBlur > 0 ? `blur(${opts.bgBlur}px)` : undefined,
+                  transform: opts.bgBlur > 0 ? 'scale(1.06)' : undefined,
+                }}
+              />
+              <div className="pt-bg-dim" style={{ background: `rgba(0, 0, 0, ${opts.bgDim / 100})` }} />
+            </>
+          ) }
+          <div className="pt-stage-inner">
           <div className="pt-phase" style={{ fontSize: 13, color: `${phase === 'focus' ? opts.workColor : opts.breakColor}b8`, marginBottom: 4 }}>
             {phaseLabel} · {tt('第 {n} 轮', { n: Math.min(doneRounds + 1, opts.roundsBeforeLong) })}
           </div>
@@ -401,6 +475,7 @@ const Pomodoro: React.FC = () => {
               </Button>
             ))}
           </Space>
+          </div>
         </div>
 
         <Divider style={{ margin: '16px 0 12px' }} />
@@ -474,14 +549,66 @@ const Pomodoro: React.FC = () => {
             </Tooltip>
           </Space>
           <Space size={6}>
-            <Text type="secondary" style={{ fontSize: 13 }}>{t('背景颜色')}</Text>
-            <ColorPicker
+            <Text type="secondary" style={{ fontSize: 13 }}>{t('背景')}</Text>
+            <Select
               size="small"
-              value={opts.background}
-              presets={BACKGROUND_PRESETS.map((g) => ({ label: g.label, colors: g.colors }))}
-              onChange={(value) => patch({ background: value.toHexString() })}
+              style={{ width: 92 }}
+              value={opts.bgMode}
+              onChange={(v) => patch({ bgMode: v })}
+              options={[
+                { value: 'color', label: t('纯色') },
+                { value: 'image', label: t('图片') },
+              ]}
             />
           </Space>
+          { opts.bgMode === 'color' ? (
+            <Space size={6}>
+              <Text type="secondary" style={{ fontSize: 13 }}>{t('背景颜色')}</Text>
+              <ColorPicker
+                size="small"
+                value={opts.background}
+                presets={BACKGROUND_PRESETS.map((g) => ({ label: g.label, colors: g.colors }))}
+                onChange={(value) => patch({ background: value.toHexString() })}
+              />
+            </Space>
+          ) : (
+            <>
+              <Space size={6}>
+                <Switch size="small" checked={opts.bgSameImage} onChange={onSameImageChange} />
+                <Text type="secondary" style={{ fontSize: 13 }}>{t('专注/休息同一张')}</Text>
+              </Space>
+              <Space size={6}>
+                <Text type="secondary" style={{ fontSize: 13 }}>{t(opts.bgSameImage ? '背景图片' : '专注背景图')}</Text>
+                <Button size="small" icon={<UploadOutlined />} onClick={() => openBgPick(opts.bgSameImage ? 'shared' : 'focus')}>
+                  {t((opts.bgSameImage ? opts.bgImage : opts.bgFocusImage) !== '' ? '更换图片…' : '选择图片…')}
+                </Button>
+                { (opts.bgSameImage ? opts.bgImage : opts.bgFocusImage) !== '' && (
+                  <Button size="small" type="text" onClick={() => patch(opts.bgSameImage ? { bgImage: '' } : { bgFocusImage: '' })}>{t('清除')}</Button>
+                ) }
+              </Space>
+              { !opts.bgSameImage && (
+                <Space size={6}>
+                  <Text type="secondary" style={{ fontSize: 13 }}>{t('休息背景图')}</Text>
+                  <Button size="small" icon={<UploadOutlined />} onClick={() => openBgPick('break')}>
+                    {t(opts.bgBreakImage !== '' ? '更换图片…' : '选择图片…')}
+                  </Button>
+                  { opts.bgBreakImage !== '' && (
+                    <Button size="small" type="text" onClick={() => patch({ bgBreakImage: '' })}>{t('清除')}</Button>
+                  ) }
+                </Space>
+              ) }
+              <Space size={6}>
+                <Text type="secondary" style={{ fontSize: 13 }}>{t('遮罩')}</Text>
+                <Slider min={0} max={90} value={opts.bgDim} onChange={(v) => patch({ bgDim: v })} style={{ width: 96, margin: 0 }} />
+                <Text type="secondary" style={{ fontSize: 12 }}>{opts.bgDim}%</Text>
+              </Space>
+              <Space size={6}>
+                <Text type="secondary" style={{ fontSize: 13 }}>{t('模糊')}</Text>
+                <Slider min={0} max={20} value={opts.bgBlur} onChange={(v) => patch({ bgBlur: v })} style={{ width: 96, margin: 0 }} />
+                <Text type="secondary" style={{ fontSize: 12 }}>{opts.bgBlur}px</Text>
+              </Space>
+            </>
+          ) }
           <Space size={6}>
             <Text type="secondary" style={{ fontSize: 13 }}>{t('专注颜色')}</Text>
             <ColorPicker
@@ -508,6 +635,14 @@ const Pomodoro: React.FC = () => {
         {opts.sound === 'custom' && !customAudio && (
           <div style={{ marginTop: 6, color: '#999', fontSize: 12 }}>{t('音频文件仅本机播放, 不会上传')}</div>
         )}
+        { /* 背景图选择框 (隐藏, 由「选择图片…」按钮触发) */ }
+        <input
+          ref={bgInputRef}
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; void onPickBackground(bgTargetRef.current, f); }}
+        />
       </Card>
 
       <Divider>{t(' 番茄时钟说明 ')}</Divider>

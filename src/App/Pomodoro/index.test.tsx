@@ -2,6 +2,14 @@ import '@testing-library/jest-dom';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import Pomodoro from './index';
 import { DEFAULTS_STORAGE_KEY, TICK_MS } from './data';
+
+// ---- 背景图处理桩: 跳过真实 canvas 压缩, 用文件名回显可控 dataURL ----
+const mockPrepare = jest.fn(async (file: File) => ({ url: `data:image/jpeg;base64,${file.name}`, bytes: 1 }));
+jest.mock('./bg', () => ({
+  prepareBackgroundImage: (file: File) => mockPrepare(file),
+  TOO_LARGE: 'too-large',
+}));
+
 afterEach(() => cleanup());
 
 // 全量跑时并行资源紧张, 放宽本文件超时 (内部含 fake timers 长推进)
@@ -56,6 +64,8 @@ beforeEach(() => {
   notifyCalls.length = 0;
   audioPlay.mockClear();
   createUrl.mockClear();
+  mockPrepare.mockReset();
+  mockPrepare.mockImplementation(async (file: File) => ({ url: `data:image/jpeg;base64,${file.name}`, bytes: 1 }));
   (URL as unknown as { createObjectURL?: () => string }).createObjectURL = createUrl;
   (URL as unknown as { revokeObjectURL?: () => void }).revokeObjectURL = revokeUrl;
   jest.useFakeTimers();
@@ -73,6 +83,43 @@ const btn = (name: string): HTMLButtonElement => {
   return hit as HTMLButtonElement;
 };
 const bigClock = () => Array.from(document.querySelectorAll('div')).find((d) => /^\d{1,2}:\d{2}$/.test(d.textContent ?? '')) as HTMLElement;
+
+/** 按标签文字定位同一行内的 Switch (intros 说明文字里也含同名文字, 因此限定控件归属) */
+const ctrlSwitch = (label: string): HTMLElement => {
+  const hit = screen.getAllByText(label).find((el) => el.closest('.ant-space')?.querySelector('.ant-switch'));
+  if (!hit) throw new Error(`未找到开关: ${label}`);
+  return (hit.closest('.ant-space') as HTMLElement).querySelector('.ant-switch') as HTMLElement;
+};
+
+/** 「背景」选择器 (页面里第二个 Select) */
+const bgSelect = (): HTMLElement => {
+  const hit = Array.from(document.querySelectorAll('.ant-select')).find((s) => /纯色|圖片|图片/.test(s.textContent ?? ''));
+  if (!hit) throw new Error('未找到背景模式选择器');
+  return hit as HTMLElement;
+};
+
+/** 切换背景模式 (纯色 / 图片) */
+const chooseBgMode = (label: string) => {
+  fireEvent.mouseDown(bgSelect().querySelector('.ant-select-selector') as HTMLElement);
+  const opt = Array.from(document.querySelectorAll('.ant-select-item-option')).find((o) => (o.textContent ?? '').trim() === label);
+  fireEvent.click(opt as HTMLElement);
+};
+
+const bgLayer = () => document.querySelector('.pt-bg') as HTMLElement | null;
+const bgLayerStyle = (): CSSStyleDeclaration => (bgLayer() as HTMLElement).style;
+/** 唯一的隐藏图片选择框 (三个「选择图片…」按钮共用它) */
+const bgInput = () => document.querySelector('input[type=file][accept="image/*"]') as HTMLInputElement;
+
+/** 选一张背景图并等待压缩 Promise 落定 */
+const pickBackground = async (name: string, row?: string) => {
+  if (row) {
+    const line = screen.getByText(row).closest('.ant-space') as HTMLElement;
+    fireEvent.click(line.querySelector('button') as HTMLElement);
+  }
+  await act(async () => {
+    fireEvent.change(bgInput(), { target: { files: [ new File([ 'x' ], name, { type: 'image/png' }) ] } });
+  });
+};
 
 /** 推进 TICK 若干次 (模拟真实时钟) */
 const advance = async (ms: number) => { await act(async () => { jest.advanceTimersByTime(ms); }); };
@@ -267,6 +314,104 @@ describe('番茄时钟 页面', () => {
     cleanup();
     render(<Pomodoro />);
     expect(bigClock().textContent).toBe('50:00');
+  });
+
+  test('背景模式切到图片: 选图后舞台叠加背景图层, 清除后移除', async () => {
+    render(<Pomodoro />);
+    // 默认纯色模式: 舞台不渲染背景图图层
+    expect(bgLayer()).toBeNull();
+
+    chooseBgMode('图片');
+    // 图片模式多出「专注/休息同一张」开关; 未选图时仍只有底层纯色
+    expect(ctrlSwitch('专注/休息同一张')).toBeInTheDocument();
+    expect(bgLayer()).toBeNull();
+
+    await pickBackground('bg1.png');
+    expect(bgLayerStyle().backgroundImage).toContain('data:image/jpeg;base64,bg1.png');
+    // 遮罩层默认 40% 黑
+    expect((document.querySelector('.pt-bg-dim') as HTMLElement).style.background).toContain('0.4');
+    // 选到图后按钮变为「更换图片…」并提供「清除」
+    expect(btn('更换图片…')).toBeInTheDocument();
+    fireEvent.click(btn('清除'));
+    expect(bgLayer()).toBeNull();
+    expect(btn('选择图片…')).toBeInTheDocument();
+  });
+
+  test('专注与休息可分开选图: 关掉「同一张」后各阶段用各自图片', async () => {
+    render(<Pomodoro />);
+    chooseBgMode('图片');
+    await pickBackground('shared.png');
+    expect(bgLayerStyle().backgroundImage).toContain('shared.png');
+
+    // 关掉共用: 共用图复制到专注槽, 并出现「休息背景图」行
+    fireEvent.click(ctrlSwitch('专注/休息同一张'));
+    expect(screen.getByText('休息背景图')).toBeInTheDocument();
+    expect(bgLayerStyle().backgroundImage).toContain('shared.png');
+
+    // 给休息单独选一张
+    await pickBackground('break.png', '休息背景图');
+    expect(bgLayerStyle().backgroundImage).toContain('shared.png');
+    // 切到休息阶段 → 换成休息图
+    fireEvent.click(btn('短休息'));
+    expect(bgLayerStyle().backgroundImage).toContain('break.png');
+    // 切回专注 → 仍是专注图
+    fireEvent.click(btn('专注'));
+    expect(bgLayerStyle().backgroundImage).toContain('shared.png');
+  });
+
+  test('遮罩与模糊: 按默认设置渲染 filter/遮罩层, 且全屏同样生效', () => {
+    localStorage.setItem(DEFAULTS_STORAGE_KEY, JSON.stringify({
+      bgMode: 'image',
+      bgImage: 'data:image/png;base64,SEED',
+      bgDim: 60,
+      bgBlur: 8,
+    }));
+    render(<Pomodoro />);
+    expect(bgLayerStyle().filter).toBe('blur(8px)');
+    expect(bgLayerStyle().transform).toBe('scale(1.06)');
+    expect((document.querySelector('.pt-bg-dim') as HTMLElement).style.background).toContain('0.6');
+
+    fireEvent.click(btn('全屏'));
+    expect(document.querySelector('.pt-stage-full .pt-bg')).not.toBeNull();
+  });
+
+  test('背景图过大 / 读取失败: 提示错误且不写入背景', async () => {
+    render(<Pomodoro />);
+    chooseBgMode('图片');
+
+    mockPrepare.mockRejectedValueOnce(new Error('too-large'));
+    await pickBackground('huge.png');
+    expect(screen.getByText('图片过大, 请换一张或先压缩')).toBeInTheDocument();
+    expect(bgLayer()).toBeNull();
+
+    mockPrepare.mockRejectedValueOnce(Object.assign(new Error('decode-failed'), { code: 'decode-failed' }));
+    await pickBackground('broken.png');
+    expect(screen.getByText('图片读取失败, 请重试')).toBeInTheDocument();
+    expect(bgLayer()).toBeNull();
+
+    // 非图片文件直接拒绝, 不进入处理流程
+    mockPrepare.mockClear();
+    await act(async () => {
+      fireEvent.change(bgInput(), { target: { files: [ new File([ 'x' ], 'a.txt', { type: 'text/plain' }) ] } });
+    });
+    expect(screen.getByText('请选择图片文件…')).toBeInTheDocument();
+    expect(mockPrepare).not.toHaveBeenCalled();
+  });
+
+  test('图片背景也能存入默认设置并重新打开沿用', async () => {
+    render(<Pomodoro />);
+    chooseBgMode('图片');
+    await pickBackground('bg2.png');
+    fireEvent.click(btn('保存为默认设置'));
+
+    const saved = JSON.parse(localStorage.getItem(DEFAULTS_STORAGE_KEY) as string);
+    expect(saved.bgMode).toBe('image');
+    expect(saved.bgImage).toBe('data:image/jpeg;base64,bg2.png');
+    expect(saved.bgDim).toBe(40);
+
+    cleanup();
+    render(<Pomodoro />);
+    expect(bgLayerStyle().backgroundImage).toContain('bg2.png');
   });
 });
 

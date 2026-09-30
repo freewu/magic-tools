@@ -1,10 +1,14 @@
 import { DEFAULTS_STORAGE_KEY } from './data';
 import {
-  DEFAULT_OPTIONS, clampMinutes, clampRepeat, clampRounds, clampVolume, formatClock,
-  getDefaultOptions, isSameOptions, nextPhaseOf, normalizeBackground, normalizeHex,
-  normalizeOptions, normalizeSound, patchDefaultOptions, phaseSeconds, remainingOf,
-  setDefaultOptions, shouldLongBreak,
+  DEFAULT_OPTIONS, bgImageOf, clampBlur, clampDim, clampMinutes, clampRepeat, clampRounds,
+  clampVolume, formatClock, getDefaultOptions, isSameOptions, nextPhaseOf, normalizeBackground,
+  normalizeBgMode, normalizeHex, normalizeImageUrl, normalizeOptions, normalizeSound,
+  patchDefaultOptions, phaseSeconds, remainingOf, setDefaultOptions, shouldLongBreak,
+  trySetDefaultOptions,
 } from './lib';
+
+const IMG = 'data:image/jpeg;base64,AAAA';
+const IMG2 = 'data:image/png;base64,BBBB';
 
 describe('番茄时钟 lib', () => {
   beforeEach(() => localStorage.clear());
@@ -46,6 +50,50 @@ describe('番茄时钟 lib', () => {
     expect(normalizeOptions({ workColor: 'bad' }).workColor).toBe('#ffffff');
     expect(normalizeOptions({ breakColor: '#00ff00' }).breakColor).toBe('#00ff00');
     expect(normalizeOptions({ breakColor: '' }).breakColor).toBe('#34d399');
+    // 图片背景字段
+    expect(normalizeOptions({ bgMode: 'image' }).bgMode).toBe('image');
+    expect(normalizeOptions({ bgMode: 'video' as never }).bgMode).toBe('color');
+    expect(normalizeOptions({ bgImage: IMG, bgDim: 200, bgBlur: 99, bgSameImage: true })).toEqual({
+      ...DEFAULT_OPTIONS,
+      bgImage: IMG,
+      bgDim: 90,
+      bgBlur: 20,
+      bgSameImage: true,
+    });
+  });
+
+  test('背景模式 / 遮罩 / 模糊 / 图片地址归一化', () => {
+    expect(normalizeBgMode('image')).toBe('image');
+    expect(normalizeBgMode('color')).toBe('color');
+    expect(normalizeBgMode(null)).toBe('color');
+    expect(clampDim(0)).toBe(0);
+    expect(clampDim(120)).toBe(90);
+    expect(clampDim('x')).toBe(40);
+    expect(clampBlur(-3)).toBe(0);
+    expect(clampBlur(50)).toBe(20);
+    expect(clampBlur(Number.NaN)).toBe(0);
+
+    expect(normalizeImageUrl(IMG)).toBe(IMG);
+    expect(normalizeImageUrl('  data:image/png;base64,AA  ')).toBe('data:image/png;base64,AA');
+    expect(normalizeImageUrl('https://a.com/b.png')).toBe('https://a.com/b.png');
+    expect(normalizeImageUrl('blob:http://localhost/abc')).toBe('blob:http://localhost/abc');
+    // svg 可能内嵌脚本, 不支持; 其它非图片一律归空
+    expect(normalizeImageUrl('data:image/svg+xml;base64,AA')).toBe('');
+    expect(normalizeImageUrl('javascript:alert(1)')).toBe('');
+    expect(normalizeImageUrl('')).toBe('');
+    expect(normalizeImageUrl(null)).toBe('');
+  });
+
+  test('bgImageOf: 共用一张 / 专注与休息分开', () => {
+    const shared = normalizeOptions({ bgSameImage: true, bgImage: IMG, bgFocusImage: IMG2 });
+    expect(bgImageOf(shared, 'focus')).toBe(IMG);
+    expect(bgImageOf(shared, 'short')).toBe(IMG);
+    expect(bgImageOf(shared, 'long')).toBe(IMG);
+
+    const split = normalizeOptions({ bgSameImage: false, bgImage: IMG, bgFocusImage: IMG2, bgBreakImage: '' });
+    expect(bgImageOf(split, 'focus')).toBe(IMG2);
+    expect(bgImageOf(split, 'short')).toBe('');
+    expect(bgImageOf(split, 'long')).toBe('');
   });
 
   test('默认设置: 写入可读回, 损坏回退, patch 局部更新', () => {
@@ -66,12 +114,25 @@ describe('番茄时钟 lib', () => {
     expect(patchDefaultOptions({ workMinutes: 40 }).sound).toBe(DEFAULT_OPTIONS.sound);
   });
 
+  test('trySetDefaultOptions: 成功 true / 写入异常 false', () => {
+    expect(trySetDefaultOptions({ workMinutes: 30 })).toBe(true);
+    expect(getDefaultOptions().workMinutes).toBe(30);
+
+    const spy = jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('quota'); });
+    expect(trySetDefaultOptions({ workMinutes: 31 })).toBe(false);
+    spy.mockRestore();
+  });
+
   test('isSameOptions 逐字段比较', () => {
     expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS })).toBe(true);
     expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS, notify: false })).toBe(false);
     expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS, volume: 81 })).toBe(false);
     expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS, background: '#ff0000' })).toBe(false);
     expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS, workColor: '#112233' })).toBe(false);
+    expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS, bgMode: 'image' })).toBe(false);
+    expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS, bgImage: IMG })).toBe(false);
+    expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS, bgDim: 50 })).toBe(false);
+    expect(isSameOptions(DEFAULT_OPTIONS, { ...DEFAULT_OPTIONS, bgBreakImage: IMG })).toBe(false);
   });
 
   test('normalizeHex/normalizeBackground 校验', () => {

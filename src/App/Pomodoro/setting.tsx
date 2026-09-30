@@ -1,13 +1,14 @@
-import { ColorPicker, Divider, Form, InputNumber, Select, Slider, Switch, Typography } from 'antd';
+import { Button, ColorPicker, Divider, Form, InputNumber, Select, Slider, Space, Switch, Typography } from 'antd';
 import { useState } from 'react';
 import { useLocale } from '../../hook/locale-context';
 import { row as _r, rowT } from '../Setting/rows-lang';
 import {
-  BACKGROUND_DEFAULT, BACKGROUND_PRESETS, BREAK_COLOR_DEFAULT, LONG_MIN_DEFAULT, REPEAT_DEFAULT,
-  ROUNDS_BEFORE_LONG_DEFAULT, SHORT_MIN_DEFAULT, SOUND_KEYS, VOLUME_DEFAULT, WORK_COLOR_DEFAULT,
-  WORK_MIN_DEFAULT, type SoundKey,
+  BACKGROUND_DEFAULT, BACKGROUND_PRESETS, BG_BLUR_DEFAULT, BG_DIM_DEFAULT,
+  BREAK_COLOR_DEFAULT, LONG_MIN_DEFAULT, REPEAT_DEFAULT, ROUNDS_BEFORE_LONG_DEFAULT,
+  SHORT_MIN_DEFAULT, SOUND_KEYS, VOLUME_DEFAULT, WORK_COLOR_DEFAULT, WORK_MIN_DEFAULT,
+  type SoundKey,
 } from './data';
-import { clampMinutes, clampRounds, clampRepeat, clampVolume, getDefaultOptions, normalizeHex, patchDefaultOptions } from './lib';
+import { clampBlur, clampDim, clampMinutes, clampRounds, clampRepeat, clampVolume, getDefaultOptions, normalizeHex, patchDefaultOptions } from './lib';
 import { u } from './lang';
 
 const SOUND_TEXT: Record<SoundKey, string> = {
@@ -128,6 +129,65 @@ export const PomodoroSetting: React.FC = () => {
       >
         <ColorItem value={ opts.breakColor } onChange={ (hex) => patch({ breakColor: normalizeHex(hex, BREAK_COLOR_DEFAULT) }) } />
       </Form.Item>
+      <Form.Item
+        label={ st('默认背景模式') }
+        extra={ st('时钟背景使用纯色还是图片; 背景图片在工具页选择后「保存为默认设置」即可记住') }
+      >
+        <Select
+          style={ { width: 160 } }
+          value={ opts.bgMode }
+          onChange={ (v) => patch({ bgMode: v }) }
+          options={ [
+            { value: 'color', label: st('纯色') },
+            { value: 'image', label: st('图片') },
+          ] }
+        />
+      </Form.Item>
+      { opts.bgMode === 'image' && (
+        <>
+          <Form.Item
+            label={ st('默认图片共用') }
+            extra={ st('专注与休息共用同一张背景图; 关闭后可在工具页分别为专注与休息选图') }
+          >
+            <Switch checked={ opts.bgSameImage } onChange={ (v) => patch({ bgSameImage: v })} />
+          </Form.Item>
+          <Form.Item
+            label={ st('默认遮罩') }
+            extra={ rowT(locale, '图片上的黑色遮罩浓度, 越高时钟数字越清晰, 默认 ${n}%', { n: BG_DIM_DEFAULT }) }
+          >
+            <Slider min={ 0 } max={ 90 } value={ opts.bgDim } onChange={ (v) => patch({ bgDim: clampDim(v) }) } style={ { width: 260 } } />
+          </Form.Item>
+          <Form.Item
+            label={ st('默认模糊') }
+            extra={ rowT(locale, '背景图的模糊像素, 默认 ${n}px', { n: BG_BLUR_DEFAULT }) }
+          >
+            <Slider min={ 0 } max={ 20 } value={ opts.bgBlur } onChange={ (v) => patch({ bgBlur: clampBlur(v) }) } style={ { width: 260 } } />
+          </Form.Item>
+          <Form.Item
+            label={ st('默认背景图') }
+            extra={ st('这里仅能清除已保存的背景图; 更换图片请在工具页选择后「保存为默认设置」') }
+          >
+            <Space wrap size={ 8 }>
+              <Typography.Text type="secondary" style={ { fontSize: 12 } }>
+                { st(opts.bgSameImage ? '共用一张' : '专注') }: { opts.bgSameImage ? (opts.bgImage ? st('已设置') : st('未设置')) : (opts.bgFocusImage ? st('已设置') : st('未设置')) }
+              </Typography.Text>
+              { (opts.bgSameImage ? opts.bgImage : opts.bgFocusImage) !== '' && (
+                <Button size="small" onClick={ () => patch(opts.bgSameImage ? { bgImage: '' } : { bgFocusImage: '' }) }>{ st('清除背景图') }</Button>
+              ) }
+              { !opts.bgSameImage && (
+                <>
+                  <Typography.Text type="secondary" style={ { fontSize: 12 } }>
+                    { st('休息') }: { opts.bgBreakImage ? st('已设置') : st('未设置') }
+                  </Typography.Text>
+                  { opts.bgBreakImage !== '' && (
+                    <Button size="small" onClick={ () => patch({ bgBreakImage: '' }) }>{ st('清除休息图') }</Button>
+                  ) }
+                </>
+              ) }
+            </Space>
+          </Form.Item>
+        </>
+      ) }
       <Form.Item
         label={ st('默认音量') }
         extra={ rowT(locale, '提示音音量, 默认 ${n}', { n: VOLUME_DEFAULT }) }

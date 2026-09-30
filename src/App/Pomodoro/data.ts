@@ -49,6 +49,24 @@ export const BACKGROUND_PRESETS: ReadonlyArray<{ label: string; colors: string[]
   { label: '浅色', colors: [ '#f8fafc', '#e2e8f0', '#ffffff', '#fef3c7' ] },
 ];
 
+/** 背景类型: 纯色 / 图片 */
+export type BgMode = 'color' | 'image';
+export const BG_MODES: readonly BgMode[] = [ 'color', 'image' ];
+export const BG_MODE_DEFAULT: BgMode = 'color';
+
+/** 图片模式下专注与休息是否共用同一张背景图 (关掉则两张分别设置) */
+export const BG_SAME_DEFAULT = true;
+
+/** 图片上的黑色遮罩浓度 (0 ~ 90 %), 越高时钟数字越清晰 */
+export const BG_DIM_MIN = 0;
+export const BG_DIM_MAX = 90;
+export const BG_DIM_DEFAULT = 40;
+
+/** 背景图模糊像素 (0 ~ 20) */
+export const BG_BLUR_MIN = 0;
+export const BG_BLUR_MAX = 20;
+export const BG_BLUR_DEFAULT = 0;
+
 /**
  * 内置完成音的合成参数: 每个音符 (at 秒时开始, 持续 dur 秒, 指定波形与相对音量)
  * 全部用 Web Audio 在本机合成, 不加载任何音频文件

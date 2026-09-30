@@ -1,9 +1,11 @@
 // 番茄时钟: 纯逻辑 (默认设置校验/存取、时间格式化、阶段轮换)
 import {
-  AUTONEXT_DEFAULT, BACKGROUND_DEFAULT, BREAK_COLOR_DEFAULT, DEFAULTS_STORAGE_KEY,
-  LONG_MIN_DEFAULT, MINUTES_MAX, MINUTES_MIN, NOTIFY_DEFAULT, REPEAT_DEFAULT, REPEAT_MAX,
-  REPEAT_MIN, ROUNDS_BEFORE_LONG_DEFAULT, SHORT_MIN_DEFAULT, SOUND_KEYS, VOLUME_DEFAULT,
-  VOLUME_MAX, VOLUME_MIN, WORK_COLOR_DEFAULT, WORK_MIN_DEFAULT, type PhaseKey, type SoundKey,
+  AUTONEXT_DEFAULT, BACKGROUND_DEFAULT, BG_BLUR_DEFAULT, BG_BLUR_MAX, BG_BLUR_MIN, BG_DIM_DEFAULT,
+  BG_DIM_MAX, BG_DIM_MIN, BG_MODE_DEFAULT, BG_MODES, BG_SAME_DEFAULT, BREAK_COLOR_DEFAULT,
+  DEFAULTS_STORAGE_KEY, LONG_MIN_DEFAULT, MINUTES_MAX, MINUTES_MIN, NOTIFY_DEFAULT,
+  REPEAT_DEFAULT, REPEAT_MAX, REPEAT_MIN, ROUNDS_BEFORE_LONG_DEFAULT, SHORT_MIN_DEFAULT,
+  SOUND_KEYS, VOLUME_DEFAULT, VOLUME_MAX, VOLUME_MIN, WORK_COLOR_DEFAULT, WORK_MIN_DEFAULT,
+  type BgMode, type PhaseKey, type SoundKey,
 } from './data';
 
 /** 番茄时钟参数 (工具页当前参数与默认设置共用同一结构) */
@@ -22,6 +24,20 @@ export interface PomodoroOptions {
   repeatCount: number;
   /** 时钟/全屏背景色 (#RRGGBB) */
   background: string;
+  /** 背景类型: 纯色 (background) / 图片 */
+  bgMode: BgMode;
+  /** 图片模式下专注与休息是否共用同一张背景图 */
+  bgSameImage: boolean;
+  /** 图片遮罩浓度 (0 ~ 90 %) */
+  bgDim: number;
+  /** 图片模糊像素 (0 ~ 20) */
+  bgBlur: number;
+  /** 共用的背景图 (bgSameImage 时生效) */
+  bgImage: string;
+  /** 专注阶段背景图 (bgSameImage=false 时生效) */
+  bgFocusImage: string;
+  /** 休息阶段背景图 (bgSameImage=false 时生效) */
+  bgBreakImage: string;
   /** 专注阶段时间数字颜色 */
   workColor: string;
   /** 休息阶段时间数字颜色 */
@@ -43,6 +59,13 @@ export const DEFAULT_OPTIONS: PomodoroOptions = {
   repeatCount: REPEAT_DEFAULT,
   volume: VOLUME_DEFAULT,
   background: BACKGROUND_DEFAULT,
+  bgMode: BG_MODE_DEFAULT,
+  bgSameImage: BG_SAME_DEFAULT,
+  bgDim: BG_DIM_DEFAULT,
+  bgBlur: BG_BLUR_DEFAULT,
+  bgImage: '',
+  bgFocusImage: '',
+  bgBreakImage: '',
   workColor: WORK_COLOR_DEFAULT,
   breakColor: BREAK_COLOR_DEFAULT,
   notify: NOTIFY_DEFAULT,
@@ -82,6 +105,33 @@ export const normalizeHex = (v: unknown, fallback: string): string =>
 /** 背景色: 只接受 #RRGGBB (非法回退默认黑) */
 export const normalizeBackground = (v: unknown): string => normalizeHex(v, BACKGROUND_DEFAULT);
 
+/** 背景模式: 只接受 color / image */
+export const normalizeBgMode = (v: unknown): BgMode =>
+  BG_MODES.includes(v as BgMode) ? (v as BgMode) : BG_MODE_DEFAULT;
+
+/** 遮罩浓度 0 ~ 90 */
+export const clampDim = (v: unknown): number => clampInt(v, BG_DIM_MIN, BG_DIM_MAX, BG_DIM_DEFAULT);
+
+/** 背景图模糊像素 0 ~ 20 */
+export const clampBlur = (v: unknown): number => clampInt(v, BG_BLUR_MIN, BG_BLUR_MAX, BG_BLUR_DEFAULT);
+
+/**
+ * 背景图地址: 只接受本机可用的图片 dataURL (不含 svg, 避免内嵌脚本面) / blob / http(s),
+ * 其它一律归空 (未设置)
+ */
+export const normalizeImageUrl = (v: unknown): string => {
+  if (typeof v !== 'string') return '';
+  const s = v.trim();
+  if (s === '') return '';
+  if (/^data:image\/(png|jpe?g|webp|gif|avif|bmp);base64,/i.test(s)) return s;
+  if (/^https?:\/\//i.test(s) || /^blob:/i.test(s)) return s;
+  return '';
+};
+
+/** 当前阶段实际使用的背景图 (共用一张时取共用图, 否则专注/休息各用各的) */
+export const bgImageOf = (opts: PomodoroOptions, phase: PhaseKey): string =>
+  opts.bgSameImage ? opts.bgImage : phase === 'focus' ? opts.bgFocusImage : opts.bgBreakImage;
+
 /** 音色: 只接受已知 key */
 export const normalizeSound = (v: unknown): SoundKey =>
   SOUND_KEYS.includes(v as SoundKey) ? (v as SoundKey) : DEFAULT_OPTIONS.sound;
@@ -96,6 +146,13 @@ export const normalizeOptions = (raw?: Partial<PomodoroOptions> | null): Pomodor
   repeatCount: clampRepeat(raw?.repeatCount),
   volume: clampVolume(raw?.volume),
   background: normalizeBackground(raw?.background),
+  bgMode: normalizeBgMode(raw?.bgMode),
+  bgSameImage: raw?.bgSameImage === undefined ? DEFAULT_OPTIONS.bgSameImage : raw.bgSameImage === true,
+  bgDim: clampDim(raw?.bgDim),
+  bgBlur: clampBlur(raw?.bgBlur),
+  bgImage: normalizeImageUrl(raw?.bgImage),
+  bgFocusImage: normalizeImageUrl(raw?.bgFocusImage),
+  bgBreakImage: normalizeImageUrl(raw?.bgBreakImage),
   workColor: normalizeHex(raw?.workColor, WORK_COLOR_DEFAULT),
   breakColor: normalizeHex(raw?.breakColor, BREAK_COLOR_DEFAULT),
   notify: raw?.notify === undefined ? DEFAULT_OPTIONS.notify : raw.notify === true,
@@ -109,6 +166,20 @@ export const getDefaultOptions = (): PomodoroOptions => {
     return raw ? normalizeOptions(JSON.parse(raw) as Partial<PomodoroOptions>) : { ...DEFAULT_OPTIONS };
   } catch {
     return { ...DEFAULT_OPTIONS };
+  }
+};
+
+/**
+ * 写入默认设置 (规整后存储)
+ * @returns 是否成功落盘 (localStorage 写满 / 隐私模式会返回 false)
+ */
+export const trySetDefaultOptions = (raw?: Partial<PomodoroOptions> | null): boolean => {
+  try {
+    localStorage.setItem(DEFAULTS_STORAGE_KEY, JSON.stringify(normalizeOptions(raw)));
+    return true;
+  } catch {
+    /* 配额超限 / 隐私模式: 写入失败 */
+    return false;
   }
 };
 
@@ -137,6 +208,13 @@ export const isSameOptions = (a: PomodoroOptions, b: PomodoroOptions): boolean =
   a.repeatCount === b.repeatCount &&
   a.volume === b.volume &&
   a.background === b.background &&
+  a.bgMode === b.bgMode &&
+  a.bgSameImage === b.bgSameImage &&
+  a.bgDim === b.bgDim &&
+  a.bgBlur === b.bgBlur &&
+  a.bgImage === b.bgImage &&
+  a.bgFocusImage === b.bgFocusImage &&
+  a.bgBreakImage === b.bgBreakImage &&
   a.workColor === b.workColor &&
   a.breakColor === b.breakColor &&
   a.notify === b.notify &&
