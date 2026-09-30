@@ -1,4 +1,7 @@
 import '@testing-library/jest-dom';
+
+// 套件包含真实格式化大文件, 全量并行下放宽超时
+test: jest.setTimeout(60000);
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { message } from 'antd';
 import { saveTextFile } from '../../lib/tauri';

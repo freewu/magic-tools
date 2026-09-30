@@ -161,6 +161,8 @@ pub fn run() {
         // 系统保存对话框 + 文件读写 (条形码/二维码保存图片)
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
+        // 系统通知 (番茄时钟等工具的阶段完成弹窗)
+        .plugin(tauri_plugin_notification::init())
         // 网页 TDK 检测: Rust 侧抓取网页源码 (绕过浏览器 CORS)
         .invoke_handler(tauri::generate_handler![
             web_fetch::fetch_url_body,

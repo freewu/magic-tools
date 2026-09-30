@@ -9,6 +9,7 @@ import { MetronomeSetting } from "../Metronome/setting";
 import { ScreenRecorderSetting } from "../ScreenRecorder/setting";
 import { QrDecodeSetting } from "../QrDecode/setting";
 import { SensitiveWordSetting } from "../SensitiveWord/setting";
+import { PomodoroSetting } from "../Pomodoro/setting";
 
 export const SettingMisc = () => {
 
@@ -23,6 +24,7 @@ export const SettingMisc = () => {
       <ScreenRecorderSetting />
       <QrDecodeSetting />
       <SensitiveWordSetting />
+      <PomodoroSetting />
     </Form>
   )
 }

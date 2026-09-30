@@ -43,5 +43,7 @@
       "icons/icon.png"
     ]
   },
-  "plugins": {}
+  "plugins": {
+    "notification": {}
+  }
 }

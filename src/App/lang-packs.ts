@@ -140,6 +140,7 @@ import Metronome from './Metronome/lang';
 import ScreenRecorder from './ScreenRecorder/lang';
 import QrDecode from './QrDecode/lang';
 import SensitiveWord from './SensitiveWord/lang';
+import Pomodoro from './Pomodoro/lang';
 import IptablesRules from './IptablesRules/lang';
 import TcRules from './TcRules/lang';
 import NginxConfig from './NginxConfig/lang';
@@ -292,4 +293,5 @@ export const langPacks = {
   ScreenRecorder,
   QrDecode,
   SensitiveWord,
+  Pomodoro,
 };

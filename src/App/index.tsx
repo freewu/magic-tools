@@ -146,6 +146,7 @@ const list = [
   'ScreenRecorder',
   'QrDecode',
   'SensitiveWord',
+  'Pomodoro',
 ];
 
 import { defineLoader } from './app-modules';

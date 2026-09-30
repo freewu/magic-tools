@@ -39,6 +39,7 @@ base64 = "0.22"
 trust-dns-resolver = "0.23"
 # Whois (TCP 43) / MTR (异步等待与超时)
 tokio = { version = "1", features = ["net", "time", "io-util"] }
+tauri-plugin-notification = "2.5.0"
 
 # MTR 探测: Windows 用系统 IP Helper API (无需管理员权限), 其它平台用原始套接字
 [target.'cfg(windows)'.dependencies]
