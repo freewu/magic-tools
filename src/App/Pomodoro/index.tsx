@@ -459,22 +459,25 @@ const Pomodoro: React.FC = () => {
             {formatClock(leftSec)}
           </div>
           <div style={{ marginTop: 8 }}>{dots}</div>
-          <Space size={12} style={{ marginTop: 16 }}>
-            <Button type="primary" size="large" icon={running ? <PauseCircleOutlined /> : <PlayCircleOutlined />} onClick={running ? pause : start}>
-              {running ? t('暂停') : t('开始')}
-            </Button>
-            <Button size="large" icon={<ReloadOutlined />} onClick={reset}>{t('重置')}</Button>
-            <Button size="large" icon={<RightOutlined />} onClick={() => { setRunning(false); switchPhase(phase === 'focus' ? 'short' : 'focus'); }}>
-              {t('跳过当前阶段')}
-            </Button>
-          </Space>
-          <Space size={8} style={{ marginTop: 18 }}>
-            {PHASE_KEYS.map((p) => (
-              <Button key={p} size="small" type={phase === p ? 'primary' : 'default'} onClick={() => switchPhase(p)}>
-                {p === 'focus' ? t('专注') : p === 'short' ? t('短休息') : t('长休息')}
+          { /* 操作按钮与阶段页签分两行 (Space 是 inline-flex, 不包裹会被排到同一行) */ }
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 18, marginTop: 16 }}>
+            <Space size={12}>
+              <Button type="primary" size="large" icon={running ? <PauseCircleOutlined /> : <PlayCircleOutlined />} onClick={running ? pause : start}>
+                {running ? t('暂停') : t('开始')}
               </Button>
-            ))}
-          </Space>
+              <Button size="large" icon={<ReloadOutlined />} onClick={reset}>{t('重置')}</Button>
+              <Button size="large" icon={<RightOutlined />} onClick={() => { setRunning(false); switchPhase(phase === 'focus' ? 'short' : 'focus'); }}>
+                {t('跳过当前阶段')}
+              </Button>
+            </Space>
+            <Space size={8}>
+              {PHASE_KEYS.map((p) => (
+                <Button key={p} size="small" type={phase === p ? 'primary' : 'default'} onClick={() => switchPhase(p)}>
+                  {p === 'focus' ? t('专注') : p === 'short' ? t('短休息') : t('长休息')}
+                </Button>
+              ))}
+            </Space>
+          </div>
           </div>
         </div>
 

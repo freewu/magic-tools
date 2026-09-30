@@ -417,6 +417,19 @@ describe('番茄时钟 页面', () => {
     expect(bgLayerStyle().backgroundImage).toContain('bg2.png');
   });
 
+  test('按钮排与阶段页签分两行: 「跳过当前阶段」与「专注」之间有间隔', () => {
+    render(<Pomodoro />);
+    const rowA = btn('跳过当前阶段').closest('.ant-space') as HTMLElement;
+    const rowB = btn('专注').closest('.ant-space') as HTMLElement;
+    // 两排不同行 (Space 为 inline-flex, 不包裹会排到同一行)
+    expect(rowA).not.toBe(rowB);
+    const stack = rowA.parentElement as HTMLElement;
+    expect(stack).toBe(rowB.parentElement);
+    expect(stack.style.display).toBe('flex');
+    expect(stack.style.flexDirection).toBe('column');
+    expect(parseInt(stack.style.gap || '0', 10)).toBeGreaterThanOrEqual(12);
+  });
+
   test('控件排版: 「自动开始下一阶段」紧随时长参数, 背景与配色设置单独一排', () => {
     render(<Pomodoro />);
     // 控件包在 <Space size={6}> 里, 该 Space 的父级 ant-space-item 再往上就是那一排
