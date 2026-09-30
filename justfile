@@ -106,8 +106,15 @@ lint:
     npm run lint
 
 # Run Jest unit tests
+# 全量跑所有测试 (提交前 / 改动涉及全局注册表或公共库时; 约 2 分钟)
 test:
     npm test
+
+# Run Jest unit tests for a tool (or several, space separated in one argument),
+# e.g. `just test-app Whiteboard` or `just test-app "Whiteboard Metronome"`
+# 日常开发只跑改动/新增工具的测试即可 (jest 按路径子串匹配)
+test-app app:
+    npm test '--' {{app}}
 
 # Clean build artifacts (dist/ + Rust target/)
 clean:

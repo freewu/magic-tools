@@ -27,6 +27,12 @@ Cloudflare Pages 的构建环境和本地不同（本地 Node 24 / npm 11），�
 - 只改 `package.json` 版本号（不改依赖）时，lockfile 顶部 `version` 字段也需同步（可同上命令刷新）；
   设置 `NODE_VERSION=22` 让 CF 侧 npm 升到 10.x 后兼容性更好，但**不能代替**上述 npm9 同步步骤
 
+## 运行测试
+
+- **日常开发只跑改动/新增工具的测试**：`just test-app <工具目录名>`（如 `just test-app Whiteboard`），多个工具用空格分隔放在一个引号参数里：`just test-app "Whiteboard Metronome"`；等价命令 `npm test -- src/App/<工具目录名>`（jest 按路径子串匹配）
+- 改动涉及全局（`src/App/index.tsx` 注册表、`src/App/lang-packs.ts`、`src/lib/*` 公共库、`vite.config.mts` 分包）以及**提交前 / 发布前**，才需要跑全量 `just test`（约 2 分钟）；全量可只跑一次，其余中间步骤用 `just test-app` 提速
+- 按需补充 `npx tsc --noEmit`（类型）与 `npm run build:renderer`（构建）验证
+
 ## 版本发布流程
 
 > **重要：版本发布是「按指令执行」，不是自动流程。**
