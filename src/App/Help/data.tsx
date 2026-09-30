@@ -80,6 +80,45 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-10-01 V2.20.0 Release", "2026-10-01 V2.20.0 Release", "2026-10-01 V2.20.0 Release"),
+    items: trio(
+      [
+        "新增「番茄时钟」工具 (其它): 专注 / 短休息 / 长休息三阶段自动轮换 (每几个专注后转长休可调), 剩余时间按截止时刻推算、切后台也不漂移; 可自动开始下一阶段, 阶段完成可弹桌面系统通知 (权限被拒则页面内提示); 提示音支持 5 种本地合成音色 (叮 / 钟声 / 哔哔哔 / 木鱼 / 风铃) 或自定义音频文件 (仅本机播放, 不上传), 可设重复次数 (1~5) 与音量; 内置全屏 (原生 Fullscreen API + 窗口内 CSS 全屏兜底); 参数可保存为默认设置, 也可在设置中心预设",
+        "番茄时钟支持自定义配色: 背景可换任意纯色 (内置深 / 浅色板), 专注与休息阶段的时间数字颜色分别设置, 全屏时同样生效; 控制区按「时长参数 / 提醒设置 / 背景与配色」三排分组, 自动开始下一阶段紧跟轮次设置",
+        "番茄时钟背景可换成图片: 上传本地图片作为时钟 / 全屏背景, 可勾选「专注 / 休息同一张」共用, 也可关掉后分别为专注与休息选图并随阶段自动切换; 图片等比压缩后仅存本机 localStorage、不上传, 并可用「遮罩」「模糊」调节以保证时钟数字清晰",
+        "新增「白板」工具 (生成器): 由 Excalidraw 驱动的无限画布, 自由绘制矩形 / 椭圆 / 箭头 / 连线 / 文字 / 手绘线条, 支持橡皮擦、框选、对齐与图层; 画布自动保存在浏览器本地, 重新打开自动恢复; 支持全屏; 不联网、不上传、无协作账号",
+        "修复桌面版启动失败: tauri-plugin-notification 的权限配置类型写成 {} (应为 null), 导致 Tauri 初始化 panic",
+        "修复「白板」渲染不开的两处根因: 容器高度塌陷与样式未加载",
+        "全部 143 个工具现均有页面级测试 (补齐 99 个工具的 index.test.tsx), 全量测试 2642 → 2975 条; 开发期只跑改动工具的测试 (just test-app)",
+        "README 顶部版本信息由纯文本 (长期停留在 v2.7.0) 改为 shields.io 徽章 (version / Tauri / React / Ant Design / MIT), 并修正为当前版本, 三语 README 同步; AGENTS.md 版本号清单补充 README 徽章 / docs HTML 徽章 / lockfile 三处; 新增 version-consistency 测试把该清单变成可执行断言",
+        "工具总数 141 → 143 (生成器 11 → 12, 其它 15 → 16)",
+      ],
+      [
+        "新增「番茄時鐘」工具 (其他): 專注 / 短休息 / 長休息三階段自動輪換 (每幾個專注後轉長休可調), 剩餘時間按截止時刻推算、切到背景也不漂移; 可自動開始下一階段, 階段完成可彈桌面系統通知 (權限被拒則頁面內提示); 提示音支援 5 種本機合成音色 (叮 / 鐘聲 / 嗶嗶嗶 / 木魚 / 風鈴) 或自訂音訊檔 (僅本機播放, 不上傳), 可設重複次數 (1~5) 與音量; 內建全螢幕 (原生 Fullscreen API + 視窗內 CSS 全螢幕備援); 參數可儲存為預設設定, 也可在設定中心預設",
+        "番茄時鐘支援自訂配色: 背景可換任意純色 (內建深 / 淺色板), 專注與休息階段的時間數字顏色分別設定, 全螢幕時同樣生效; 控制區按「時長參數 / 提醒設定 / 背景與配色」三排分組, 自動開始下一階段緊跟輪次設定",
+        "番茄時鐘背景可換成圖片: 上傳本機圖片作為時鐘 / 全螢幕背景, 可勾選「專注 / 休息同一張」共用, 也可關掉後分別為專注與休息選圖並隨階段自動切換; 圖片等比壓縮後僅存本機 localStorage、不上傳, 並可用「遮罩」「模糊」調節以保證時鐘數字清晰",
+        "新增「白板」工具 (生成器): 由 Excalidraw 驅動的無限畫布, 自由繪製矩形 / 橢圓 / 箭頭 / 連線 / 文字 / 手繪線條, 支援橡皮擦、框選、對齊與圖層; 畫布自動儲存在瀏覽器本機, 重新開啟自動恢復; 支援全螢幕; 不連網、不上傳、無協作帳號",
+        "修復桌面版啟動失敗: tauri-plugin-notification 的權限設定型別寫成 {} (應為 null), 導致 Tauri 初始化 panic",
+        "修復「白板」渲染不開的兩處根因: 容器高度塌陷與樣式未載入",
+        "全部 143 個工具現均有頁面級測試 (補齊 99 個工具的 index.test.tsx), 全量測試 2642 → 2975 條; 開發期只跑改動工具的測試 (just test-app)",
+        "README 頂部版本資訊由純文字 (長期停留在 v2.7.0) 改為 shields.io 徽章 (version / Tauri / React / Ant Design / MIT), 並修正為目前版本, 三語 README 同步; AGENTS.md 版本號清單補充 README 徽章 / docs HTML 徽章 / lockfile 三處; 新增 version-consistency 測試把該清單變成可執行斷言",
+        "工具總數 141 → 143 (生成器 11 → 12, 其他 15 → 16)",
+      ],
+      [
+        "New “Pomodoro” tool (Utilities): automatic focus / short break / long break rotation (how many focus rounds precede a long break is configurable), with the remaining time computed from the deadline so it stays accurate in background tabs; optionally auto-start the next phase and raise a desktop notification when a phase ends (falls back to an in-page notice if the permission is denied); five built-in synthesised sounds (ding / bell / beeps / wood block / wind chime) or your own audio file (played locally, never uploaded), with repeat count (1–5) and volume; fullscreen (native Fullscreen API with an in-window CSS fallback); settings can be saved as defaults or preset in Settings",
+        "Pomodoro: custom colours — pick any solid background colour (dark / light presets included) and set the focus and break digit colours separately; both apply in fullscreen too, and the controls are grouped into three rows (durations / alerts / appearance) with auto-start next to the round setting",
+        "Pomodoro: image backgrounds — upload a local image for the clock / fullscreen backdrop, tick “Same image for focus & break” to share one image, or turn it off to choose separate images per phase that switch automatically; the image is scaled down and stored only in local storage (never uploaded), with Overlay and Blur controls to keep the digits readable",
+        "New “Whiteboard” tool (Generators): an infinite canvas powered by Excalidraw — rectangles, ellipses, arrows, connectors, text and freehand strokes with eraser, selection, alignment and layers; the canvas is autosaved in the browser and restored on reopen; fullscreen supported; no network, no uploads, no collaboration accounts",
+        "Fixed the desktop app failing to start: the tauri-plugin-notification permission config was written as {} instead of null, causing a Tauri initialisation panic",
+        "Fixed two root causes of the Whiteboard not rendering: a collapsed container height and styles never being loaded",
+        "All 143 tools now have page-level tests (99 new index.test.tsx files); the full suite grew from 2642 to 2975 tests, and day-to-day runs only test the tools that changed (just test-app)",
+        "The README header now uses shields.io badges (version / Tauri / React / Ant Design / MIT) instead of plain text that had been stuck at v2.7.0, with the version corrected; all three READMEs updated, and the AGENTS.md version-bump checklist now also covers the README badges, the docs HTML badges and the lockfiles, and a new version-consistency test turns that checklist into executable assertions",
+        "Tool count grew from 141 to 143 (Generators 11 → 12, Utilities 15 → 16)",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-09-29 V2.19.0 Release", "2026-09-29 V2.19.0 Release", "2026-09-29 V2.19.0 Release"),
     items: trio(
       [

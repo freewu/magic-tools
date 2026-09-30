@@ -91,6 +91,13 @@ const ctrlSwitch = (label: string): HTMLElement => {
   return (hit.closest('.ant-space') as HTMLElement).querySelector('.ant-switch') as HTMLElement;
 };
 
+/** 按标签文字定位同一行内的 ColorPicker 触发器 (不依赖取色器在页面里的先后顺序) */
+const ctrlPicker = (label: string): HTMLElement => {
+  const hit = screen.getAllByText(label).find((el) => el.closest('.ant-space')?.querySelector('.ant-color-picker-trigger'));
+  if (!hit) throw new Error(`未找到取色器: ${label}`);
+  return (hit.closest('.ant-space') as HTMLElement).querySelector('.ant-color-picker-trigger') as HTMLElement;
+};
+
 /** 「背景」选择器 (页面里第二个 Select) */
 const bgSelect = (): HTMLElement => {
   const hit = Array.from(document.querySelectorAll('.ant-select')).find((s) => /纯色|圖片|图片/.test(s.textContent ?? ''));
@@ -143,8 +150,7 @@ describe('番茄时钟 页面', () => {
     expect(document.querySelectorAll('.ant-color-picker-trigger')).toHaveLength(3);
     // 每个标签旁边就是一个取色器控件 (intros 说明文字里也含同名文字, 因此校验控件归属)
     [ '背景颜色', '专注颜色', '休息颜色' ].forEach((label) => {
-      const hit = screen.getAllByText(label).find((el) => el.closest('.ant-space')?.querySelector('.ant-color-picker-trigger'));
-      expect(hit).toBeTruthy();
+      expect(ctrlPicker(label)).toBeTruthy();
     });
   });
 
@@ -190,7 +196,6 @@ describe('番茄时钟 页面', () => {
   });
 
   test('开启弹通知: 阶段完成时调用 Notification; 关闭则不调用', async () => {
-    const switches = () => screen.getAllByRole('switch') as HTMLButtonElement[];
     render(<Pomodoro />);
     const nums = Array.from(document.querySelectorAll('.ant-input-number input')) as HTMLInputElement[];
     fireEvent.change(nums[0], { target: { value: '1' } });
@@ -203,8 +208,7 @@ describe('番茄时钟 页面', () => {
     cleanup();
     notifyCalls.length = 0;
     render(<Pomodoro />);
-    // 两个开关: [0]=弹通知 [1]=自动开始
-    fireEvent.click(switches()[0]); // 关闭通知
+    fireEvent.click(ctrlSwitch('完成时弹通知')); // 关闭通知
     const nums2 = Array.from(document.querySelectorAll('.ant-input-number input')) as HTMLInputElement[];
     fireEvent.change(nums2[0], { target: { value: '1' } });
     fireEvent.blur(nums2[0]);
@@ -261,12 +265,11 @@ describe('番茄时钟 页面', () => {
     expect(bigClock().textContent).toBe('05:00');
     expect(bigClock().style.color).toBe('rgb(52, 211, 153)');
 
-    // 三个取色器: 背景 / 专注颜色 / 休息颜色
-    const triggers = Array.from(document.querySelectorAll('.ant-color-picker-trigger')) as HTMLElement[];
-    expect(triggers).toHaveLength(3);
+    // 三个取色器: 背景颜色 / 专注颜色 / 休息颜色 (按标签定位, 不依赖页面顺序)
+    expect(document.querySelectorAll('.ant-color-picker-trigger')).toHaveLength(3);
 
     // 打开「背景颜色」弹出层, 用十六进制输入框改色
-    fireEvent.click(triggers[0]);
+    fireEvent.click(ctrlPicker('背景颜色'));
     const hexWrap = document.querySelector('.ant-color-picker-hex-input') as HTMLElement | null;
     expect(hexWrap).not.toBeNull();
     const hexInput = (hexWrap?.tagName === 'INPUT' ? hexWrap : hexWrap?.querySelector('input')) as HTMLInputElement;
@@ -412,6 +415,38 @@ describe('番茄时钟 页面', () => {
     cleanup();
     render(<Pomodoro />);
     expect(bgLayerStyle().backgroundImage).toContain('bg2.png');
+  });
+
+  test('控件排版: 「自动开始下一阶段」紧随时长参数, 背景与配色设置单独一排', () => {
+    render(<Pomodoro />);
+    // 控件包在 <Space size={6}> 里, 该 Space 的父级 ant-space-item 再往上就是那一排
+    const rowOf = (label: string): HTMLElement => {
+      const hit = screen.getAllByText(label).find((el) => el.closest('.ant-space'));
+      if (!hit) throw new Error(`未找到控件: ${label}`);
+      const inner = hit.closest('.ant-space') as HTMLElement;
+      return inner.parentElement?.closest('.ant-space') as HTMLElement;
+    };
+
+    // 第一排: 时长参数 + 每几个专注后长休 + 自动开始下一阶段
+    expect(rowOf('自动开始下一阶段')).toBe(rowOf('每几个专注后长休'));
+    expect(rowOf('自动开始下一阶段')).toBe(rowOf('专注时长 (分钟)'));
+
+    // 第二排: 提示音 / 音量 / 通知 (不含背景与配色)
+    expect(rowOf('完成提示音')).toBe(rowOf('音量'));
+    expect(rowOf('完成时弹通知')).toBe(rowOf('完成提示音'));
+
+    // 第三排: 背景设置 + 时间数字配色
+    const bgRow = rowOf('背景');
+    expect(bgRow).not.toBe(rowOf('完成提示音'));
+    expect(rowOf('背景颜色')).toBe(bgRow);
+    expect(rowOf('专注颜色')).toBe(bgRow);
+    expect(rowOf('休息颜色')).toBe(bgRow);
+
+    // 图片模式下 「同一张」/ 遮罩 / 模糊 也都在第三排
+    chooseBgMode('图片');
+    expect(rowOf('专注/休息同一张')).toBe(bgRow);
+    expect(rowOf('遮罩')).toBe(bgRow);
+    expect(rowOf('模糊')).toBe(bgRow);
   });
 });
 

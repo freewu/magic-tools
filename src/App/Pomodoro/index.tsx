@@ -498,6 +498,10 @@ const Pomodoro: React.FC = () => {
             <Text type="secondary" style={{ fontSize: 13 }}>{t('每几个专注后长休')}</Text>
             <InputNumber size="small" min={1} max={12} value={opts.roundsBeforeLong} onChange={(v) => patch({ roundsBeforeLong: Number(v) })} style={{ width: 56 }} />
           </Space>
+          <Space size={6}>
+            <Switch size="small" checked={opts.autoNext} onChange={(v) => patch({ autoNext: v })} />
+            <Text type="secondary" style={{ fontSize: 13 }}>{t('自动开始下一阶段')}</Text>
+          </Space>
         </Space>
 
         <Space size={24} wrap style={{ marginTop: 14 }}>
@@ -548,6 +552,10 @@ const Pomodoro: React.FC = () => {
               <Text type="secondary" style={{ fontSize: 13 }}>{t('完成时弹通知')}</Text>
             </Tooltip>
           </Space>
+        </Space>
+
+        {/* 外观设置 (第三排: 背景 + 时间数字配色) */}
+        <Space size={24} wrap style={{ marginTop: 14 }}>
           <Space size={6}>
             <Text type="secondary" style={{ fontSize: 13 }}>{t('背景')}</Text>
             <Select
@@ -626,10 +634,6 @@ const Pomodoro: React.FC = () => {
               presets={BACKGROUND_PRESETS.map((g) => ({ label: g.label, colors: g.colors }))}
               onChange={(value) => patch({ breakColor: value.toHexString() })}
             />
-          </Space>
-          <Space size={6}>
-            <Switch size="small" checked={opts.autoNext} onChange={(v) => patch({ autoNext: v })} />
-            <Text type="secondary" style={{ fontSize: 13 }}>{t('自动开始下一阶段')}</Text>
           </Space>
         </Space>
         {opts.sound === 'custom' && !customAudio && (
