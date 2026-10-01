@@ -1,13 +1,14 @@
 import {
-  DEFAULT_OPTIONS, advance, clampCountdown, clampFontSize, clampLineHeight, clampSpeed,
-  focusOpacity, formatClock, getDefaultOptions, isSameOptions, isSliderTarget, isToggleKey,
+  DEFAULT_OPTIONS, advance, clampCountdown, clampFontSize, clampGuideRatio, clampLineHeight, clampSpeed,
+  focusOpacity, formatClock, getDefaultOptions, guideRatioAt, isSameOptions, isSliderTarget, isToggleKey,
   isTypingTarget, lineCentersOf, lineStepOf, lineUnits, nextSampleScript, normalizeGuideColor,
   normalizeOptions, patchDefaultOptions, pickSampleScript, progressOf, remainingSeconds, sampleScriptsOf,
   scrollDistance, setDefaultOptions, splitLineAt, splitScript, sweepOf,
 } from './lib';
 import {
   COUNTDOWN_DEFAULT, DEFAULTS_STORAGE_KEY, FADE_DEFAULT, FOCUS_DEFAULT, FOCUS_MIN_OPACITY, FONT_SIZE_DEFAULT,
-  FONT_SIZE_MAX, FONT_SIZE_MIN, GUIDE_COLOR_DEFAULT, GUIDE_DEFAULT, LINE_HEIGHT_DEFAULT, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN,
+  FONT_SIZE_MAX, FONT_SIZE_MIN, GUIDE_COLOR_DEFAULT, GUIDE_DEFAULT, GUIDE_RATIO_DEFAULT, GUIDE_RATIO_MAX,
+  GUIDE_RATIO_MIN, LINE_HEIGHT_DEFAULT, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN,
   PAD_RATIO, SAMPLE_SCRIPTS, SPEED_DEFAULT, SPEED_MAX, SPEED_MIN,
 } from './data';
 
@@ -49,6 +50,31 @@ describe('选项校验', () => {
     expect(clampCountdown(undefined)).toBe(COUNTDOWN_DEFAULT);
   });
 
+  test('基准线位置: 夹取到 15%~85% 并保留两位小数, 非法值回退默认', () => {
+    expect(clampGuideRatio(GUIDE_RATIO_DEFAULT)).toBe(GUIDE_RATIO_DEFAULT);
+    expect(clampGuideRatio(0.5)).toBe(0.5);
+    expect(clampGuideRatio(0.234)).toBe(0.23);
+    expect(clampGuideRatio(0.567)).toBe(0.57);
+    expect(clampGuideRatio(0)).toBe(GUIDE_RATIO_MIN);
+    expect(clampGuideRatio(-2)).toBe(GUIDE_RATIO_MIN);
+    expect(clampGuideRatio(1)).toBe(GUIDE_RATIO_MAX);
+    expect(clampGuideRatio(9)).toBe(GUIDE_RATIO_MAX);
+    expect(clampGuideRatio('0.66')).toBe(0.66);
+    expect(clampGuideRatio('abc')).toBe(GUIDE_RATIO_DEFAULT);
+    expect(clampGuideRatio(undefined)).toBe(GUIDE_RATIO_DEFAULT);
+  });
+
+  test('guideRatioAt: 把舞台内的鼠标 Y 坐标换算成基准线比例并按范围夹取', () => {
+    // 舞台顶部 100, 高 400: 鼠标在 y=300 即 50%
+    expect(guideRatioAt(300, 100, 400)).toBe(0.5);
+    expect(guideRatioAt(100, 100, 400)).toBe(GUIDE_RATIO_MIN);
+    expect(guideRatioAt(900, 100, 400)).toBe(GUIDE_RATIO_MAX);
+    expect(guideRatioAt(0, 0, 400)).toBe(GUIDE_RATIO_MIN);
+    // 高度未测量到 → 维持默认值, 不会把线甩到顶端
+    expect(guideRatioAt(300, 0, 0)).toBe(GUIDE_RATIO_DEFAULT);
+    expect(guideRatioAt(300, 0, NaN)).toBe(GUIDE_RATIO_DEFAULT);
+  });
+
   test('基准线颜色只接受 #RRGGBB, 非法值回退默认蓝', () => {
     expect(normalizeGuideColor('#123abc')).toBe('#123abc');
     expect(normalizeGuideColor('  #ABCDEF  ')).toBe('#abcdef');
@@ -67,6 +93,7 @@ describe('选项校验', () => {
     expect(normalizeOptions({ speed: 120, fade: false })).toEqual({
       speed: 120, fontSize: FONT_SIZE_DEFAULT, lineHeight: LINE_HEIGHT_DEFAULT,
       fade: false, focus: FOCUS_DEFAULT, guide: GUIDE_DEFAULT, guideColor: GUIDE_COLOR_DEFAULT,
+      guideRatio: GUIDE_RATIO_DEFAULT,
       countdown: COUNTDOWN_DEFAULT,
     });
     expect(normalizeOptions({ focus: 'on' }).focus).toBe(FOCUS_DEFAULT);
@@ -96,11 +123,11 @@ describe('默认设置', () => {
   test('写入后可读回 (非法规整后再存), 返回落盘内容', () => {
     const saved = setDefaultOptions({
       speed: 999, fontSize: 52, lineHeight: 2.04, fade: false, focus: false,
-      guide: false, guideColor: '#123ABC', countdown: COUNTDOWN_DEFAULT,
+      guide: false, guideColor: '#123ABC', guideRatio: GUIDE_RATIO_DEFAULT, countdown: COUNTDOWN_DEFAULT,
     });
     expect(saved).toEqual({
       speed: SPEED_MAX, fontSize: 52, lineHeight: 2, fade: false, focus: false,
-      guide: false, guideColor: '#123abc', countdown: COUNTDOWN_DEFAULT,
+      guide: false, guideColor: '#123abc', guideRatio: GUIDE_RATIO_DEFAULT, countdown: COUNTDOWN_DEFAULT,
     });
     expect(JSON.parse(localStorage.getItem(DEFAULTS_STORAGE_KEY) as string)).toEqual(saved);
     expect(getDefaultOptions()).toEqual(saved);
@@ -109,12 +136,13 @@ describe('默认设置', () => {
   test('patchDefaultOptions 只改传入字段, 其余沿用已存值 (无存值时回退内置默认)', () => {
     setDefaultOptions({
       speed: 120, fontSize: 52, lineHeight: 2, fade: false, focus: false,
-      guide: true, guideColor: GUIDE_COLOR_DEFAULT, countdown: COUNTDOWN_DEFAULT,
+      guide: true, guideColor: GUIDE_COLOR_DEFAULT, guideRatio: GUIDE_RATIO_DEFAULT, countdown: COUNTDOWN_DEFAULT,
     });
     const after = patchDefaultOptions({ speed: 90 });
     expect(after).toEqual({
       speed: 90, fontSize: 52, lineHeight: 2, fade: false, focus: false,
-      guide: GUIDE_DEFAULT, guideColor: GUIDE_COLOR_DEFAULT, countdown: COUNTDOWN_DEFAULT,
+      guide: GUIDE_DEFAULT, guideColor: GUIDE_COLOR_DEFAULT, guideRatio: GUIDE_RATIO_DEFAULT,
+      countdown: COUNTDOWN_DEFAULT,
     });
     expect(getDefaultOptions()).toEqual(after);
 
@@ -148,7 +176,8 @@ describe('默认设置', () => {
     expect(getDefaultOptions()).toEqual({
       speed: SPEED_MIN, fontSize: FONT_SIZE_MAX, lineHeight: LINE_HEIGHT_MIN,
       fade: FADE_DEFAULT, focus: FOCUS_DEFAULT,
-      guide: GUIDE_DEFAULT, guideColor: GUIDE_COLOR_DEFAULT, countdown: COUNTDOWN_DEFAULT,
+      guide: GUIDE_DEFAULT, guideColor: GUIDE_COLOR_DEFAULT, guideRatio: GUIDE_RATIO_DEFAULT,
+      countdown: COUNTDOWN_DEFAULT,
     });
   });
 

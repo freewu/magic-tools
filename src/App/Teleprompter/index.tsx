@@ -7,12 +7,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { LocaleId } from '../../i18n/lang';
 import { useLocale } from '../../hook/locale-context';
 import {
-  COUNTDOWN_OPTIONS, FONT_SIZE_MAX, FONT_SIZE_MIN, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN, PAD_RATIO, READ_RATIO,
+  COUNTDOWN_OPTIONS, FONT_SIZE_MAX, FONT_SIZE_MIN, GUIDE_RATIO_MAX, GUIDE_RATIO_MIN, GUIDE_RATIO_STEP,
+  LINE_HEIGHT_MAX, LINE_HEIGHT_MIN, PAD_RATIO,
   SPEED_MAX, SPEED_MIN, SPEED_STEP, STAGE_BG, STAGE_DIM_FG, STAGE_FG, STAGE_FOCUS_FG,
 } from './data';
 import {
-  advance, clampFontSize, clampLineHeight, clampSpeed, focusOpacity,
-  formatClock, getDefaultOptions, isSameOptions, isSliderTarget, isToggleKey, isTypingTarget,
+  advance, clampFontSize, clampGuideRatio, clampLineHeight, clampSpeed, focusOpacity,
+  formatClock, getDefaultOptions, guideRatioAt, isSameOptions, isSliderTarget, isToggleKey, isTypingTarget,
   lineCentersOf, lineStepOf, nextSampleScript, normalizeGuideColor, pickSampleScript, progressOf, remainingSeconds,
   scrollDistance, setDefaultOptions, splitLineAt, splitScript, sweepOf,
   type LineRect, type PrompterOptions,
@@ -36,6 +37,8 @@ const STAGE_CSS = `
 .tp-line { padding: 0 8px; margin: 0 -8px; border-radius: 6px; }
 .tp-line-active { color: ${STAGE_FOCUS_FG}; background: rgba(255,255,255,0.05); }
 .tp-guide { position: absolute; left: 0; right: 0; height: 2px; z-index: 3; pointer-events: none; }
+.tp-guide-hit { position: absolute; left: 0; right: 0; height: 22px; z-index: 4; cursor: ns-resize; touch-action: none; }
+.tp-guide-tip { position: absolute; right: 8px; z-index: 5; padding: 1px 6px; border-radius: 4px; background: rgba(0,0,0,0.62); color: #fff; font-size: 11px; pointer-events: none; }
 .tp-guide::before, .tp-guide::after { content: ''; position: absolute; top: -3px; width: 10px; height: 8px; background: inherit; }
 .tp-guide::before { left: 0; }
 .tp-guide::after { right: 0; }
@@ -110,7 +113,7 @@ const Teleprompter: React.FC = () => {
   const done = distance > 0 && offset >= distance;
 
   // ---- 逐行焦点 + 逐字高亮: 阅读线压着的那一行按进度从左到右点亮, 其余行按距离衰减透明度 ----
-  const readY = box.vh * READ_RATIO;
+  const readY = box.vh * opts.guideRatio;
   // 还没测到行位置时 (首帧 / 无法测量) 按 字号 × 行距 推一份行框出来
   const lineRects = useMemo(() => {
     const step = Math.max(1, opts.fontSize * opts.lineHeight);
@@ -136,6 +139,32 @@ const Teleprompter: React.FC = () => {
   const patch = useCallback((next: Partial<PrompterOptions>) => {
     setOpts((prev) => ({ ...prev, ...next }));
   }, []);
+
+  /**
+   * 基准线上下调整 (拖动): 在舞台上按住这条线上下拖, 直接把线放到视线位置
+   * 拖动中在右侧实时显示百分比, 松手结束; 舞台高度未测量到时不动
+   */
+  const [ draggingGuide, setDraggingGuide ] = useState(false);
+  const onGuidePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const view = viewRef.current;
+    if (!view) return;
+    e.preventDefault();
+    setDraggingGuide(true);
+    const rect = view.getBoundingClientRect();
+    const height = view.clientHeight || rect.height;
+    const moveTo = (clientY: number) => patch({ guideRatio: guideRatioAt(clientY, rect.top, height) });
+    moveTo(e.clientY);
+    const stop = () => {
+      setDraggingGuide(false);
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', stop);
+      document.removeEventListener('pointercancel', stop);
+    };
+    const onMove = (ev: PointerEvent) => moveTo(ev.clientY);
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', stop);
+    document.addEventListener('pointercancel', stop);
+  }, [ patch ]);
 
   // 偏移量同时写 ref 与 state: 动画帧里读 ref, 避免闭包拿到过期值
   const commit = useCallback((next: number) => {
@@ -334,14 +363,21 @@ const Teleprompter: React.FC = () => {
       if ((typing || onSlider) && !full) return;
       if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
         e.preventDefault();
-        patch({ speed: clampSpeed(opts.speed + (e.key === 'ArrowUp' ? SPEED_STEP : -SPEED_STEP)) });
+        const up = e.key === 'ArrowUp';
+        // Shift + ↑↓: 上下移动阅读基准线 (线在舞台里的高度)
+        if (e.shiftKey) {
+          const step = GUIDE_RATIO_STEP * 2 * (up ? -1 : 1);
+          patch({ guideRatio: clampGuideRatio(opts.guideRatio + step) });
+          return;
+        }
+        patch({ speed: clampSpeed(opts.speed + (up ? SPEED_STEP : -SPEED_STEP)) });
         return;
       }
       if (e.key === 'Escape' && full && !document.fullscreenElement) exitFull();
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [ toggle, playing, counting, full, opts.speed, patch, exitFull ]);
+  }, [ toggle, playing, counting, full, opts.speed, opts.guideRatio, patch, exitFull ]);
 
   const stageClass = `tp-stage${full ? ' tp-full' : ''}${opts.fade ? ' tp-fade' : ''}`;
   const estTotal = distance / Math.max(1, opts.speed);
@@ -409,7 +445,7 @@ const Teleprompter: React.FC = () => {
           </Space>
           <Space size={8}>
             <Switch size="small" checked={opts.guide} onChange={(v) => patch({ guide: v })} />
-            <Tooltip title={t('阅读基准线: 在阅读线位置显示一条横线, 方便对准视线; 可自定义颜色')}>
+            <Tooltip title={t('阅读基准线: 在阅读线位置显示一条横线, 方便对准视线; 可自定义颜色, 也可上下调整位置')}>
               <span style={{ color: '#888' }}>{t('基准线')}</span>
             </Tooltip>
             <ColorPicker
@@ -418,6 +454,20 @@ const Teleprompter: React.FC = () => {
               value={opts.guideColor}
               onChange={(v) => patch({ guideColor: normalizeGuideColor(v.toHexString()) })}
             />
+            <Tooltip title={t('基准线位置: 拖动滑块或在舞台上直接上下拖这条线, 把视线定在舒服的高度 (占舞台高度的比例)')}>
+              <span style={{ color: '#888' }}>{t('基准线位置')}</span>
+            </Tooltip>
+            <Slider
+              min={GUIDE_RATIO_MIN}
+              max={GUIDE_RATIO_MAX}
+              step={GUIDE_RATIO_STEP}
+              disabled={!opts.guide}
+              value={opts.guideRatio}
+              onChange={(v) => patch({ guideRatio: clampGuideRatio(v) })}
+              style={{ width: 110, margin: 0 }}
+              tooltip={{ formatter: (v) => `${Math.round((v ?? 0) * 100)}%` }}
+            />
+            <Text type="secondary" style={{ fontSize: 12 }}>{`${Math.round(opts.guideRatio * 100)}%`}</Text>
           </Space>
           <Space size={8}>
             <Tooltip title={t('开始前先倒数, 留出时间看向镜头 / 做好准备; 再点一次「开始」或按空格可取消')}>
@@ -430,7 +480,7 @@ const Teleprompter: React.FC = () => {
               options={COUNTDOWN_OPTIONS.map((n) => ({ value: n, label: n === 0 ? t('关闭') : tt('{n} 秒', { n }) }))}
             />
           </Space>
-          <Tooltip title={t('把当前的速度 / 字号 / 行距 / 淡入淡出 / 逐行高亮 / 基准线 / 倒计时存为默认值, 下次打开时沿用; 也可在 设置 → 其它 → 提词器 中修改')}>
+          <Tooltip title={t('把当前的速度 / 字号 / 行距 / 淡入淡出 / 逐行高亮 / 基准线(颜色·位置) / 倒计时存为默认值, 下次打开时沿用; 也可在 设置 → 其它 → 提词器 中修改')}>
             {/* 按钮 disabled 时自身不响应鼠标, 用 span 包一层保证提示仍可弹出 */}
             <span style={{ display: 'inline-block' }}>
               <Button
@@ -449,7 +499,7 @@ const Teleprompter: React.FC = () => {
       <Card
         size="small"
         title={t('提词器')}
-        extra={<Text type="secondary" style={{ fontSize: 12 }}>{t('空格 开始/暂停/取消倒计时 · ↑↓ 调速 · Esc 退出全屏')}</Text>}
+        extra={<Text type="secondary" style={{ fontSize: 12 }}>{t('空格 开始/暂停/取消倒计时 · ↑↓ 调速 · Shift+↑↓ 移动基准线 · Esc 退出全屏')}</Text>}
       >
         <div ref={stageRef} className={stageClass}>
           <div className="tp-view" ref={viewRef}>
@@ -479,7 +529,20 @@ const Teleprompter: React.FC = () => {
               </div>
             </div>
             {opts.guide && hasScript && (
-              <div className="tp-guide" style={{ top: readY, background: opts.guideColor }} />
+              <>
+                <div className="tp-guide" style={{ top: readY, background: opts.guideColor }} />
+                <div
+                  className="tp-guide-hit"
+                  style={{ top: readY - 11 }}
+                  title={t('按住上下拖动, 调整基准线位置')}
+                  onPointerDown={onGuidePointerDown}
+                />
+                {draggingGuide && (
+                  <div className="tp-guide-tip" style={{ top: Math.max(0, readY - 28) }}>
+                    {`${Math.round(opts.guideRatio * 100)}%`}
+                  </div>
+                )}
+              </>
             )}
             {counting !== null && (
               <div className="tp-count">

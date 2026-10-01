@@ -4,7 +4,7 @@ import { TeleprompterSetting } from './setting';
 import { COUNTDOWN_DEFAULT, DEFAULTS_STORAGE_KEY, GUIDE_COLOR_DEFAULT } from './data';
 import { DEFAULT_OPTIONS, getDefaultOptions } from './lib';
 
-/** 面板里的滑块手柄 (速度 / 字号 / 行距 三个) */
+/** 面板里的滑块手柄 (速度 / 字号 / 行距 / 基准线位置 四个) */
 const handles = () => Array.from(document.querySelectorAll('.ant-slider-handle')) as HTMLElement[];
 /** 面板里的开关 (淡入淡出 / 逐行高亮 / 基准线 三个) */
 const switches = () => screen.getAllByRole('switch') as HTMLButtonElement[];
@@ -14,7 +14,7 @@ const picker = () => document.querySelector('.ant-color-picker-trigger') as HTML
 describe('TeleprompterSetting 默认设置', () => {
   beforeEach(() => localStorage.clear());
 
-  test('渲染 3 个滑块 + 3 个开关 + 基准线取色器 + 倒计时分段, 初始值即内置默认值', () => {
+  test('渲染 4 个滑块 + 3 个开关 + 基准线取色器 + 倒计时分段, 初始值即内置默认值', () => {
     render(<TeleprompterSetting />);
 
     expect(screen.getByText('提词器')).toBeInTheDocument();
@@ -22,13 +22,16 @@ describe('TeleprompterSetting 默认设置', () => {
     expect(screen.getByText('默认字号')).toBeInTheDocument();
     expect(screen.getByText('默认行距')).toBeInTheDocument();
     expect(screen.getByText('默认基准线')).toBeInTheDocument();
+    expect(screen.getByText('默认基准线位置')).toBeInTheDocument();
     expect(screen.getByText('默认基准线颜色')).toBeInTheDocument();
     expect(screen.getByText('默认倒计时')).toBeInTheDocument();
 
-    expect(handles()).toHaveLength(3);
+    expect(handles()).toHaveLength(4);
     expect(screen.getByText(`${DEFAULT_OPTIONS.speed} px/s`)).toBeInTheDocument();
     expect(screen.getByText(`${DEFAULT_OPTIONS.fontSize} px`)).toBeInTheDocument();
     expect(screen.getByText(`${DEFAULT_OPTIONS.lineHeight.toFixed(1)} x`)).toBeInTheDocument();
+    // 基准线位置默认 42%
+    expect(screen.getByText(`${Math.round(DEFAULT_OPTIONS.guideRatio * 100)}%`)).toBeInTheDocument();
 
     const sw = switches();
     expect(sw).toHaveLength(3);
@@ -73,6 +76,10 @@ describe('TeleprompterSetting 默认设置', () => {
     // 1.8 → 1.9 (行距保留一位小数)
     expect(getDefaultOptions().lineHeight).toBe(1.9);
 
+    // 基准线位置: 42% → 43%
+    fireEvent.keyDown(handles()[3], { key: 'ArrowUp', keyCode: 38, which: 38 });
+    expect(getDefaultOptions().guideRatio).toBe(0.43);
+
     // 关掉三个开关: 其余已存字段保持不变
     fireEvent.click(switches()[0]);
     fireEvent.click(switches()[1]);
@@ -85,6 +92,7 @@ describe('TeleprompterSetting 默认设置', () => {
       focus: false,
       guide: false,
       guideColor: GUIDE_COLOR_DEFAULT,
+      guideRatio: 0.43,
       countdown: COUNTDOWN_DEFAULT,
     });
     expect(JSON.parse(localStorage.getItem(DEFAULTS_STORAGE_KEY) as string).fade).toBe(false);
@@ -104,8 +112,9 @@ describe('TeleprompterSetting 默认设置', () => {
     expect(sw[0]).not.toBeChecked();
     expect(sw[1]).not.toBeChecked();
     expect(sw[2]).not.toBeChecked();
-    // 关掉基准线时取色器置灰, 颜色回显为已存值
+    // 关掉基准线时取色器置灰, 颜色回显为已存值; 位置非法 (未存) 时回退默认 42%
     expect(picker()).toHaveClass('ant-color-picker-trigger-disabled');
+    expect(screen.getByText(`${Math.round(DEFAULT_OPTIONS.guideRatio * 100)}%`)).toBeInTheDocument();
   });
 
   test('改基准线颜色立即写入默认设置 (十六进制输入)', () => {
@@ -125,6 +134,21 @@ describe('TeleprompterSetting 默认设置', () => {
     // 关掉基准线开关同样立刻落盘
     fireEvent.click(switches()[2]);
     expect(getDefaultOptions().guide).toBe(false);
+  });
+
+  test('基准线位置滑到边界会夹取到 15% ~ 85%', () => {
+    localStorage.setItem(DEFAULTS_STORAGE_KEY, JSON.stringify({ guideRatio: 0.99 }));
+    render(<TeleprompterSetting />);
+
+    // 存储里的越界值先被规整到上限 85%
+    expect(getDefaultOptions().guideRatio).toBe(0.85);
+    expect(screen.getByText('85%')).toBeInTheDocument();
+
+    const arrowDown = { key: 'ArrowDown', keyCode: 40, which: 40 };
+    fireEvent.keyDown(handles()[3], arrowDown);
+    expect(getDefaultOptions().guideRatio).toBe(0.84);
+    // 滑块提示气泡与读数都会回显 84%
+    expect(screen.getAllByText('84%').length).toBeGreaterThan(0);
   });
 
   test('已保存内容损坏时回显内置默认值 (不抛异常)', () => {

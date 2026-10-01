@@ -152,6 +152,19 @@ const switchOf = (label: string): HTMLButtonElement => {
 };
 /** 阅读基准线 (开关打开且脚本非空时渲染) */
 const guideEl = (): HTMLElement | null => document.querySelector('.tp-guide');
+/** 基准线的拖动热区 (上下拖动调位置) */
+const guideHit = (): HTMLElement => document.querySelector('.tp-guide-hit') as HTMLElement;
+/** 拖动中显示的百分比气泡 */
+const guideTip = (): HTMLElement | null => document.querySelector('.tp-guide-tip');
+/** 基准线位置滑块的标签 (与其他 Space 项区分) */
+const guideSlider = (): HTMLElement => handleOf('基准线位置');
+/** 在热区上按下指针 (jsdom 无 PointerEvent, 用带 clientY 的鼠标事件充当) */
+const pointerDownAt = (clientY: number) => {
+  fireEvent(guideHit(), new MouseEvent('pointerdown', { bubbles: true, cancelable: true, clientY }));
+};
+const pointerMoveTo = (clientY: number) => {
+  fireEvent(document, new MouseEvent('pointermove', { bubbles: true, clientY }));
+};
 /** 基准线开关 (标签为「基准线」的那一组) */
 const guideSwitch = (): HTMLButtonElement => switchOf('基准线');
 /** 基准线取色器触发器 */
@@ -343,7 +356,7 @@ describe('Teleprompter 设置', () => {
 
     expect(JSON.parse(localStorage.getItem(DEFAULTS_STORAGE_KEY) as string)).toEqual({
       speed: 65, fontSize: 40, lineHeight: 1.8, fade: false, focus: true,
-      guide: true, guideColor: '#1677ff', countdown: 3,
+      guide: true, guideColor: '#1677ff', guideRatio: READ_RATIO, countdown: 3,
     });
     await waitFor(() => expect(document.querySelector('.ant-message')?.textContent).toContain('已保存为默认设置'));
     // 与默认值一致后按钮重新置灰
@@ -402,6 +415,55 @@ describe('Teleprompter 设置', () => {
     // 清空脚本后舞台没有内容可读, 基准线一并隐藏
     fireEvent.click(btn('清空'));
     expect(guideEl()).toBeNull();
+    expect(document.querySelector('.tp-guide-hit')).toBeNull();
+  });
+
+  test('基准线上下调整: 滑块 / Shift+↑↓ / 舞台上直接拖动, 并与逐行阅读线联动', () => {
+    render(<Teleprompter />);
+    expect(guideEl()?.style.top).toBe(`${READ_Y}px`);
+
+    // Shift + ↑↓: 每次 2% (向上=更靠上, 视线提前看到后面的行)
+    fireEvent.keyDown(document, { key: 'ArrowUp', shiftKey: true });
+    expect(screen.getByText('40%')).toBeInTheDocument();
+    expect(guideEl()?.style.top).toBe(`${VIEW_H * 0.4}px`);
+    // 不影响调速
+    expect(screen.getByText('60 px/s')).toBeInTheDocument();
+    fireEvent.keyDown(document, { key: 'ArrowDown', shiftKey: true });
+    expect(guideEl()?.style.top).toBe(`${READ_Y}px`);
+
+    // 舞台上按住这条线上下拖: 鼠标 Y 直接换算成比例 (jsdom 视口顶部为 0)
+    pointerDownAt(VIEW_H * 0.7);
+    expect(guideTip()?.textContent).toBe('70%');
+    expect(guideEl()?.style.top).toBe(`${VIEW_H * 0.7}px`);
+    pointerMoveTo(VIEW_H * 0.2);
+    expect(guideEl()?.style.top).toBe(`${VIEW_H * 0.2}px`);
+    // 拖出舞台就夹在 15% ~ 85% 之间
+    pointerMoveTo(-50);
+    expect(guideEl()?.style.top).toBe(`${VIEW_H * 0.15}px`);
+    pointerMoveTo(VIEW_H + 50);
+    expect(guideEl()?.style.top).toBe(`${VIEW_H * 0.85}px`);
+    fireEvent(document, new MouseEvent('pointerup', { bubbles: true }));
+    expect(guideTip()).toBeNull();
+
+    // 位置滑块与拖动 / 快捷键共用同一个参数
+    fireEvent.keyDown(guideSlider(), { key: 'ArrowDown', keyCode: 40, which: 40 });
+    expect(guideEl()?.style.top).toBe(`${VIEW_H * 0.84}px`);
+    // 滑块回显 84% (滑块提示气泡与读数各一份, 用 getAllByText)
+    expect(screen.getAllByText('84%').length).toBeGreaterThan(0);
+
+    // 与「逐行高亮」的阅读线联动: 同一个滚动位置, 线往下移后高亮的行跟着前移
+    pointerDownAt(READ_Y); // 拖回默认位置 (42%)
+    fireEvent(document, new MouseEvent('pointerup', { bubbles: true }));
+    expect(guideEl()?.style.top).toBe(`${READ_Y}px`);
+    fireEvent.click(btn('开始'));
+    finishCountdown();
+    advanceFrames(14); // 滚过约一行 (156px)
+    expect(activeEls()[0]).toBe(lineEls()[1]);
+
+    pointerDownAt(VIEW_H * 0.85);
+    fireEvent(document, new MouseEvent('pointerup', { bubbles: true }));
+    expect(guideEl()?.style.top).toBe(`${VIEW_H * 0.85}px`);
+    expect(activeEls()[0]).toBe(lineEls()[3]); // 阅读线下降 → 高亮行跟进
   });
 
   test('逐行高亮: 当前行随滚动下移, 越远越淡; 关闭后所有行同样清晰', () => {

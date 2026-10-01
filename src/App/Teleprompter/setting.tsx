@@ -5,11 +5,11 @@ import { row as _r, rowT } from '../Setting/rows-lang';
 import { uT } from './lang';
 import {
   COUNTDOWN_OPTIONS, FONT_SIZE_DEFAULT, FONT_SIZE_MAX, FONT_SIZE_MIN,
-  GUIDE_COLOR_DEFAULT,
+  GUIDE_COLOR_DEFAULT, GUIDE_RATIO_DEFAULT, GUIDE_RATIO_MAX, GUIDE_RATIO_MIN, GUIDE_RATIO_STEP,
   LINE_HEIGHT_DEFAULT, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN,
   SPEED_DEFAULT, SPEED_MAX, SPEED_MIN, SPEED_STEP,
 } from './data';
-import { clampCountdown, normalizeGuideColor } from './lib';
+import { clampCountdown, clampGuideRatio, normalizeGuideColor } from './lib';
 import { getDefaultOptions, patchDefaultOptions, type PrompterOptions } from './lib';
 
 /** 提词器默认设置 (挂载到 设置 → 其它) */
@@ -97,6 +97,26 @@ export const TeleprompterSetting: React.FC = () => {
           unCheckedChildren={ st('关闭') }
           onChange={ (v: boolean) => change({ guide: v }) }
         />
+      </Form.Item>
+      <Form.Item
+        label={ st('默认基准线位置') }
+        extra={ rowT(locale, '阅读基准线的垂直位置 (占舞台高度的比例), 范围 ${min} - ${max}, 默认 ${d}; 工具页里也可直接在舞台上上下拖这条线调整', {
+          min: `${Math.round(GUIDE_RATIO_MIN * 100)}%`,
+          max: `${Math.round(GUIDE_RATIO_MAX * 100)}%`,
+          d: `${Math.round(GUIDE_RATIO_DEFAULT * 100)}%`,
+        }) }
+      >
+        <Slider
+          min={ GUIDE_RATIO_MIN }
+          max={ GUIDE_RATIO_MAX }
+          step={ GUIDE_RATIO_STEP }
+          value={ opts.guideRatio }
+          disabled={ !opts.guide }
+          onChange={ (v: number) => change({ guideRatio: clampGuideRatio(v) }) }
+          style={ { width: 260 } }
+          tooltip={ { formatter: (v?: number) => `${Math.round((v ?? 0) * 100)}%` } }
+        />
+        <Typography.Text type="secondary" style={ { marginLeft: 8, fontSize: 12 } }>{ `${Math.round(opts.guideRatio * 100)}%` }</Typography.Text>
       </Form.Item>
       <Form.Item
         label={ st('默认基准线颜色') }

@@ -6,7 +6,7 @@ import {
   DEFAULTS_STORAGE_KEY,
   FADE_DEFAULT, FOCUS_DECAY, FOCUS_DEFAULT, FOCUS_MIN_OPACITY,
   FONT_SIZE_DEFAULT, FONT_SIZE_MAX, FONT_SIZE_MIN,
-  GUIDE_COLOR_DEFAULT, GUIDE_DEFAULT,
+  GUIDE_COLOR_DEFAULT, GUIDE_DEFAULT, GUIDE_RATIO_DEFAULT, GUIDE_RATIO_MAX, GUIDE_RATIO_MIN,
   LINE_HEIGHT_DEFAULT, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN,
   PAD_RATIO, SAMPLE_SCRIPTS, SPEED_DEFAULT, SPEED_MAX, SPEED_MIN,
 } from './data';
@@ -27,6 +27,8 @@ export interface PrompterOptions {
   guide: boolean;
   /** 阅读基准线颜色 (#RRGGBB) */
   guideColor: string;
+  /** 阅读基准线垂直位置: 占视口高度的比例 (0.15 ~ 0.85), 也可直接在舞台上拖动这条线调整 */
+  guideRatio: number;
   /** 开始前倒计时 (秒), 0 = 关闭: 从开头点「开始」时先倒数再滚动 */
   countdown: number;
 }
@@ -40,6 +42,7 @@ export const DEFAULT_OPTIONS: PrompterOptions = {
   focus: FOCUS_DEFAULT,
   guide: GUIDE_DEFAULT,
   guideColor: GUIDE_COLOR_DEFAULT,
+  guideRatio: GUIDE_RATIO_DEFAULT,
   countdown: COUNTDOWN_DEFAULT,
 };
 
@@ -88,6 +91,26 @@ const normalizeHex = (v: unknown, fallback: string): string =>
 /** 阅读基准线颜色: 只接受 #RRGGBB, 非法值回退默认蓝 */
 export const normalizeGuideColor = (v: unknown): string => normalizeHex(v, GUIDE_COLOR_DEFAULT);
 
+/** 基准线垂直位置 (占视口高度的比例, 保留两位小数), 非法值回退默认 */
+export const clampGuideRatio = (v: unknown): number => {
+  const n = toNum(v);
+  if (Number.isNaN(n)) return GUIDE_RATIO_DEFAULT;
+  const clamped = Math.min(GUIDE_RATIO_MAX, Math.max(GUIDE_RATIO_MIN, n));
+  return Math.round(clamped * 100) / 100;
+};
+
+/**
+ * 舞台上拖动基准线: 把鼠标的 clientY 换算成基准线比例
+ * rectTop / height 为舞台可视区 (tp-view) 的顶部坐标与高度; 高度为 0 (未测量) 时维持默认
+ */
+export const guideRatioAt = (clientY: number, rectTop: number, height: number): number => {
+  const h = toNum(height);
+  const y = toNum(clientY);
+  const top = toNum(rectTop);
+  if (!Number.isFinite(h) || h <= 0 || !Number.isFinite(y) || !Number.isFinite(top)) return GUIDE_RATIO_DEFAULT;
+  return clampGuideRatio((y - top) / h);
+};
+
 /** 把任意来源 (JSON / 旧版本存储值) 规整成合法选项: 缺字段与非法值都回退默认 */
 export const normalizeOptions = (raw: unknown): PrompterOptions => {
   const src = (raw && typeof raw === 'object' ? raw : {}) as Partial<Record<keyof PrompterOptions, unknown>>;
@@ -99,6 +122,7 @@ export const normalizeOptions = (raw: unknown): PrompterOptions => {
     focus: typeof src.focus === 'boolean' ? src.focus : FOCUS_DEFAULT,
     guide: typeof src.guide === 'boolean' ? src.guide : GUIDE_DEFAULT,
     guideColor: normalizeGuideColor(src.guideColor),
+    guideRatio: clampGuideRatio(src.guideRatio),
     countdown: clampCountdown(src.countdown),
   };
 };

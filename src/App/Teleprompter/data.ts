@@ -30,14 +30,22 @@ export const FADE_DEFAULT = true;
 /** 逐行焦点高亮 (高亮当前阅读行并按阅读进度逐字点亮, 越远越淡) 默认开启 */
 export const FOCUS_DEFAULT = true;
 
-/** 阅读基准线: 视线停留位置占视口高度的比例 (略高于正中, 给下方留出预告行) */
+/** 阅读基准线: 阅读线位置占视口高度的默认比例 (略高于正中, 给下方留出预告行) */
 export const READ_RATIO = 0.42;
+
+/** 阅读基准线位置可调范围 (占视口高度的比例): 0.15 = 靠上给下方留出更多预告行, 0.85 = 靠下 */
+export const GUIDE_RATIO_MIN = 0.15;
+export const GUIDE_RATIO_MAX = 0.85;
+/** 拖动 / 滑块的步进 (1%) */
+export const GUIDE_RATIO_STEP = 0.01;
+/** 基准线垂直位置默认值 (= 原来的固定阅读线位置) */
+export const GUIDE_RATIO_DEFAULT = READ_RATIO;
 
 /** 非当前行的最低可见度 / 每远离一行衰减到的比例 (越小衰减越快) */
 export const FOCUS_MIN_OPACITY = 0.12;
 export const FOCUS_DECAY = 0.62;
 
-/** 阅读基准线: 播放时在阅读线位置压一条横线, 方便对准视线 (默认开启, 颜色可自定义) */
+/** 阅读基准线: 播放时在阅读线位置压一条横线, 方便对准视线 (默认开启, 颜色与上下位置可调) */
 export const GUIDE_DEFAULT = true;
 export const GUIDE_COLOR_DEFAULT = '#1677ff';
 
