@@ -71,6 +71,7 @@ const uilangRows: Record<string, [string, string]> = {
   '自定义音频': ['自訂音訊', 'Custom audio'],
   ' 番茄时钟说明 ': [' 番茄鐘說明 ', ' About the pomodoro timer '],
   '提示音重复播放次数 (1-5)': ['提示音重複播放次數 (1-5)', 'How many times the alert sound repeats (1-5)'],
+  '空格/回车 开始·暂停 · Esc 退出全屏': ['空白鍵/Enter 開始·暫停 · Esc 退出全屏', 'Space / Enter start·pause · Esc exit fullscreen'],
 };
 
 export const u = (locale: string, zh: string): string => {

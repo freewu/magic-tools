@@ -1,14 +1,15 @@
-import { Divider, Form, Segmented, Slider, Switch, Typography } from 'antd';
+import { ColorPicker, Divider, Form, Segmented, Slider, Switch, Typography } from 'antd';
 import { useState } from 'react';
 import { useLocale } from '../../hook/locale-context';
 import { row as _r, rowT } from '../Setting/rows-lang';
 import { uT } from './lang';
 import {
   COUNTDOWN_OPTIONS, FONT_SIZE_DEFAULT, FONT_SIZE_MAX, FONT_SIZE_MIN,
+  GUIDE_COLOR_DEFAULT,
   LINE_HEIGHT_DEFAULT, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN,
   SPEED_DEFAULT, SPEED_MAX, SPEED_MIN, SPEED_STEP,
 } from './data';
-import { clampCountdown } from './lib';
+import { clampCountdown, normalizeGuideColor } from './lib';
 import { getDefaultOptions, patchDefaultOptions, type PrompterOptions } from './lib';
 
 /** 提词器默认设置 (挂载到 设置 → 其它) */
@@ -84,6 +85,28 @@ export const TeleprompterSetting: React.FC = () => {
           checkedChildren={ st('开启') }
           unCheckedChildren={ st('关闭') }
           onChange={ (v: boolean) => change({ focus: v }) }
+        />
+      </Form.Item>
+      <Form.Item
+        label={ st('默认基准线') }
+        extra={ rowT(locale, '打开「提词器」时是否默认显示阅读基准线 (在阅读线位置画一条横线, 方便对准视线)') }
+      >
+        <Switch
+          checked={ opts.guide }
+          checkedChildren={ st('开启') }
+          unCheckedChildren={ st('关闭') }
+          onChange={ (v: boolean) => change({ guide: v }) }
+        />
+      </Form.Item>
+      <Form.Item
+        label={ st('默认基准线颜色') }
+        extra={ rowT(locale, '阅读基准线的颜色, 默认 ${d} (只在「默认基准线」开启时显示)', { d: GUIDE_COLOR_DEFAULT }) }
+      >
+        <ColorPicker
+          value={ opts.guideColor }
+          disabled={ !opts.guide }
+          onChange={ (v) => change({ guideColor: normalizeGuideColor(v.toHexString()) }) }
+          showText
         />
       </Form.Item>
       <Form.Item

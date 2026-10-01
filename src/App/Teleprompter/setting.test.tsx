@@ -1,24 +1,28 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { TeleprompterSetting } from './setting';
-import { COUNTDOWN_DEFAULT, DEFAULTS_STORAGE_KEY } from './data';
+import { COUNTDOWN_DEFAULT, DEFAULTS_STORAGE_KEY, GUIDE_COLOR_DEFAULT } from './data';
 import { DEFAULT_OPTIONS, getDefaultOptions } from './lib';
 
 /** 面板里的滑块手柄 (速度 / 字号 / 行距 三个) */
 const handles = () => Array.from(document.querySelectorAll('.ant-slider-handle')) as HTMLElement[];
-/** 面板里的开关 (淡入淡出 / 逐行高亮 两个) */
+/** 面板里的开关 (淡入淡出 / 逐行高亮 / 基准线 三个) */
 const switches = () => screen.getAllByRole('switch') as HTMLButtonElement[];
+/** 面板里唯一的取色器 (基准线颜色) */
+const picker = () => document.querySelector('.ant-color-picker-trigger') as HTMLElement;
 
 describe('TeleprompterSetting 默认设置', () => {
   beforeEach(() => localStorage.clear());
 
-  test('渲染 3 个滑块 + 2 个开关 + 倒计时分段, 初始值即内置默认值', () => {
+  test('渲染 3 个滑块 + 3 个开关 + 基准线取色器 + 倒计时分段, 初始值即内置默认值', () => {
     render(<TeleprompterSetting />);
 
     expect(screen.getByText('提词器')).toBeInTheDocument();
     expect(screen.getByText('默认滚动速度')).toBeInTheDocument();
     expect(screen.getByText('默认字号')).toBeInTheDocument();
     expect(screen.getByText('默认行距')).toBeInTheDocument();
+    expect(screen.getByText('默认基准线')).toBeInTheDocument();
+    expect(screen.getByText('默认基准线颜色')).toBeInTheDocument();
     expect(screen.getByText('默认倒计时')).toBeInTheDocument();
 
     expect(handles()).toHaveLength(3);
@@ -27,10 +31,13 @@ describe('TeleprompterSetting 默认设置', () => {
     expect(screen.getByText(`${DEFAULT_OPTIONS.lineHeight.toFixed(1)} x`)).toBeInTheDocument();
 
     const sw = switches();
-    expect(sw).toHaveLength(2);
-    // 淡入淡出与逐行高亮都默认开启
+    expect(sw).toHaveLength(3);
+    // 淡入淡出 / 逐行高亮 / 基准线都默认开启
     expect(sw[0]).toBeChecked();
     expect(sw[1]).toBeChecked();
+    expect(sw[2]).toBeChecked();
+    // 基准线颜色默认蓝
+    expect(picker()).toBeInTheDocument();
     // 倒计时默认档位: 3 秒被选中
     const selected = document.querySelector('.ant-segmented-item-selected');
     expect(selected?.textContent?.replace(/\s+/g, '')).toBe(`${COUNTDOWN_DEFAULT}秒`);
@@ -66,15 +73,18 @@ describe('TeleprompterSetting 默认设置', () => {
     // 1.8 → 1.9 (行距保留一位小数)
     expect(getDefaultOptions().lineHeight).toBe(1.9);
 
-    // 关掉两个开关: 其余已存字段保持不变
+    // 关掉三个开关: 其余已存字段保持不变
     fireEvent.click(switches()[0]);
     fireEvent.click(switches()[1]);
+    fireEvent.click(switches()[2]);
     expect(getDefaultOptions()).toEqual({
       speed: DEFAULT_OPTIONS.speed + 5,
       fontSize: DEFAULT_OPTIONS.fontSize + 1,
       lineHeight: 1.9,
       fade: false,
       focus: false,
+      guide: false,
+      guideColor: GUIDE_COLOR_DEFAULT,
       countdown: COUNTDOWN_DEFAULT,
     });
     expect(JSON.parse(localStorage.getItem(DEFAULTS_STORAGE_KEY) as string).fade).toBe(false);
@@ -83,6 +93,7 @@ describe('TeleprompterSetting 默认设置', () => {
   test('已保存的默认设置会回显 (与工具页「保存为默认设置」共用同一份)', () => {
     localStorage.setItem(DEFAULTS_STORAGE_KEY, JSON.stringify({
       speed: 150, fontSize: 64, lineHeight: 2.4, fade: false, focus: false,
+      guide: false, guideColor: '#123456',
     }));
     render(<TeleprompterSetting />);
 
@@ -92,6 +103,28 @@ describe('TeleprompterSetting 默认设置', () => {
     const sw = switches();
     expect(sw[0]).not.toBeChecked();
     expect(sw[1]).not.toBeChecked();
+    expect(sw[2]).not.toBeChecked();
+    // 关掉基准线时取色器置灰, 颜色回显为已存值
+    expect(picker()).toHaveClass('ant-color-picker-trigger-disabled');
+  });
+
+  test('改基准线颜色立即写入默认设置 (十六进制输入)', () => {
+    render(<TeleprompterSetting />);
+
+    expect(getDefaultOptions().guideColor).toBe(GUIDE_COLOR_DEFAULT);
+    fireEvent.click(picker());
+    const wrap = document.querySelector('.ant-color-picker-hex-input');
+    const input = (wrap?.tagName === 'INPUT' ? wrap : wrap?.querySelector('input')) as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'abcdef' } });
+
+    expect(getDefaultOptions().guideColor).toBe('#abcdef');
+    expect(JSON.parse(localStorage.getItem(DEFAULTS_STORAGE_KEY) as string).guideColor).toBe('#abcdef');
+    // 其余字段不受影响
+    expect(getDefaultOptions().guide).toBe(true);
+
+    // 关掉基准线开关同样立刻落盘
+    fireEvent.click(switches()[2]);
+    expect(getDefaultOptions().guide).toBe(false);
   });
 
   test('已保存内容损坏时回显内置默认值 (不抛异常)', () => {

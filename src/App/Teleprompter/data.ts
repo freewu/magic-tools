@@ -37,6 +37,10 @@ export const READ_RATIO = 0.42;
 export const FOCUS_MIN_OPACITY = 0.12;
 export const FOCUS_DECAY = 0.62;
 
+/** 阅读基准线: 播放时在阅读线位置压一条横线, 方便对准视线 (默认开启, 颜色可自定义) */
+export const GUIDE_DEFAULT = true;
+export const GUIDE_COLOR_DEFAULT = '#1677ff';
+
 /** 滚动区域配色 (提词器惯例: 深底浅字, 长时间观看不刺眼) */
 export const STAGE_BG = '#101114';
 export const STAGE_FG = '#f2f3f5';

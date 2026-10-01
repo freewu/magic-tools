@@ -387,6 +387,16 @@ const ROWS: Record<string, Row> = {
     '開啟「提詞器」時是否預設開啟逐行高亮 (高亮目前閱讀行並依進度由左至右逐字點亮, 離它越遠的行越透明、顏色越淡)',
     'Whether line focus is on by default when opening the teleprompter (the line at the reading point is lit word by word from left to right, and the rest get more transparent the further away they are)',
   ],
+  '默认基准线': ['預設基準線', 'Guide line by default'],
+  '默认基准线颜色': ['預設基準線顏色', 'Default guide line colour'],
+  '打开「提词器」时是否默认显示阅读基准线 (在阅读线位置画一条横线, 方便对准视线)': [
+    '開啟「提詞器」時是否預設顯示閱讀基準線 (在閱讀線位置畫一條橫線, 方便對準視線)',
+    'Whether the reading guide line is shown by default when opening the teleprompter (a horizontal line at the reading point that helps you aim your eyes)',
+  ],
+  '阅读基准线的颜色, 默认 ${d} (只在「默认基准线」开启时显示)': [
+    '閱讀基準線的顏色, 預設 ${d} (只在「預設基準線」開啟時顯示)',
+    'Colour of the reading guide line, ${d} by default (only shown while “Guide line by default” is on)',
+  ],
   '默认倒计时': ['預設倒計時', 'Default countdown'],
   '打开「提词器」后点「开始」时, 从开头播放前先倒数的秒数 (0 = 关闭)': [
     '開啟「提詞器」後點「開始」時, 從開頭播放前先倒數的秒數 (0 = 關閉)',

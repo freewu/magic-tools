@@ -1,13 +1,13 @@
 import {
   DEFAULT_OPTIONS, advance, clampCountdown, clampFontSize, clampLineHeight, clampSpeed,
   focusOpacity, formatClock, getDefaultOptions, isSameOptions, isSliderTarget, isToggleKey,
-  isTypingTarget, lineCentersOf, lineStepOf, lineUnits, nextSampleScript, normalizeOptions,
-  patchDefaultOptions, pickSampleScript, progressOf, remainingSeconds, sampleScriptsOf,
+  isTypingTarget, lineCentersOf, lineStepOf, lineUnits, nextSampleScript, normalizeGuideColor,
+  normalizeOptions, patchDefaultOptions, pickSampleScript, progressOf, remainingSeconds, sampleScriptsOf,
   scrollDistance, setDefaultOptions, splitLineAt, splitScript, sweepOf,
 } from './lib';
 import {
   COUNTDOWN_DEFAULT, DEFAULTS_STORAGE_KEY, FADE_DEFAULT, FOCUS_DEFAULT, FOCUS_MIN_OPACITY, FONT_SIZE_DEFAULT,
-  FONT_SIZE_MAX, FONT_SIZE_MIN, LINE_HEIGHT_DEFAULT, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN,
+  FONT_SIZE_MAX, FONT_SIZE_MIN, GUIDE_COLOR_DEFAULT, GUIDE_DEFAULT, LINE_HEIGHT_DEFAULT, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN,
   PAD_RATIO, SAMPLE_SCRIPTS, SPEED_DEFAULT, SPEED_MAX, SPEED_MIN,
 } from './data';
 
@@ -49,20 +49,39 @@ describe('选项校验', () => {
     expect(clampCountdown(undefined)).toBe(COUNTDOWN_DEFAULT);
   });
 
+  test('基准线颜色只接受 #RRGGBB, 非法值回退默认蓝', () => {
+    expect(normalizeGuideColor('#123abc')).toBe('#123abc');
+    expect(normalizeGuideColor('  #ABCDEF  ')).toBe('#abcdef');
+    expect(normalizeGuideColor('#12345')).toBe(GUIDE_COLOR_DEFAULT);
+    expect(normalizeGuideColor('#12345g')).toBe(GUIDE_COLOR_DEFAULT);
+    expect(normalizeGuideColor('red')).toBe(GUIDE_COLOR_DEFAULT);
+    expect(normalizeGuideColor('rgba(1,2,3,0.5)')).toBe(GUIDE_COLOR_DEFAULT);
+    expect(normalizeGuideColor(undefined)).toBe(GUIDE_COLOR_DEFAULT);
+    expect(normalizeGuideColor(123)).toBe(GUIDE_COLOR_DEFAULT);
+  });
+
   test('normalizeOptions: 缺字段 / 类型错误 / 非对象都回退默认', () => {
     expect(normalizeOptions(null)).toEqual(DEFAULT_OPTIONS);
     expect(normalizeOptions('nope')).toEqual(DEFAULT_OPTIONS);
     expect(normalizeOptions({ fade: 'yes' })).toEqual(DEFAULT_OPTIONS);
     expect(normalizeOptions({ speed: 120, fade: false })).toEqual({
       speed: 120, fontSize: FONT_SIZE_DEFAULT, lineHeight: LINE_HEIGHT_DEFAULT,
-      fade: false, focus: FOCUS_DEFAULT, countdown: COUNTDOWN_DEFAULT,
+      fade: false, focus: FOCUS_DEFAULT, guide: GUIDE_DEFAULT, guideColor: GUIDE_COLOR_DEFAULT,
+      countdown: COUNTDOWN_DEFAULT,
     });
     expect(normalizeOptions({ focus: 'on' }).focus).toBe(FOCUS_DEFAULT);
     expect(normalizeOptions({ focus: false }).focus).toBe(false);
+    expect(normalizeOptions({ guide: 'on' }).guide).toBe(GUIDE_DEFAULT);
+    expect(normalizeOptions({ guide: false }).guide).toBe(false);
+    // 旧版本存储里没有颜色字段 / 颜色非法 → 回退默认蓝
+    expect(normalizeOptions({ guideColor: 'blue' }).guideColor).toBe(GUIDE_COLOR_DEFAULT);
+    expect(normalizeOptions({ guideColor: '#334455' }).guideColor).toBe('#334455');
     expect(normalizeOptions({ countdown: 99 }).countdown).toBe(COUNTDOWN_DEFAULT + 27); // 夹到最近档位 30
     expect(normalizeOptions({ countdown: 4 }).countdown).toBe(3); // 与 3 / 5 等距取更小档位
     expect(DEFAULT_OPTIONS.fade).toBe(FADE_DEFAULT);
     expect(DEFAULT_OPTIONS.focus).toBe(FOCUS_DEFAULT);
+    expect(DEFAULT_OPTIONS.guide).toBe(GUIDE_DEFAULT);
+    expect(DEFAULT_OPTIONS.guideColor).toBe(GUIDE_COLOR_DEFAULT);
     expect(DEFAULT_OPTIONS.speed).toBe(SPEED_DEFAULT);
     expect(DEFAULT_OPTIONS.countdown).toBe(COUNTDOWN_DEFAULT);
   });
@@ -75,19 +94,27 @@ describe('默认设置', () => {
   });
 
   test('写入后可读回 (非法规整后再存), 返回落盘内容', () => {
-    const saved = setDefaultOptions({ speed: 999, fontSize: 52, lineHeight: 2.04, fade: false, focus: false, countdown: COUNTDOWN_DEFAULT });
+    const saved = setDefaultOptions({
+      speed: 999, fontSize: 52, lineHeight: 2.04, fade: false, focus: false,
+      guide: false, guideColor: '#123ABC', countdown: COUNTDOWN_DEFAULT,
+    });
     expect(saved).toEqual({
-      speed: SPEED_MAX, fontSize: 52, lineHeight: 2, fade: false, focus: false, countdown: COUNTDOWN_DEFAULT,
+      speed: SPEED_MAX, fontSize: 52, lineHeight: 2, fade: false, focus: false,
+      guide: false, guideColor: '#123abc', countdown: COUNTDOWN_DEFAULT,
     });
     expect(JSON.parse(localStorage.getItem(DEFAULTS_STORAGE_KEY) as string)).toEqual(saved);
     expect(getDefaultOptions()).toEqual(saved);
   });
 
   test('patchDefaultOptions 只改传入字段, 其余沿用已存值 (无存值时回退内置默认)', () => {
-    setDefaultOptions({ speed: 120, fontSize: 52, lineHeight: 2, fade: false, focus: false, countdown: COUNTDOWN_DEFAULT });
+    setDefaultOptions({
+      speed: 120, fontSize: 52, lineHeight: 2, fade: false, focus: false,
+      guide: true, guideColor: GUIDE_COLOR_DEFAULT, countdown: COUNTDOWN_DEFAULT,
+    });
     const after = patchDefaultOptions({ speed: 90 });
     expect(after).toEqual({
-      speed: 90, fontSize: 52, lineHeight: 2, fade: false, focus: false, countdown: COUNTDOWN_DEFAULT,
+      speed: 90, fontSize: 52, lineHeight: 2, fade: false, focus: false,
+      guide: GUIDE_DEFAULT, guideColor: GUIDE_COLOR_DEFAULT, countdown: COUNTDOWN_DEFAULT,
     });
     expect(getDefaultOptions()).toEqual(after);
 
@@ -103,8 +130,12 @@ describe('默认设置', () => {
     const keys = Object.keys(DEFAULT_OPTIONS) as (keyof typeof DEFAULT_OPTIONS)[];
     keys.forEach((k) => {
       const other: Record<string, unknown> = { ...DEFAULT_OPTIONS };
-      // 倒计时是离散档位: +1 会被夹回默认, 改用 +2 保证与默认不同
-      other[k] = typeof other[k] === 'boolean' ? !other[k] : Number(other[k]) + (k === 'countdown' ? 2 : 1);
+      // 倒计时是离散档位: +1 会被夹回默认, 改用 +2 保证与默认不同; 颜色是字符串, 换一个合法色值
+      other[k] = typeof other[k] === 'boolean'
+        ? !other[k]
+        : typeof other[k] === 'string'
+          ? '#123456'
+          : Number(other[k]) + (k === 'countdown' ? 2 : 1);
       expect(isSameOptions(DEFAULT_OPTIONS, other as unknown as typeof DEFAULT_OPTIONS)).toBe(false);
     });
   });
@@ -116,7 +147,8 @@ describe('默认设置', () => {
     localStorage.setItem(DEFAULTS_STORAGE_KEY, JSON.stringify({ speed: 1, fontSize: 9999, lineHeight: -3 }));
     expect(getDefaultOptions()).toEqual({
       speed: SPEED_MIN, fontSize: FONT_SIZE_MAX, lineHeight: LINE_HEIGHT_MIN,
-      fade: FADE_DEFAULT, focus: FOCUS_DEFAULT, countdown: COUNTDOWN_DEFAULT,
+      fade: FADE_DEFAULT, focus: FOCUS_DEFAULT,
+      guide: GUIDE_DEFAULT, guideColor: GUIDE_COLOR_DEFAULT, countdown: COUNTDOWN_DEFAULT,
     });
   });
 

@@ -5,6 +5,7 @@ import {
   normalizeBgMode, normalizeHex, normalizeImageUrl, normalizeOptions, normalizeSound,
   patchDefaultOptions, phaseSeconds, remainingOf, setDefaultOptions, shouldLongBreak,
   trySetDefaultOptions,
+  isToggleKey, isTypingTarget,
 } from './lib';
 
 const IMG = 'data:image/jpeg;base64,AAAA';
@@ -163,6 +164,20 @@ describe('番茄时钟 lib', () => {
     expect(phaseSeconds('focus', opts)).toBe(25 * 60);
     expect(phaseSeconds('short', opts)).toBe(5 * 60);
     expect(phaseSeconds('long', opts)).toBe(15 * 60);
+  });
+
+  test('isToggleKey 识别空格 / 回车; isTypingTarget 识别输入控件', () => {
+    expect(isToggleKey({ key: ' ' })).toBe(true);
+    expect(isToggleKey({ code: 'Space' })).toBe(true);
+    expect(isToggleKey({ key: 'Spacebar' })).toBe(true);
+    expect(isToggleKey({ key: 'Enter' })).toBe(true);
+    expect(isToggleKey({ key: 'Escape' })).toBe(false);
+    expect(isToggleKey(null)).toBe(false);
+    expect(isTypingTarget({ tagName: 'input' })).toBe(true);
+    expect(isTypingTarget({ tagName: 'TEXTAREA' })).toBe(true);
+    expect(isTypingTarget({ tagName: 'div', isContentEditable: true })).toBe(true);
+    expect(isTypingTarget({ tagName: 'button' })).toBe(false);
+    expect(isTypingTarget(null)).toBe(false);
   });
 
   test('阶段轮换与长休阈值', () => {

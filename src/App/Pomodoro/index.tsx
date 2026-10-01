@@ -13,8 +13,8 @@ import {
   BACKGROUND_PRESETS, PHASE_KEYS, SOUND_KEYS, SOUND_PATTERNS, TICK_MS, type PhaseKey, type SoundKey,
 } from './data';
 import {
-  formatClock, bgImageOf, getDefaultOptions, isSameOptions, normalizeOptions, remainingOf,
-  trySetDefaultOptions,
+  formatClock, bgImageOf, getDefaultOptions, isSameOptions, isToggleKey, isTypingTarget,
+  normalizeOptions, remainingOf, trySetDefaultOptions,
   type PomodoroOptions,
 } from './lib';
 import { prepareBackgroundImage, TOO_LARGE } from './bg';
@@ -308,6 +308,23 @@ const Pomodoro: React.FC = () => {
     setLeftSec(remainingOf(deadlineRef.current, Date.now()));
   }, []);
 
+  // 全屏模式下按 空格/回车 切换 开始·暂停 (输入框内的按键交给输入框处理)
+  const toggleRef = useRef<() => void>(() => undefined);
+  useEffect(() => { toggleRef.current = running ? pause : start; }, [ running, pause, start ]);
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!full || e.repeat) return;
+      if (!isToggleKey(e)) return;
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      if (isTypingTarget(e.target as HTMLElement | null)) return;
+      // 阻止空格滚动页面 / 触发已聚焦按钮的默认点击 (否则空格会误触「退出全屏」)
+      e.preventDefault();
+      toggleRef.current();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [ full ]);
+
   const reset = useCallback(() => {
     setRunning(false);
     deadlineRef.current = 0;
@@ -477,6 +494,11 @@ const Pomodoro: React.FC = () => {
                 </Button>
               ))}
             </Space>
+            { full && (
+              <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>
+                {t('空格/回车 开始·暂停 · Esc 退出全屏')}
+              </Text>
+            ) }
           </div>
           </div>
         </div>

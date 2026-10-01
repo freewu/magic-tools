@@ -254,5 +254,20 @@ export const nextPhaseOf = (current: PhaseKey): PhaseKey => {
 export const shouldLongBreak = (completedFocusInCycle: number, roundsBeforeLong: number): boolean =>
   completedFocusInCycle >= clampRounds(roundsBeforeLong);
 
+/** 是否为「开始 / 暂停」触发键: 空格 (主) 或回车 (大屏遥控器也方便) */
+export const isToggleKey = (e: { key?: string; code?: string } | null | undefined): boolean => {
+  if (!e) return false;
+  return e.key === ' ' || e.key === 'Spacebar' || e.code === 'Space' || e.key === 'Enter';
+};
+
+/** 键盘事件是否来自输入控件 (此时空格 / 回车归控件自己处理) */
+export const isTypingTarget = (
+  node: { tagName?: string; isContentEditable?: boolean } | null | undefined
+): boolean => {
+  if (!node) return false;
+  const tag = String(node.tagName ?? '').toUpperCase();
+  return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || node.isContentEditable === true;
+};
+
 // 供类型引用 (保持导入整洁)
 export type { PhaseKey, SoundKey };

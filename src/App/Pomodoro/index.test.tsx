@@ -479,9 +479,49 @@ describe('番茄时钟 全屏', () => {
     // 时钟字号放大
     expect((document.querySelector('.pt-clock-num') as HTMLElement).style.fontSize).toBe('140px');
     expect(screen.getByRole('button', { name: /退出全屏/ })).toBeInTheDocument();
+    expect(screen.getByText(/空格\/回车 开始·暂停/)).toBeInTheDocument();
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(document.querySelector('.pt-stage-full')).toBeNull();
     expect(fullBtn()).toBeInTheDocument();
+  });
+
+  test('全屏下空格/回车 开始·暂停, 非全屏不响应, Esc 退出全屏', () => {
+    render(<Pomodoro />);
+    const clock = () => document.querySelector('.pt-clock-num')?.textContent;
+    const runningTag = () => document.body.textContent ?? '';
+    // 非全屏: 空格/回车都不应开始
+    fireEvent.keyDown(document, { key: ' ' });
+    fireEvent.keyDown(document, { key: 'Enter' });
+    expect(runningTag()).toContain('已暂停');
+    expect(clock()).toBe('25:00');
+
+    fireEvent.click(fullBtn());
+    // 全屏: 空格开始
+    fireEvent.keyDown(document, { key: ' ' });
+    expect(runningTag()).toContain('进行中');
+    // 回车暂停
+    fireEvent.keyDown(document, { key: 'Enter' });
+    expect(runningTag()).toContain('已暂停');
+    // 再次回车恢复
+    fireEvent.keyDown(document, { key: 'Enter' });
+    expect(runningTag()).toContain('进行中');
+    // Esc 退出全屏 (仍不停止计时 → 此处只验证退出)
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(document.querySelector('.pt-stage-full')).toBeNull();
+    // 退出后空格不再切换暂停
+    fireEvent.keyDown(document, { key: ' ' });
+    expect(runningTag()).toContain('进行中');
+  });
+
+  test('全屏下带修饰键或输入框内按空格不切换', () => {
+    render(<Pomodoro />);
+    fireEvent.click(fullBtn());
+    fireEvent.keyDown(document, { key: ' ', ctrlKey: true });
+    fireEvent.keyDown(document, { key: ' ', shiftKey: true });
+    expect(document.body.textContent ?? '').toContain('已暂停');
+    const input = document.querySelector('input.ant-input-number-input') as HTMLInputElement;
+    fireEvent.keyDown(input, { key: ' ', bubbles: true });
+    expect(document.body.textContent ?? '').toContain('已暂停');
   });
 
   test('支持原生全屏时调用 Fullscreen API', () => {

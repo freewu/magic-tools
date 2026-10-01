@@ -1,12 +1,12 @@
 import { useLocale } from '../../hook/locale-context';
 
 const zh = `<h2>这个工具做什么</h2>
-<blockquote><p>把讲稿粘贴进来, 让文字按设定速度自动向上滚动 —— 直播、录课、发布会、口播视频对着念就行。全部在本地完成 (不联网、不上传), 支持<strong>速度调节</strong>、<strong>逐行焦点高亮</strong> (只高亮正在念的那一行, 并随阅读进度从左到右逐字点亮, 越远越淡)、<strong>上下边缘淡入淡出</strong>、<strong>开始倒计时</strong> (留出时间看向镜头, 倒数完自动开滚)、<strong>全屏播放</strong>与<strong>空格暂停/开始</strong>。</p></blockquote>
+<blockquote><p>把讲稿粘贴进来, 让文字按设定速度自动向上滚动 —— 直播、录课、发布会、口播视频对着念就行。全部在本地完成 (不联网、不上传), 支持<strong>速度调节</strong>、<strong>逐行焦点高亮</strong> (只高亮正在念的那一行, 并随阅读进度从左到右逐字点亮, 越远越淡)、<strong>上下边缘淡入淡出</strong>、<strong>开始倒计时</strong> (留出时间看向镜头, 倒数完自动开滚)、<strong>阅读基准线</strong> (视线所在的横线, 可开关并自定义颜色)、<strong>全屏播放</strong>与<strong>空格暂停/开始</strong>。</p></blockquote>
 
 <h2>使用步骤</h2>
 <ul>
 <li><p>把讲稿粘贴到「提词脚本」里 (打开时会按当前语言随机载入一首示范诗: 中文为《沁园春·长沙》《再别康桥》, 英文为 <em>Do not go gentle into that good night</em> / <em>When You Are Old</em>; 点「载入示例」可再随机换一首), 空行会当成段落间距保留</p></li>
-<li><p>按需要调「字号」「行距」「淡入淡出」与「逐行高亮」: 字号大适合站远一点看, 行距大更容易用手指跟读</p></li>
+<li><p>按需要调「字号」「行距」「淡入淡出」与「逐行高亮」: 字号大适合站远一点看, 行距大更容易用手指跟读; 视线盯不住时把「基准线」打开, 阅读线位置会压一条横线, 顺着它念不容易跑行</p></li>
 <li><p>点「全屏」进入全屏提词, 再按<strong>空格</strong>开始滚动; 默认会先<strong>倒计时 3 秒</strong> (可在页面上改 关闭 / 3 / 5 / 10 / 15 / 30 秒), 倒数期间看向镜头做好准备, 倒数完自动开始; 倒计时中再按一次空格 (或再点「开始」) 即可取消、立即开滚</p></li>
 <li><p>底部工具条上的「速度」可以边播边调, 右侧显示进度条与剩余时间; 「回到开头」可重新开始</p></li>
 <li><p>调好一套顺手的速度 / 字号 / 行距后, 点「保存为默认设置」即可存为默认值, 下次打开自动沿用; 也可以直接到 <strong>设置 → 其它 → 提词器</strong> 里预设</p></li>
@@ -23,18 +23,19 @@ const zh = `<h2>这个工具做什么</h2>
 <ul>
 <li><p>速度就是字面意义上的"每秒滚动多少像素", 所以改完字号后建议重新试一遍速度: 一般 40 ~ 80 px/s 比较接近日常语速</p></li>
 <li><p>「淡入淡出」让文字在上下边缘渐隐, 「逐行高亮」则只把视线所在的那一行点亮 (这一行会随滚动从左到右逐字点亮)、越远的行越透明颜色越淡, 两者叠加后视线几乎只能落在当前行; 关掉「逐行高亮」所有行会同样清晰, 适合快速通读</p></li>
+<li><p>「基准线」就是横在阅读线位置的那条线 (默认蓝色, 可用旁边的取色器改色, 也可关掉): 提词器上字是往上走的, 有了这条线就知道眼睛该盯哪里; 它的位置与「逐行高亮」的阅读线完全一致</p></li>
 <li><p>全屏时只保留底部工具条, 脚本编辑区会隐藏在背后, 退出全屏即可继续改稿; 速度 / 字号 / 行距 / 淡入淡出 / 逐行高亮 以「默认设置」为准, 想在本次会话里试参数不会影响下次打开</p></li>
 <li><p>只按逻辑行渲染, 不做自动换行排版限制: 一行太长时会在视口内自动折行, 想控制断句就自己在合适的位置换行</p></li>
 <li><p>建议用深色底配浅色字时把屏幕亮度调低一点, 长时间对着念眼睛更舒服</p></li>
 </ul>`;
 
 const tw = `<h2>這個工具做什麼</h2>
-<blockquote><p>把講稿貼進來, 讓文字按設定速度自動向上捲動 —— 直播、錄課、發表會、口播影片對著念就行。全部在本機完成 (不連網、不上傳), 支援<strong>速度調節</strong>、<strong>逐行焦點高亮</strong> (只高亮正在念的那一行, 並依閱讀進度由左至右逐字點亮, 越遠越淡)、<strong>上下邊緣淡入淡出</strong>、<strong>開始倒計時</strong> (留出時間看向鏡頭, 倒數完自動開滾)、<strong>全螢幕播放</strong>與<strong>空格暫停/開始</strong>。</p></blockquote>
+<blockquote><p>把講稿貼進來, 讓文字按設定速度自動向上捲動 —— 直播、錄課、發表會、口播影片對著念就行。全部在本機完成 (不連網、不上傳), 支援<strong>速度調節</strong>、<strong>逐行焦點高亮</strong> (只高亮正在念的那一行, 並依閱讀進度由左至右逐字點亮, 越遠越淡)、<strong>上下邊緣淡入淡出</strong>、<strong>開始倒計時</strong> (留出時間看向鏡頭, 倒數完自動開滾)、<strong>閱讀基準線</strong> (視線所在的橫線, 可開關並自訂顏色)、<strong>全螢幕播放</strong>與<strong>空格暫停/開始</strong>。</p></blockquote>
 
 <h2>使用步驟</h2>
 <ul>
 <li><p>把講稿貼到「提詞腳本」裡 (打開時會按目前語言隨機載入一首示範詩: 中文為《沁園春·長沙》《再別康橋》, 英文為 <em>Do not go gentle into that good night</em> / <em>When You Are Old</em>; 點「載入範例」可再隨機換一首), 空行會當成段落間距保留</p></li>
-<li><p>按需要調「字號」「行距」「淡入淡出」與「逐行高亮」: 字號大適合站遠一點看, 行距大更容易用手指跟讀</p></li>
+<li><p>按需要調「字號」「行距」「淡入淡出」與「逐行高亮」: 字號大適合站遠一點看, 行距大更容易用手指跟讀; 視線盯不住時把「基準線」打開, 閱讀線位置會壓一條橫線, 順著它念不容易跑行</p></li>
 <li><p>點「全屏」進入全螢幕提詞, 再按<strong>空格</strong>開始捲動; 預設會先<strong>倒計時 3 秒</strong> (可在頁面上改 關閉 / 3 / 5 / 10 / 15 / 30 秒), 倒數期間看向鏡頭做好準備, 倒數完自動開始; 倒計時中再按一次空白鍵 (或再點「開始」) 即可取消、立即開滾</p></li>
 <li><p>底部工具條上的「速度」可以邊播邊調, 右側顯示進度條與剩餘時間; 「回到開頭」可重新開始</p></li>
 <li><p>調好一套順手的速度 / 字號 / 行距後, 點「儲存為預設設定」即可存為預設值, 下次開啟自動沿用; 也可以直接到 <strong>設定 → 其他 → 提詞器</strong> 裡預設</p></li>
@@ -51,18 +52,19 @@ const tw = `<h2>這個工具做什麼</h2>
 <ul>
 <li><p>速度就是字面上的"每秒捲動多少像素", 所以改完字號後建議重新試一遍速度: 一般 40 ~ 80 px/s 比較接近日常語速</p></li>
 <li><p>「淡入淡出」讓文字在上下邊緣漸隱, 「逐行高亮」則只把視線所在的那一行點亮 (這一行會隨捲動由左至右逐字點亮)、越遠的行越透明顏色越淡, 兩者疊加後視線幾乎只能落在目前行; 關掉「逐行高亮」所有行會同樣清晰, 適合快速通讀</p></li>
+<li><p>「基準線」就是橫在閱讀線位置的那條線 (預設藍色, 可用旁邊的取色器改色, 也可關掉): 提詞器上字是往上走的, 有了這條線就知道眼睛該盯哪裡; 它的位置與「逐行高亮」的閱讀線完全一致</p></li>
 <li><p>全螢幕時只保留底部工具條, 腳本編輯區會隱藏在背後, 退出全螢幕即可繼續改稿; 速度 / 字號 / 行距 / 淡入淡出 / 逐行高亮 以「預設設定」為準, 想在本工作階段裡試參數不會影響下次開啟</p></li>
 <li><p>只按邏輯行渲染, 不做自動換行排版限制: 一行太長時會在視口內自動折行, 想控制斷句就自己在合適的位置換行</p></li>
 <li><p>建議用深色底配淺色字時把螢幕亮度調低一點, 長時間對著念眼睛更舒服</p></li>
 </ul>`;
 
 const en = `<h2>What this tool does</h2>
-<blockquote><p>Paste your script and let it scroll upwards at the speed you choose — handy for live streams, recorded lessons, launches and talking-head videos. Everything runs locally (offline, nothing uploaded) with <strong>speed control</strong>, <strong>line focus</strong> (only the line you are reading stays bright, lit word by word as you go, the rest fade out), <strong>fade-in / fade-out edges</strong>, <strong>a countdown before it starts</strong> (time to look at the camera — scrolling begins automatically), <strong>fullscreen playback</strong> and <strong>space to pause / resume</strong>.</p></blockquote>
+<blockquote><p>Paste your script and let it scroll upwards at the speed you choose — handy for live streams, recorded lessons, launches and talking-head videos. Everything runs locally (offline, nothing uploaded) with <strong>speed control</strong>, <strong>line focus</strong> (only the line you are reading stays bright, lit word by word as you go, the rest fade out), <strong>fade-in / fade-out edges</strong>, <strong>a countdown before it starts</strong> (time to look at the camera — scrolling begins automatically), <strong>a reading guide line</strong> (a horizontal line at the reading point, toggleable and with a colour of your own), <strong>fullscreen playback</strong> and <strong>space to pause / resume</strong>.</p></blockquote>
 
 <h2>How to use</h2>
 <ul>
 <li><p>Paste the script into “Script”. A demo poem is picked at random for the current language on open (Chinese: 《沁園春·長沙》/《再別康橋》; English: <em>Do not go gentle into that good night</em> / <em>When You Are Old</em>) — hit “Load sample” to shuffle to the other one. Blank lines are kept as paragraph spacing</p></li>
-<li><p>Tune “Font size”, “Line height”, “Fade edges” and “Line focus”: a bigger font helps when you stand further away, more line height makes it easier to track the text with a finger</p></li>
+<li><p>Tune “Font size”, “Line height”, “Fade edges” and “Line focus”: a bigger font helps when you stand further away, more line height makes it easier to track the text with a finger. If your eyes keep drifting, switch the “Guide line” on — a horizontal line is drawn at the reading point and following it keeps you from losing your place</p></li>
 <li><p>Click “Fullscreen”, then press <strong>Space</strong> to start scrolling. A <strong>countdown runs first</strong> (default 3 s; choose off / 3 / 5 / 10 / 15 / 30 s on the page) so you can look at the camera and get ready — scrolling begins on its own. Press Space (or Start) again during the countdown to cancel it and start immediately</p></li>
 <li><p>The “Speed” slider in the bottom bar can be changed while playing; the bar also shows a progress bar and time left, and “Back to start” rewinds to the beginning</p></li>
 <li><p>Once the speed / font size / line height feel right, hit “Save as defaults” to keep them for next time — or preset them under <strong>Settings → Utilities → Teleprompter</strong></p></li>
@@ -79,6 +81,7 @@ const en = `<h2>What this tool does</h2>
 <ul>
 <li><p>Speed literally means “pixels scrolled per second”, so re-check it after changing the font size: 40 – 80 px/s usually matches a natural speaking pace</p></li>
 <li><p>“Fade edges” dissolves lines in at the bottom and out at the top, while “Line focus” brightens only the line at the reading point (lit word by word from left to right as you read) and dims the rest the further away they are — together your eyes can hardly drift off the current line. Turn “Line focus” off and every line stays equally readable, which suits a quick read-through</p></li>
+<li><p>The “Guide line” is the line drawn across the reading point (blue by default — recolour it with the picker next to it, or turn it off): since the text scrolls upwards, this line tells you exactly where to keep your eyes, and it sits on the very same reading point that “Line focus” uses</p></li>
 <li><p>In fullscreen only the bottom bar stays — the editor sits behind it, so leave fullscreen to keep editing. Speed, font size, line height, fade and line focus follow the saved defaults, so experimenting during a session never changes what you get next time</p></li>
 <li><p>Only logical lines are rendered and long lines wrap automatically inside the viewport; insert line breaks yourself if you want to control the phrasing</p></li>
 <li><p>With light text on a dark background, dimming the screen a little is easier on the eyes for long sessions</p></li>

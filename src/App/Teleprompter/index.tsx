@@ -1,4 +1,4 @@
-import { Button, Card, Divider, Input, Progress, Segmented, Slider, Space, Switch, Tooltip, Typography, message } from 'antd';
+import { Button, Card, ColorPicker, Divider, Input, Progress, Segmented, Slider, Space, Switch, Tooltip, Typography, message } from 'antd';
 import {
   ClearOutlined, FileTextOutlined, FullscreenExitOutlined, FullscreenOutlined,
   PauseCircleOutlined, PlayCircleOutlined, ReloadOutlined, SaveOutlined, StopOutlined,
@@ -13,7 +13,7 @@ import {
 import {
   advance, clampFontSize, clampLineHeight, clampSpeed, focusOpacity,
   formatClock, getDefaultOptions, isSameOptions, isSliderTarget, isToggleKey, isTypingTarget,
-  lineCentersOf, lineStepOf, nextSampleScript, pickSampleScript, progressOf, remainingSeconds,
+  lineCentersOf, lineStepOf, nextSampleScript, normalizeGuideColor, pickSampleScript, progressOf, remainingSeconds,
   scrollDistance, setDefaultOptions, splitLineAt, splitScript, sweepOf,
   type LineRect, type PrompterOptions,
 } from './lib';
@@ -35,6 +35,10 @@ const STAGE_CSS = `
 .tp-text { white-space: pre-wrap; word-break: break-word; font-weight: 600; color: ${STAGE_FG}; }
 .tp-line { padding: 0 8px; margin: 0 -8px; border-radius: 6px; }
 .tp-line-active { color: ${STAGE_FOCUS_FG}; background: rgba(255,255,255,0.05); }
+.tp-guide { position: absolute; left: 0; right: 0; height: 2px; z-index: 3; pointer-events: none; }
+.tp-guide::before, .tp-guide::after { content: ''; position: absolute; top: -3px; width: 10px; height: 8px; background: inherit; }
+.tp-guide::before { left: 0; }
+.tp-guide::after { right: 0; }
 .tp-lit { color: ${STAGE_FOCUS_FG}; text-shadow: 0 2px 16px rgba(255,255,255,0.18); }
 .tp-rest { color: ${STAGE_DIM_FG}; }
 .tp-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 8px 12px; background: rgba(255,255,255,0.06); border-top: 1px solid rgba(255,255,255,0.12); }
@@ -404,6 +408,18 @@ const Teleprompter: React.FC = () => {
             </Tooltip>
           </Space>
           <Space size={8}>
+            <Switch size="small" checked={opts.guide} onChange={(v) => patch({ guide: v })} />
+            <Tooltip title={t('阅读基准线: 在阅读线位置显示一条横线, 方便对准视线; 可自定义颜色')}>
+              <span style={{ color: '#888' }}>{t('基准线')}</span>
+            </Tooltip>
+            <ColorPicker
+              size="small"
+              disabled={!opts.guide}
+              value={opts.guideColor}
+              onChange={(v) => patch({ guideColor: normalizeGuideColor(v.toHexString()) })}
+            />
+          </Space>
+          <Space size={8}>
             <Tooltip title={t('开始前先倒数, 留出时间看向镜头 / 做好准备; 再点一次「开始」或按空格可取消')}>
               <span style={{ color: '#888' }}>{t('倒计时')}</span>
             </Tooltip>
@@ -414,7 +430,7 @@ const Teleprompter: React.FC = () => {
               options={COUNTDOWN_OPTIONS.map((n) => ({ value: n, label: n === 0 ? t('关闭') : tt('{n} 秒', { n }) }))}
             />
           </Space>
-          <Tooltip title={t('把当前的速度 / 字号 / 行距 / 淡入淡出 / 逐行高亮 / 倒计时存为默认值, 下次打开时沿用; 也可在 设置 → 其它 → 提词器 中修改')}>
+          <Tooltip title={t('把当前的速度 / 字号 / 行距 / 淡入淡出 / 逐行高亮 / 基准线 / 倒计时存为默认值, 下次打开时沿用; 也可在 设置 → 其它 → 提词器 中修改')}>
             {/* 按钮 disabled 时自身不响应鼠标, 用 span 包一层保证提示仍可弹出 */}
             <span style={{ display: 'inline-block' }}>
               <Button
@@ -462,6 +478,9 @@ const Teleprompter: React.FC = () => {
                   : <div style={{ color: '#777' }}>{t('请先在上方输入提词脚本')}</div>}
               </div>
             </div>
+            {opts.guide && hasScript && (
+              <div className="tp-guide" style={{ top: readY, background: opts.guideColor }} />
+            )}
             {counting !== null && (
               <div className="tp-count">
                 <div className="tp-count-num">{counting}</div>

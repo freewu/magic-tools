@@ -5,7 +5,7 @@ const zh = `<h2>这个工具做什么</h2>
 
 <h2>使用步骤</h2>
 <ul>
-<li><p>点「<b>开始</b>」即开始专注计时; 大数字显示剩余时间, 顶部的圆点表示本轮累计完成的番茄数; 想当倒计时大屏用可点右上角<b>「全屏」</b> (再按 <code>Esc</code> 退出)</p></li>
+<li><p>点「<b>开始</b>」即开始专注计时; 大数字显示剩余时间, 顶部的圆点表示本轮累计完成的番茄数; 想当倒计时大屏用可点右上角<b>「全屏」</b>, 全屏下按 <b>空格</b> (或 <code>Enter</code>) 即可<b>开始 / 暂停</b>, 再按 <code>Esc</code> 退出全屏</p></li>
 <li><p>时间到会自动播放提示音并进入下一阶段 (默认<b>自动开始</b>; 也可以关掉, 只提示不自动走)</p></li>
 <li><p>随时可「<b>暂停</b> / <b>重置</b>」; 想提前结束当前阶段就点「<b>跳过当前阶段</b>」, 也可以直接用页签手动切到 <b>专注 / 短休息 / 长休息</b></p></li>
 <li><p>「<b>完成提示音</b>」有 5 种内置合成音 (叮 / 钟声 / 哔哔哔 / 木鱼 / 风铃), 并支持「<b>提示次数</b>」(1~5) 重复提醒; 选「<b>自定义音频</b>」后可点「选择音频文件…」上传你喜欢的 wav / mp3 / ogg —— 文件只在本机用 <code>objectURL</code> 播放、不进任何网络, 切浏览器会话后需重新指定</p></li>
@@ -28,7 +28,7 @@ const tw = `<h2>這個工具做什麼</h2>
 
 <h2>使用步驟</h2>
 <ul>
-<li><p>點「<b>開始</b>」即開始專注計時; 大數字顯示剩餘時間, 頂部的圓點表示本輪累計完成的番茄數; 想當倒數大螢幕用可點右上角<b>「全屏」</b> (再按 <code>Esc</code> 退出)</p></li>
+<li><p>點「<b>開始</b>」即開始專注計時; 大數字顯示剩餘時間, 頂部的圓點表示本輪累計完成的番茄數; 想當倒數大螢幕用可點右上角<b>「全屏」</b>, 全螢幕下按 <b>空白鍵</b> (或 <code>Enter</code>) 即可<b>開始 / 暫停</b>, 再按 <code>Esc</code> 退出全螢幕</p></li>
 <li><p>時間到會自動播放提示音並進入下一階段 (預設<b>自動開始</b>; 也可以關掉, 只提示不自動走)</p></li>
 <li><p>隨時可「<b>暫停</b> / <b>重置</b>」; 想提前結束目前階段就點「<b>跳過目前階段</b>」, 也可以直接用手頁切到 <b>專注 / 短休息 / 長休息</b></p></li>
 <li><p>「<b>完成提示音</b>」有 5 種內建合成音 (叮 / 鐘聲 / 嗶嗶嗶 / 木魚 / 風鈴), 並支援「<b>提示次數</b>」(1~5) 重複提醒; 選「<b>自訂音訊</b>」後可點「選擇音訊檔…」上傳你喜歡的 wav / mp3 / ogg —— 檔案只在本機用 <code>objectURL</code> 播放、不進任何網路, 切瀏覽器工作階段後需重新指定</p></li>
@@ -51,7 +51,7 @@ const en = `<h2>What this tool does</h2>
 
 <h2>How to use</h2>
 <ul>
-<li><p>Press <b>Start</b> to begin a focus session; the big digits show the time left and the dots above mark the pomodoros completed in this cycle. Use <b>Fullscreen</b> at the top-right for a big countdown screen (<code>Esc</code> to leave)</p></li>
+<li><p>Press <b>Start</b> to begin a focus session; the big digits show the time left and the dots above mark the pomodoros completed in this cycle. Use <b>Fullscreen</b> at the top-right for a big countdown screen — press <b>Space</b> (or <code>Enter</code>) there to <b>start / pause</b>, and <code>Esc</code> to leave</p></li>
 <li><p>When time is up the alert sound plays and the next phase begins (auto-start is on by default; turn it off to only be alerted)</p></li>
 <li><p><b>Pause</b> / <b>Reset</b> are always available; <b>Skip phase</b> ends the current one early and the tabs switch between <b>Focus / Short break / Long break</b> manually</p></li>
 <li><p><b>Alert sound</b> offers 5 built-in synth timbres (ding / bell / beep / wood block / chime) plus a <b>Repeat count</b> (1–5); pick <b>Custom audio</b> and a “Choose audio…” button appears to load your own wav / mp3 / ogg — the file is played locally via <code>objectURL</code> and never uploaded (re-pick it in a new browser session)</p></li>

@@ -27,14 +27,19 @@ const uilangRows: Record<string, [string, string]> = {
     '逐行焦點: 高亮目前閱讀行, 並依閱讀進度由左至右逐字點亮; 離它越遠的行越透明、顏色越淡',
     'The line at the reading point is highlighted and lit word by word from left to right; the further away a line is, the more transparent and dimmer it becomes',
   ],
+  '基准线': ['基準線', 'Guide line'],
+  '阅读基准线: 在阅读线位置显示一条横线, 方便对准视线; 可自定义颜色': [
+    '閱讀基準線: 在閱讀線位置顯示一條橫線, 方便對準視線; 可自訂顏色',
+    'Reading guide line: draws a horizontal line at the reading point so you can aim your eyes; the colour is up to you',
+  ],
   '保存为默认设置': ['儲存為預設設定', 'Save as defaults'],
   '已保存为默认设置, 下次打开提词器时生效': [
     '已儲存為預設設定, 下次開啟提詞器時生效',
     'Saved as defaults — it will apply next time you open the teleprompter',
   ],
-  '把当前的速度 / 字号 / 行距 / 淡入淡出 / 逐行高亮 / 倒计时存为默认值, 下次打开时沿用; 也可在 设置 → 其它 → 提词器 中修改': [
-    '把目前的速度 / 字號 / 行距 / 淡入淡出 / 逐行高亮 / 倒計時存為預設值, 下次開啟時沿用; 也可在 設定 → 其他 → 提詞器 中修改',
-    'Store the current speed / font size / line height / fade / line focus / countdown as the defaults used next time; they can also be edited in Settings → Utilities → Teleprompter',
+  '把当前的速度 / 字号 / 行距 / 淡入淡出 / 逐行高亮 / 基准线 / 倒计时存为默认值, 下次打开时沿用; 也可在 设置 → 其它 → 提词器 中修改': [
+    '把目前的速度 / 字號 / 行距 / 淡入淡出 / 逐行高亮 / 基準線 / 倒計時存為預設值, 下次開啟時沿用; 也可在 設定 → 其他 → 提詞器 中修改',
+    'Store the current speed / font size / line height / fade / line focus / guide line / countdown as the defaults used next time; they can also be edited in Settings → Utilities → Teleprompter',
   ],
 
   // 倒计时

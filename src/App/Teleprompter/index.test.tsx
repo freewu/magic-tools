@@ -150,6 +150,25 @@ const switchOf = (label: string): HTMLButtonElement => {
   if (!sw) throw new Error(`未找到开关: ${label}`);
   return sw as HTMLButtonElement;
 };
+/** 阅读基准线 (开关打开且脚本非空时渲染) */
+const guideEl = (): HTMLElement | null => document.querySelector('.tp-guide');
+/** 基准线开关 (标签为「基准线」的那一组) */
+const guideSwitch = (): HTMLButtonElement => switchOf('基准线');
+/** 基准线取色器触发器 */
+const guidePicker = (): HTMLElement => {
+  const item = screen.getByText('基准线').closest('.ant-space-item');
+  const trigger = item?.parentElement?.querySelector('.ant-color-picker-trigger');
+  if (!trigger) throw new Error('未找到基准线取色器');
+  return trigger as HTMLElement;
+};
+/** 取色器弹出层里的十六进制输入框 (改色的最短路径) */
+const hexInput = (): HTMLInputElement => {
+  const wrap = document.querySelector('.ant-color-picker-hex-input');
+  const input = (wrap?.tagName === 'INPUT' ? wrap : wrap?.querySelector('input')) as HTMLInputElement | null;
+  if (!input) throw new Error('未找到十六进制输入框');
+  return input;
+};
+
 /** 逐行渲染的行元素 */
 const lineEls = () => Array.from(document.querySelectorAll('.tp-line')) as HTMLElement[];
 /** 当前高亮的行 (只应有一行) */
@@ -323,7 +342,8 @@ describe('Teleprompter 设置', () => {
     fireEvent.click(btn('保存为默认设置'));
 
     expect(JSON.parse(localStorage.getItem(DEFAULTS_STORAGE_KEY) as string)).toEqual({
-      speed: 65, fontSize: 40, lineHeight: 1.8, fade: false, focus: true, countdown: 3,
+      speed: 65, fontSize: 40, lineHeight: 1.8, fade: false, focus: true,
+      guide: true, guideColor: '#1677ff', countdown: 3,
     });
     await waitFor(() => expect(document.querySelector('.ant-message')?.textContent).toContain('已保存为默认设置'));
     // 与默认值一致后按钮重新置灰
@@ -349,6 +369,39 @@ describe('Teleprompter 设置', () => {
 
     fireEvent.click(switchOf('淡入淡出'));
     expect(stage().className).not.toContain('tp-fade');
+  });
+
+  test('阅读基准线: 默认压在阅读线上, 可开关并自定义颜色', () => {
+    render(<Teleprompter />);
+
+    // 默认显示: 位置就是阅读线 (视口 400 × 0.42 = 168), 颜色默认蓝
+    expect(guideEl()).not.toBeNull();
+    expect(guideEl()?.style.top).toBe(`${READ_Y}px`);
+    expect(guideEl()?.style.background).toBe('rgb(22, 119, 255)');
+    expect(stageCss()).toContain('.tp-guide');
+
+    // 关掉后舞台里不再有基准线, 取色器同步置灰
+    fireEvent.click(guideSwitch());
+    expect(guideEl()).toBeNull();
+    expect(guidePicker()).toHaveClass('ant-color-picker-trigger-disabled');
+
+    // 再打开并改色: 用十六进制输入框改色, 基准线颜色实时更新
+    fireEvent.click(guideSwitch());
+    fireEvent.click(guidePicker());
+    fireEvent.change(hexInput(), { target: { value: '123456' } });
+    expect(guideEl()?.style.background).toBe('rgb(18, 52, 86)');
+    expect(guideEl()?.style.top).toBe(`${READ_Y}px`);
+
+    // 播放时基准线不动 (它是视线参考, 不跟着文字滚动)
+    fireEvent.click(btn('开始'));
+    finishCountdown();
+    advanceFrames(5);
+    expect(track().style.transform).not.toBe('translateY(0px)');
+    expect(guideEl()?.style.top).toBe(`${READ_Y}px`);
+
+    // 清空脚本后舞台没有内容可读, 基准线一并隐藏
+    fireEvent.click(btn('清空'));
+    expect(guideEl()).toBeNull();
   });
 
   test('逐行高亮: 当前行随滚动下移, 越远越淡; 关闭后所有行同样清晰', () => {

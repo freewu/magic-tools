@@ -6,6 +6,7 @@ import {
   DEFAULTS_STORAGE_KEY,
   FADE_DEFAULT, FOCUS_DECAY, FOCUS_DEFAULT, FOCUS_MIN_OPACITY,
   FONT_SIZE_DEFAULT, FONT_SIZE_MAX, FONT_SIZE_MIN,
+  GUIDE_COLOR_DEFAULT, GUIDE_DEFAULT,
   LINE_HEIGHT_DEFAULT, LINE_HEIGHT_MAX, LINE_HEIGHT_MIN,
   PAD_RATIO, SAMPLE_SCRIPTS, SPEED_DEFAULT, SPEED_MAX, SPEED_MIN,
 } from './data';
@@ -22,6 +23,10 @@ export interface PrompterOptions {
   fade: boolean;
   /** 逐行焦点高亮 (高亮当前阅读行并按阅读进度逐字点亮, 越远越淡) */
   focus: boolean;
+  /** 阅读基准线: 在阅读线位置显示一条横线, 方便对准视线 */
+  guide: boolean;
+  /** 阅读基准线颜色 (#RRGGBB) */
+  guideColor: string;
   /** 开始前倒计时 (秒), 0 = 关闭: 从开头点「开始」时先倒数再滚动 */
   countdown: number;
 }
@@ -33,6 +38,8 @@ export const DEFAULT_OPTIONS: PrompterOptions = {
   lineHeight: LINE_HEIGHT_DEFAULT,
   fade: FADE_DEFAULT,
   focus: FOCUS_DEFAULT,
+  guide: GUIDE_DEFAULT,
+  guideColor: GUIDE_COLOR_DEFAULT,
   countdown: COUNTDOWN_DEFAULT,
 };
 
@@ -74,6 +81,13 @@ export const clampCountdown = (v: unknown): number => {
   return best;
 };
 
+/** 颜色: 只接受 #RRGGBB (非法 / 旧版本存储值都回退 fallback) */
+const normalizeHex = (v: unknown, fallback: string): string =>
+  typeof v === 'string' && /^#[0-9a-fA-F]{6}$/.test(v.trim()) ? v.trim().toLowerCase() : fallback;
+
+/** 阅读基准线颜色: 只接受 #RRGGBB, 非法值回退默认蓝 */
+export const normalizeGuideColor = (v: unknown): string => normalizeHex(v, GUIDE_COLOR_DEFAULT);
+
 /** 把任意来源 (JSON / 旧版本存储值) 规整成合法选项: 缺字段与非法值都回退默认 */
 export const normalizeOptions = (raw: unknown): PrompterOptions => {
   const src = (raw && typeof raw === 'object' ? raw : {}) as Partial<Record<keyof PrompterOptions, unknown>>;
@@ -83,6 +97,8 @@ export const normalizeOptions = (raw: unknown): PrompterOptions => {
     lineHeight: clampLineHeight(src.lineHeight),
     fade: typeof src.fade === 'boolean' ? src.fade : FADE_DEFAULT,
     focus: typeof src.focus === 'boolean' ? src.focus : FOCUS_DEFAULT,
+    guide: typeof src.guide === 'boolean' ? src.guide : GUIDE_DEFAULT,
+    guideColor: normalizeGuideColor(src.guideColor),
     countdown: clampCountdown(src.countdown),
   };
 };
