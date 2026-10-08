@@ -6,7 +6,7 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
-![version](https://img.shields.io/badge/magic--tools-v2.20.0-007EC6?style=flat-square&labelColor=24292F) ![Tauri](https://img.shields.io/badge/Tauri-2-0E7490?style=flat-square&labelColor=24292F&logo=tauri&logoColor=fff) ![React](https://img.shields.io/badge/React-18-087EA4?style=flat-square&labelColor=24292F&logo=react&logoColor=fff) ![Ant Design](https://img.shields.io/badge/Ant_Design-5-0170FE?style=flat-square&labelColor=24292F&logo=antdesign&logoColor=fff) ![MIT License](https://img.shields.io/badge/license-MIT-4F46E5?style=flat-square&labelColor=24292F)
+![version](https://img.shields.io/badge/magic--tools-v2.21.0-007EC6?style=flat-square&labelColor=24292F) ![Tauri](https://img.shields.io/badge/Tauri-2-0E7490?style=flat-square&labelColor=24292F&logo=tauri&logoColor=fff) ![React](https://img.shields.io/badge/React-18-087EA4?style=flat-square&labelColor=24292F&logo=react&logoColor=fff) ![Ant Design](https://img.shields.io/badge/Ant_Design-5-0170FE?style=flat-square&labelColor=24292F&logo=antdesign&logoColor=fff) ![MIT License](https://img.shields.io/badge/license-MIT-4F46E5?style=flat-square&labelColor=24292F)
 
 [下載桌面版](#-下載) · [線上體驗](https://freewu.github.io/magic-tools/) · [提交 Issue](https://github.com/freewu/magic-tools/issues/new)
 
@@ -52,9 +52,9 @@ Base64 圖片 · ASCII 圖片 · 程式碼截圖 · ICO 生成 · App Icon 生�
 HTML 標籤去除 · 瀏覽器指紋 · CSR 申請文件(本機產生 RSA 私鑰 + PKCS#10 請求, 支援 SAN) · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 檢查 · 關鍵詞密度 · 網頁TDK 資訊檢測 · DNS 查詢(僅桌面版) · Whois 查詢(僅桌面版) · MTR 查詢(僅桌面版: traceroute + ping, 逐跳丟包/RTT/抖動) · robots.txt 生成 · iptables 規則(日常情境一鍵產生: 開放連接埠 / 封鎖 IP / 封鎖網段 / 連接埠轉發; 也可解析現有規則或依表單產生指令, 支援 iptables-save) · tc 規則(HTB / TBF / netem 限速與弱網模擬, 入口限速走 ifb) · nginx 設定(靜態站點 / SPA / PHP / 反向代理, 含 TLS、gzip、靜態快取、限流、防盜連, 直接產生 vhost 設定檔)
 
 ### 🧩 其他 *(16)*
-CSS 配色 · 行數統計 · 正則表達式 · 檔案比較 · 鍵盤按鍵資訊 · Chmod 權限 · ASCII 文字 · CIDR 計算器 · WebSocket 偵錯 · 提詞器(調速/淡入淡出/逐行高亮/閱讀基準線可開關並自訂顏色/全螢幕, 開始前可先倒計時, 空格 開始·暫停·取消倒計時, 預設值可在設定裡改/頁面一鍵儲存) · BOM 檢查(偵測 / 移除 / 新增 UTF-8·UTF-16·UTF-32 BOM, 編碼推測與文字預覽) · 節拍器(20~300 BPM, 拍號與拍內細分, 3 種音色 + 音量, 開始前預排拍倒計時, 全螢幕閃爍圓點, 連擊測速) · 螢幕錄製(瀏覽器專享: 擷取螢幕/視窗/分頁, 可選系統聲音與麥克風, 影格率·位元率·解析度可選, 一鍵儲存 WebM/MP4) · 二維碼解析(上傳/拖曳/貼上二維碼圖片, 用 jsQR 讀出內容: 網址·WiFi 配網·名片·郵件·電話·簡訊·座標·動態密碼, 結構化欄位顯示, 預覽圖上框出二維碼位置, 反色策略可調, 本機歷史記錄) · 敏感詞檢測(Aho–Corasick 掃描, 通用/小紅書/微信公眾號三套詞庫: 危險等級、命中位置與替換建議, 一鍵打碼與報告匯出, 寬鬆匹配可揪出「微 信」這類繞過寫法) · 番茄鐘(專注/短休/長休循環, 5 種內建合成提示音或指定自己的音訊檔, 提示音可設重複次數, 彈窗通知桌面端用系統彈窗, 時鐘背景與專注/休息數字配色可調, 背景可換成自己的圖片)
+CSS 配色 · 行數統計 · 正則表達式 · 檔案比較 · 鍵盤按鍵資訊 · Chmod 權限 · ASCII 文字 · CIDR 計算器 · WebSocket 偵錯 · 提詞器(調速/淡入淡出/逐行高亮/閱讀基準線可開關、自訂顏色並上下調整位置/全螢幕, 開始前可先倒計時, 空格 開始·暫停·取消倒計時, 預設值可在設定裡改/頁面一鍵儲存) · BOM 檢查(偵測 / 移除 / 新增 UTF-8·UTF-16·UTF-32 BOM, 編碼推測與文字預覽) · 節拍器(20~300 BPM, 拍號與拍內細分, 3 種音色 + 音量, 開始前預排拍倒計時, 全螢幕閃爍圓點, 連擊測速) · 螢幕錄製(瀏覽器專享: 擷取螢幕/視窗/分頁, 可選系統聲音與麥克風, 影格率·位元率·解析度可選, 一鍵儲存 WebM/MP4) · 二維碼解析(上傳/拖曳/貼上二維碼圖片, 用 jsQR 讀出內容: 網址·WiFi 配網·名片·郵件·電話·簡訊·座標·動態密碼, 結構化欄位顯示, 預覽圖上框出二維碼位置, 反色策略可調, 本機歷史記錄) · 敏感詞檢測(Aho–Corasick 掃描, 通用/小紅書/微信公眾號三套詞庫: 危險等級、命中位置與替換建議, 一鍵打碼與報告匯出, 寬鬆匹配可揪出「微 信」這類繞過寫法) · 番茄鐘(專注/短休/長休循環, 5 種內建合成提示音或指定自己的音訊檔, 提示音可設重複次數, 彈窗通知桌面端用系統彈窗, 時鐘背景與專注/休息數字配色可調, 背景可換成自己的圖片, 全螢幕支援空格/Enter 開始·暫停)
 
-> 另有內建頁面：**應用中心**(支援按應用名稱 / 分類名稱搜尋 + 分類篩選)、**說明與更新日誌**、**設定**。
+> 另有內建頁面：**應用中心**(支援按應用名稱 / 分類名稱搜尋 + 分類篩選)、**我的收藏**(常用工具集中收藏, 懸浮入口可拖到任意位置)、**說明與更新日誌**、**設定**。
 
 ## 💻 下載
 
@@ -131,7 +131,7 @@ magic-tools
 
 **🧩 其他 *(16)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `Metronome` · `Pomodoro` · `QrDecode` · `RegexTester` · `ScreenRecorder` · `SensitiveWord` · `Teleprompter` · `WebSocketDebug`
 
-> 內建頁面 `AppStore`(應用中心) / `Help` / `Setting` 也位於 `src/App/` 下 (註冊 `Type = 'misc'`), 但屬固定頁面而非工具。
+> 內建頁面 `AppStore`(應用中心) / `Favorites`(我的收藏) / `Help` / `Setting` 也位於 `src/App/` 下 (註冊 `Type = 'misc'`), 但屬固定頁面而非工具。
 
 ## 🚀 開發與執行
 

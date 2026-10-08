@@ -6,7 +6,7 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
-![version](https://img.shields.io/badge/magic--tools-v2.20.0-007EC6?style=flat-square&labelColor=24292F) ![Tauri](https://img.shields.io/badge/Tauri-2-0E7490?style=flat-square&labelColor=24292F&logo=tauri&logoColor=fff) ![React](https://img.shields.io/badge/React-18-087EA4?style=flat-square&labelColor=24292F&logo=react&logoColor=fff) ![Ant Design](https://img.shields.io/badge/Ant_Design-5-0170FE?style=flat-square&labelColor=24292F&logo=antdesign&logoColor=fff) ![MIT License](https://img.shields.io/badge/license-MIT-4F46E5?style=flat-square&labelColor=24292F)
+![version](https://img.shields.io/badge/magic--tools-v2.21.0-007EC6?style=flat-square&labelColor=24292F) ![Tauri](https://img.shields.io/badge/Tauri-2-0E7490?style=flat-square&labelColor=24292F&logo=tauri&logoColor=fff) ![React](https://img.shields.io/badge/React-18-087EA4?style=flat-square&labelColor=24292F&logo=react&logoColor=fff) ![Ant Design](https://img.shields.io/badge/Ant_Design-5-0170FE?style=flat-square&labelColor=24292F&logo=antdesign&logoColor=fff) ![MIT License](https://img.shields.io/badge/license-MIT-4F46E5?style=flat-square&labelColor=24292F)
 
 [下载桌面版](#-下载) · [在线体验](https://freewu.github.io/magic-tools/) · [提交 Issue](https://github.com/freewu/magic-tools/issues/new)
 
@@ -52,9 +52,9 @@ Base64图片 · ASCII 图片 · 代码截图 · ICO 生成 · App Icon 生成 ·
 HTML 标签去除 · 浏览器指纹 · CSR 申请文件(本机生成 RSA 私钥 + PKCS#10 请求, 支持 SAN) · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 检查 · 关键词密度 · 网页TDK信息检测 · DNS 查询(仅桌面版) · Whois 查询(仅桌面版) · MTR 查询(仅桌面版: traceroute + ping, 逐跳丢包/RTT/抖动) · robots.txt 生成 · iptables 规则(日常场景一键生成: 开放端口 / 封禁 IP / 封禁网段 / 端口转发; 也可解析已有规则或按表单生成命令, 支持 iptables-save) · tc 规则(HTB / TBF / netem 限速与弱网模拟, 入口限速走 ifb) · nginx 配置(静态站点 / SPA / PHP / 反向代理, 含 TLS、gzip、静态缓存、限流、防盗链, 直接生成 vhost 配置文件)
 
 ### 🧩 其它 *(16)*
-CSS 配色 · 行数统计 · 正则表达式 · 文件比较 · 键盘按键信息 · Chmod 权限 · ASCII 文字 · CIDR 计算器 · WebSocket 调试 · 提词器(调速/淡入淡出/逐行高亮/阅读基准线可开关并自定义颜色/全屏, 开始前可先倒计时, 空格 开始·暂停·取消倒计时, 默认值可在设置里改/页面一键保存) · BOM 检查(检测 / 去除 / 添加 UTF-8·UTF-16·UTF-32 BOM, 编码推测与文本预览) · 节拍器(20~300 BPM, 拍号与拍内细分, 3 种音色 + 音量, 开始前预排拍倒计时, 全屏闪烁圆点, 连击测速) · 屏幕录制(浏览器专享: 采集屏幕/窗口/标签页, 可选系统声音与麦克风, 帧率·码率·分辨率可选, 一键保存 WebM/MP4) · 二维码解析(上传/拖拽/粘贴二维码图片, 用 jsQR 读出内容: 网址·WiFi 配网·名片·邮件·电话·短信·坐标·动态口令, 结构化字段展示, 预览图上框出二维码位置, 反色策略可调, 本地历史记录) · 敏感词检测(Aho–Corasick 扫描, 通用/小红书/微信公众号三套词库: 危险等级、命中位置与替换建议, 一键打码与报告导出, 宽松匹配可揪出「微 信」这类绕过写法) · 番茄时钟(专注/短休/长休循环, 5 种内置合成提示音或指定自己的音频文件, 提示音可设重复次数, 弹窗通知桌面端用系统弹窗, 时钟背景与专注/休息数字配色可调, 背景可换成自己的图片)
+CSS 配色 · 行数统计 · 正则表达式 · 文件比较 · 键盘按键信息 · Chmod 权限 · ASCII 文字 · CIDR 计算器 · WebSocket 调试 · 提词器(调速/淡入淡出/逐行高亮/阅读基准线可开关、自定义颜色并上下调整位置/全屏, 开始前可先倒计时, 空格 开始·暂停·取消倒计时, 默认值可在设置里改/页面一键保存) · BOM 检查(检测 / 去除 / 添加 UTF-8·UTF-16·UTF-32 BOM, 编码推测与文本预览) · 节拍器(20~300 BPM, 拍号与拍内细分, 3 种音色 + 音量, 开始前预排拍倒计时, 全屏闪烁圆点, 连击测速) · 屏幕录制(浏览器专享: 采集屏幕/窗口/标签页, 可选系统声音与麦克风, 帧率·码率·分辨率可选, 一键保存 WebM/MP4) · 二维码解析(上传/拖拽/粘贴二维码图片, 用 jsQR 读出内容: 网址·WiFi 配网·名片·邮件·电话·短信·坐标·动态口令, 结构化字段展示, 预览图上框出二维码位置, 反色策略可调, 本地历史记录) · 敏感词检测(Aho–Corasick 扫描, 通用/小红书/微信公众号三套词库: 危险等级、命中位置与替换建议, 一键打码与报告导出, 宽松匹配可揪出「微 信」这类绕过写法) · 番茄时钟(专注/短休/长休循环, 5 种内置合成提示音或指定自己的音频文件, 提示音可设重复次数, 弹窗通知桌面端用系统弹窗, 时钟背景与专注/休息数字配色可调, 背景可换成自己的图片, 全屏支持空格/回车 开始·暂停)
 
-> 另有内置页面：**应用中心**(支持按应用名 / 分类名搜索 + 分类筛选)、**帮助与更新日志**、**设置**。
+> 另有内置页面：**应用中心**(支持按应用名 / 分类名搜索 + 分类筛选)、**我的收藏**(常用工具集中收藏, 悬浮入口可拖到任意位置)、**帮助与更新日志**、**设置**。
 
 ## 💻 下载
 
@@ -131,7 +131,7 @@ magic-tools
 
 **🧩 其它 *(16)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `Metronome` · `Pomodoro` · `QrDecode` · `RegexTester` · `ScreenRecorder` · `SensitiveWord` · `Teleprompter` · `WebSocketDebug`
 
-> 内置页面 `AppStore`(应用中心) / `Help` / `Setting` 也位于 `src/App/` 下 (注册 `Type = 'misc'`), 但属固定页面而非工具。
+> 内置页面 `AppStore`(应用中心) / `Favorites`(我的收藏) / `Help` / `Setting` 也位于 `src/App/` 下 (注册 `Type = 'misc'`), 但属固定页面而非工具。
 
 ## 🚀 开发与运行
 

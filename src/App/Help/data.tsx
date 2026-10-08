@@ -80,6 +80,33 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-10-08 V2.21.0 Release", "2026-10-08 V2.21.0 Release", "2026-10-08 V2.21.0 Release"),
+    items: trio(
+      [
+        "新增「我的收藏」系统级页面: 把常用工具集中收藏到一处, 支持按名称搜索 (中英繁 + 目录名)、单卡取消收藏、一键清空; 应用中心每个卡片右上角新增五角星, 点击收藏 / 取消, 收藏状态用 localStorage + 自定义事件全局实时同步; 应用中心「默认展示应用」下拉新增「我的收藏」选项, 系统级页面 3 → 4",
+        "我的收藏新增可拖动悬浮入口 (右下角浮标): 拖到任意位置并持久化, 右键复位默认位置, 角标显示收藏数量, 单击直达收藏页",
+        "我的收藏支持拖动排序: 按住卡片拖动调整顺序 (越过分隔阈值才进入拖动, 实时重排并持久化); 搜索中或仅 1 条收藏时自动停用拖动; 卡片整卡为抓握手型、仅应用名文字为点击手型, 拖动中整页切换为抓着手; 拖动排序在桌面版 (Tauri / WebView2) 无效的问题已改用 Pointer Events 修复",
+        "提词器新增阅读基准线: 在阅读线位置画一条横线帮助对准视线, 可自定义颜色, 并可上下调整位置 (拖动滑块 / 在舞台上直接上下拖 / Shift+↑↓), 位置按舞台高度比例记忆",
+        "番茄时钟全屏模式支持空格 / 回车 开始·暂停快捷键; 并修复「跳过当前阶段」与阶段页签挤在同一行 (改为上下两排并留出间隔)",
+      ],
+      [
+        "新增「我的收藏」系統級頁面: 把常用工具集中收藏到一處, 支援依名稱搜尋 (中英繁 + 目錄名)、單卡取消收藏、一鍵清空; 應用中心每個卡片右上角新增五角星, 點擊收藏 / 取消, 收藏狀態用 localStorage + 自訂事件全域即時同步; 應用中心「預設展示應用」下拉新增「我的收藏」選項, 系統級頁面 3 → 4",
+        "我的收藏新增可拖曳懸浮入口 (右下角浮標): 拖到任意位置並持久化, 右鍵重設預設位置, 角標顯示收藏數量, 單擊直達收藏頁",
+        "我的收藏支援拖曳排序: 按住卡片拖曳調整順序 (越過分隔閾值才進入拖曳, 即時重排並持久化); 搜尋中或僅 1 筆收藏時自動停用拖曳; 卡片整張為抓握手型、僅應用名文字為點擊手型, 拖曳中整頁切換為抓著手; 拖曳排序在桌面版 (Tauri / WebView2) 無效的問題已改用 Pointer Events 修復",
+        "提詞器新增閱讀基準線: 在閱讀線位置畫一條橫線幫助對準視線, 可自訂顏色, 並可上下調整位置 (拖曳滑桿 / 在舞台上直接上下拖 / Shift+↑↓), 位置依舞台高度比例記憶",
+        "番茄時鐘全螢幕模式支援空格 /  Enter 開始·暫停快速鍵; 並修復「跳過目前階段」與階段頁籤擠在同一行 (改為上下兩排並留出間隔)",
+      ],
+      [
+        "New “My Favorites” system page: keep your frequently used tools in one place, with search by name (English / Simplified / Traditional Chinese, plus folder name), per-card unfavourite and one-click clear; every app card in the App Center now has a star in the top-right corner to favourite / unfavourite, with the state synced instantly everywhere through localStorage plus a custom event; “My Favorites” is also available in the App Center’s default-app dropdown, and the system pages went from 3 to 4",
+        "My Favorites: a draggable floating shortcut (bottom-right) — move it anywhere and it stays there, right-click to reset it to the default spot, the badge shows how many favourites you have, and a click opens the page",
+        "My Favorites: drag to reorder — press and drag a card to change the order (dragging only starts after a small threshold, reordering live and persisting the result); reordering is disabled while searching or with a single favourite; the card shows a grabbing cursor while only the app name shows the pointer, and the whole page switches to grabbing while dragging. Also fixed reordering not working on the desktop build (Tauri / WebView2) by switching from native HTML5 drag-and-drop to Pointer Events",
+        "Teleprompter: a new reading guide line — a horizontal line at the reading point to aim your eyes, with a colour of your choice and an adjustable height (drag the slider, drag the line itself on stage, or Shift+↑↓), remembered as a share of the stage height",
+        "Pomodoro: Space / Enter now start and pause in fullscreen, and the Skip button no longer gets squeezed onto the same row as the phase tabs (now stacked in two rows with a gap)",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-10-01 V2.20.0 Release", "2026-10-01 V2.20.0 Release", "2026-10-01 V2.20.0 Release"),
     items: trio(
       [
