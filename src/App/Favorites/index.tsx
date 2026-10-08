@@ -24,6 +24,10 @@ const { Text } = Typography;
 // 移动超过该像素才视为拖动 (避免把普通点击误判为拖动)
 const DRAG_THRESHOLD = 5;
 
+// 拖动过程中挂在 body 上的类名: 用于把整页光标统一成「抓着手」(grabbing),
+// 因为拖动时指针会滑过其它卡片, 仅靠某个元素的 cursor 无法稳定生效
+const DRAGGING_BODY_CLASS = 'favorites-dragging';
+
 type DragState = {
   key: string;      // 正在拖动的卡片 key (用于高亮)
   index: number;    // 当前所在索引 (随拖动实时更新)
@@ -104,6 +108,7 @@ const Favorites = () => {
         s.active = true;
         movedRef.current = true;
         setDraggingKey(s.key);
+        document.body.classList.add(DRAGGING_BODY_CLASS);
       }
       // 指针落在哪张卡片上就把它挪到该位置 (实时重排)
       const idx = indexAtPoint(ev.clientX, ev.clientY);
@@ -116,6 +121,7 @@ const Favorites = () => {
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onUp);
+      document.body.classList.remove(DRAGGING_BODY_CLASS);
       cleanupRef.current = null;
     };
     const onUp = (ev: PointerEvent) => {

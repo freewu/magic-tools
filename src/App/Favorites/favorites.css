@@ -50,6 +50,16 @@
   z-index: 1;
 }
 
+/* 拖动排序进行中 (body 上的类由 JS 在越过拖动阈值时添加):
+   指针会滑过其它卡片/空白, 仅靠单个元素的 cursor 无法稳定生效,
+   所以整页统一为「抓着手 grabbing」, 与悬浮入口拖动时的表现一致 */
+body.favorites-dragging,
+body.favorites-dragging * {
+  cursor: grabbing !important;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 /* 拖动把手: 卡片左侧中部, 默认隐去, 悬停时淡显 */
 .favorites-drag-handle {
   position: absolute;

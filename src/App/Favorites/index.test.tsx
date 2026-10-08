@@ -61,7 +61,10 @@ const renderPage = () => render(
   </MemoryRouter>
 );
 
-beforeEach(() => localStorage.clear());
+beforeEach(() => {
+  localStorage.clear();
+  document.body.classList.remove('favorites-dragging');
+});
 
 describe('我的收藏页面', () => {
   test('无收藏时展示空状态与提示', () => {
@@ -188,6 +191,47 @@ describe('我的收藏页面', () => {
     fireEvent.pointerUp(star, { pointerId: 4 });
     fireEvent.click(star);
     expect(screen.getByText('共 1 个收藏')).toBeInTheDocument();
+  });
+
+  test('拖动过程中给 body 加抓握手型类, 结束后移除', () => {
+    setFavorites([ 'AESCrypto', 'SM4Crypto' ]);
+    renderPage();
+    const wrappers = Array.from(document.querySelectorAll<HTMLElement>('.favorites-sortable'));
+    wrappers.forEach((el, i) => {
+      el.getBoundingClientRect = () => ({
+        left: i * 100, right: (i + 1) * 100, top: 0, bottom: 50,
+        width: 100, height: 50, x: i * 100, y: 0, toJSON: () => ({}),
+      } as DOMRect);
+    });
+    const dt = { pointerId: 9, button: 0, pointerType: 'mouse' };
+    fireEvent.pointerDown(wrappers[0], { ...dt, clientX: 10, clientY: 10 });
+    // 未越过拖动阈值: 仍视为普通点击, 不加类
+    fireEvent.pointerMove(wrappers[0], { ...dt, clientX: 12, clientY: 10 });
+    expect(document.body.classList.contains('favorites-dragging')).toBe(false);
+    // 越过阈值: 进入拖动, 整页切换为抓握手型
+    fireEvent.pointerMove(wrappers[0], { ...dt, clientX: 150, clientY: 10 });
+    expect(document.body.classList.contains('favorites-dragging')).toBe(true);
+    // 抬手: 移除类, 光标恢复
+    fireEvent.pointerUp(wrappers[0], { ...dt, clientX: 150, clientY: 10 });
+    expect(document.body.classList.contains('favorites-dragging')).toBe(false);
+  });
+
+  test('拖动中卸载页面时也会移除抓握手型类', () => {
+    setFavorites([ 'AESCrypto', 'SM4Crypto' ]);
+    const { unmount } = renderPage();
+    const wrappers = Array.from(document.querySelectorAll<HTMLElement>('.favorites-sortable'));
+    wrappers.forEach((el, i) => {
+      el.getBoundingClientRect = () => ({
+        left: i * 100, right: (i + 1) * 100, top: 0, bottom: 50,
+        width: 100, height: 50, x: i * 100, y: 0, toJSON: () => ({}),
+      } as DOMRect);
+    });
+    const dt = { pointerId: 10, button: 0, pointerType: 'mouse' };
+    fireEvent.pointerDown(wrappers[0], { ...dt, clientX: 10, clientY: 10 });
+    fireEvent.pointerMove(wrappers[0], { ...dt, clientX: 150, clientY: 10 });
+    expect(document.body.classList.contains('favorites-dragging')).toBe(true);
+    unmount();
+    expect(document.body.classList.contains('favorites-dragging')).toBe(false);
   });
 
   test('仅未搜索且收藏>1 时展示拖动把手', () => {
