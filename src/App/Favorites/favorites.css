@@ -27,7 +27,7 @@
 }
 
 /* 卡片外层包装 (拖动排序载体): 卡片自带 margin 5px, 包装层保持同宽
-   - 未搜索且收藏>1 时标记 favorites-sortable-draggable, 可拖动 */
+   - 未搜索且收藏>1 时标记 favorites-sortable-draggable, 可拖动 (Pointer Events) */
 .favorites-sortable {
   position: relative;
   border-radius: 6px;
@@ -36,21 +36,17 @@
 
 .favorites-sortable-draggable {
   cursor: grab;
+  /* 拖动排序期间禁止选中文字, 避免鼠标拖动变成框选 */
+  -webkit-user-select: none;
+  user-select: none;
 }
 
-.favorites-sortable-draggable:active {
-  cursor: grabbing;
-}
-
-/* 拖动中的卡片淡显 */
+/* 正在拖动的卡片: 退到半透明, 作为「被拿起」的反馈
+   (不缩放: 避免改变 getBoundingClientRect 造成命中抖动) */
 .favorites-sortable-dragging {
-  opacity: 0.35;
-}
-
-/* 当前落点: 虚线高亮 */
-.favorites-sortable-over {
-  outline: 2px dashed #faad14;
-  outline-offset: 2px;
+  opacity: 0.55;
+  cursor: grabbing;
+  z-index: 1;
 }
 
 /* 拖动把手: 卡片左侧中部, 默认隐去, 悬停时淡显 */

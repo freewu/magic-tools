@@ -6,6 +6,20 @@ import { LocaleProvider } from '../../hook/locale-context';
 import { AppContext } from '../../hook/app-context';
 import { getFavorites, setFavorites } from '../../lib/favorite';
 
+// jsdom 未实现 PointerEvent: 提供最小实现 (继承 MouseEvent 保留 clientX/clientY),
+// 使拖动排序用例可真实走通 pointerdown/move/up 逻辑
+if (typeof (window as any).PointerEvent === 'undefined') {
+  class PointerEventPolyfill extends MouseEvent {
+    public pointerId :number;
+    constructor(type :string, init :any = {}) {
+      super(type, init);
+      this.pointerId = init.pointerId ?? 1;
+      if (init.pointerType) (this as any).pointerType = init.pointerType;
+    }
+  }
+  (window as any).PointerEvent = PointerEventPolyfill;
+}
+
 // App/index.tsx 有顶层 await + import.meta.glob (jest commonjs 不支持), 故打桩成固定应用列表
 jest.mock('../index', () => {
   const appList = [
@@ -110,15 +124,70 @@ describe('我的收藏页面', () => {
       .map((el) => el.getAttribute('data-uri'));
     expect(order()).toEqual([ 'AESCrypto', 'SM4Crypto', 'DnsQuery' ]);
 
-    const wrappers = Array.from(document.querySelectorAll('.favorites-sortable'));
-    const dt = { dataTransfer: { setData: jest.fn(), getData: () => '0', effectAllowed: '', dropEffect: '' } };
+    // jsdom 中 getBoundingClientRect 恒为 0: 模拟三张卡片横向排列 (每张 100x50)
+    const wrappers = Array.from(document.querySelectorAll<HTMLElement>('.favorites-sortable'));
+    wrappers.forEach((el, i) => {
+      el.getBoundingClientRect = () => ({
+        left: i * 100, right: (i + 1) * 100, top: 0, bottom: 50,
+        width: 100, height: 50, x: i * 100, y: 0, toJSON: () => ({}),
+      } as DOMRect);
+    });
+
     // 把第 1 张 (AESCrypto) 拖到第 3 张位置
-    fireEvent.dragStart(wrappers[0], dt);
-    fireEvent.dragOver(wrappers[2], dt);
-    fireEvent.drop(wrappers[2], dt);
+    const dt = { pointerId: 1, button: 0, pointerType: 'mouse' };
+    fireEvent.pointerDown(wrappers[0], { ...dt, clientX: 10, clientY: 10 });
+    fireEvent.pointerMove(wrappers[0], { ...dt, clientX: 250, clientY: 10 });
+    fireEvent.pointerUp(wrappers[0], { ...dt, clientX: 250, clientY: 10 });
 
     expect(order()).toEqual([ 'SM4Crypto', 'DnsQuery', 'AESCrypto' ]);
     expect(getFavorites()).toEqual([ 'SM4Crypto', 'DnsQuery', 'AESCrypto' ]);
+  });
+
+  test('拖动结束后那次 click 不触发卡片跳转', () => {
+    setFavorites([ 'AESCrypto', 'SM4Crypto' ]);
+    renderPage();
+    const wrappers = Array.from(document.querySelectorAll<HTMLElement>('.favorites-sortable'));
+    wrappers.forEach((el, i) => {
+      el.getBoundingClientRect = () => ({
+        left: i * 100, right: (i + 1) * 100, top: 0, bottom: 50,
+        width: 100, height: 50, x: i * 100, y: 0, toJSON: () => ({}),
+      } as DOMRect);
+    });
+    const card = wrappers[0].querySelector('.app') as HTMLElement;
+    const spy = jest.fn();
+    card.addEventListener('click', spy);
+
+    const dt = { pointerId: 2, button: 0, pointerType: 'mouse' };
+    fireEvent.pointerDown(wrappers[0], { ...dt, clientX: 10, clientY: 10 });
+    fireEvent.pointerMove(wrappers[0], { ...dt, clientX: 150, clientY: 10 });
+    fireEvent.pointerUp(wrappers[0], { ...dt, clientX: 150, clientY: 10 });
+    fireEvent.click(card);
+
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  test('拖动结束后点击星标仍可取消收藏 (未被误吞)', () => {
+    setFavorites([ 'AESCrypto', 'SM4Crypto' ]);
+    renderPage();
+    const wrappers = Array.from(document.querySelectorAll<HTMLElement>('.favorites-sortable'));
+    wrappers.forEach((el, i) => {
+      el.getBoundingClientRect = () => ({
+        left: i * 100, right: (i + 1) * 100, top: 0, bottom: 50,
+        width: 100, height: 50, x: i * 100, y: 0, toJSON: () => ({}),
+      } as DOMRect);
+    });
+    // 先拖动一次 (movedRef 置位)
+    const dt = { pointerId: 3, button: 0, pointerType: 'mouse' };
+    fireEvent.pointerDown(wrappers[0], { ...dt, clientX: 10, clientY: 10 });
+    fireEvent.pointerMove(wrappers[0], { ...dt, clientX: 150, clientY: 10 });
+    fireEvent.pointerUp(wrappers[0], { ...dt, clientX: 150, clientY: 10 });
+
+    // 紧接着点击某张卡片的星标: 应正常取消收藏 (而不是被当作拖动尾巴吞掉)
+    const star = document.querySelector('.favorites-sortable .app-star') as HTMLElement;
+    fireEvent.pointerDown(star, { pointerId: 4, button: 0, pointerType: 'mouse' });
+    fireEvent.pointerUp(star, { pointerId: 4 });
+    fireEvent.click(star);
+    expect(screen.getByText('共 1 个收藏')).toBeInTheDocument();
   });
 
   test('仅未搜索且收藏>1 时展示拖动把手', () => {
