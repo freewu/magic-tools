@@ -35,7 +35,9 @@
 }
 
 .favorites-sortable-draggable {
-  cursor: grab;
+  /* 整张卡片保持「点击手型」(与卡片内 appname 一致, 点击打开应用);
+     拖动排序的能力由左侧把手图标 + 工具栏提示表达, 不再把光标改成抓握手型 */
+  cursor: pointer;
   /* 拖动排序期间禁止选中文字, 避免鼠标拖动变成框选 */
   -webkit-user-select: none;
   user-select: none;
@@ -45,7 +47,6 @@
    (不缩放: 避免改变 getBoundingClientRect 造成命中抖动) */
 .favorites-sortable-dragging {
   opacity: 0.55;
-  cursor: grabbing;
   z-index: 1;
 }
 
