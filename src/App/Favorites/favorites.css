@@ -34,10 +34,19 @@
   transition: opacity 0.15s;
 }
 
-.favorites-sortable-draggable {
-  /* 整张卡片保持「点击手型」(与卡片内 appname 一致, 点击打开应用);
-     拖动排序的能力由左侧把手图标 + 工具栏提示表达, 不再把光标改成抓握手型 */
+.favorites-sortable-draggable,
+.favorites-sortable-draggable .app {
+  /* 整张卡片为抓握手型: 提示可按住拖动排序 */
+  cursor: grabbing;
+}
+
+/* 仅应用名文字为点击手型: 提示点击文字可打开应用
+   (app-item 里的 <Space> 加了 app-name 类; 星标按钮自带 pointer) */
+.favorites-sortable-draggable .app-name {
   cursor: pointer;
+}
+
+.favorites-sortable-draggable {
   /* 拖动排序期间禁止选中文字, 避免鼠标拖动变成框选 */
   -webkit-user-select: none;
   user-select: none;

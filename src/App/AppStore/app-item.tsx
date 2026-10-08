@@ -74,7 +74,7 @@ const AppItem = ({ uri, label, icon, desktop, web } :AppItemProps) => {
           { faved ? <StarFilled /> : <StarOutlined /> }
         </button>
       </Tooltip>
-      <Space>
+      <Space className="app-name">
         {/* { icon } */}
         { label }
       </Space>
