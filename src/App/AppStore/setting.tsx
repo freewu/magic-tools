@@ -20,6 +20,7 @@ export const AppStoreSetting = () => {
   const getAppList = () => {
     const result = [
       { value: 'AppStore', label: appNameOf(locale, 'AppStore', '应用中心') },
+      { value: 'Favorites', label: appNameOf(locale, 'Favorites', '我的收藏') },
       { value: 'Help', label: appNameOf(locale, 'Help', '帮助页面') },
       { value: 'Setting', label: appNameOf(locale, 'Setting', '设置') },
     ];

@@ -27,7 +27,7 @@ export const AppContext = createContext<{
 } | null>(null)
 
 // 固定页面 (不在 appList 中, 同样允许出现在标签里)
-const FIXED_PAGE_KEYS = ['Setting', 'AppStore', 'Help'];
+const FIXED_PAGE_KEYS = ['Setting', 'AppStore', 'Help', 'Favorites'];
 // 当前有效的页面 key 集合 (防止恢复到旧版本/加载遗漏产生的无效标签 -> 点开无响应)
 const validPageKeys = new Set([...appList.map((i) => i.key), ...FIXED_PAGE_KEYS]);
 

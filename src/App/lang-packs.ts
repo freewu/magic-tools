@@ -129,6 +129,7 @@ import CSRGenerator from './CSRGenerator/lang';
 import AppStore from './AppStore/lang';
 import Setting from './Setting/lang';
 import Help from './Help/lang';
+import Favorites from './Favorites/lang';
 import MockData from './MockData/lang';
 import WebSocketDebug from './WebSocketDebug/lang';
 import SudokuGenerator from './SudokuGenerator/lang';
@@ -277,6 +278,7 @@ export const langPacks = {
   AppStore,
   Setting,
   Help,
+  Favorites,
   MockData,
   WebSocketDebug,
   SudokuGenerator,

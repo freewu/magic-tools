@@ -10,6 +10,8 @@ export default {
     defaultApp: '默认展示应用',
     desktopOnly: '仅桌面版',
     webOnly: '仅 Web',
+    favorite: '收藏',
+    unfavorite: '取消收藏',
   },
   'zh-TW': {
     appName: '應用中心',
@@ -20,6 +22,8 @@ export default {
     defaultApp: '預設展示應用',
     desktopOnly: '僅桌面版',
     webOnly: '僅 Web',
+    favorite: '收藏',
+    unfavorite: '取消收藏',
   },
   en: {
     appName: 'App Store',
@@ -30,5 +34,7 @@ export default {
     defaultApp: 'Default App',
     desktopOnly: 'Desktop only',
     webOnly: 'Web only',
+    favorite: 'Add to favorites',
+    unfavorite: 'Remove from favorites',
   },
 } as const;

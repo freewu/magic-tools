@@ -18,6 +18,7 @@ const PAGE_NAMES: Record<string,string> = {
   "AppStore": "应用中心",
   "Setting": "设置",
   "Help": "帮助页面",
+  "Favorites": "我的收藏",
 };
 
 // 内置页面不显示面包屑 (无上级分类层级, 只有 Tabs 标签)

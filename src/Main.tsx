@@ -6,6 +6,7 @@ import { LocaleProvider } from "./hook/locale-context"
 import { AppContextProvider } from "./hook/app-context"
 import { default as MainSider } from './layout/main-sider';
 import { default as MainContent } from './layout/main-content';
+import FavoritesFab from './layout/favorites-fab';
 import { UpdateProvider } from './layout/update-context';
 import { listenOpenPage } from "./lib/tauri";
 import { getVersion } from './version';
@@ -66,6 +67,8 @@ const Main :React.FC = () => {
             <Layout style={ { height: '100vh' } }>
               <MainSider />
               <MainContent />
+              {/* 收藏悬浮入口: 全局可见, 可拖动到任意位置, 点击进入「我的收藏」 */}
+              <FavoritesFab />
             </Layout>
           </UpdateProvider>
         </AppContextProvider>

@@ -1,0 +1,20 @@
+/* 我的收藏页面 (系统级页面) 样式 */
+.favorites .favorites-toolbar-right {
+  flex-shrink: 0;
+}
+
+/* 空状态: 标题 + 操作提示分两行, 提示更淡 */
+.favorites-empty .favorites-empty-text {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.favorites-empty .favorites-empty-title {
+  font-size: 14px;
+}
+
+.favorites-empty .favorites-empty-hint {
+  font-size: 12px;
+  opacity: 0.7;
+}

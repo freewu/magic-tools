@@ -1,0 +1,39 @@
+/* 收藏悬浮入口 (FAB): 固定悬浮, 可拖动到任意位置 */
+.favorites-fab {
+  position: fixed;
+  z-index: 999;               /* 高于内容区与侧边栏拖拽条 (20), 低于 antd 弹层 (1000+) */
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 1px solid var(--app-border, rgba(128, 128, 128, 0.35));
+  border-radius: 50%;
+  background: var(--app-raised, #ffffff);
+  color: #faad14;
+  font-size: 20px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  touch-action: none;         /* 拖动时禁止页面滚动 (触摸端) */
+  -webkit-user-select: none;
+  user-select: none;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+
+.favorites-fab:hover {
+  transform: scale(1.06);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.24);
+}
+
+.favorites-fab:active,
+.favorites-fab-dragging {
+  cursor: grabbing;
+}
+
+.favorites-fab-dragging {
+  transition: none;
+  transform: scale(1.04);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+}

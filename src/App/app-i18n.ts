@@ -25,4 +25,5 @@ export const FIXED_PAGE_ZH: Record<string, string> = {
   AppStore: '应用中心',
   Setting: '设置',
   Help: '帮助页面',
+  Favorites: '我的收藏',
 };

@@ -3,10 +3,12 @@ import React,{ useState, useContext } from "react";
 import { useNavigate } from "react-router-dom"
 import "./appstore.css"
 import Icon from '@ant-design/icons';
-import { DesktopOutlined, GlobalOutlined } from "@ant-design/icons";
+import { DesktopOutlined, GlobalOutlined, StarFilled, StarOutlined } from "@ant-design/icons";
 import { AppContext } from "../../hook/app-context";
 import { useLocale } from "../../hook/locale-context";
 import { tr } from "../../i18n/lang";
+import { useFavorites } from "../../hook/use-favorites";
+import { toggleFavorite } from "../../lib/favorite";
 import appstoreLang from "./lang";
 
 export type AppItemProps = {
@@ -22,12 +24,21 @@ const AppItem = ({ uri, label, icon, desktop, web } :AppItemProps) => {
   const navigate = useNavigate();
   const { app, setApp } = useContext(AppContext)!
   const { locale } = useLocale();
+  const favorites = useFavorites();
+  const faved = favorites.includes(uri);
 
   const colClick = ( e:any ) => {
     const uri = e.currentTarget.getAttribute('data-uri');
     // 左边栏需要选中相关应用
     setApp(uri);
     navigate("/" + uri, { replace: true })
+  }
+
+  // 星标点击: 收藏 / 取消收藏 (阻止冒泡, 不触发卡片跳转)
+  const onStarClick = ( e:React.MouseEvent ) => {
+    e.stopPropagation();
+    e.preventDefault();
+    toggleFavorite(uri);
   }
 
   return (
@@ -50,6 +61,19 @@ const AppItem = ({ uri, label, icon, desktop, web } :AppItemProps) => {
           </span>
         </Tooltip>
       ) }
+      {/* 收藏星标: 卡片右上角, 点击收藏 / 取消收藏 */}
+      <Tooltip title={ tr(appstoreLang, locale, faved ? 'unfavorite' : 'favorite', faved ? '取消收藏' : '收藏') }>
+        <button
+          type="button"
+          className={ 'app-star' + (faved ? ' app-star-on' : '') }
+          aria-label={ tr(appstoreLang, locale, faved ? 'unfavorite' : 'favorite', faved ? '取消收藏' : '收藏') }
+          aria-pressed={ faved }
+          onClick={ onStarClick }
+          onPointerDown={ (e) => e.stopPropagation() }
+        >
+          { faved ? <StarFilled /> : <StarOutlined /> }
+        </button>
+      </Tooltip>
       <Space>
         {/* { icon } */}
         { label }

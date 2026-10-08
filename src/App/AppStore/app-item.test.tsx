@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import AppItem from './app-item';
 import { AppContext } from '../../hook/app-context';
+import { getFavorites } from '../../lib/favorite';
 
 // app-context 依赖 App/index.tsx 的顶层 await + import.meta.glob (jest commonjs 不支持), 故打桩
 jest.mock('../../hook/app-context', () => ({
@@ -27,7 +28,7 @@ const renderItem = (desktop?: boolean, web?: boolean) => render(
   </MemoryRouter>
 );
 
-beforeEach(() => setApp.mockClear());
+beforeEach(() => { setApp.mockClear(); localStorage.clear(); });
 
 describe('AppStore 应用卡片', () => {
   test('仅桌面版应用展示「仅桌面版」标识', () => {
@@ -53,5 +54,17 @@ describe('AppStore 应用卡片', () => {
     renderItem(false);
     fireEvent.click(screen.getByText('DNS 查询'));
     expect(setApp).toHaveBeenCalledWith('DnsQuery');
+  });
+
+  test('点击星标收藏应用 (不触发切换), 再次点击取消收藏', () => {
+    renderItem(false);
+    // 未收藏 -> 星标 aria-label 为「收藏」
+    fireEvent.click(screen.getByRole('button', { name: '收藏' }));
+    expect(getFavorites()).toEqual(['DnsQuery']);
+    expect(setApp).not.toHaveBeenCalled();
+    // 已收藏 -> 星标变为「取消收藏」
+    fireEvent.click(screen.getByRole('button', { name: '取消收藏' }));
+    expect(getFavorites()).toEqual([]);
+    expect(setApp).not.toHaveBeenCalled();
   });
 });
