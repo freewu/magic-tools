@@ -1,8 +1,8 @@
-// 我的收藏 (系统级页面): 展示已收藏的应用, 支持搜索 / 取消收藏 / 清空
+// 我的收藏 (系统级页面): 展示已收藏的应用, 支持搜索 / 取消收藏 / 清空 / 拖动排序
 // 收藏来源: 应用中心每个应用卡片右上角的星标; 悬浮入口 (FavoritesFab) 可直达本页
 import { useMemo, useState } from 'react';
 import { Button, Empty, Input, Popconfirm, Space, Typography } from 'antd';
-import { ClearOutlined, SearchOutlined } from '@ant-design/icons';
+import { ClearOutlined, HolderOutlined, SearchOutlined } from '@ant-design/icons';
 import { appList } from '../index';
 import { default as AppItem } from '../AppStore/app-item';
 import { matchQuery } from '../AppStore/lib';
@@ -10,7 +10,7 @@ import { appNameOf } from '../app-i18n';
 import { useLocale } from '../../hook/locale-context';
 import { tr, trTpl } from '../../i18n/lang';
 import { useFavorites } from '../../hook/use-favorites';
-import { clearFavorites } from '../../lib/favorite';
+import { clearFavorites, moveFavorite } from '../../lib/favorite';
 import favoritesLang from './lang';
 import '../AppStore/appstore.css';
 import './favorites.css';
@@ -22,6 +22,9 @@ const Favorites = () => {
   const favorites = useFavorites();
   // 搜索关键词: 匹配应用名 (三语) / 目录名
   const [ query, setQuery ] = useState<string>('');
+  // 拖动排序: dragIndex=正在拖动的卡片, overIndex=当前悬停的落点
+  const [ dragIndex, setDragIndex ] = useState<number | null>(null);
+  const [ overIndex, setOverIndex ] = useState<number | null>(null);
 
   // 收藏列表 -> 应用卡片 (按收藏顺序展示, 名称随语言; 过滤已下线/不存在的 app key)
   const items = useMemo(
@@ -43,6 +46,38 @@ const Favorites = () => {
     [items, query]
   );
 
+  // 仅在「未搜索 (列表=完整收藏)」且收藏数 > 1 时允许拖动排序, 避免过滤视图下顺序歧义
+  const canDrag = query.trim() === '' && items.length > 1;
+
+  const onDragStart = (index: number) => (e: React.DragEvent) => {
+    setDragIndex(index);
+    setOverIndex(index);
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', String(index));
+    }
+  };
+
+  const onDragOver = (index: number) => (e: React.DragEvent) => {
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+    setOverIndex((cur) => (cur === index ? cur : index));
+  };
+
+  const onDrop = (index: number) => (e: React.DragEvent) => {
+    e.preventDefault();
+    const raw = e.dataTransfer?.getData('text/plain');
+    const from = dragIndex ?? (raw ? Number(raw) : NaN);
+    setDragIndex(null);
+    setOverIndex(null);
+    if (Number.isInteger(from) && from !== index) moveFavorite(from, index);
+  };
+
+  const onDragEnd = () => {
+    setDragIndex(null);
+    setOverIndex(null);
+  };
+
   return (
     <div className="favorites" style={ { height: '100%', display: 'flex', flexDirection: 'column' } }>
       {/* 顶部工具栏: 左=搜索框, 右=收藏总数 + 清空 */}
@@ -57,6 +92,11 @@ const Favorites = () => {
           onChange={ (e) => setQuery(e.target.value) }
         />
         <Space size={ 12 } className="favorites-toolbar-right">
+          { canDrag && (
+            <Text type="secondary" className="favorites-drag-hint">
+              <HolderOutlined /> { tr(favoritesLang, locale, 'dragHint', '拖动卡片可调整顺序') }
+            </Text>
+          ) }
           <Text type="secondary" className="appstore-toolbar-count">
             { trTpl(favoritesLang, locale, 'count', { n: items.length }) }
           </Text>
@@ -77,16 +117,41 @@ const Favorites = () => {
 
       <div className="appstore" style={ { flex: 1, minHeight: 0, overflowY: 'auto' } }>
         {
-          visible.map((item) => (
-            <AppItem
-              key={ item.key }
-              uri={ item.key }
-              icon={ item.icon }
-              label={ item.label }
-              desktop={ item.desktop }
-              web={ item.web }
-            />
-          ))
+          visible.map((item, index) => {
+            const dragging = canDrag && dragIndex === index;
+            const over = canDrag && overIndex === index && dragIndex !== index;
+            return (
+              <div
+                key={ item.key }
+                className={ 'favorites-sortable'
+                  + (canDrag ? ' favorites-sortable-draggable' : '')
+                  + (dragging ? ' favorites-sortable-dragging' : '')
+                  + (over ? ' favorites-sortable-over' : '') }
+                draggable={ canDrag }
+                onDragStart={ canDrag ? onDragStart(index) : undefined }
+                onDragOver={ canDrag ? onDragOver(index) : undefined }
+                onDrop={ canDrag ? onDrop(index) : undefined }
+                onDragEnd={ canDrag ? onDragEnd : undefined }
+              >
+                <AppItem
+                  uri={ item.key }
+                  icon={ item.icon }
+                  label={ item.label }
+                  desktop={ item.desktop }
+                  web={ item.web }
+                />
+                { canDrag && (
+                  <span
+                    className="favorites-drag-handle"
+                    title={ tr(favoritesLang, locale, 'dragHandle', '拖动排序') }
+                    aria-hidden="true"
+                  >
+                    <HolderOutlined />
+                  </span>
+                ) }
+              </div>
+            );
+          })
         }
         {
           // 尚未收藏任何应用

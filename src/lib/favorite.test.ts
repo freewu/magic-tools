@@ -3,6 +3,7 @@ import {
   clearFavorites,
   getFavorites,
   isFavorite,
+  moveFavorite,
   normalizeFavorites,
   setFavorite,
   setFavorites,
@@ -76,5 +77,25 @@ describe('收藏列表持久化', () => {
     clearFavorites();
     window.removeEventListener(FAVORITE_EVENT, on);
     expect(seen).toEqual([['AES'], ['AES', 'SM4'], []]);
+  });
+});
+
+describe('moveFavorite 拖动排序', () => {
+  test('把后面的收藏移到前面', () => {
+    setFavorites([ 'AES', 'SM4', 'DES' ]);
+    expect(moveFavorite(2, 0)).toEqual([ 'DES', 'AES', 'SM4' ]);
+    expect(getFavorites()).toEqual([ 'DES', 'AES', 'SM4' ]);
+  });
+
+  test('把前面的收藏移到后面', () => {
+    setFavorites([ 'AES', 'SM4', 'DES' ]);
+    expect(moveFavorite(0, 2)).toEqual([ 'SM4', 'DES', 'AES' ]);
+  });
+
+  test('位置相同 / 越界时顺序不变', () => {
+    setFavorites([ 'AES', 'SM4' ]);
+    expect(moveFavorite(1, 1)).toEqual([ 'AES', 'SM4' ]);
+    expect(moveFavorite(-1, 0)).toEqual([ 'AES', 'SM4' ]);
+    expect(moveFavorite(0, 5)).toEqual([ 'AES', 'SM4' ]);
   });
 });

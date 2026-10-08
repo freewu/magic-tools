@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import Favorites from './index';
 import { LocaleProvider } from '../../hook/locale-context';
 import { AppContext } from '../../hook/app-context';
-import { setFavorites } from '../../lib/favorite';
+import { getFavorites, setFavorites } from '../../lib/favorite';
 
 // App/index.tsx 有顶层 await + import.meta.glob (jest commonjs 不支持), 故打桩成固定应用列表
 jest.mock('../index', () => {
@@ -100,5 +100,34 @@ describe('我的收藏页面', () => {
     expect(screen.queryByText('AES 加解密')).not.toBeInTheDocument();
     expect(screen.getByText('SM4 加解密')).toBeInTheDocument();
     expect(screen.getByText('共 1 个收藏')).toBeInTheDocument();
+  });
+
+  test('可拖动卡片调整收藏顺序 (并持久化新顺序)', () => {
+    setFavorites([ 'AESCrypto', 'SM4Crypto', 'DnsQuery' ]);
+    renderPage();
+    // 卡片顺序: 读取每张卡片 data-uri
+    const order = () => Array.from(document.querySelectorAll('.favorites-sortable .app'))
+      .map((el) => el.getAttribute('data-uri'));
+    expect(order()).toEqual([ 'AESCrypto', 'SM4Crypto', 'DnsQuery' ]);
+
+    const wrappers = Array.from(document.querySelectorAll('.favorites-sortable'));
+    const dt = { dataTransfer: { setData: jest.fn(), getData: () => '0', effectAllowed: '', dropEffect: '' } };
+    // 把第 1 张 (AESCrypto) 拖到第 3 张位置
+    fireEvent.dragStart(wrappers[0], dt);
+    fireEvent.dragOver(wrappers[2], dt);
+    fireEvent.drop(wrappers[2], dt);
+
+    expect(order()).toEqual([ 'SM4Crypto', 'DnsQuery', 'AESCrypto' ]);
+    expect(getFavorites()).toEqual([ 'SM4Crypto', 'DnsQuery', 'AESCrypto' ]);
+  });
+
+  test('仅未搜索且收藏>1 时展示拖动把手', () => {
+    setFavorites([ 'AESCrypto', 'SM4Crypto' ]);
+    renderPage();
+    expect(document.querySelectorAll('.favorites-drag-handle').length).toBe(2);
+    // 搜索时禁用拖动 (过滤视图下顺序歧义)
+    fireEvent.change(screen.getByPlaceholderText('搜索收藏的应用'), { target: { value: 'aes' } });
+    expect(document.querySelectorAll('.favorites-drag-handle').length).toBe(0);
+    expect(document.querySelector('.favorites-sortable-draggable')).toBeNull();
   });
 });

@@ -2,6 +2,8 @@
 // - 持久化到 localStorage('favorite-apps'), 存 app key 数组, 按收藏先后顺序 (新收藏追加在末尾)
 // - 变更时广播 window 自定义事件, 已挂载的收藏页 / 应用中心卡片 / 悬浮入口实时同步
 // - 纯函数实现 (不依赖 React), 便于单测; React 侧订阅见 src/hook/use-favorites.ts
+import { moveItem } from './array';
+
 const FAVORITE_KEY = 'favorite-apps';
 
 /** 收藏变更事件名 (detail = 最新的 key 列表) */
@@ -81,4 +83,16 @@ export function toggleFavorite(app :string) :boolean {
 /** 清空全部收藏 */
 export function clearFavorites() :void {
   setFavorites([]);
+}
+
+/**
+ * 调整收藏顺序: 把 from 位置的收藏移到 to 位置 (拖动排序)
+ * @returns 变更后的收藏列表
+ */
+export function moveFavorite(from :number, to :number) :string[] {
+  const list = getFavorites();
+  const next = moveItem(list, from, to);
+  // 顺序未变化时不重复写入 / 广播
+  if (next.every((k, i) => k === list[i])) return list;
+  return setFavorites(next);
 }

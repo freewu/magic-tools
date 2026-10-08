@@ -12,6 +12,8 @@ export default {
     clear: '清空收藏',
     clearConfirm: '确定清空全部收藏吗？',
     cancel: '取消',
+    dragHint: '拖动卡片可调整顺序',
+    dragHandle: '拖动排序',
     fab: '打开我的收藏（可拖动到任意位置）',
   },
   'zh-TW': {
@@ -25,6 +27,8 @@ export default {
     clear: '清空收藏',
     clearConfirm: '確定清空全部收藏嗎？',
     cancel: '取消',
+    dragHint: '拖曳卡片可調整順序',
+    dragHandle: '拖曳排序',
     fab: '開啟我的收藏（可拖曳到任意位置）',
   },
   en: {
@@ -38,6 +42,8 @@ export default {
     clear: 'Clear All',
     clearConfirm: 'Clear all favorites?',
     cancel: 'Cancel',
+    dragHint: 'Drag cards to reorder',
+    dragHandle: 'Drag to reorder',
     fab: 'Open favorites (drag anywhere)',
   },
 } as const;
