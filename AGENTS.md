@@ -27,6 +27,16 @@ Cloudflare Pages 的构建环境和本地不同（本地 Node 24 / npm 11），�
 - 只改 `package.json` 版本号（不改依赖）时，lockfile 顶部 `version` 字段也需同步（可同上命令刷新）；
   设置 `NODE_VERSION=22` 让 CF 侧 npm 升到 10.x 后兼容性更好，但**不能代替**上述 npm9 同步步骤
 
+## 持续集成 (CI)
+
+- **每次 `git push`（任意分支）/ PR 都会自动跑 `.github/workflows/ci.yml`**，三步质量门禁：
+  1. `npx tsc --noEmit`（类型检查）
+  2. `npm test -- --silent`（全量 Jest 单元测试，含版本号一致性校验）
+  3. `npm run build:renderer`（渲染层构建）
+- 同分支连续提交会自动取消上一轮未跑完的任务（`concurrency`），无需手动干预
+- **不包含** ESLint（仓库当前没有 eslint 配置文件，`npm run lint` 会直接报错）与 Rust `cargo check`/Tauri 打包；版本发布的产物构建仍由 `build-release.yml`（`v*` tag）负责
+- 本地提交前建议至少跑一次与 CI 等价的三步命令，避免红叉
+
 ## 运行测试
 
 - **日常开发只跑改动/新增工具的测试**：`just test-app <工具目录名>`（如 `just test-app Whiteboard`），多个工具用空格分隔放在一个引号参数里：`just test-app "Whiteboard Metronome"`；等价命令 `npm test -- src/App/<工具目录名>`（jest 按路径子串匹配）

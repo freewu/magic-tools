@@ -1,0 +1,57 @@
+# 日常 CI: 每次提交 / PR 都跑质量门禁 (类型检查 + 单元测试 + 渲染层构建)
+#
+# 与发布流程的分工:
+#   - 本工作流 (ci.yml)          : push 任意分支 / PR, 只做前端静态检查与测试, 不产出发行物
+#   - build-release.yml          : 推送 v* tag 时构建三平台安装包
+#   - deploy-pages.yml           : 推送 v* tag 时部署纯前端 Web 版
+name: ci
+
+on:
+  # branches: '**' 只匹配分支引用, 不会和 v* tag 的发布工作流重复触发
+  push:
+    branches:
+      - '**'
+  pull_request:
+  workflow_dispatch:
+
+# 同一分支上连续提交时, 自动取消尚未跑完的旧任务, 节省额度
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: typecheck / test / build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      # Node 版本与 .nvmrc / deploy-pages.yml 保持一致 (22)
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      # 与发布工作流相同的容错策略: lock 文件与 runner 的 npm 版本不匹配时回退 npm install
+      - name: Install dependencies
+        run: |
+          npm ci --no-audit --no-fund --registry=https://registry.npmjs.org || {
+            echo 'npm ci failed (lock drift?), falling back to npm install'; \
+            npm install --no-audit --no-fund --registry=https://registry.npmjs.org; \
+          }
+
+      - name: Type check (tsc --noEmit)
+        run: npx tsc --noEmit
+
+      # jest 会自动进入 CI 模式 (CI=true), 输出更精简且快照不会被写回
+      - name: Unit tests (jest)
+        run: npm test -- --silent
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Build renderer (vite build)
+        run: npm run build:renderer
