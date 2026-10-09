@@ -150,6 +150,7 @@ const list = [
 ];
 
 import { defineLoader } from './app-modules';
+import { APP_TYPES } from './app-types';
 
 // 加载 App 的定义 名称 / icon 
 // Desktop: 仅桌面版可用的应用 (浏览器演示版下页面内提示并禁用请求按钮, 应用中心展示「仅桌面版」标识)
@@ -200,19 +201,22 @@ const appList = await getAppList();
 // 生成 menu
 export const genMenuList = (appList :Array<AppItem>) => {
   type MenuGroup = { key: string; label: ReactNode; icon: ReactNode; children: AppItem[]; name: string };
-  // 菜单分组 key/icon 与 App define 中的 Type 对应
+  // 菜单分组 key/icon 与 App define 中的 Type 对应; 顺序与默认名称取自 APP_TYPES (单一来源)
   // name: 分类纯文本名称 (供面包屑等非菜单场景使用, label 会在下方升级为含数量徽标的 ReactNode)
-  let menuList = new Map<string, MenuGroup>([
-    ["convert", { key: 'convert',  label: '类型转换',  name: '类型转换',  icon: <SwapOutlined />, children: new Array<AppItem>() }],
-    ["codec", { key: 'codec',  label: '编解码',  name: '编解码',  icon: <CodeOutlined />, children: new Array<AppItem>() }],
-    ["crypto", { key: 'crypto',  label: '加解密',  name: '加解密',  icon: <LockOutlined />, children: new Array<AppItem>() }],
-    ["value-calc", { key: 'value-calc',  label: '值计算',  name: '值计算',  icon: <CalculatorOutlined />, children: new Array<AppItem>() }],
-    ["formatter", { key: 'formatter',  label: '格式化',  name: '格式化',  icon: <FormatPainterOutlined />, children: new Array<AppItem>() }],
-    ["image", { key: 'image',  label: '图片',  name: '图片',  icon: <PictureOutlined />, children: new Array<AppItem>() }],
-    ["generator", { key: 'generator',  label: '生成器',  name: '生成器',  icon: <AppstoreAddOutlined />, children: [] as AppItem[] }],
-    ["webmaster", { key: 'webmaster',  label: '站长工具',  name: '站长工具',  icon: <GlobalOutlined />, children: [] as AppItem[] }],
-    ["misc", { key: 'misc',  label: '其它',  name: '其它',  icon: <EllipsisOutlined />, children: [] as AppItem[] }],
-  ]);
+  const MENU_ICONS: Record<string, ReactNode> = {
+    'convert': <SwapOutlined />,
+    'codec': <CodeOutlined />,
+    'crypto': <LockOutlined />,
+    'value-calc': <CalculatorOutlined />,
+    'formatter': <FormatPainterOutlined />,
+    'image': <PictureOutlined />,
+    'generator': <AppstoreAddOutlined />,
+    'webmaster': <GlobalOutlined />,
+    'misc': <EllipsisOutlined />,
+  };
+  let menuList = new Map<string, MenuGroup>(
+    APP_TYPES.map(({ key, name }) => [ key, { key, label: name, name, icon: MENU_ICONS[key], children: new Array<AppItem>() } ])
+  );
 
   // todo 收藏
   // 按 app type 分类

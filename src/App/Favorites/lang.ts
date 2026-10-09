@@ -14,6 +14,9 @@ export default {
     cancel: '取消',
     dragHint: '拖动卡片可调整顺序',
     dragHandle: '拖动排序',
+    groupByType: '按类型展示',
+    groupHint: '按应用类型分组展示收藏',
+    settingGroupByType: '收藏按类型展示',
     fab: '打开我的收藏（可拖动到任意位置）',
   },
   'zh-TW': {
@@ -29,6 +32,9 @@ export default {
     cancel: '取消',
     dragHint: '拖曳卡片可調整順序',
     dragHandle: '拖曳排序',
+    groupByType: '按類型展示',
+    groupHint: '按應用類型分組展示收藏',
+    settingGroupByType: '收藏按類型展示',
     fab: '開啟我的收藏（可拖曳到任意位置）',
   },
   en: {
@@ -44,6 +50,9 @@ export default {
     cancel: 'Cancel',
     dragHint: 'Drag cards to reorder',
     dragHandle: 'Drag to reorder',
+    groupByType: 'Group by Type',
+    groupHint: 'Group favorites by app type',
+    settingGroupByType: 'Group favorites by type',
     fab: 'Open favorites (drag anywhere)',
   },
 } as const;

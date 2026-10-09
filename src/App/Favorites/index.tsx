@@ -5,16 +5,19 @@
 // 窗口默认开启 dragDropEnabled 会拦截 HTML5 拖放事件, 原生 dragstart/drop 不会派发到页面;
 // Pointer Events 不受影响 (悬浮入口也用同一机制), 同时天然支持触屏.
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Empty, Input, Popconfirm, Space, Typography } from 'antd';
-import { ClearOutlined, HolderOutlined, SearchOutlined } from '@ant-design/icons';
+import { Button, Divider, Empty, Input, Popconfirm, Space, Tooltip, Typography } from 'antd';
+import { AppstoreOutlined, ClearOutlined, HolderOutlined, SearchOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { appList } from '../index';
+import { APP_TYPES } from '../app-types';
 import { default as AppItem } from '../AppStore/app-item';
 import { matchQuery } from '../AppStore/lib';
 import { appNameOf } from '../app-i18n';
 import { useLocale } from '../../hook/locale-context';
 import { tr, trTpl } from '../../i18n/lang';
+import shell from '../../i18n/shell';
 import { useFavorites } from '../../hook/use-favorites';
 import { clearFavorites, moveFavorite } from '../../lib/favorite';
+import { GROUP_BY_TYPE_EVENT, getDefaultGroupByType } from './lib';
 import favoritesLang from './lang';
 import '../AppStore/appstore.css';
 import './favorites.css';
@@ -42,6 +45,8 @@ const Favorites = () => {
   const favorites = useFavorites();
   // 搜索关键词: 匹配应用名 (三语) / 目录名
   const [ query, setQuery ] = useState<string>('');
+  // 按类型分组展示: 默认值取自设置 (默认关闭), 页面按钮可即时切换并写回设置
+  const [ groupByType, setGroupByType ] = useState<boolean>(() => getDefaultGroupByType());
   // 拖动排序: 高亮正在拖动的卡片
   const [ draggingKey, setDraggingKey ] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
@@ -53,6 +58,17 @@ const Favorites = () => {
 
   // 卸载时兜底清理拖动监听
   useEffect(() => () => cleanupRef.current?.(), []);
+
+  // 设置页修改「收藏按类型展示」默认值时实时同步到本页
+  // (标签页保活: 切走/切回不会重建组件, 故用事件而非重新读取)
+  useEffect(() => {
+    const onChange = (e :Event) => {
+      const detail = (e as CustomEvent<boolean>).detail;
+      setGroupByType(typeof detail === 'boolean' ? detail : getDefaultGroupByType());
+    };
+    window.addEventListener(GROUP_BY_TYPE_EVENT, onChange);
+    return () => window.removeEventListener(GROUP_BY_TYPE_EVENT, onChange);
+  }, []);
 
   // 收藏列表 -> 应用卡片 (按收藏顺序展示, 名称随语言; 过滤已下线/不存在的 app key)
   const items = useMemo(
@@ -74,8 +90,27 @@ const Favorites = () => {
     [items, query]
   );
 
-  // 仅在「未搜索 (列表=完整收藏)」且收藏数 > 1 时允许拖动排序, 避免过滤视图下顺序歧义
-  const canDrag = query.trim() === '' && items.length > 1;
+  // 仅在「未搜索 (列表=完整收藏)」且收藏数 > 1 时允许拖动排序, 避免过滤视图下顺序歧义;
+  // 按类型分组视图下卡片跨组移动无法表达顺序, 故一并禁用
+  const canDrag = query.trim() === '' && items.length > 1 && !groupByType;
+
+  // 按类型分组 (仅包含命中当前搜索的收藏; 顺序与分类名取自 APP_TYPES / shell 词典)
+  const grouped = useMemo(
+    () => groupByType
+      ? APP_TYPES
+        .map(({ key, name }) => ({
+          key,
+          name: tr(shell, locale, 'cat.' + key, name),
+          children: visible.filter((a) => a.type === key),
+        }))
+        .filter((g) => g.children.length > 0)
+      : [],
+    [ groupByType, visible, locale ]
+  );
+
+  // 切换分组展示: 仅影响当前页面的即时视图, 不写回设置
+  // (持久化的默认值由「设置 → 系统 → 收藏按类型展示」决定)
+  const toggleGroupByType = () => setGroupByType((v) => !v);
 
   // 命中测试: 返回指针所在卡片在列表中的索引 (指针落在卡片间空隙时返回 null)
   const indexAtPoint = (x: number, y: number) :number | null => {
@@ -152,9 +187,39 @@ const Favorites = () => {
     }
   };
 
+  // 单个收藏卡片 (含拖动排序包装层; 分组视图下 canDrag=false, 不可拖动)
+  const renderCard = (item :typeof visible[number], index :number) => (
+    <div
+      key={ item.key }
+      className={ 'favorites-sortable'
+        + (canDrag ? ' favorites-sortable-draggable' : '')
+        + (draggingKey === item.key ? ' favorites-sortable-dragging' : '') }
+      onPointerDownCapture={ canDrag ? onPointerDownCapture : undefined }
+      onPointerDown={ canDrag ? onPointerDown(index, item.key) : undefined }
+      onClickCapture={ canDrag ? onClickCapture : undefined }
+    >
+      <AppItem
+        uri={ item.key }
+        icon={ item.icon }
+        label={ item.label }
+        desktop={ item.desktop }
+        web={ item.web }
+      />
+      { canDrag && (
+        <span
+          className="favorites-drag-handle"
+          title={ tr(favoritesLang, locale, 'dragHandle', '拖动排序') }
+          aria-hidden="true"
+        >
+          <HolderOutlined />
+        </span>
+      ) }
+    </div>
+  );
+
   return (
     <div className="favorites" style={ { height: '100%', display: 'flex', flexDirection: 'column' } }>
-      {/* 顶部工具栏: 左=搜索框, 右=收藏总数 + 清空 */}
+      {/* 顶部工具栏: 左=搜索框, 右=按类型展示开关 + 收藏总数 + 清空 */}
       <div className="appstore-toolbar">
         <Input
           size="small"
@@ -166,6 +231,15 @@ const Favorites = () => {
           onChange={ (e) => setQuery(e.target.value) }
         />
         <Space size={ 12 } className="favorites-toolbar-right">
+          <Tooltip title={ tr(favoritesLang, locale, 'groupHint', '按应用类型分组展示收藏') }>
+            <Button
+              size="small"
+              type={ groupByType ? 'primary' : 'default' }
+              aria-pressed={ groupByType }
+              icon={ groupByType ? <AppstoreOutlined /> : <UnorderedListOutlined /> }
+              onClick={ toggleGroupByType }
+            >{ tr(favoritesLang, locale, 'groupByType', '按类型展示') }</Button>
+          </Tooltip>
           { canDrag && (
             <Text type="secondary" className="favorites-drag-hint">
               <HolderOutlined /> { tr(favoritesLang, locale, 'dragHint', '拖动卡片可调整顺序') }
@@ -195,34 +269,17 @@ const Favorites = () => {
         style={ { flex: 1, minHeight: 0, overflowY: 'auto' } }
       >
         {
-          visible.map((item, index) => (
-            <div
-              key={ item.key }
-              className={ 'favorites-sortable'
-                + (canDrag ? ' favorites-sortable-draggable' : '')
-                + (draggingKey === item.key ? ' favorites-sortable-dragging' : '') }
-              onPointerDownCapture={ canDrag ? onPointerDownCapture : undefined }
-              onPointerDown={ canDrag ? onPointerDown(index, item.key) : undefined }
-              onClickCapture={ canDrag ? onClickCapture : undefined }
-            >
-              <AppItem
-                uri={ item.key }
-                icon={ item.icon }
-                label={ item.label }
-                desktop={ item.desktop }
-                web={ item.web }
-              />
-              { canDrag && (
-                <span
-                  className="favorites-drag-handle"
-                  title={ tr(favoritesLang, locale, 'dragHandle', '拖动排序') }
-                  aria-hidden="true"
-                >
-                  <HolderOutlined />
-                </span>
-              ) }
-            </div>
-          ))
+          groupByType
+            ? grouped.map((g) => (
+              <div className="appstore-group" key={ g.key }>
+                <Divider dashed orientation="left" plain className="appstore-group-divider">
+                  <span className="appstore-group-name">{ g.name }</span>
+                  <span className="appstore-group-count">( { g.children.length } )</span>
+                </Divider>
+                { g.children.map((item, i) => renderCard(item, i)) }
+              </div>
+            ))
+            : visible.map((item, index) => renderCard(item, index))
         }
         {
           // 尚未收藏任何应用

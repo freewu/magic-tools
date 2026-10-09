@@ -2,6 +2,7 @@ import { getSiderFlag, getSiderWidth, setSiderWidth, SIDER_WIDTH_MIN, SIDER_WIDT
 import { useState } from "react";
 import { Form, Radio, Slider, Switch } from "antd";
 import { AppStoreSetting } from "../AppStore/setting";
+import { FavoritesSetting } from "../Favorites/setting";
 import { useTheme } from "../../hook/theme-context";
 import { useLocale, LOCALE_IDS, LOCALE_LABELS } from "../../hook/locale-context";
 import type { LocaleId } from "../../i18n/lang";
@@ -70,6 +71,7 @@ export const SettingSystem = () => {
         />
       </Form.Item>
       <AppStoreSetting />
+      <FavoritesSetting />
     </Form>
   )
 }

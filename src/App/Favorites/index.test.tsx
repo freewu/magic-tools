@@ -1,10 +1,11 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Favorites from './index';
 import { LocaleProvider } from '../../hook/locale-context';
 import { AppContext } from '../../hook/app-context';
 import { getFavorites, setFavorites } from '../../lib/favorite';
+import { getDefaultGroupByType, setDefaultGroupByType } from './lib';
 
 // jsdom 未实现 PointerEvent: 提供最小实现 (继承 MouseEvent 保留 clientX/clientY),
 // 使拖动排序用例可真实走通 pointerdown/move/up 逻辑
@@ -242,5 +243,64 @@ describe('我的收藏页面', () => {
     fireEvent.change(screen.getByPlaceholderText('搜索收藏的应用'), { target: { value: 'aes' } });
     expect(document.querySelectorAll('.favorites-drag-handle').length).toBe(0);
     expect(document.querySelector('.favorites-sortable-draggable')).toBeNull();
+  });
+});
+
+describe('我的收藏 按类型展示', () => {
+  test('默认平铺展示, 工具栏提供「按类型展示」按钮', () => {
+    setFavorites([ 'AESCrypto', 'DnsQuery' ]);
+    renderPage();
+    expect(document.querySelectorAll('.appstore-group').length).toBe(0);
+    expect(screen.getByRole('button', { name: /按类型展示/ })).toHaveAttribute('aria-pressed', 'false');
+    expect(getDefaultGroupByType()).toBe(false);
+  });
+
+  test('点击按钮按应用类型分组 (仅当前视图), 再点回到平铺', () => {
+    setFavorites([ 'AESCrypto', 'SM4Crypto', 'DnsQuery' ]);
+    renderPage();
+
+    const btn = screen.getByRole('button', { name: /按类型展示/ });
+    fireEvent.click(btn);
+
+    // 分组顺序遵循 APP_TYPES: 加解密(crypto) 在 站长工具(webmaster) 之前
+    const names = Array.from(document.querySelectorAll('.appstore-group-name')).map((el) => el.textContent);
+    expect(names).toEqual([ '加解密', '站长工具' ]);
+    expect(document.querySelectorAll('.appstore-group .app').length).toBe(3);
+    // 分组视图禁用拖动排序
+    expect(document.querySelector('.favorites-drag-handle')).toBeNull();
+    expect(btn).toHaveAttribute('aria-pressed', 'true');
+    // 页面按钮只切换当前视图, 不修改设置中的默认值
+    expect(getDefaultGroupByType()).toBe(false);
+
+    fireEvent.click(btn);
+    expect(document.querySelectorAll('.appstore-group').length).toBe(0);
+    expect(btn).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  test('设置为按类型展示时, 页面初始即为分组视图', () => {
+    setDefaultGroupByType(true);
+    setFavorites([ 'AESCrypto', 'DnsQuery' ]);
+    renderPage();
+    expect(document.querySelectorAll('.appstore-group').length).toBe(2);
+  });
+
+  test('分组视图下搜索仅保留命中项对应分组', () => {
+    setDefaultGroupByType(true);
+    setFavorites([ 'AESCrypto', 'SM4Crypto', 'DnsQuery' ]);
+    renderPage();
+    fireEvent.change(screen.getByPlaceholderText('搜索收藏的应用'), { target: { value: 'dns' } });
+    const names = Array.from(document.querySelectorAll('.appstore-group-name')).map((el) => el.textContent);
+    expect(names).toEqual([ '站长工具' ]);
+    expect(screen.queryByText('AES 加解密')).not.toBeInTheDocument();
+  });
+
+  test('设置页修改默认值时, 已打开的收藏页实时同步', () => {
+    setFavorites([ 'AESCrypto', 'DnsQuery' ]);
+    renderPage();
+    expect(document.querySelectorAll('.appstore-group').length).toBe(0);
+    act(() => { setDefaultGroupByType(true); });
+    expect(document.querySelectorAll('.appstore-group').length).toBe(2);
+    act(() => { setDefaultGroupByType(false); });
+    expect(document.querySelectorAll('.appstore-group').length).toBe(0);
   });
 });
