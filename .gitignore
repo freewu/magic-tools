@@ -36,6 +36,9 @@ npm-debug.log.*
 
 
 *.lock
+# 例外: Tauri 应用需锁定 Rust 依赖 (保证三平台构建可复现),
+# 且 src/__tests__/version-consistency.test.ts 会校验其顶层版本号 (清单 9)
+!src-tauri/Cargo.lock
 
 # 临时验证参考包 (勿提交)
 tmp-sym-ref/

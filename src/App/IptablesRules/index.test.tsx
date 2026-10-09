@@ -5,6 +5,10 @@ import { saveTextFile } from '../../lib/tauri';
 import IptablesRules from './index';
 import { SAMPLE_IPTABLES } from './data';
 
+// 本文件内的 antd Table 渲染极重 (单文件本地约 2 分钟),
+// CI 共享 runner 上 CPU 抢占会更慢, 默认 5s 会偶发超时, 遂放宽单测超时
+jest.setTimeout(20000);
+
 jest.mock('../../lib/tauri', () => ({
   ...jest.requireActual('../../lib/tauri'),
   saveTextFile: jest.fn().mockResolvedValue(true),

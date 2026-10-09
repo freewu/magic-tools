@@ -34,6 +34,7 @@ Cloudflare Pages 的构建环境和本地不同（本地 Node 24 / npm 11），�
   2. `npm test -- --silent`（全量 Jest 单元测试，含版本号一致性校验）
   3. `npm run build:renderer`（渲染层构建）
 - 同分支连续提交会自动取消上一轮未跑完的任务（`concurrency`），无需手动干预
+- **`src-tauri/Cargo.lock` 已纳入版本管理**（`.gitignore` 中对 `*.lock` 做了 `!` 例外）：既锁定 Rust 依赖保证三平台构建可复现，也让 CI 上的版本号一致性测试（清单 9）有文件可校验
 - **不包含** ESLint（仓库当前没有 eslint 配置文件，`npm run lint` 会直接报错）与 Rust `cargo check`/Tauri 打包；版本发布的产物构建仍由 `build-release.yml`（`v*` tag）负责
 - 本地提交前建议至少跑一次与 CI 等价的三步命令，避免红叉
 
