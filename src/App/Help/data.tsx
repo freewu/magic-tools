@@ -80,6 +80,33 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-10-09 V2.22.0 Release", "2026-10-09 V2.22.0 Release", "2026-10-09 V2.22.0 Release"),
+    items: trio(
+      [
+        "新增「祖冲之序列密码」(ZUC) 加解密工具: 国密 ZUC 序列密码 (GB/T 33133, ZUC-128) 加解密, 底层为 Rust 编译的 WebAssembly (原始 C ABI, 无 wasm-bindgen), 全部计算在本机完成、不联网; 支持十六进制与文本输入, 密钥 / IV 按算法长度校验",
+        "新增「聊天生成器」工具: 9 种平台风格 (微信 / QQ / Slack / Telegram / Discord / WhatsApp / LINE / 钉钉 / 飞书) 的手机屏或桌面窗口预览, 支持文字 / 图片 / 语音 / 时间分隔四类消息并可上移下移调整顺序, 可设置聊天标题、副标题、昵称、头像 (仅本机使用、不上传) 与手机状态栏 (系统 / 时间 / 电量 / 信号 / 网络 / 充电), 一键导出 PNG (可设导出倍率)",
+        "聊天生成器支持微信专属红包 / 转账卡片 (橙色卡片 + 内联 SVG 图标, 可编辑祝福语与金额, 其他平台自动退化为纯文字); 对方昵称默认 bluefrog、默认头像为项目 Logo; 微信 / QQ / LINE / 钉钉 / 飞书标题居中且微信不展示副标题; 新增免打扰开关",
+        "修复: 预览外框黑色区域过大 (改为上下左右各 6px 对称边框)、iOS / 安卓风格切换看不出效果 (改为灵动岛 88x26 / 居中挖孔 + 状态栏高度 34 / 26 + 电量百分比在电池内 / 外 + 信号形状等可见差异, 两种风格时钟均在左侧)、深色模式下消息行与编辑区底色刺眼 (改用 antd 主题 token); 电量 <10% 红 / <20% 黄 / 充电中绿, 并允许 0%",
+        "工程: 过滤第三方依赖构建时的两条固定告警; 三语 README 与官网 docs 同步更新工具清单; 全量测试 3059 → 3163 条; 工具总数 143 → 145",
+      ],
+      [
+        "新增「祖沖之序列密碼」(ZUC) 加解密工具: 國密 ZUC 序列密碼 (GB/T 33133, ZUC-128) 加解密, 底層為 Rust 編譯的 WebAssembly (原始 C ABI, 無 wasm-bindgen), 全部計算在本機完成、不連網; 支援十六進位與文字輸入, 金鑰 / IV 依演算法長度檢查",
+        "新增「聊天產生器」工具: 9 種平台風格 (微信 / QQ / Slack / Telegram / Discord / WhatsApp / LINE / 釘釘 / 飛書) 的手機螢幕或桌面視窗預覽, 支援文字 / 圖片 / 語音 / 時間分隔四類訊息並可上移下移調整順序, 可設定聊天標題、副標題、暱稱、頭像 (僅本機使用、不上傳) 與手機狀態列 (系統 / 時間 / 電量 / 訊號 / 網路 / 充電), 一鍵匯出 PNG (可設匯出倍率)",
+        "聊天產生器支援微信專屬紅包 / 轉帳卡片 (橙色卡片 + 內嵌 SVG 圖示, 可編輯祝福語與金額, 其他平台自動退化為純文字); 對方暱稱預設 bluefrog、預設頭像為專案 Logo; 微信 / QQ / LINE / 釘釘 / 飛書標題置中且微信不顯示副標題; 新增勿擾開關",
+        "修復: 預覽外框黑色區域過大 (改為上下左右各 6px 對稱邊框)、iOS / 安卓風格切換看不出效果 (改為動態島 88x26 / 置中挖孔 + 狀態列高度 34 / 26 + 電量百分比在電池內 / 外 + 訊號形狀等可見差異, 兩種風格時鐘均在左側)、深色模式下訊息列與編輯區底色刺眼 (改用 antd 主題 token); 電量 <10% 紅 / <20% 黃 / 充電中綠, 並允許 0%",
+        "工程: 過濾第三方依賴建置時的兩條固定警告; 三語 README 與官網 docs 同步更新工具清單; 全量測試 3059 → 3163 筆; 工具總數 143 → 145",
+      ],
+      [
+        "Added the “ZUC sequence cipher” (Zu Chongzhi) tool: ZUC-128 (GB/T 33133) encryption / decryption backed by Rust compiled to WebAssembly (raw C ABI, no wasm-bindgen) — everything runs locally with no network access; accepts hex and text input and validates the key / IV length per algorithm",
+        "Added the “Chat Generator” tool: phone-screen or desktop-window previews for 9 platform styles (WeChat / QQ / Slack / Telegram / Discord / WhatsApp / LINE / DingTalk / Feishu), with text / image / voice / time-divider messages that can be reordered, configurable chat title, subtitle, nicknames, avatars (local only, never uploaded) and phone status bar (system / time / battery / signal / network / charging), plus one-click PNG export at a selectable scale",
+        "Chat Generator: WeChat-only red packet / transfer cards (orange card with inline SVG icon, editable greeting and amount — other platforms degrade to plain text); the default name is bluefrog and the default avatar is the project logo; WeChat / QQ / LINE / DingTalk / Feishu centre the title and WeChat hides the subtitle; new mute toggle",
+        "Fixed: oversized dark area around the preview (now a symmetric 6 px bezel on all sides), iOS / Android style switch having no visible effect (now a Dynamic Island 88x26 vs centred punch-hole, status bar height 34 / 26, battery percentage inside vs outside, signal icon shape — the clock stays on the left for both), and harsh message-row / editor backgrounds in dark mode (now antd theme tokens); battery colours are red below 10%, amber below 20% and green while charging, and 0% is allowed",
+        "Engineering: filtered two fixed bundler warnings from third-party deps; sync the tool list in the three READMEs and docs; total tests 3059 → 3163; tool count 143 → 145",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-10-09 V2.21.1 Release", "2026-10-09 V2.21.1 Release", "2026-10-09 V2.21.1 Release"),
     items: trio(
       [

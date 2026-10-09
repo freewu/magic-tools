@@ -3,8 +3,8 @@
 // 配置文件为 JSON, 结构如下:
 // {
 //   "app": "magic-tools",
-//   "fileVersion": 1,
-//   "appVersion": "2.21.1",
+//   "fileVersion": 2,
+//   "appVersion": "2.22.0",
 //   "exportedAt": "2025-01-02T03:04:05.000Z",
 //   "settings": { "theme-mode": "dark", "app-locale": "zh-CN", ... },
 //   "apps": { "AESCrypto": { "Mode": "CBC", ... }, ... }
