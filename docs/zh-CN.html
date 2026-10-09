@@ -56,7 +56,8 @@ h2{font-size:26px;text-align:center;margin:0 0 6px}
 footer{border-top:1px solid var(--line);padding:28px 0 40px;text-align:center;color:var(--muted);font-size:14px}
 .foot-links{display:flex;flex-wrap:wrap;gap:18px;justify-content:center;margin-bottom:10px}
 .foot-links a{color:var(--muted)}
-@media(max-width:640px){.hero h1{font-size:32px}.hero{padding:44px 16px 30px}}
+@media(max-width:640px){.hero h1{font-size:32px}.hero{padding:44px 16px 30px}.dl-cards{grid-template-columns:1fr}}
+@media(min-width:641px) and (max-width:980px){.dl-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
