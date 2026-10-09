@@ -26,6 +26,7 @@ const list = [
   'DotMatrixFont',
   'SudokuGenerator',
   'CopybookGenerator',
+  'ChatGenerator',
   'CronRules',
   'GitignoreGenerator',
   'Whiteboard',

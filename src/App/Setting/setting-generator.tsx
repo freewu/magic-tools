@@ -6,8 +6,9 @@ import { HtpasswdGeneratorSetting } from "../HtpasswdGenerator/setting";
 import { MockDataSetting } from "../MockData/setting";
 import { SudokuGeneratorSetting } from "../SudokuGenerator/setting";
 import { CopybookGeneratorSetting } from "../CopybookGenerator/setting";
+import { ChatGeneratorSetting } from "../ChatGenerator/setting";
 
-// 生成器分类设置: 二维码 / 条形码 / htpasswd / 数据生成 / 数独 / 字帖 (密码生成、OTP、点阵字、Cron 暂无设置项)
+// 生成器分类设置: 二维码 / 条形码 / htpasswd / 数据生成 / 数独 / 字帖 / 聊天生成器 (密码生成、OTP、点阵字、Cron 暂无设置项)
 export const SettingGenerator = () => {
 
   return (
@@ -18,6 +19,7 @@ export const SettingGenerator = () => {
       <MockDataSetting />
       <SudokuGeneratorSetting />
       <CopybookGeneratorSetting />
+      <ChatGeneratorSetting />
     </Form>
   )
 }

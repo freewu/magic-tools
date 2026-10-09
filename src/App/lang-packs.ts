@@ -135,6 +135,7 @@ import MockData from './MockData/lang';
 import WebSocketDebug from './WebSocketDebug/lang';
 import SudokuGenerator from './SudokuGenerator/lang';
 import CopybookGenerator from './CopybookGenerator/lang';
+import ChatGenerator from './ChatGenerator/lang';
 import JSONLConvert from './JSONLConvert/lang';
 import Teleprompter from './Teleprompter/lang';
 import BOMCheck from './BOMCheck/lang';
@@ -285,6 +286,7 @@ export const langPacks = {
   WebSocketDebug,
   SudokuGenerator,
   CopybookGenerator,
+  ChatGenerator,
   JSONLConvert,
   Teleprompter,
   IptablesRules,

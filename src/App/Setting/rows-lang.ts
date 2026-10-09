@@ -522,6 +522,34 @@ const ROWS: Record<string, Row> = {
   '纯字母数字词要求左右不是字母, 避免「v」命中 version / VIP 这类英文单词': ['純英數字詞要求左右不是字母, 避免「v」命中 version / VIP 這類英文單詞', 'Pure alphanumeric words must not be surrounded by letters, so “v” no longer matches inside version or VIP'],
   '默认打码字符': ['預設打碼字元', 'Default mask character'],
   '「复制打码文本 / 保存打码文本」使用的字符': ['「複製打碼文字 / 儲存打碼文字」使用的字元', 'Character used by Copy / Save masked text'],
+
+  // ---- 聊天生成器 (Chat Generator) ----
+  '聊天生成器': ['聊天產生器', 'Chat Generator'],
+  '默认平台': ['預設平台', 'Default platform'],
+  '默认聊天标题': ['預設聊天標題', 'Default chat title'],
+  '默认导出倍率': ['預設匯出倍率', 'Default export scale'],
+  '默认显示底部输入栏': ['預設顯示底部輸入欄', 'Show bottom input bar by default'],
+  '默认显示昵称': ['預設顯示暱稱', 'Show names by default'],
+  '打开「聊天生成器」时默认选中的平台, 默认 ${d}': [
+    '開啟「聊天產生器」時預設選中的平台, 預設 ${d}',
+    'Platform selected by default when opening the chat generator (default ${d})',
+  ],
+  '打开「聊天生成器」时填入的默认聊天标题, 默认 ${d}': [
+    '開啟「聊天產生器」時填入的預設聊天標題, 預設 ${d}',
+    'Chat title filled in by default when opening the chat generator (default ${d})',
+  ],
+  '导出 PNG 的像素倍率 (1x / 2x / 3x), 默认 ${d}x': [
+    '匯出 PNG 的像素倍率 (1x / 2x / 3x), 預設 ${d}x',
+    'Pixel ratio used when exporting the PNG (1x / 2x / 3x, default ${d}x)',
+  ],
+  '打开「聊天生成器」时是否默认显示手机底部的输入栏': [
+    '開啟「聊天產生器」時是否預設顯示手機底部的輸入欄',
+    'Whether the phone input bar is shown by default when opening the chat generator',
+  ],
+  '气泡样式的平台是否默认在气泡上方显示昵称 (Slack / Discord 始终显示)': [
+    '氣泡樣式的平台是否預設在氣泡上方顯示暱稱 (Slack / Discord 始終顯示)',
+    'Whether bubble platforms show the sender name above the bubble by default (Slack / Discord always show it)',
+  ],
 };
 
 /**
