@@ -1,18 +1,28 @@
 // 聊天生成器: 数据模型校验 / 消息增删改排序 / 默认值读写
 import {
-  BATTERY_DEFAULT, BATTERY_MAX, BATTERY_MIN, CHARGING_DEFAULT, DURATION_DEFAULT, DURATION_MAX, DURATION_MIN,
-  IMAGE_MAX_CHARS, KEY_BATTERY, KEY_CHARGING, KEY_NAME_IN, KEY_NAME_OUT, KEY_NETWORK, KEY_PLATFORM, KEY_SCALE,
+  AMOUNT_DEFAULT, AMOUNT_MAX, AVATAR_IN_DEFAULT, BATTERY_DEFAULT, BATTERY_MAX, BATTERY_MIN, CHARGING_DEFAULT,
+  DURATION_DEFAULT, DURATION_MAX, DURATION_MIN,
+  IMAGE_MAX_CHARS, KEY_BATTERY, KEY_CHARGING, KEY_MUTE, KEY_NAME_IN, KEY_NAME_OUT, KEY_NETWORK, KEY_PLATFORM, KEY_SCALE,
   KEY_SHOW_INPUT, KEY_SHOW_NAMES, KEY_SIGNAL, KEY_STATUS_TIME, KEY_SUBTITLE, KEY_SYSTEM, KEY_TITLE, MESSAGES_MAX,
+  MUTE_DEFAULT,
   NAME_IN_DEFAULT,
-  NAME_MAX, NAME_OUT_DEFAULT, NETWORK_DEFAULT, NETWORKS, PLATFORMS, PLATFORM_DEFAULT, PLATFORM_IDS, SAMPLE_IMAGE,
+  NAME_MAX, NAME_OUT_DEFAULT, NETWORK_DEFAULT, NETWORKS, PLATFORMS, PLATFORM_DEFAULT, PLATFORM_IDS,
+  REDPACKET_TEXT_DEFAULT, REDPACKET_TEXT_MAX, SAMPLE_IMAGE,
   SAMPLE_MESSAGES, SCALE_DEFAULT, SHOW_INPUT_DEFAULT, SHOW_NAMES_DEFAULT, SIGNAL_DEFAULT, SIGNAL_MAX, SIGNAL_MIN,
   STATUS_TIME_DEFAULT, SUBTITLE_DEFAULT, SYSTEMS, SYSTEM_DEFAULT, TEXT_MAX, TIME_LABEL_MAX, TIME_PATTERN,
-  TITLE_DEFAULT, TITLE_MAX,
+  TITLE_DEFAULT, TITLE_MAX, WECHAT_PACKET_TYPES,
   type ChatDoc, type ChatMessage, type ChatMessageType, type ChatNetwork, type ChatScale, type ChatSide,
   type ChatSystem, type ChatTheme, type PlatformId,
 } from './data';
 
 // ==================== 通用小工具 ====================
+
+/** 电量配色阈值 / 颜色 (低于 10% 红, 低于 20% 黄, 充电中始终绿) */
+export const BATTERY_LOW = 10;
+export const BATTERY_WARN = 20;
+export const BATTERY_COLOR_LOW = '#ff3b30';
+export const BATTERY_COLOR_WARN = '#ff9f0a';
+export const BATTERY_COLOR_CHARGING = '#34c759';
 
 /** 取整并夹到 [min, max], 非法值 (含 null / undefined / 空串) 用 fallback */
 export const clampInt = (v: unknown, min: number, max: number, fallback: number): number => {
@@ -65,9 +75,13 @@ export const normalizeTimeText = (v: unknown, fallback?: string): string => {
   return fallback !== undefined && isTimeText(fallback) ? fallback : STATUS_TIME_DEFAULT;
 };
 
-/** 消息类型是否合法 */
+/** 消息类型是否合法 (红包 / 转账为微信专属, 见 isPacketType) */
 export const normalizeMessageType = (v: unknown): ChatMessageType =>
-  v === 'image' || v === 'voice' || v === 'time' ? v : 'text';
+  (v === 'image' || v === 'voice' || v === 'time' || isPacketType(v)) ? (v as ChatMessageType) : 'text';
+
+/** 是否为微信专属卡片消息 (红包 / 转账) */
+export const isPacketType = (v: unknown): v is ChatMessageType =>
+  (WECHAT_PACKET_TYPES as unknown[]).includes(v);
 
 /** 消息方向是否合法 */
 export const normalizeSide = (v: unknown): ChatSide => (v === 'out' ? 'out' : 'in');
@@ -88,6 +102,22 @@ export const avatarText = (name: string): string => {
 
 /** 电量文案 */
 export const batteryText = (n: number): string => `${normalizeBattery(n)}%`;
+
+/**
+ * 状态栏系统风格是否为安卓。
+ * 两种风格的时钟都在左侧 (国内主流安卓 ROM 亦如此), 差异体现在: 灵动岛 / 挖孔、
+ * 状态栏高度、电池百分比在电池内 / 外、信号图标形状 (圆角条 / 斜梯形)。
+ */
+export const isAndroid = (system: ChatSystem): boolean => system === 'android';
+
+/** 电量配色: < 10% 红, < 20% 黄, 充电中始终绿 (其余用平台状态栏文字色) */
+export const batteryColor = (level: number, charging: boolean, fallback: string): string => {
+  if (charging) return BATTERY_COLOR_CHARGING;
+  const n = normalizeBattery(level);
+  if (n < BATTERY_LOW) return BATTERY_COLOR_LOW;
+  if (n < BATTERY_WARN) return BATTERY_COLOR_WARN;
+  return fallback;
+};
 
 /** 信号格: 返回 4 个布尔 (true = 点亮) */
 export const signalLevels = (signal: number): boolean[] => {
@@ -124,20 +154,22 @@ export const normalizeMessage = (raw: Partial<ChatMessage> | null | undefined): 
     type,
     side: normalizeSide(raw?.side),
     name: clampText(raw?.name, NAME_MAX).trim(),
-    text: clampText(raw?.text, type === 'time' ? TIME_LABEL_MAX : TEXT_MAX),
+    text: clampText(raw?.text, type === 'time' ? TIME_LABEL_MAX : type === 'redpacket' ? REDPACKET_TEXT_MAX : TEXT_MAX),
     image: type === 'image' ? image : '',
+    amount: clampText(raw?.amount ?? AMOUNT_DEFAULT, AMOUNT_MAX).trim(),
     duration: normalizeDuration(raw?.duration ?? DURATION_DEFAULT),
     time: typeof raw?.time === 'string' ? clampText(raw.time, 5).trim() : '',
   };
 };
 
-/** 按会话默认昵称 / 按钮类型新建一条消息 */
+/** 按会话默认昵称 / 按钮类型新建一条消息 (红包默认填好祝福语, 转账默认填好金额) */
 export const createMessage = (doc: ChatDoc, type: ChatMessageType, side: ChatSide = 'in'): ChatMessage =>
   normalizeMessage({
     type,
     side,
     name: (side === 'out' ? doc.nameOut : doc.nameIn).trim(),
-    text: '',
+    text: type === 'redpacket' ? REDPACKET_TEXT_DEFAULT : '',
+    amount: AMOUNT_DEFAULT,
     duration: DURATION_DEFAULT,
     time: '',
   });
@@ -197,9 +229,10 @@ export const docFromDefaults = (): ChatDoc => {
     network: getDefaultNetwork(),
     showInputBar: getDefaultShowInputBar(),
     showNames: getDefaultShowNames(),
+    mute: getDefaultMute(),
     nameIn: getDefaultNameIn(),
     nameOut: getDefaultNameOut(),
-    avatarIn: '',
+    avatarIn: AVATAR_IN_DEFAULT,
     avatarOut: '',
     messages: sampleMessages(),
   };
@@ -235,6 +268,10 @@ export const getDefaultShowNames = (): boolean => {
   const raw = readSetting(KEY_SHOW_NAMES);
   return raw === '0' ? false : raw === '1' ? true : SHOW_NAMES_DEFAULT;
 };
+export const getDefaultMute = (): boolean => {
+  const raw = readSetting(KEY_MUTE);
+  return raw === '0' ? false : raw === '1' ? true : MUTE_DEFAULT;
+};
 export const getDefaultNameIn = (): string => clampText(readSetting(KEY_NAME_IN) ?? NAME_IN_DEFAULT, NAME_MAX);
 export const getDefaultNameOut = (): string => clampText(readSetting(KEY_NAME_OUT) ?? NAME_OUT_DEFAULT, NAME_MAX);
 
@@ -250,11 +287,12 @@ export const setDefaultSignal = (v: unknown): void => writeSetting(KEY_SIGNAL, S
 export const setDefaultNetwork = (v: unknown): void => writeSetting(KEY_NETWORK, normalizeNetwork(v));
 export const setDefaultShowInputBar = (v: unknown): void => writeSetting(KEY_SHOW_INPUT, v ? '1' : '0');
 export const setDefaultShowNames = (v: unknown): void => writeSetting(KEY_SHOW_NAMES, v ? '1' : '0');
+export const setDefaultMute = (v: unknown): void => writeSetting(KEY_MUTE, v ? '1' : '0');
 export const setDefaultNameIn = (v: unknown): void => writeSetting(KEY_NAME_IN, clampText(v, NAME_MAX));
 export const setDefaultNameOut = (v: unknown): void => writeSetting(KEY_NAME_OUT, clampText(v, NAME_MAX));
 
 /** 供设置面板测试 / 清理用: 所有默认值键名 */
 export const DEFAULT_KEYS: string[] = [
   KEY_PLATFORM, KEY_TITLE, KEY_SUBTITLE, KEY_SCALE, KEY_SYSTEM, KEY_STATUS_TIME, KEY_BATTERY, KEY_CHARGING,
-  KEY_SIGNAL, KEY_NETWORK, KEY_SHOW_INPUT, KEY_SHOW_NAMES, KEY_NAME_IN, KEY_NAME_OUT,
+  KEY_SIGNAL, KEY_NETWORK, KEY_SHOW_INPUT, KEY_SHOW_NAMES, KEY_MUTE, KEY_NAME_IN, KEY_NAME_OUT,
 ];

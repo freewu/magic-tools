@@ -1,8 +1,13 @@
+// 对方默认头像: 项目 Logo (打包进产物, 不联网; 用户可自行上传替换)
+import logoUrl from '../../../assets/logo.png';
+
 // 聊天生成器: 平台样式表 / 消息类型 / 默认值键名 / 示例对话
 //
 // 说明: 各平台样式为「风格化模拟」——取该平台具有辨识度的配色、气泡圆角、
 // 头像形状、状态栏与标题栏等特征, 便于生成一眼可辨的对话截图;
 // 并非逐像素还原官方客户端 (官方素材受版权保护, 本工具不内置任何官方图片资源)。
+// 唯一内置的图片是项目自身 Logo (对方默认头像, 见 AVATAR_IN_DEFAULT)。
+
 // 布局两族:
 //   - mobile  + bubble: 手机屏 (状态栏 + 标题栏 + 气泡列表 + 底部输入栏), 如微信 / QQ / WhatsApp
 //   - desktop + plain : 桌面客户端 (标题栏 + 消息流, 无气泡), 如 Slack / Discord
@@ -11,8 +16,8 @@
 export type PlatformId =
   | 'wechat' | 'qq' | 'slack' | 'telegram' | 'discord' | 'whatsapp' | 'line' | 'dingtalk' | 'feishu';
 
-/** 消息类型: 文字 / 图片 / 语音 / 时间分隔 */
-export type ChatMessageType = 'text' | 'image' | 'voice' | 'time';
+/** 消息类型: 文字 / 图片 / 语音 / 时间分隔 / 微信红包 / 微信转账 (后两者仅微信展示) */
+export type ChatMessageType = 'text' | 'image' | 'voice' | 'time' | 'redpacket' | 'transfer';
 
 /** 消息方向: in = 对方 (左侧), out = 我 (右侧) */
 export type ChatSide = 'in' | 'out';
@@ -20,7 +25,7 @@ export type ChatSide = 'in' | 'out';
 /** 已读回执样式: 无 / 单勾 / 双勾 / 双勾高亮 (已读) */
 export type ChatReceipt = 'none' | 'check' | 'double' | 'read';
 
-/** 状态栏系统风格: iOS 时间在左, 经典安卓时间在右 */
+/** 状态栏系统风格: iOS (灵动岛, 百分比在电池内) / 安卓 (居中挖孔, 百分比在电池外) */
 export type ChatSystem = 'ios' | 'android';
 
 /** 状态栏网络类型 */
@@ -41,6 +46,8 @@ export interface ChatMessage {
   text: string;
   /** 图片 data URL (type = 'image') */
   image: string;
+  /** 转账金额 (type = 'transfer', 纯数字文本, 展示为 ￥金额) */
+  amount: string;
   /** 语音时长, 秒 (type = 'voice') */
   duration: number;
   /** 消息时间 HH:MM (为空则不显示) */
@@ -61,6 +68,8 @@ export interface ChatDoc {
   showInputBar: boolean;
   /** 气泡布局下是否在气泡上方显示昵称 (Slack / Discord 始终显示) */
   showNames: boolean;
+  /** 消息免打扰: 标题右侧显示禁音图标 */
+  mute: boolean;
   /** 对方昵称 */
   nameIn: string;
   /** 我的昵称 */
@@ -103,10 +112,17 @@ export interface ChatTheme {
   background: string;
   /** 背景纹理 (CSS background-image, 空 = 无) */
   pattern: string;
-  /** 手机状态栏 (desktop 布局为 null) */
-  statusBar: { bg: string; color: string; timeRight: boolean } | null;
+  /** 手机状态栏 (desktop 布局为 null); 时间在左/右由 doc.system 决定 (iOS 在左, 安卓在右) */
+  statusBar: { bg: string; color: string } | null;
   /** 顶部标题栏 */
-  header: { bg: string; color: string; subColor: string; border: string; back: boolean };
+  header: {
+    bg: string; color: string; subColor: string; border: string;
+    /** 标题是否居中 (微信 / QQ / LINE / 钉钉 / 飞书居中, WhatsApp / Telegram / 桌面端靠左) */
+    center: boolean;
+    /** 是否展示副标题 (微信标题栏没有副标题) */
+    subtitle: boolean;
+    back: boolean;
+  };
   incoming: BubbleTheme;
   outgoing: BubbleTheme;
   /** 头像形状: 圆角 px (直径一半为圆形) */
@@ -150,8 +166,8 @@ export const PLATFORMS: ChatTheme[] = [
     width: 375,
     background: '#ededed',
     pattern: '',
-    statusBar: { bg: '#ededed', color: '#000000', timeRight: false },
-    header: { bg: '#ededed', color: '#000000', subColor: '#7f7f7f', border: '#e0e0e0', back: true },
+    statusBar: { bg: '#ededed', color: '#000000' },
+    header: { bg: '#ededed', color: '#000000', subColor: '#7f7f7f', border: '#e0e0e0', center: true, subtitle: false, back: true },
     incoming: { bg: '#ffffff', color: '#000000', radius: 4, tail: true, border: '' },
     outgoing: { bg: '#95ec69', color: '#000000', radius: 4, tail: true, border: '' },
     avatar: { radius: 4, size: 40, bg: '#c9c9c9', color: '#ffffff' },
@@ -171,8 +187,8 @@ export const PLATFORMS: ChatTheme[] = [
     width: 375,
     background: '#f2f3f5',
     pattern: '',
-    statusBar: { bg: '#12b7f5', color: '#ffffff', timeRight: false },
-    header: { bg: '#12b7f5', color: '#ffffff', subColor: 'rgba(255, 255, 255, 0.82)', border: '', back: true },
+    statusBar: { bg: '#12b7f5', color: '#ffffff' },
+    header: { bg: '#12b7f5', color: '#ffffff', subColor: 'rgba(255, 255, 255, 0.82)', border: '', center: true, subtitle: true, back: true },
     incoming: { bg: '#ffffff', color: '#222222', radius: 12, tail: false, border: '' },
     outgoing: { bg: '#12b7f5', color: '#ffffff', radius: 12, tail: false, border: '' },
     avatar: { radius: 50, size: 38, bg: '#12b7f5', color: '#ffffff' },
@@ -193,7 +209,7 @@ export const PLATFORMS: ChatTheme[] = [
     background: '#ffffff',
     pattern: '',
     statusBar: null,
-    header: { bg: '#ffffff', color: '#1d1c1d', subColor: '#616061', border: '#e8e8e8', back: false },
+    header: { bg: '#ffffff', color: '#1d1c1d', subColor: '#616061', border: '#e8e8e8', center: false, subtitle: true, back: false },
     incoming: { bg: 'transparent', color: '#1d1c1d', radius: 0, tail: false, border: '' },
     outgoing: { bg: 'transparent', color: '#1d1c1d', radius: 0, tail: false, border: '' },
     avatar: { radius: 4, size: 36, bg: '#4a154b', color: '#ffffff' },
@@ -219,8 +235,8 @@ export const PLATFORMS: ChatTheme[] = [
     width: 375,
     background: '#cfdfe8',
     pattern: DOTS_LIGHT,
-    statusBar: { bg: '#517da2', color: '#ffffff', timeRight: false },
-    header: { bg: '#517da2', color: '#ffffff', subColor: 'rgba(255, 255, 255, 0.82)', border: '', back: true },
+    statusBar: { bg: '#517da2', color: '#ffffff' },
+    header: { bg: '#517da2', color: '#ffffff', subColor: 'rgba(255, 255, 255, 0.82)', border: '', center: false, subtitle: true, back: true },
     incoming: { bg: '#ffffff', color: '#000000', radius: 12, tail: true, border: '' },
     outgoing: { bg: '#effdde', color: '#000000', radius: 12, tail: true, border: '' },
     avatar: { radius: 50, size: 40, bg: '#517da2', color: '#ffffff' },
@@ -241,7 +257,7 @@ export const PLATFORMS: ChatTheme[] = [
     background: '#313338',
     pattern: '',
     statusBar: null,
-    header: { bg: '#313338', color: '#f2f3f5', subColor: '#949ba4', border: '#26272b', back: false },
+    header: { bg: '#313338', color: '#f2f3f5', subColor: '#949ba4', border: '#26272b', center: false, subtitle: true, back: false },
     incoming: { bg: 'transparent', color: '#dbdee1', radius: 0, tail: false, border: '' },
     outgoing: { bg: 'transparent', color: '#dbdee1', radius: 0, tail: false, border: '' },
     avatar: { radius: 50, size: 36, bg: '#5865f2', color: '#ffffff' },
@@ -262,8 +278,8 @@ export const PLATFORMS: ChatTheme[] = [
     width: 375,
     background: '#efeae2',
     pattern: DOTS_LIGHT,
-    statusBar: { bg: '#075e54', color: '#ffffff', timeRight: false },
-    header: { bg: '#075e54', color: '#ffffff', subColor: 'rgba(255, 255, 255, 0.82)', border: '', back: true },
+    statusBar: { bg: '#075e54', color: '#ffffff' },
+    header: { bg: '#075e54', color: '#ffffff', subColor: 'rgba(255, 255, 255, 0.82)', border: '', center: false, subtitle: true, back: true },
     incoming: { bg: '#ffffff', color: '#111b21', radius: 8, tail: true, border: '' },
     outgoing: { bg: '#d9fdd3', color: '#111b21', radius: 8, tail: true, border: '' },
     avatar: { radius: 50, size: 38, bg: '#075e54', color: '#ffffff' },
@@ -283,8 +299,8 @@ export const PLATFORMS: ChatTheme[] = [
     width: 375,
     background: '#8fb6dd',
     pattern: DOTS_DARK,
-    statusBar: { bg: '#06c755', color: '#ffffff', timeRight: false },
-    header: { bg: '#06c755', color: '#ffffff', subColor: 'rgba(255, 255, 255, 0.85)', border: '', back: true },
+    statusBar: { bg: '#06c755', color: '#ffffff' },
+    header: { bg: '#06c755', color: '#ffffff', subColor: 'rgba(255, 255, 255, 0.85)', border: '', center: true, subtitle: true, back: true },
     incoming: { bg: '#ffffff', color: '#2b2b2b', radius: 16, tail: true, border: '' },
     outgoing: { bg: '#8ce763', color: '#2b2b2b', radius: 16, tail: true, border: '' },
     avatar: { radius: 50, size: 38, bg: '#06c755', color: '#ffffff' },
@@ -304,8 +320,8 @@ export const PLATFORMS: ChatTheme[] = [
     width: 375,
     background: '#f4f5f7',
     pattern: '',
-    statusBar: { bg: '#3296fa', color: '#ffffff', timeRight: false },
-    header: { bg: '#3296fa', color: '#ffffff', subColor: 'rgba(255, 255, 255, 0.82)', border: '', back: true },
+    statusBar: { bg: '#3296fa', color: '#ffffff' },
+    header: { bg: '#3296fa', color: '#ffffff', subColor: 'rgba(255, 255, 255, 0.82)', border: '', center: true, subtitle: true, back: true },
     incoming: { bg: '#ffffff', color: '#171a1d', radius: 8, tail: false, border: '#e8eaed' },
     outgoing: { bg: '#3296fa', color: '#ffffff', radius: 8, tail: false, border: '' },
     avatar: { radius: 6, size: 40, bg: '#3296fa', color: '#ffffff' },
@@ -325,8 +341,8 @@ export const PLATFORMS: ChatTheme[] = [
     width: 375,
     background: '#ffffff',
     pattern: '',
-    statusBar: { bg: '#ffffff', color: '#1f2329', timeRight: false },
-    header: { bg: '#ffffff', color: '#1f2329', subColor: '#8f959e', border: '#e4e6eb', back: true },
+    statusBar: { bg: '#ffffff', color: '#1f2329' },
+    header: { bg: '#ffffff', color: '#1f2329', subColor: '#8f959e', border: '#e4e6eb', center: true, subtitle: true, back: true },
     incoming: { bg: '#f2f3f5', color: '#1f2329', radius: 10, tail: false, border: '' },
     outgoing: { bg: '#3370ff', color: '#ffffff', radius: 10, tail: false, border: '' },
     avatar: { radius: 50, size: 40, bg: '#3370ff', color: '#ffffff' },
@@ -343,7 +359,10 @@ export const PLATFORMS: ChatTheme[] = [
 export const PLATFORM_IDS: PlatformId[] = PLATFORMS.map((p) => p.id);
 
 /** 消息类型选项 */
-export const MESSAGE_TYPES: ChatMessageType[] = ['text', 'image', 'voice', 'time'];
+export const MESSAGE_TYPES: ChatMessageType[] = ['text', 'image', 'voice', 'time', 'redpacket', 'transfer'];
+
+/** 微信专属消息类型: 其他平台展示时退化为普通文字 (不作假) */
+export const WECHAT_PACKET_TYPES: ChatMessageType[] = ['redpacket', 'transfer'];
 
 /** 导出倍率选项 */
 export const SCALES: ChatScale[] = [1, 2, 3];
@@ -366,13 +385,17 @@ export const NAME_MAX = 16;
 export const TIME_LABEL_MAX = 40;
 /** 消息条数上限 */
 export const MESSAGES_MAX = 80;
+/** 转账金额上限 (字符数) */
+export const AMOUNT_MAX = 12;
+/** 红包祝福语上限 (字符数, 与微信红包的 25 字一致) */
+export const REDPACKET_TEXT_MAX = 25;
 /** 语音时长 (秒) 范围 */
 export const DURATION_MIN = 1;
 export const DURATION_MAX = 99;
 /** 新建语音消息的默认时长 (秒) */
 export const DURATION_DEFAULT = 5;
 /** 电量 (%) 范围 */
-export const BATTERY_MIN = 1;
+export const BATTERY_MIN = 0;
 export const BATTERY_MAX = 100;
 /** 信号格数范围 (1~4 格) */
 export const SIGNAL_MIN = 1;
@@ -406,6 +429,8 @@ export const KEY_NETWORK = 'chat-generator.network';
 export const KEY_SHOW_INPUT = 'chat-generator.showInputBar';
 /** 默认显示昵称 */
 export const KEY_SHOW_NAMES = 'chat-generator.showNames';
+/** 默认免打扰 */
+export const KEY_MUTE = 'chat-generator.mute';
 /** 默认我的昵称 */
 export const KEY_NAME_OUT = 'chat-generator.nameOut';
 /** 默认对方昵称 */
@@ -425,8 +450,15 @@ export const SIGNAL_DEFAULT = 4;
 export const NETWORK_DEFAULT: ChatNetwork = 'wifi';
 export const SHOW_INPUT_DEFAULT = true;
 export const SHOW_NAMES_DEFAULT = false;
-export const NAME_IN_DEFAULT = '林小满';
+export const MUTE_DEFAULT = false;
+export const NAME_IN_DEFAULT = 'bluefrog';
 export const NAME_OUT_DEFAULT = '我';
+
+/** 对方默认头像 (项目 Logo, 由打包器生成 URL, 导出 PNG 时同源可读) */
+export const AVATAR_IN_DEFAULT = logoUrl;
+/** 微信红包默认祝福语 / 说明文案, 转账说明文案与默认金额 */
+export const REDPACKET_TEXT_DEFAULT = '恭喜发财，大吉大利';
+export const AMOUNT_DEFAULT = '100.00';
 
 /** 状态栏时间格式 (与官方一致: 上午 9:41 / 9:41) */
 export const TIME_PATTERN = /^([01]?\d|2[0-3]):[0-5]\d$/;

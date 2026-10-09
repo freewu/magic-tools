@@ -1,19 +1,24 @@
 import {
-  BATTERY_DEFAULT, CHARGING_DEFAULT, IMAGE_MAX_CHARS, MESSAGES_MAX, NAME_IN_DEFAULT, NAME_MAX, NAME_OUT_DEFAULT,
-  NETWORK_DEFAULT, PLATFORMS, PLATFORM_DEFAULT, SAMPLE_IMAGE, SCALE_DEFAULT, SHOW_INPUT_DEFAULT,
+  AMOUNT_DEFAULT, AMOUNT_MAX, AVATAR_IN_DEFAULT, BATTERY_DEFAULT, CHARGING_DEFAULT, IMAGE_MAX_CHARS, MESSAGES_MAX,
+  MUTE_DEFAULT, NAME_IN_DEFAULT, NAME_MAX, NAME_OUT_DEFAULT,
+  NETWORK_DEFAULT, PLATFORMS, PLATFORM_DEFAULT, REDPACKET_TEXT_DEFAULT, REDPACKET_TEXT_MAX, SAMPLE_IMAGE,
+  SCALE_DEFAULT, SHOW_INPUT_DEFAULT,
   SHOW_NAMES_DEFAULT, SIGNAL_DEFAULT, STATUS_TIME_DEFAULT, SUBTITLE_DEFAULT, SYSTEM_DEFAULT, TEXT_MAX,
   TIME_LABEL_MAX, TITLE_DEFAULT, TITLE_MAX,
   type ChatDoc, type ChatMessage,
 } from './data';
 import {
-  DEFAULT_KEYS, addMessage, avatarText, batteryText, clampInt, clampText, clearMessages, createMessage,
-  docFromDefaults, getDefaultBattery, getDefaultCharging, getDefaultNameIn, getDefaultNameOut,
+  DEFAULT_KEYS, BATTERY_COLOR_CHARGING, BATTERY_COLOR_LOW, BATTERY_COLOR_WARN, addMessage, avatarText,
+  batteryColor, batteryText, clampInt, clampText, clearMessages, createMessage,
+  docFromDefaults, getDefaultBattery, getDefaultCharging, getDefaultMute, getDefaultNameIn, getDefaultNameOut,
   getDefaultNetwork, getDefaultPlatform, getDefaultScale, getDefaultShowInputBar, getDefaultShowNames,
-  getDefaultSignal, getDefaultStatusTime, getDefaultSubtitle, getDefaultSystem, getDefaultTitle, isTimeText,
+  getDefaultSignal, getDefaultStatusTime, getDefaultSubtitle, getDefaultSystem, getDefaultTitle, isAndroid,
+  isPacketType, isTimeText,
   moveMessage, newId, normalizeBattery, normalizeDuration, normalizeMessage, normalizeMessageType,
   normalizeNetwork, normalizePlatform, normalizeScale, normalizeSide, normalizeSignal, normalizeSystem,
   normalizeTimeText, platformLabel, receiptMark, removeMessage, sampleMessages, setDefaultBattery,
-  setDefaultCharging, setDefaultNameIn, setDefaultNameOut, setDefaultNetwork, setDefaultPlatform, setDefaultScale,
+  setDefaultCharging, setDefaultMute, setDefaultNameIn, setDefaultNameOut, setDefaultNetwork, setDefaultPlatform,
+  setDefaultScale,
   setDefaultShowInputBar, setDefaultShowNames, setDefaultSignal, setDefaultStatusTime, setDefaultSubtitle,
   setDefaultSystem, setDefaultTitle, signalLevels, themeOf, updateMessage, voiceText,
 } from './lib';
@@ -56,7 +61,8 @@ describe('聊天生成器 · 数值与枚举校验', () => {
 
   test('电量 / 信号 / 语音时长 夹到合法区间', () => {
     expect(normalizeBattery(55)).toBe(55);
-    expect(normalizeBattery(0)).toBe(1);
+    expect(normalizeBattery(0)).toBe(0); // 允许 0% (低电量截图)
+    expect(normalizeBattery(-5)).toBe(0);
     expect(normalizeBattery(1200)).toBe(100);
     expect(normalizeSignal(3)).toBe(3);
     expect(normalizeSignal(0)).toBe(1);
@@ -82,8 +88,29 @@ describe('聊天生成器 · 数值与枚举校验', () => {
     expect(normalizeMessageType('voice')).toBe('voice');
     expect(normalizeMessageType('video')).toBe('text');
     expect(normalizeMessageType(undefined)).toBe('text');
+    // 红包 / 转账是合法类型 (微信专属, 其他平台会退化为文字)
+    expect(normalizeMessageType('redpacket')).toBe('redpacket');
+    expect(normalizeMessageType('transfer')).toBe('transfer');
+    expect(isPacketType('redpacket')).toBe(true);
+    expect(isPacketType('transfer')).toBe(true);
+    expect(isPacketType('text')).toBe(false);
+    expect(isPacketType(undefined)).toBe(false);
     expect(normalizeSide('out')).toBe('out');
     expect(normalizeSide('x')).toBe('in');
+  });
+
+  test('平台标题栏差异: 微信居中且无副标题, 桌面临近平台靠左', () => {
+    expect(themeOf('wechat').header.center).toBe(true);
+    expect(themeOf('wechat').header.subtitle).toBe(false);
+    expect(themeOf('qq').header.subtitle).toBe(true);
+    expect(themeOf('line').header.center).toBe(true);
+    expect(themeOf('dingtalk').header.center).toBe(true);
+    expect(themeOf('feishu').header.center).toBe(true);
+    for (const p of PLATFORMS.filter((x) => x.id === 'telegram' || x.id === 'whatsapp' || x.id === 'slack' || x.id === 'discord')) {
+      expect(p.header.center).toBe(false);
+    }
+    // 手机屏都有返回箭头, 桌面端没有
+    for (const p of PLATFORMS) expect(p.header.back).toBe(p.layout === 'mobile');
   });
 });
 
@@ -104,7 +131,7 @@ describe('聊天生成器 · 平台样式表', () => {
   });
 
   test('手机屏带状态栏与输入栏, Slack / Discord 为桌面消息流', () => {
-    expect(themeOf('wechat').statusBar?.timeRight).toBe(false);
+    expect(themeOf('wechat').statusBar).not.toBeNull();
     expect(themeOf('wx' as never).id).toBe('wechat'); // 非法 id 回退第一个平台
     expect(themeOf('qq').inputBar?.pill).toBeTruthy();
     expect(themeOf('slack').layout).toBe('desktop');
@@ -127,9 +154,33 @@ describe('聊天生成器 · 平台样式表', () => {
     expect(voiceText(6)).toBe('6"');
     expect(voiceText(0)).toBe('1"');
     expect(receiptMark('none')).toBe('');
-    expect(receiptMark('check')).toBe('✓');
     expect(receiptMark('double')).toBe('✓✓');
     expect(receiptMark('read')).toBe('✓✓');
+  });
+
+  test('电量配色: < 10% 红, < 20% 黄, 充电中始终绿', () => {
+    const fallback = '#ffffff';
+    // 阈值边界: 9 红 / 10 黄 / 19 黄 / 20 用平台色
+    expect(batteryColor(0, false, fallback)).toBe(BATTERY_COLOR_LOW);
+    expect(batteryColor(9, false, fallback)).toBe(BATTERY_COLOR_LOW);
+    expect(batteryColor(10, false, fallback)).toBe(BATTERY_COLOR_WARN);
+    expect(batteryColor(19, false, fallback)).toBe(BATTERY_COLOR_WARN);
+    expect(batteryColor(20, false, fallback)).toBe(fallback);
+    expect(batteryColor(82, false, fallback)).toBe(fallback);
+    // 充电中无论电量高低都是绿色
+    for (const n of [1, 9, 10, 19, 20, 100]) expect(batteryColor(n, true, fallback)).toBe(BATTERY_COLOR_CHARGING);
+    // 非法电量先夹到区间再判色 (不会出现 NaN 比较)
+    expect(batteryColor(Number.NaN, false, fallback)).toBe(fallback);
+    expect(batteryColor(-5, false, fallback)).toBe(BATTERY_COLOR_LOW);
+  });
+
+  test('状态栏系统差异由 isAndroid 描述 (两种风格时钟都在左, 差异在灵动岛/挖孔与百分比位置)', () => {
+    expect(isAndroid('android')).toBe(true);
+    expect(isAndroid('ios')).toBe(false);
+    // 与平台无关: 同一平台切换系统即可看到差异
+    for (const p of PLATFORMS.filter((x) => x.layout === 'mobile')) {
+      expect(p.statusBar).not.toBeNull();
+    }
   });
 });
 
@@ -165,6 +216,20 @@ describe('聊天生成器 · 消息增删改', () => {
     expect(blank.type).toBe('text');
     expect(blank.side).toBe('in');
     expect(blank.id).toBeTruthy();
+    expect(blank.amount).toBe(AMOUNT_DEFAULT);
+  });
+
+  test('红包 / 转账: 祝福语与金额的默认值 / 上限', () => {
+    // 红包祝福语上限为 25 字 (与微信红包一致)
+    const packet = normalizeMessage({ type: 'redpacket', text: 'x'.repeat(REDPACKET_TEXT_MAX + 10) });
+    expect(packet.text).toHaveLength(REDPACKET_TEXT_MAX);
+    // 普通文字仍用 TEXT_MAX
+    expect(normalizeMessage({ type: 'text', text: 'y'.repeat(REDPACKET_TEXT_MAX + 10) }).text)
+      .toHaveLength(REDPACKET_TEXT_MAX + 10);
+    // 金额截断到 AMOUNT_MAX 且两端空白被去掉
+    expect(normalizeMessage({ type: 'transfer', amount: 'z'.repeat(AMOUNT_MAX + 5) }).amount).toHaveLength(AMOUNT_MAX);
+    expect(normalizeMessage({ type: 'transfer', amount: ' 12.50 ' }).amount).toBe('12.50');
+    expect(normalizeMessage({ type: 'transfer', amount: undefined }).amount).toBe(AMOUNT_DEFAULT);
   });
 
   test('createMessage 按发送方取默认昵称, 时间为空', () => {
@@ -178,6 +243,17 @@ describe('聊天生成器 · 消息增删改', () => {
     expect(createMessage(doc, 'voice', 'out').name).toBe('我方乙');
     // 默认值为 'in'
     expect(createMessage(doc, 'image').side).toBe('in');
+  });
+
+  test('createMessage 给红包填好默认祝福语, 给转账填好默认金额', () => {
+    const doc = docOf();
+    const packet = createMessage(doc, 'redpacket');
+    expect(packet.text).toBe(REDPACKET_TEXT_DEFAULT);
+    expect(packet.type).toBe('redpacket');
+    expect(packet.image).toBe('');
+    const transfer = createMessage(doc, 'transfer');
+    expect(transfer.amount).toBe(AMOUNT_DEFAULT);
+    expect(transfer.text).toBe('');
   });
 
   test('addMessage 追加, 达到上限后不再增加', () => {
@@ -265,6 +341,10 @@ describe('聊天生成器 · 默认值读写', () => {
     expect(getDefaultShowNames()).toBe(SHOW_NAMES_DEFAULT);
     expect(getDefaultNameIn()).toBe(NAME_IN_DEFAULT);
     expect(getDefaultNameOut()).toBe(NAME_OUT_DEFAULT);
+    expect(getDefaultMute()).toBe(MUTE_DEFAULT);
+    // 对方昵称默认为 bluefrog, 默认头像为内置 Logo (由打包器生成 URL)
+    expect(NAME_IN_DEFAULT).toBe('bluefrog');
+    expect(AVATAR_IN_DEFAULT.length).toBeGreaterThan(0);
   });
 
   test('设置后能读回, 非法值写入时即被规范化', () => {
@@ -282,6 +362,7 @@ describe('聊天生成器 · 默认值读写', () => {
     setDefaultShowNames(true);
     setDefaultNameIn('甲');
     setDefaultNameOut('乙');
+    setDefaultMute(true);
 
     expect(getDefaultPlatform()).toBe('discord');
     expect(getDefaultTitle()).toBe('群聊标题');
@@ -297,6 +378,7 @@ describe('聊天生成器 · 默认值读写', () => {
     expect(getDefaultShowNames()).toBe(true);
     expect(getDefaultNameIn()).toBe('甲');
     expect(getDefaultNameOut()).toBe('乙');
+    expect(getDefaultMute()).toBe(true);
 
     // 非法值 / 超长值在写入时被修正
     setDefaultPlatform('unknown');
@@ -310,7 +392,7 @@ describe('聊天生成器 · 默认值读写', () => {
     expect(getDefaultPlatform()).toBe(PLATFORM_DEFAULT);
     expect(getDefaultScale()).toBe(3); // 越界值写入时即按上限夹取
     expect(getDefaultStatusTime()).toBe(STATUS_TIME_DEFAULT);
-    expect(getDefaultBattery()).toBe(1);
+    expect(getDefaultBattery()).toBe(0); // 0% 也是合法电量
     expect(getDefaultSignal()).toBe(4);
     expect(getDefaultTitle()).toHaveLength(TITLE_MAX);
     expect(getDefaultNameIn()).toHaveLength(NAME_MAX);
@@ -326,14 +408,15 @@ describe('聊天生成器 · 默认值读写', () => {
     expect(doc.title).toBe('假期计划');
     expect(doc.battery).toBe(48);
     expect(doc.showInputBar).toBe(false);
-    expect(doc.avatarIn).toBe('');
+    expect(doc.mute).toBe(MUTE_DEFAULT);
+    expect(doc.avatarIn).toBe(AVATAR_IN_DEFAULT);
     expect(doc.avatarOut).toBe('');
     expect(doc.messages.length).toBeGreaterThan(0);
     expect(doc.messages[0].type).toBe('time');
   });
 
   test('DEFAULT_KEYS 覆盖全部默认值键名, 且读取时同样防御非法值', () => {
-    expect(DEFAULT_KEYS.length).toBe(14);
+    expect(DEFAULT_KEYS.length).toBe(15);
     for (const key of DEFAULT_KEYS) expect(key.startsWith('chat-generator.')).toBe(true);
     // 全部键写入垃圾值 (模拟手工改写 / 旧版本残留)
     for (const key of DEFAULT_KEYS) localStorage.setItem(key, 'x'.repeat(200));

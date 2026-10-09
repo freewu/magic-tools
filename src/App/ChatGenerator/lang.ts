@@ -35,6 +35,10 @@ const rows: Record<string, [string, string]> = {
   '头像仅本地使用, 不会上传': ['頭像僅在本機使用, 不會上傳', 'Avatars are used locally only and never uploaded'],
   '显示昵称': ['顯示暱稱', 'Show names'],
   '在气泡上方显示昵称': ['在氣泡上方顯示暱稱', 'Show the nickname above each bubble'],
+  '免打扰': ['勿擾', 'Mute'],
+  '在标题右侧显示免打扰 (禁音) 图标': ['在標題右側顯示勿擾 (靜音) 圖示', 'Show a mute icon next to the chat title'],
+  '微信平台不展示副标题': ['微信平台不顯示副標題', 'WeChat does not show a subtitle'],
+  '用默认头像': ['使用預設頭像', 'Use the default avatar'],
 
   // ---- 手机状态栏 ----
   '手机状态栏': ['手機狀態列', 'Phone status bar'],
@@ -42,6 +46,7 @@ const rows: Record<string, [string, string]> = {
   '安卓': ['安卓', 'Android'],
   '时间': ['時間', 'Time'],
   '电量': ['電量', 'Battery'],
+  '电量低于 10% 显示红色, 低于 20% 显示黄色, 充电中显示绿色': ['電量低於 10% 顯示紅色, 低於 20% 顯示黃色, 充電中顯示綠色', 'Red below 10%, amber below 20%, and green while charging'],
   '充电中': ['充電中', 'Charging'],
   '信号': ['訊號', 'Signal'],
   '格': ['格', 'bars'],
@@ -63,6 +68,14 @@ const rows: Record<string, [string, string]> = {
   '替换图片': ['替換圖片', 'Replace image'],
   '时长 (秒)': ['時長 (秒)', 'Duration (s)'],
   '时间分隔文案': ['時間分隔文案', 'Timestamp label'],
+  '红包': ['紅包', 'Red packet'],
+  '微信红包': ['微信紅包', 'WeChat Red Packet'],
+  '转账': ['轉帳', 'Transfer'],
+  '添加红包': ['新增紅包', 'Add red packet'],
+  '添加转账': ['新增轉帳', 'Add transfer'],
+  '祝福语': ['祝福語', 'Greeting'],
+  '金额': ['金額', 'Amount'],
+  '仅微信平台展示红包与转账卡片': ['僅微信平台顯示紅包與轉帳卡片', 'Red packet & transfer cards are WeChat only'],
   '上移': ['上移', 'Move up'],
   '下移': ['下移', 'Move down'],
   '删除': ['刪除', 'Delete'],
@@ -83,6 +96,10 @@ const rows: Record<string, [string, string]> = {
   '支持文字 / 图片 / 语音 / 时间分隔四类消息, 可上移下移调整顺序': [
     '支援文字 / 圖片 / 語音 / 時間分隔四類訊息, 可上移下移調整順序',
     'Text / image / voice / timestamp messages, reorderable with move up & down',
+  ],
+  '微信平台额外支持红包 / 转账卡片, 其他平台会退化为文字': [
+    '微信平台額外支援紅包 / 轉帳卡片, 其他平台會退化為文字',
+    'WeChat also supports red packet / transfer cards; other platforms fall back to plain text',
   ],
   '可设置标题、昵称、头像与手机状态栏 (系统 / 时间 / 电量 / 信号 / 网络) 等细节': [
     '可設定標題、暱稱、頭像與手機狀態列 (系統 / 時間 / 電量 / 訊號 / 網路) 等細節',

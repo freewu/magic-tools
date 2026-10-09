@@ -1,7 +1,7 @@
 // 聊天生成器: 左侧编辑对话 (平台 / 会话信息 / 手机状态栏 / 消息列表), 右侧实时预览并导出 PNG
 import {
   Alert, Button, Card, Col, Divider, Input, InputNumber, Row, Segmented, Select, Space, Switch, Tabs, Tag,
-  Tooltip, Typography, Upload, message,
+  Tooltip, Typography, Upload, message, theme as antdTheme,
 } from 'antd';
 import {
   ArrowDownOutlined, ArrowUpOutlined, CloudUploadOutlined, DeleteOutlined, DownloadOutlined, PictureOutlined,
@@ -14,7 +14,8 @@ import { useLocale } from '../../hook/locale-context';
 import { savePngFile } from '../../lib/tauri';
 import { cr, crT } from './lang';
 import {
-  IMAGE_MAX_CHARS, MESSAGES_MAX, NAME_MAX, NETWORKS, PLATFORMS, SCALES, TEXT_MAX, TIME_LABEL_MAX, TITLE_MAX,
+  AMOUNT_MAX, AVATAR_IN_DEFAULT, IMAGE_MAX_CHARS, MESSAGES_MAX, NAME_MAX, NETWORKS, PLATFORMS, REDPACKET_TEXT_MAX,
+  SCALES, TEXT_MAX, TIME_LABEL_MAX, TITLE_MAX,
   type ChatDoc, type ChatMessage, type ChatMessageType, type ChatNetwork, type ChatScale, type ChatSide,
   type ChatSystem, type PlatformId,
 } from './data';
@@ -26,7 +27,9 @@ import {
 const { Text, Paragraph } = Typography;
 
 /** 消息类型 -> 文案 key (再走 lang 取词) */
-const TYPE_LABEL: Record<ChatMessageType, string> = { text: '文字', image: '图片', voice: '语音', time: '时间' };
+const TYPE_LABEL: Record<ChatMessageType, string> = {
+  text: '文字', image: '图片', voice: '语音', time: '时间', redpacket: '红包', transfer: '转账',
+};
 
 const ChatGenerator: React.FC = () => {
   const { locale } = useLocale();
@@ -38,9 +41,20 @@ const ChatGenerator: React.FC = () => {
   const [scale, setScale] = useState<ChatScale>(() => getDefaultScale());
   const [exporting, setExporting] = useState(false);
   const shotRef = useRef<HTMLDivElement>(null);
+  // 跟随明暗主题取色 (深色模式下不能用写死的浅底色块, 否则暗底上的浅色方块十分刺眼)
+  const { token } = antdTheme.useToken();
 
   const theme = themeOf(doc.platform);
   const patch = (p: Partial<ChatDoc>) => setDoc((d) => ({ ...d, ...p }));
+  // 红包 / 转账是微信专属能力, 其他平台不提供 (避免生成不存在于该平台的卡片)
+  const isWechat = doc.platform === 'wechat';
+
+  /** 消息类型下拉: 微信多出红包 / 转账; 切到其他平台后保留消息已选类型, 避免下拉显示原始值 */
+  const typeOptions = (type: ChatMessageType): ChatMessageType[] => {
+    const base: ChatMessageType[] = ['text', 'image', 'voice', 'time'];
+    const list = isWechat ? base.concat(['redpacket', 'transfer']) : base;
+    return list.includes(type) ? list : [...list, type];
+  };
 
   // ---- 消息操作 ----
   const append = (type: ChatMessageType, side: ChatSide = 'in') => {
@@ -142,13 +156,24 @@ const ChatGenerator: React.FC = () => {
                 </span>
                 <span>
                   <Text type="secondary" style={{ fontSize: 12, marginRight: 6 }}>{t('副标题')}</Text>
-                  <Input
-                    size="small"
-                    style={{ width: 130 }}
-                    maxLength={TITLE_MAX}
-                    value={doc.subtitle}
-                    onChange={(e) => patch({ subtitle: e.target.value })}
-                  />
+                  <Tooltip title={theme.header.subtitle ? '' : t('微信平台不展示副标题')}>
+                    <span>
+                      <Input
+                        size="small"
+                        style={{ width: 130 }}
+                        maxLength={TITLE_MAX}
+                        disabled={!theme.header.subtitle}
+                        value={doc.subtitle}
+                        onChange={(e) => patch({ subtitle: e.target.value })}
+                      />
+                    </span>
+                  </Tooltip>
+                </span>
+                <span>
+                  <Text type="secondary" style={{ fontSize: 12, marginRight: 6 }}>{t('免打扰')}</Text>
+                  <Tooltip title={t('在标题右侧显示免打扰 (禁音) 图标')}>
+                    <Switch size="small" checked={doc.mute} onChange={(v) => patch({ mute: v })} />
+                  </Tooltip>
                 </span>
               </Space>
 
@@ -195,7 +220,9 @@ const ChatGenerator: React.FC = () => {
                   </Tooltip>
                   {doc.avatarIn ? (
                     <Button size="small" type="link" onClick={() => patch({ avatarIn: '' })}>{t('移除头像')}</Button>
-                  ) : null}
+                  ) : (
+                    <Button size="small" type="link" onClick={() => patch({ avatarIn: AVATAR_IN_DEFAULT })}>{t('用默认头像')}</Button>
+                  )}
                 </span>
                 <span>
                   <Text type="secondary" style={{ fontSize: 12, marginRight: 6 }}>{t('我的头像')}</Text>
@@ -241,11 +268,13 @@ const ChatGenerator: React.FC = () => {
                   </Tooltip>
                 </span>
                 <span>
-                  <Text type="secondary" style={{ fontSize: 12, marginRight: 6 }}>{t('电量')}</Text>
+                  <Tooltip title={t('电量低于 10% 显示红色, 低于 20% 显示黄色, 充电中显示绿色')}>
+                    <Text type="secondary" style={{ fontSize: 12, marginRight: 6 }}>{t('电量')}</Text>
+                  </Tooltip>
                   <InputNumber
                     size="small"
                     style={{ width: 86 }}
-                    min={1}
+                    min={0}
                     max={100}
                     value={doc.battery}
                     onChange={(v) => patch({ battery: Number(v ?? 82) })}
@@ -293,9 +322,17 @@ const ChatGenerator: React.FC = () => {
               <Divider style={{ margin: '4px 0' }} />
 
               {/* ---- 消息列表 ---- */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
                 <Text strong style={{ fontSize: 13 }}>{tt('消息 (共 {n} 条)', { n: doc.messages.length })}</Text>
-                <Button size="small" onClick={() => { patch({ messages: sampleMessages() }); message.success(t('已载入示例对话')); }}>{t('载入示例')}</Button>
+                <Space size={6} wrap>
+                  <Tooltip title={isWechat ? '' : t('仅微信平台展示红包与转账卡片')}>
+                    <span style={{ display: 'inline-flex', gap: 6 }}>
+                      <Button size="small" disabled={!isWechat} onClick={() => append('redpacket', 'in')}>{t('添加红包')}</Button>
+                      <Button size="small" disabled={!isWechat} onClick={() => append('transfer', 'in')}>{t('添加转账')}</Button>
+                    </span>
+                  </Tooltip>
+                  <Button size="small" onClick={() => { patch({ messages: sampleMessages() }); message.success(t('已载入示例对话')); }}>{t('载入示例')}</Button>
+                </Space>
               </div>
               <div style={{ maxHeight: '46vh', overflowY: 'auto', paddingRight: 4 }}>
                 {doc.messages.length === 0 ? (
@@ -305,7 +342,8 @@ const ChatGenerator: React.FC = () => {
                     key={msg.id}
                     style={{
                       display: 'flex', alignItems: 'flex-start', gap: 6, padding: '6px 8px', marginBottom: 6,
-                      border: '1px solid #f0f0f0', borderRadius: 6, background: '#fafafa',
+                      border: `1px solid ${token.colorBorderSecondary}`, borderRadius: 6,
+                      background: token.colorFillQuaternary,
                     }}
                   >
                     <Tag style={{ marginTop: 3 }}>{i + 1}</Tag>
@@ -324,7 +362,7 @@ const ChatGenerator: React.FC = () => {
                           style={{ width: 92 }}
                           value={msg.type}
                           onChange={(v: ChatMessageType) => onUpdate(msg.id, { type: v })}
-                          options={(['text', 'image', 'voice', 'time'] as ChatMessageType[]).map((k) => ({ value: k, label: t(TYPE_LABEL[k]) }))}
+                          options={typeOptions(msg.type).map((k) => ({ value: k, label: t(TYPE_LABEL[k]) }))}
                         />
                         {msg.type === 'time' ? null : (
                           <Input
@@ -373,6 +411,27 @@ const ChatGenerator: React.FC = () => {
                         {msg.type === 'image' && msg.image ? (
                           <Button size="small" type="link" onClick={() => onUpdate(msg.id, { image: '' })}>{t('删除')}</Button>
                         ) : null}
+                        {msg.type === 'redpacket' ? (
+                          <Input
+                            size="small"
+                            style={{ width: 220 }}
+                            maxLength={REDPACKET_TEXT_MAX}
+                            value={msg.text}
+                            placeholder={t('祝福语')}
+                            onChange={(e) => onUpdate(msg.id, { text: e.target.value })}
+                          />
+                        ) : null}
+                        {msg.type === 'transfer' ? (
+                          <Input
+                            size="small"
+                            style={{ width: 150 }}
+                            maxLength={AMOUNT_MAX}
+                            prefix="￥"
+                            value={msg.amount}
+                            placeholder={t('金额')}
+                            onChange={(e) => onUpdate(msg.id, { amount: e.target.value })}
+                          />
+                        ) : null}
                         {doc.showNames || theme.bubble === 'plain' ? (
                           <Input
                             size="small"
@@ -398,6 +457,7 @@ const ChatGenerator: React.FC = () => {
                 <ul style={{ paddingLeft: 18, margin: 0 }}>
                   <li>{t('可切换 9 个平台: 微信 / QQ / Slack / Telegram / Discord / WhatsApp / LINE / 钉钉 / 飞书')}</li>
                   <li>{t('支持文字 / 图片 / 语音 / 时间分隔四类消息, 可上移下移调整顺序')}</li>
+                  <li>{t('微信平台额外支持红包 / 转账卡片, 其他平台会退化为文字')}</li>
                   <li>{t('可设置标题、昵称、头像与手机状态栏 (系统 / 时间 / 电量 / 信号 / 网络) 等细节')}</li>
                   <li>{t('全部内容在本地渲染并导出 PNG, 不联网、不上传任何数据')}</li>
                   <li>{t('样式为各平台风格的近似模拟, 与官方客户端存在差异; 请勿用于伪造真实聊天记录或任何违法用途')}</li>
@@ -430,7 +490,7 @@ const ChatGenerator: React.FC = () => {
             }
           >
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <div ref={shotRef} style={{ display: 'inline-block', background: '#f5f5f5', padding: 12, borderRadius: 8 }}>
+              <div ref={shotRef} style={{ display: 'inline-block', padding: 12 }}>
                 <ChatPreview doc={doc} />
               </div>
             </div>
