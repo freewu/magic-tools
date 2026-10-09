@@ -51,6 +51,7 @@ const list = [
   'DESCrypto',
   'BlowfishCrypto',
   'RabbitCrypto',
+  'ZucCrypto',
   'RC2Crypto',
   'RC4Crypto',
   'RC5Crypto',

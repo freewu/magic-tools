@@ -2,7 +2,7 @@
 
 # 🧰 Magic Tools
 
-**全能开发工具箱 —— 9 大分类、143 个实用工具，桌面 + Web 双端。**
+**全能开发工具箱 —— 9 大分类、144 个实用工具，桌面 + Web 双端。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
@@ -17,7 +17,7 @@
 ## ✨ 亮点
 
 - **100+ 常用开发工具**，按 9 大分类组织：编解码、类型转换、加解密、值计算、格式化、图片、生成器、站长工具与实用小工具。
-- **完整的密码学套件** —— 对称加密（AES / DES / 3DES / SM4 / ChaCha20 / Blowfish / Rabbit / RC2–RC6 / TEA / XTEA / XXTEA）、非对称（RSA / SM2 国密）、古典密码（凯撒 / 栅栏 / 维吉尼亚 / 希尔），以及 Cisco Type 7。
+- **完整的密码学套件** —— 对称加密（AES / DES / 3DES / SM4 / ChaCha20 / Blowfish / Rabbit / RC2–RC6 / TEA / XTEA / XXTEA / 祖冲之 ZUC）、非对称（RSA / SM2 国密）、古典密码（凯撒 / 栅栏 / 维吉尼亚 / 希尔），以及 Cisco Type 7。
 - **哈希与 MAC** —— MD5、SHA-1/2、SHA-3、Keccak、SM3、BCrypt、Scrypt、PBKDF2、HKDF、HMAC、CMAC、KMAC，以及 BCC / LRC / CRC 校验。
 - **批量二维码 / 条形码** —— 一次生成多条并预览，桌面版一键选择文件夹导出全部 PNG。
 - **本地运算、数据不上传** —— 所有计算都在设备本地完成，支持深色模式；左右两栏宽度可拖动调整。
@@ -27,8 +27,8 @@
 
 > 顶部切换语言可阅读 **English** 与 **繁體中文** 版本。
 
-### 🔐 加解密 *(22)*
-AES 加解密 · RSA 加解密 · SM2 加解密 · SM4 加解密 · SM9 加解密 · 凯撒加解密 · 栅栏加解密 · 维吉尼亚加解密 · 希尔加解密 · Cisco Type 7 · DES 加解密 · Blowfish 加解密 · Rabbit 加解密 · RC2 加解密 · RC4 加解密 · RC5 加解密 · RC6 加解密 · ChaCha20 加解密 · 3DES 加解密 · TEA 加解密 · XTEA 加解密 · XXTEA 加解密
+### 🔐 加解密 *(23)*
+AES 加解密 · RSA 加解密 · SM2 加解密 · SM4 加解密 · SM9 加解密 · 凯撒加解密 · 栅栏加解密 · 维吉尼亚加解密 · 希尔加解密 · Cisco Type 7 · DES 加解密 · Blowfish 加解密 · Rabbit 加解密 · RC2 加解密 · RC4 加解密 · RC5 加解密 · RC6 加解密 · ChaCha20 加解密 · 3DES 加解密 · TEA 加解密 · XTEA 加解密 · XXTEA 加解密 · 祖冲之序列密码
 
 ### 🧮 值计算 *(15)*
 Hash 值计算 · HmacHash 值计算 · SHA3 Hash 值计算 · Keccak Hash 值计算 · BCrypt · Scrypt · PBKDF2 值计算 · CMAC 计算 · HKDF 计算 · KMAC 计算 · PPI计算 · 原码/反码/补码计算 · BCC 校验 · LRC 校验 · CRC 校验
@@ -92,7 +92,7 @@ magic-tools
 │   │   ├── app-modules.ts    # 构建期用 import.meta.glob 静态收集 (替代 webpack context 动态导入)
 │   │   ├── app-i18n.ts       # 应用注册表: appNameOf() 等取各工具/固定页三语名称
 │   │   ├── lang-packs.ts     # 汇总各工具 lang.ts 的默认语言包 (default 导出)
-│   │   └── <工具>/           # 每工具一个目录 (当前 143 个, 清单见下) — 两步注册
+│   │   └── <工具>/           # 每工具一个目录 (当前 144 个, 清单见下) — 两步注册
 │   │       ├── define.tsx    # 注册元数据: AppName(zh-CN 默认名) / Icon / Type(分组)
 │   │       ├── index.tsx     # 工具页面组件 (默认导出, 懒加载)
 │   │       ├── lang.ts       # 默认语言包 + 三语词条 (zh 短语即 key, 值=[zh-TW, en]) + 本地取词函数
@@ -111,9 +111,9 @@ magic-tools
 
 ### `src/App/` 现有工具清单
 
-[`src/App/`](src/App/) 下现有 **143** 个工具目录, 每个目录 = 一个工具, 由其中 `define.tsx` 声明。**新增工具需两步登记**：(1) 把目录名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 数组 (该数组决定侧边栏/应用中心菜单顺序与路由; `import.meta.glob` 只负责发现页面组件, 不决定菜单); (2) 把其 `lang.ts` 默认导出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名称与界面文案才能随语言切换。按下表 `Type` 分组列出 (与侧边栏/上方功能总览一致), 括号内为目录数。除下列公共文件外, 个别工具另有私有文件 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
+[`src/App/`](src/App/) 下现有 **144** 个工具目录, 每个目录 = 一个工具, 由其中 `define.tsx` 声明。**新增工具需两步登记**：(1) 把目录名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 数组 (该数组决定侧边栏/应用中心菜单顺序与路由; `import.meta.glob` 只负责发现页面组件, 不决定菜单); (2) 把其 `lang.ts` 默认导出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名称与界面文案才能随语言切换。按下表 `Type` 分组列出 (与侧边栏/上方功能总览一致), 括号内为目录数。除下列公共文件外, 个别工具另有私有文件 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
 
-**🔐 加解密 *(22)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `SM9Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
+**🔐 加解密 *(23)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `SM9Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto` · `ZucCrypto`
 
 **🧮 值计算 *(15)*** — `BCCCheck` · `BcryptCalc` · `CMACCalc` · `CRCCheck` · `ComplementCalc` · `HKDFCalc` · `Hash` · `HmacHash` · `KMACCalc` · `KeccakHash` · `LRCCheck` · `PBKDF2Calc` · `PPICalc` · `SHA3Hash` · `ScryptCalc`
 

@@ -13,6 +13,7 @@ import { DESCryptoSetting } from "../DESCrypto/setting";
 import { BlowfishCryptoSetting } from "../BlowfishCrypto/setting";
 import { TripleDESCryptoSetting } from "../TripleDESCrypto/setting";
 import { RabbitCryptoSetting } from "../RabbitCrypto/setting";
+import { ZucCryptoSetting } from "../ZucCrypto/setting";
 import { RC2CryptoSetting } from "../RC2Crypto/setting";
 import { RC4CryptoSetting } from "../RC4Crypto/setting";
 import { RC5CryptoSetting } from "../RC5Crypto/setting";
@@ -39,6 +40,7 @@ export const SettingCrypto = () => {
       <BlowfishCryptoSetting />
       <TripleDESCryptoSetting />
       <RabbitCryptoSetting />
+      <ZucCryptoSetting />
       <RC2CryptoSetting />
       <RC4CryptoSetting />
       <RC5CryptoSetting />

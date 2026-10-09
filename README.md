@@ -2,7 +2,7 @@
 
 # 🧰 Magic Tools
 
-**An all-in-one developer toolbox — 143 utilities in 9 categories, cross-platform desktop & Web.**
+**An all-in-one developer toolbox — 144 utilities in 9 categories, cross-platform desktop & Web.**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
@@ -17,7 +17,7 @@
 ## ✨ Highlights
 
 - **100+ everyday developer tools** organized into 9 categories: codecs, converters, cryptography, hashing, formatters, image tools, generators, webmaster tools and utilities.
-- **Full cryptography suite** — symmetric (AES / DES / 3DES / SM4 / ChaCha20 / Blowfish / Rabbit / RC2–RC6 / TEA / XTEA / XXTEA), asymmetric (RSA / SM2), classical ciphers (Caesar / Rail Fence / Vigenère / Hill) plus Cisco Type 7.
+- **Full cryptography suite** — symmetric (AES / DES / 3DES / SM4 / ChaCha20 / Blowfish / Rabbit / RC2–RC6 / TEA / XTEA / XXTEA / ZUC), asymmetric (RSA / SM2), classical ciphers (Caesar / Rail Fence / Vigenère / Hill) plus Cisco Type 7.
 - **Hashing & MACs** — MD5, SHA-1, SHA-2, SHA-3, Keccak, SM3, BCrypt, Scrypt, PBKDF2, HKDF, HMAC, CMAC, KMAC and BCC / LRC / CRC checksums.
 - **Batch QR / barcode** generation — create many codes at once and export every PNG to a folder in one click on desktop.
 - **Local & private** — all computation happens in your browser / device; nothing is uploaded. Dark mode included, and the sidebar width is drag-resizable.
@@ -27,8 +27,8 @@
 
 > Click the language switcher at the top to read this document in **简体中文** or **繁體中文**.
 
-### 🔐 Cryptography *(22)*
-AES · DES · 3DES · RSA · SM2 · SM4 · SM9 · ChaCha20 · Blowfish · Rabbit · RC2 · RC4 · RC5 · RC6 · TEA · XTEA · XXTEA · Caesar · Rail Fence · Vigenère · Hill · Cisco Type 7
+### 🔐 Cryptography *(23)*
+AES · DES · 3DES · RSA · SM2 · SM4 · SM9 · ChaCha20 · Blowfish · Rabbit · RC2 · RC4 · RC5 · RC6 · TEA · XTEA · XXTEA · Caesar · Rail Fence · Vigenère · Hill · Cisco Type 7 · ZUC sequence cipher (Zu Chongzhi)
 
 ### 🧮 Hash, MAC & Value Calculators *(15)*
 Hash (MD5/SHA1/SHA2/SM3/…) · HMAC · SHA-3 · Keccak · BCrypt · Scrypt · PBKDF2 · CMAC · HKDF · KMAC · PPI · Complement (sign-magnitude / 1's / 2's) · BCC checksum · LRC checksum · CRC checksum (30+ parameterised standards)
@@ -92,7 +92,7 @@ magic-tools
 │   │   ├── app-modules.ts    # build-time collection via import.meta.glob (replaces webpack context)
 │   │   ├── app-i18n.ts       # app registry: appNameOf() trilingual names for tools & fixed pages
 │   │   ├── lang-packs.ts     # aggregates every tool's default language pack (lang.ts default export)
-│   │   └── <Tool>/           # one folder per tool (143, grouped list below) — 2-step registration
+│   │   └── <Tool>/           # one folder per tool (144, grouped list below) — 2-step registration
 │   │       ├── define.tsx    # registration metadata: AppName (zh-CN default) / Icon / Type (category)
 │   │       ├── index.tsx     # tool page component (default export; lazy-loaded)
 │   │       ├── lang.ts       # default language pack + rows (zh phrase = key → [zh-TW, en]) + lookup helpers
@@ -111,9 +111,9 @@ magic-tools
 
 ### Existing tools under `src/App/`
 
-143 tool folders live under [`src/App/`](src/App/) and each holds one tool declared by its `define.tsx`. **Adding a tool takes two steps:** (1) append the folder name to the `list` array in [`src/App/index.tsx`](src/App/index.tsx) — that hand-maintained registry drives the sidebar / App Center menu order and routing, while `import.meta.glob` only discovers the page component; (2) add its `lang.ts` default export to [`src/App/lang-packs.ts`](src/App/lang-packs.ts) so names/UI strings can be translated. Grouped below by the `Type` registered in `define.tsx` (same categories as the sidebar / [feature overview](#-feature-overview)). Some tools add tool-specific files besides the common ones (e.g. `AESCrypto/gcm.ts`, `Hash/sm3.ts`+`keccak.ts`, `CronRules/parse.tsx`, `Setting/setting-*.tsx`):
+144 tool folders live under [`src/App/`](src/App/) and each holds one tool declared by its `define.tsx`. **Adding a tool takes two steps:** (1) append the folder name to the `list` array in [`src/App/index.tsx`](src/App/index.tsx) — that hand-maintained registry drives the sidebar / App Center menu order and routing, while `import.meta.glob` only discovers the page component; (2) add its `lang.ts` default export to [`src/App/lang-packs.ts`](src/App/lang-packs.ts) so names/UI strings can be translated. Grouped below by the `Type` registered in `define.tsx` (same categories as the sidebar / [feature overview](#-feature-overview)). Some tools add tool-specific files besides the common ones (e.g. `AESCrypto/gcm.ts`, `Hash/sm3.ts`+`keccak.ts`, `CronRules/parse.tsx`, `Setting/setting-*.tsx`):
 
-**🔐 Cryptography *(22)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `SM9Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto`
+**🔐 Cryptography *(23)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `SM9Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto` · `ZucCrypto`
 
 **🧮 Hash, MAC & Value Calculators *(15)*** — `BCCCheck` · `BcryptCalc` · `CMACCalc` · `CRCCheck` · `ComplementCalc` · `HKDFCalc` · `Hash` · `HmacHash` · `KMACCalc` · `KeccakHash` · `LRCCheck` · `PBKDF2Calc` · `PPICalc` · `SHA3Hash` · `ScryptCalc`
 

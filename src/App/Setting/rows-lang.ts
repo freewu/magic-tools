@@ -177,6 +177,7 @@ const ROWS: Record<string, Row> = {
   'Blowfish 加解密': ['Blowfish 加解密', 'Blowfish Encrypt & Decrypt'],
   'ChaCha20 加解密': ['ChaCha20 加解密', 'ChaCha20 Encrypt & Decrypt'],
   'Rabbit 加解密': ['Rabbit 加解密', 'Rabbit Encrypt & Decrypt'],
+  '祖冲之序列密码': ['祖沖之序列密碼', 'ZUC Encrypt & Decrypt'],
   'RC2 加解密': ['RC2 加解密', 'RC2 Encrypt & Decrypt'],
   'RC4 加解密': ['RC4 加解密', 'RC4 Encrypt & Decrypt'],
   'RC5 加解密': ['RC5 加解密', 'RC5 Encrypt & Decrypt'],

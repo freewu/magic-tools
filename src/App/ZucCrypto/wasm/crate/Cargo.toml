@@ -1,0 +1,22 @@
+[package]
+name = "zuc-wasm"
+version = "0.1.0"
+edition = "2021"
+description = "ZUC (祖冲之) stream cipher WebAssembly shim for MagicTools"
+license = "MIT"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# 算法实现: https://github.com/Nugine/zuc (MIT)
+# ZUC-128 = GB/T 33133.1-2016 / 128-EEA3 = GB/T 33133.2-2021, ZUC-256 = ZUC256-version1.1
+zuc = "=0.4.1"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

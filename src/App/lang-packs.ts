@@ -37,6 +37,7 @@ import BasicAuthCodec from './BasicAuthCodec/lang';
 import DESCrypto from './DESCrypto/lang';
 import BlowfishCrypto from './BlowfishCrypto/lang';
 import RabbitCrypto from './RabbitCrypto/lang';
+import ZucCrypto from './ZucCrypto/lang';
 import RC2Crypto from './RC2Crypto/lang';
 import RC4Crypto from './RC4Crypto/lang';
 import RC5Crypto from './RC5Crypto/lang';
@@ -186,6 +187,7 @@ export const langPacks = {
   DESCrypto: DESCrypto,
   BlowfishCrypto: BlowfishCrypto,
   RabbitCrypto: RabbitCrypto,
+  ZucCrypto: ZucCrypto,
   RC2Crypto: RC2Crypto,
   RC4Crypto: RC4Crypto,
   RC5Crypto: RC5Crypto,
