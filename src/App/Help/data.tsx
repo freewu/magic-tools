@@ -80,6 +80,27 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-10-09 V2.21.1 Release", "2026-10-09 V2.21.1 Release", "2026-10-09 V2.21.1 Release"),
+    items: trio(
+      [
+        "设置中心新增配置导入 / 导出 (按钮位于设置页右上角): 导出文件名为 magic-tools.config.<版本号>.<yyyymmddHHmmss>.json, 内含版本号与导出时间, 内容 = 全部本地设置快照 + 各应用结构化默认配置 (文件格式版本 2, 按各应用 lib.ts 的 getDefault<项> / setDefault<项> 约定自动发现, 当前覆盖 65 个应用 / 172 项); 导入会校验文件身份与格式后合并写回 (只覆盖文件里出现的键), 完成自动重载页面, 并对「非 MagicTools 配置」「JSON 解析失败」「缺少 settings / apps」分类提示",
+        "我的收藏新增按类型展示: 工具栏按钮一键按类型分组 (与左侧菜单同序, 组头带数量); 默认是否分组可在「设置中心 → 系统 → 收藏按类型展示」配置 (默认关闭 / 平铺), 页面按钮只切换当前视图不改默认值, 设置改动实时同步到已打开的收藏页; 分组视图自动停用拖动排序",
+        "新增 GitHub Actions CI: 每次 push / PR 执行 类型检查 + 全量单元测试 + 渲染层构建, 同分支自动取消未跑完的旧任务; src-tauri/Cargo.lock 纳入版本管理 (锁定 Rust 依赖, 三平台构建可复现); 三语 README 新增实时 CI 徽章; 全量测试 3050 → 3059 条",
+      ],
+      [
+        "設定中心新增設定匯入 / 匯出 (按鈕位於設定頁右上角): 匯出檔名為 magic-tools.config.<版本號>.<yyyymmddHHmmss>.json, 內含版本號與匯出時間, 內容 = 全部本機設定快照 + 各應用結構化預設設定 (檔案格式版本 2, 依各應用 lib.ts 的 getDefault<項> / setDefault<項> 約定自動探索, 目前涵蓋 65 個應用 / 172 項); 匯入會驗證檔案身分與格式後合併寫回 (只覆蓋檔案中出現的鍵), 完成後自動重新載入頁面, 並對「非 MagicTools 設定檔」「JSON 解析失敗」「缺少 settings / apps」分類提示",
+        "我的收藏新增按類型展示: 工具列按鈕一鍵依類型分組 (與左側選單同序, 組頭顯示數量); 預設是否分組可在「設定中心 → 系統 → 收藏按類型展示」設定 (預設關閉 / 平鋪), 頁面按鈕只切換目前檢視不改預設值, 設定變更即時同步到已開啟的收藏頁; 分組檢視自動停用拖曳排序",
+        "新增 GitHub Actions CI: 每次 push / PR 執行 型別檢查 + 全量單元測試 + 渲染層建置, 同分支自動取消未跑完的舊任務; src-tauri/Cargo.lock 納入版本管理 (鎖定 Rust 依賴, 三平台建置可重現); 三語 README 新增即時 CI 徽章; 全量測試 3050 → 3059 筆",
+      ],
+      [
+        "Settings now supports configuration import / export (buttons in the top-right of the Settings page): export writes magic-tools.config.<version>.<yyyymmddHHmmss>.json containing the version and the export timestamp, with all local settings (a localStorage snapshot) plus each app's structured default settings (file format v2, auto-discovered from the existing getDefault<Item> / setDefault<Item> convention — 65 apps / 172 items today); import validates the file and merges it back (only the keys present in the file are overwritten), reloads the page afterwards, and reports distinct messages for “not a MagicTools config”, “invalid JSON” and “missing settings / apps”",
+        "My Favorites: group by type — a toolbar button groups favourites by app type (same order as the sidebar, with per-group counts); the default (off = flat list) can be set in Settings → System → “Group favorites by type”; the page button only toggles the current view, setting changes sync live to an already-open Favorites page, and reordering is disabled in the grouped view",
+        "Added a GitHub Actions CI workflow: every push / PR runs type check + full unit tests + renderer build, with superseded runs cancelled per branch; src-tauri/Cargo.lock is now tracked (pins Rust dependencies for reproducible builds); live CI badges added to the three READMEs; total tests 3050 → 3059",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-10-08 V2.21.0 Release", "2026-10-08 V2.21.0 Release", "2026-10-08 V2.21.0 Release"),
     items: trio(
       [

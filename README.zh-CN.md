@@ -6,7 +6,7 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
-![version](https://img.shields.io/badge/magic--tools-v2.21.0-007EC6?style=flat-square&labelColor=24292F) ![ci](https://img.shields.io/github/actions/workflow/status/freewu/magic-tools/ci.yml?style=flat-square&label=CI&labelColor=24292F&logo=githubactions&logoColor=fff) ![Tauri](https://img.shields.io/badge/Tauri-2-0E7490?style=flat-square&labelColor=24292F&logo=tauri&logoColor=fff) ![React](https://img.shields.io/badge/React-18-087EA4?style=flat-square&labelColor=24292F&logo=react&logoColor=fff) ![Ant Design](https://img.shields.io/badge/Ant_Design-5-0170FE?style=flat-square&labelColor=24292F&logo=antdesign&logoColor=fff) ![MIT License](https://img.shields.io/badge/license-MIT-4F46E5?style=flat-square&labelColor=24292F)
+![version](https://img.shields.io/badge/magic--tools-v2.21.1-007EC6?style=flat-square&labelColor=24292F) ![ci](https://img.shields.io/github/actions/workflow/status/freewu/magic-tools/ci.yml?style=flat-square&label=CI&labelColor=24292F&logo=githubactions&logoColor=fff) ![Tauri](https://img.shields.io/badge/Tauri-2-0E7490?style=flat-square&labelColor=24292F&logo=tauri&logoColor=fff) ![React](https://img.shields.io/badge/React-18-087EA4?style=flat-square&labelColor=24292F&logo=react&logoColor=fff) ![Ant Design](https://img.shields.io/badge/Ant_Design-5-0170FE?style=flat-square&labelColor=24292F&logo=antdesign&logoColor=fff) ![MIT License](https://img.shields.io/badge/license-MIT-4F46E5?style=flat-square&labelColor=24292F)
 
 [下载桌面版](#-下载) · [在线体验](https://freewu.github.io/magic-tools/) · [提交 Issue](https://github.com/freewu/magic-tools/issues/new)
 

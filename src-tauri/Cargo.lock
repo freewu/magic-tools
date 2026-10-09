@@ -2137,7 +2137,7 @@ dependencies = [
 
 [[package]]
 name = "magic-tools"
-version = "2.21.0"
+version = "2.21.1"
 dependencies = [
  "base64 0.22.1",
  "log",
