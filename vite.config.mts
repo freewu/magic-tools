@@ -1,7 +1,35 @@
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, extname, join, resolve } from 'node:path';
-import { defineConfig, type Plugin } from 'vite';
+import { createLogger, defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
+
+// ---------------- 构建日志降噪 (仅过滤第三方包的两条固定告警) ----------------
+// 这两条每次构建都会打印, 但都不是本项目代码的问题; 长期噪声会掩盖真正需要看的告警。
+// 只精确匹配这两条, 其余告警 (含本项目自己的同类问题) 照常输出:
+//   1. vtracer-wasm/vtracer.js 内部的 new URL('vtracer_bg.wasm', import.meta.url):
+//      该包写死了包内并不存在的文件名 (实际为 vtracer.wasm), 我们在
+//      src/App/ImageToSvg/tracer.ts 里已显式传入 ?url 资源, 这行是死代码; 而 node_modules
+//      无法加 /* @vite-ignore */ 注释 (重装依赖即丢失), 故在此按原文精确滤掉。
+//   2. SM9Crypto/wasm/gmssl.js (Emscripten 生成的胶水代码) 引用 Node 内置模块 module:
+//      浏览器/桌面端走的是另一分支, 用不到; 限定 importer 为 gmssl.js 才过滤。
+const THIRD_PARTY_NOISE = [
+  "new URL('vtracer_bg.wasm', import.meta.url) doesn't exist at build time",
+];
+
+const isThirdPartyNoise = (msg :unknown) :boolean => {
+  if (typeof msg !== 'string') return false;
+  return THIRD_PARTY_NOISE.some((noise) => msg.includes(noise));
+};
+
+/** 过滤 vtracer 的静态资源告警 (经 logger.warnOnce 输出, 需包装 logger 才能拦住) */
+const quietLogger = () => {
+  const logger = createLogger();
+  const warn = logger.warn.bind(logger);
+  const warnOnce = logger.warnOnce.bind(logger);
+  logger.warn = (msg, options) => { if (!isThirdPartyNoise(msg)) warn(msg, options); };
+  logger.warnOnce = (msg, options) => { if (!isThirdPartyNoise(msg)) warnOnce(msg, options); };
+  return logger;
+};
 
 // ---------------- Vditor 运行时资源 (仅「即时渲染 Markdown」使用) ----------------
 // Vditor 把 lute 引擎 / 图标 / 语言包 / 代码高亮 / katex / 内容主题 / 表情图 都放在运行期
@@ -118,6 +146,7 @@ const vditorAssets = (): Plugin => {
 export default defineConfig({
   root: 'src',
   base: './',
+  customLogger: quietLogger(),
   // 静态资源目录 (src/public): 存放 favicon 等无需打包处理、原样拷入产物的文件
   publicDir: 'public',
   plugins: [react(), vditorAssets()],
@@ -138,6 +167,12 @@ export default defineConfig({
     // 属桌面工具多页共享 UI 框架的固有成本, 阈值提到 1100 留余量
     chunkSizeWarningLimit: 1100,
     rollupOptions: {
+      // 过滤第 2 条第三方告警: 只有 importer 是 SM9 的 gmssl.js 时才忽略
+      onwarn(warning, defaultHandler) {
+        const msg = warning.message ?? '';
+        if (msg.includes('has been externalized for browser compatibility') && msg.includes('gmssl.js')) return;
+        defaultHandler(warning);
+      },
       output: {
         // 手动分包: 主入口 (layout/App 注册表) 只留业务骨架,
         // 框架/UI/工具依赖拆成独立 vendor chunk, 供懒加载页面按需复用
