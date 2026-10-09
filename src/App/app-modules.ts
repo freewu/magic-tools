@@ -12,6 +12,8 @@ import type { ComponentType, LazyExoticComponent } from 'react';
 const pageGlob = import.meta.glob('./*/index.tsx');
 // key: './MorseCodec/define.tsx' -> () => Promise<{ AppName, Icon, Type }>
 const defineGlob = import.meta.glob<Record<string, unknown>>('./*/define.tsx');
+// key: './MorseCodec/lib.ts' -> () => Promise<模块> (供配置导入导出收集 getDefault*/setDefault* 成对函数)
+const libGlob = import.meta.glob<Record<string, unknown>>('./*/lib.ts');
 
 /** 懒加载页面组件 (src/App/<key>/index.tsx 默认导出) */
 const lazyCache = new Map<string, LazyExoticComponent<ComponentType<Record<string, never>>>>();
@@ -26,7 +28,17 @@ export function lazyPage(key: string): LazyExoticComponent<ComponentType<Record<
   return comp;
 }
 
-/** 应用定义加载器 (src/App/<app>/define.tsx 具名导出 AppName/Icon/Type) */
+/** 应用定义加载器 (src/App/<app>/define.tsx) */
 export function defineLoader(app: string): (() => Promise<Record<string, unknown>>) | undefined {
   return defineGlob[`./${app}/define.tsx`];
+}
+
+/** 应用 lib 模块加载器 (src/App/<app>/lib.ts, 含 getDefault<Item> / setDefault<Item> 配置读写函数) */
+export function libLoader(app: string): (() => Promise<Record<string, unknown>>) | undefined {
+  return libGlob[`./${app}/lib.ts`];
+}
+
+/** 全部含 lib.ts 的应用 key (目录名, 与 appList 一致) */
+export function appLibKeys(): string[] {
+  return Object.keys(libGlob).map((path) => path.replace(/^\.\//, '').replace(/\/lib\.ts$/, ''));
 }

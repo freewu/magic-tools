@@ -7,6 +7,7 @@ import { useLocale } from "../../hook/locale-context";
 import { tr } from "../../i18n/lang";
 import shell from "../../i18n/shell";
 import { appNameOf } from "../app-i18n";
+import { SettingConfig } from "./setting-config";
 
 const CATEGORY_ICONS: Record<string, ReactNode> = {
   system: <SettingOutlined />,
@@ -134,31 +135,49 @@ const Setting = () => {
         </div>
       </div>
 
-      {/* 右侧: 所有分类连排, 滚动时左侧 tab 自动切换 */}
-      <div
-        ref={ scrollRef }
-        onScroll={ onScroll }
-        style={ { flex: 1, minWidth: 0, overflowY: 'auto', overflowX: 'hidden', background: token.colorBgLayout, padding: '4px 16px 0', position: 'relative' } }
-      >
-        { itemList.map((item) => (
-          <div
-            key={ item.key }
-            ref={ (el) => {
-              if (el) blockRefs.current.set(item.key, el);
-              else blockRefs.current.delete(item.key);
-            } }
-            style={ { paddingBottom: 22 } }
-          >
-            <div style={ { display: 'flex', alignItems: 'center', gap: 8, fontSize: 16, fontWeight: 700, padding: '14px 2px 8px', color: token.colorText } }>
-              <span style={ { fontSize: 15, display: 'inline-flex' } }>{ CATEGORY_ICONS[item.key] ?? null }</span>
-              { itemName(item.key, item.label) }
+      {/* 右侧: 顶部工具条 (导入 / 导出) + 分类连排, 滚动时左侧 tab 自动切换 */}
+      <div style={ { flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', background: token.colorBgLayout } }>
+        {/* 右上角: 配置文件导入 / 导出 */}
+        <div
+          style={ {
+            flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            gap: 8, padding: '8px 16px', borderBottom: `1px solid ${token.colorBorderSecondary}`,
+            background: token.colorBgContainer,
+          } }
+        >
+          <span style={ { display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 600, color: token.colorText, minWidth: 0 } }>
+            <span style={ { fontSize: 15, display: 'inline-flex' } }>{ CATEGORY_ICONS[active] ?? null }</span>
+            <span style={ { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }>
+              { itemName(active, itemList.find((i) => i.key === active)?.label ?? '') }
+            </span>
+          </span>
+          <SettingConfig />
+        </div>
+        <div
+          ref={ scrollRef }
+          onScroll={ onScroll }
+          style={ { flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', padding: '4px 16px 0', position: 'relative' } }
+        >
+          { itemList.map((item) => (
+            <div
+              key={ item.key }
+              ref={ (el) => {
+                if (el) blockRefs.current.set(item.key, el);
+                else blockRefs.current.delete(item.key);
+              } }
+              style={ { paddingBottom: 22 } }
+            >
+              <div style={ { display: 'flex', alignItems: 'center', gap: 8, fontSize: 16, fontWeight: 700, padding: '14px 2px 8px', color: token.colorText } }>
+                <span style={ { fontSize: 15, display: 'inline-flex' } }>{ CATEGORY_ICONS[item.key] ?? null }</span>
+                { itemName(item.key, item.label) }
+              </div>
+              <div style={ { background: token.colorBgContainer, border: `1px solid ${token.colorBorderSecondary}`, borderRadius: 8, padding: '6px 16px 16px' } }>
+                { item.children }
+              </div>
             </div>
-            <div style={ { background: token.colorBgContainer, border: `1px solid ${token.colorBorderSecondary}`, borderRadius: 8, padding: '6px 16px 16px' } }>
-              { item.children }
-            </div>
-          </div>
-        )) }
-        <div style={ { height: 24 } } />
+          )) }
+          <div style={ { height: 24 } } />
+        </div>
       </div>
     </div>
   );

@@ -6,18 +6,21 @@
 //   "fileVersion": 1,
 //   "appVersion": "2.21.0",
 //   "exportedAt": "2025-01-02T03:04:05.000Z",
-//   "settings": { "theme-mode": "dark", "app-locale": "zh-CN", ... }
+//   "settings": { "theme-mode": "dark", "app-locale": "zh-CN", ... },
+//   "apps": { "AESCrypto": { "Mode": "CBC", ... }, ... }
 // }
 //
 // 文件名: magic-tools.config.<appVersion>.<yyyyMMddHHmmss>.json
-// 说明: 配置即本应用写入 localStorage 的键值 (主题 / 语言 / 侧边栏 / 各工具默认值等);
-//       导出为整份快照, 导入时覆盖同名键并保留未涉及的键。
+// 说明: settings 为本应用写入 localStorage 的整份快照 (主题 / 语言 / 侧边栏 / 用户数据等);
+//       apps 为各 app 的默认配置 (App/<app>/lib.ts 的 getDefault*/setDefault* 成对函数),
+//       导出时经 getter 读取, 导入时经 setter 写回。导入覆盖同名键并保留未涉及的键。
 import { getVersion } from '../version';
+import { normalizeAppConfigMap, type AppConfigMap } from './app-config';
 
 /** 配置文件的应用标识 (校验用) */
 export const CONFIG_APP_ID = 'magic-tools';
-/** 配置文件结构版本 (结构不兼容变更时递增) */
-export const CONFIG_FILE_VERSION = 1;
+/** 配置文件结构版本 (结构不兼容变更时递增; 2 起增加 apps 字段) */
+export const CONFIG_FILE_VERSION = 2;
 /** 导出文件名前缀 */
 export const CONFIG_FILE_PREFIX = 'magic-tools.config';
 /** 纯 UI 临时状态, 不参与导入导出 (设置中心当前选中分类) */
@@ -35,6 +38,8 @@ export interface AppConfig {
   exportedAt: string;
   /** 全部配置键值 (localStorage 快照) */
   settings: Record<string, string>;
+  /** 各 app 的默认配置 (按 appKey 分组, 可选) */
+  apps?: AppConfigMap;
 }
 
 /** 解析配置失败的原因码 (供 UI 本地化文案) */
@@ -83,15 +88,17 @@ export function collectSettings(): Record<string, string> {
   return out;
 }
 
-/** 生成当前配置对象 (含应用版本号与导出时间) */
-export function buildConfig(date: Date = new Date()): AppConfig {
-  return {
+/** 生成当前配置对象 (含应用版本号与导出时间; apps 由调用方经各 app 的 getter 收集后传入) */
+export function buildConfig(date: Date = new Date(), apps?: AppConfigMap): AppConfig {
+  const config: AppConfig = {
     app: CONFIG_APP_ID,
     fileVersion: CONFIG_FILE_VERSION,
     appVersion: getVersion(),
     exportedAt: date.toISOString(),
     settings: collectSettings(),
   };
+  if (apps !== undefined) config.apps = apps;
+  return config;
 }
 
 /** 序列化配置 (缩进 2 空格, 便于人工查看与 diff) */
@@ -113,14 +120,19 @@ export function parseConfig(text: string): AppConfig {
   const obj = raw as Record<string, unknown>;
   if (obj.app !== CONFIG_APP_ID) throw new ConfigError('not-magic-tools');
   const rawSettings = obj.settings;
-  if (rawSettings === null || typeof rawSettings !== 'object' || Array.isArray(rawSettings)) {
+  const hasSettings = rawSettings !== null && typeof rawSettings === 'object' && !Array.isArray(rawSettings);
+  const apps = normalizeAppConfigMap(obj.apps);
+  // settings 与 apps 至少有一个, 否则视为缺少配置内容
+  if (!hasSettings && Object.keys(apps).length === 0) {
     throw new ConfigError('missing-settings');
   }
   // 仅接收字符串值, 过滤被排除的键, 保证写回 localStorage 安全
   const settings: Record<string, string> = {};
-  for (const [key, value] of Object.entries(rawSettings as Record<string, unknown>)) {
-    if (CONFIG_EXCLUDE_KEYS.includes(key)) continue;
-    if (typeof value === 'string') settings[key] = value;
+  if (hasSettings) {
+    for (const [key, value] of Object.entries(rawSettings as Record<string, unknown>)) {
+      if (CONFIG_EXCLUDE_KEYS.includes(key)) continue;
+      if (typeof value === 'string') settings[key] = value;
+    }
   }
   return {
     app: CONFIG_APP_ID,
@@ -128,6 +140,7 @@ export function parseConfig(text: string): AppConfig {
     appVersion: typeof obj.appVersion === 'string' ? obj.appVersion : '',
     exportedAt: typeof obj.exportedAt === 'string' ? obj.exportedAt : '',
     settings,
+    apps,
   };
 }
 

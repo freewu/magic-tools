@@ -63,6 +63,14 @@ describe('配置导出', () => {
     expect(text).toContain('\n  "app"');
     expect(JSON.parse(text)).toEqual(config);
   });
+
+  test('buildConfig 传入 apps 时写入各 app 配置', () => {
+    localStorage.setItem('theme-mode', 'dark');
+    const config = buildConfig(FIXED, { AESCrypto: { Mode: 'CBC' } });
+    expect(config.apps).toEqual({ AESCrypto: { Mode: 'CBC' } });
+    // 不传时不含 apps 字段, 保持兼容
+    expect(buildConfig(FIXED).apps).toBeUndefined();
+  });
 });
 
 describe('配置导入', () => {
@@ -102,6 +110,24 @@ describe('配置导入', () => {
     expect(config.fileVersion).toBe(CONFIG_FILE_VERSION);
     expect(config.appVersion).toBe('');
     expect(config.exportedAt).toBe('');
+  });
+
+  test('解析 apps 字段 (按 app 分组) 并仅保留对象条目', () => {
+    const config = parseConfig(JSON.stringify({
+      app: CONFIG_APP_ID,
+      settings: {},
+      apps: {
+        AESCrypto: { Mode: 'CBC', Padding: 'Pkcs7' },
+        Broken: 'not-object',
+      },
+    }));
+    expect(config.apps).toEqual({ AESCrypto: { Mode: 'CBC', Padding: 'Pkcs7' } });
+  });
+
+  test('仅含 apps 的配置文件也可导入', () => {
+    const config = parseConfig(JSON.stringify({ app: CONFIG_APP_ID, apps: { BOMCheck: { Bom: 'utf8' } } }));
+    expect(config.settings).toEqual({});
+    expect(config.apps).toEqual({ BOMCheck: { Bom: 'utf8' } });
   });
 
   test('非法内容抛出带错误码的 ConfigError', () => {
