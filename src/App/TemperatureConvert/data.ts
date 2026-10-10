@@ -11,13 +11,13 @@ export const typeList = [
 
 // 常用温度预设 (点击后自动填入数量并切换到对应温标), 文案见 lang.ts 的 ps_<id>
 export const presetList = [
-  { id: 'abszero', label: '绝对零度 -273.15 °C', value: '-273.15', unit: 'c' },
-  { id: 'ice', label: '冰点 0 °C', value: '0', unit: 'c' },
-  { id: 'room', label: '室温 25 °C', value: '25', unit: 'c' },
-  { id: 'body', label: '体温 37 °C', value: '37', unit: 'c' },
-  { id: 'boil', label: '沸点 100 °C', value: '100', unit: 'c' },
-  { id: 'fice', label: '华氏冰点 32 °F', value: '32', unit: 'f' },
-  { id: 'fboil', label: '华氏沸点 212 °F', value: '212', unit: 'f' },
-  { id: 'ln2', label: '液氮 -196 °C', value: '-196', unit: 'c' },
-  { id: 'oven', label: '烤箱 180 °C', value: '180', unit: 'c' },
+  { id: 'abszero', label: '绝对零度', value: '-273.15', unit: 'c' },
+  { id: 'ice', label: '冰点', value: '0', unit: 'c' },
+  { id: 'room', label: '室温', value: '25', unit: 'c' },
+  { id: 'body', label: '体温', value: '37', unit: 'c' },
+  { id: 'boil', label: '沸点', value: '100', unit: 'c' },
+  { id: 'fice', label: '华氏冰点', value: '32', unit: 'f' },
+  { id: 'fboil', label: '华氏沸点', value: '212', unit: 'f' },
+  { id: 'ln2', label: '液氮', value: '-196', unit: 'c' },
+  { id: 'oven', label: '烤箱', value: '180', unit: 'c' },
 ];

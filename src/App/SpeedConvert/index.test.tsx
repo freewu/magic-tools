@@ -46,18 +46,18 @@ describe('SpeedConvert 常用速度预设', () => {
     expect(area.compareDocumentPosition(tags[0]) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
   });
 
-  test('点击「第一宇宙速度 7.9 km/s」自动换算', () => {
+  test('点击「第一宇宙速度」自动换算', () => {
     const { container } = render(<SpeedConvert />);
-    fireEvent.click(presetTag(container, '第一宇宙速度7.9km/s') as HTMLElement);
+    fireEvent.click(presetTag(container, '第一宇宙速度') as HTMLElement);
     expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('7.9');
     const values = inputValues(container);
     expect(values).toContain('28440');  // 千米/时
     expect(values).toContain('7900');   // 米/秒
   });
 
-  test('点击「重力加速度 9.80665 m/s」自动换算', () => {
+  test('点击「重力加速度」自动换算', () => {
     const { container } = render(<SpeedConvert />);
-    fireEvent.click(presetTag(container, '重力加速度9.80665m/s') as HTMLElement);
+    fireEvent.click(presetTag(container, '重力加速度') as HTMLElement);
     expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('9.80665');
     const values = inputValues(container);
     expect(values).toContain('9.80665');   // 米/秒自身

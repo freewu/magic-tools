@@ -46,9 +46,9 @@ describe('WeightConvert 常用重量预设', () => {
     expect(area.compareDocumentPosition(tags[0]) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
   });
 
-  test('点击「1 斤 500 克」切到市制并换算', () => {
+  test('点击「1 斤」切到市制并换算', () => {
     const { container } = render(<WeightConvert />);
-    fireEvent.click(presetTag(container, '1斤500克') as HTMLElement);
+    fireEvent.click(presetTag(container, '1斤') as HTMLElement);
     expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('1');
     const values = inputValues(container);
     expect(values).toContain('500');      // 克
@@ -56,9 +56,9 @@ describe('WeightConvert 常用重量预设', () => {
     expect(values).toContain('10');       // 两
   });
 
-  test('点击「1 磅 453.59237 克」换算为公制', () => {
+  test('点击「1 磅」换算为公制', () => {
     const { container } = render(<WeightConvert />);
-    fireEvent.click(presetTag(container, '1磅453.59237克') as HTMLElement);
+    fireEvent.click(presetTag(container, '1磅') as HTMLElement);
     expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('1');
     const values = inputValues(container);
     expect(values).toContain('453.59237');    // 克

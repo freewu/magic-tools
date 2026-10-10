@@ -48,7 +48,7 @@ describe('AreaConvert 常用面积预设', () => {
 
   test('点击「1 公顷」自动换算各制式', () => {
     const { container } = render(<AreaConvert />);
-    fireEvent.click(presetTag(container, '1公顷10000平方米') as HTMLElement);
+    fireEvent.click(presetTag(container, '1公顷') as HTMLElement);
     expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('1');
     const values = inputValues(container);
     expect(values).toContain('10000');    // 平方米
@@ -58,7 +58,7 @@ describe('AreaConvert 常用面积预设', () => {
 
   test('点击「1 亩」切到市制并换算', () => {
     const { container } = render(<AreaConvert />);
-    fireEvent.click(presetTag(container, '1亩666.67平方米') as HTMLElement);
+    fireEvent.click(presetTag(container, '1亩') as HTMLElement);
     expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('1');
     const values = inputValues(container);
     expect(values).toContain('666.66');     // 平方米
@@ -67,7 +67,7 @@ describe('AreaConvert 常用面积预设', () => {
 
   test('点击「1 坪」切到日式制式并换算', () => {
     const { container } = render(<AreaConvert />);
-    fireEvent.click(presetTag(container, '1坪3.3058平方米') as HTMLElement);
+    fireEvent.click(presetTag(container, '1坪') as HTMLElement);
     expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('1');
     const values = inputValues(container);
     expect(values).toContain('3.30578622');  // 平方米

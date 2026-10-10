@@ -46,9 +46,9 @@ describe('TemperatureConvert 常用温度预设', () => {
     expect(area.compareDocumentPosition(tags[0]) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
   });
 
-  test('点击「沸点 100 °C」自动换算其余温标', () => {
+  test('点击「沸点」自动换算其余温标', () => {
     const { container } = render(<TemperatureConvert />);
-    const btn = presetTag(container, '沸点100°C');
+    const btn = presetTag(container, '沸点');
     expect(btn).toBeTruthy();
     fireEvent.click(btn as HTMLElement);
     expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('100');
@@ -59,9 +59,9 @@ describe('TemperatureConvert 常用温度预设', () => {
     expect(values).toContain('80');     // 列氏度
   });
 
-  test('点击「华氏沸点 212 °F」会切换到华氏并换算', () => {
+  test('点击「华氏沸点」会切换到华氏并换算', () => {
     const { container } = render(<TemperatureConvert />);
-    fireEvent.click(presetTag(container, '华氏沸点212°F') as HTMLElement);
+    fireEvent.click(presetTag(container, '华氏沸点') as HTMLElement);
     expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('212');
     expect(inputValues(container)).toContain('100'); // 摄氏度结果
   });

@@ -46,9 +46,9 @@ describe('DistanceConvert 常用距离预设', () => {
     expect(area.compareDocumentPosition(tags[0]) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
   });
 
-  test('点击「马拉松 42.195 千米」自动换算各制式', () => {
+  test('点击「马拉松」自动换算各制式', () => {
     const { container } = render(<DistanceConvert />);
-    fireEvent.click(presetTag(container, '马拉松42.195千米') as HTMLElement);
+    fireEvent.click(presetTag(container, '马拉松') as HTMLElement);
     expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('42.195');
     const values = inputValues(container);
     expect(values).toContain('42195');     // 米

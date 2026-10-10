@@ -55,15 +55,15 @@ export const typeList = [
 
 // 常用距离预设 (点击后自动填入数量并切换到对应单位), 文案见 lang.ts 的 ps_<id>
 export const presetList = [
-  { id: 'paper', label: '纸张厚度 0.1 毫米', value: '0.1', unit: 'mm' },
-  { id: 'idcard', label: '身份证宽 85.6 毫米', value: '85.6', unit: 'mm' },
-  { id: 'marathon', label: '马拉松 42.195 千米', value: '42.195', unit: 'km' },
-  { id: 'everest', label: '珠穆朗玛峰 8848.86 米', value: '8848.86', unit: 'm' },
-  { id: 'earth', label: '地球直径 12756 千米', value: '12756', unit: 'km' },
-  { id: 'moon', label: '地月距离 384400 千米', value: '384400', unit: 'km' },
-  { id: 'sun', label: '日地距离 1.496 亿千米', value: '149600000', unit: 'km' },
-  { id: 'lightyear', label: '1 光年 9.4607 万亿千米', value: '9460730472580.8', unit: 'km' },
+  { id: 'paper', label: '纸张厚度', value: '0.1', unit: 'mm' },
+  { id: 'idcard', label: '身份证宽', value: '85.6', unit: 'mm' },
+  { id: 'marathon', label: '马拉松', value: '42.195', unit: 'km' },
+  { id: 'everest', label: '珠穆朗玛峰', value: '8848.86', unit: 'm' },
+  { id: 'earth', label: '地球直径', value: '12756', unit: 'km' },
+  { id: 'moon', label: '地月距离', value: '384400', unit: 'km' },
+  { id: 'sun', label: '日地距离', value: '149600000', unit: 'km' },
+  { id: 'lightyear', label: '1 光年', value: '9460730472580.8', unit: 'km' },
   { id: 'mile', label: '1 英里', value: '1', unit: 'mile' },
   { id: 'nmile', label: '1 海里', value: '1', unit: 'nmile' },
-  { id: 'li', label: '1 里 (500 米)', value: '1', unit: 'li' },
+  { id: 'li', label: '1 里', value: '1', unit: 'li' },
 ];

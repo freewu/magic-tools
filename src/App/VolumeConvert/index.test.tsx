@@ -46,9 +46,9 @@ describe('VolumeConvert 常用容量预设', () => {
     expect(area.compareDocumentPosition(tags[0]) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
   });
 
-  test('点击「易拉罐 330 毫升」自动换算', () => {
+  test('点击「易拉罐」自动换算', () => {
     const { container } = render(<VolumeConvert />);
-    fireEvent.click(presetTag(container, '易拉罐330毫升') as HTMLElement);
+    fireEvent.click(presetTag(container, '易拉罐') as HTMLElement);
     expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('330');
     const values = inputValues(container);
     expect(values).toContain('0.33');   // 升

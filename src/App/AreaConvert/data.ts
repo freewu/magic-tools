@@ -40,16 +40,16 @@ export const typeList = [
 
 // 常用面积预设 (最上方的彩色标签, 点击后自动切到对应制式与单位并换算)
 export const presetList = [
-  { id: 'a4', label: 'A4 纸 0.06237 平方米', value: '0.06237', unit: 'm2' },
-  { id: 'parking', label: '标准车位 12.5 平方米', value: '12.5', unit: 'm2' },
-  { id: 'basketball', label: '篮球场 420 平方米', value: '420', unit: 'm2' },
-  { id: 'football', label: '足球场 7140 平方米', value: '7140', unit: 'm2' },
-  { id: 'gugong', label: '故宫 72 万平方米', value: '720000', unit: 'm2' },
-  { id: 'tiananmen', label: '天安门广场 44 万平方米', value: '440000', unit: 'm2' },
-  { id: 'km2', label: '1 平方千米 100 万平方米', value: '1', unit: 'km2' },
-  { id: 'vatican', label: '梵蒂冈 0.44 平方千米', value: '0.44', unit: 'km2' },
-  { id: 'ha', label: '1 公顷 10000 平方米', value: '1', unit: 'gq' },
-  { id: 'ym', label: '1 英亩 4046.86 平方米', value: '1', unit: 'ym' },
-  { id: 'mu', label: '1 亩 666.67 平方米', value: '1', unit: 'mu' },
-  { id: 'ping', label: '1 坪 3.3058 平方米', value: '1', unit: 'jp-ping' },
+  { id: 'a4', label: 'A4 纸', value: '0.06237', unit: 'm2' },
+  { id: 'parking', label: '标准车位', value: '12.5', unit: 'm2' },
+  { id: 'basketball', label: '篮球场', value: '420', unit: 'm2' },
+  { id: 'football', label: '足球场', value: '7140', unit: 'm2' },
+  { id: 'gugong', label: '故宫', value: '720000', unit: 'm2' },
+  { id: 'tiananmen', label: '天安门广场', value: '440000', unit: 'm2' },
+  { id: 'km2', label: '1 平方千米', value: '1', unit: 'km2' },
+  { id: 'vatican', label: '梵蒂冈', value: '0.44', unit: 'km2' },
+  { id: 'ha', label: '1 公顷', value: '1', unit: 'gq' },
+  { id: 'ym', label: '1 英亩', value: '1', unit: 'ym' },
+  { id: 'mu', label: '1 亩', value: '1', unit: 'mu' },
+  { id: 'ping', label: '1 坪', value: '1', unit: 'jp-ping' },
 ];
