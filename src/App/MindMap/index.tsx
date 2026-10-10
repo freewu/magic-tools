@@ -1,5 +1,6 @@
-import { Alert, Button, Card, Divider, Input, Segmented, Select, Space, Tooltip, message } from 'antd';
-import { CopyOutlined, DownloadOutlined, ExpandOutlined, EyeInvisibleOutlined, EyeOutlined, FullscreenExitOutlined, FullscreenOutlined } from '@ant-design/icons';
+import { Alert, Button, Card, Divider, Dropdown, Input, Segmented, Select, Space, Tooltip, message } from 'antd';
+import type { MenuProps } from 'antd';
+import { CopyOutlined, DownloadOutlined, DownOutlined, ExpandOutlined, EyeInvisibleOutlined, EyeOutlined, FullscreenExitOutlined, FullscreenOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocale } from '../../hook/locale-context';
 import { useTheme } from '../../hook/theme-context';
@@ -43,6 +44,10 @@ import { u, uT } from './lang';
 import MindMapIntro from './intro';
 
 const MONO = 'ui-monospace, SFMono-Regular, Consolas, "Courier New", monospace';
+
+/** 「导出图片」下拉的菜单项: 上排格式名, 下排说明 */
+const MENU_ITEM_STYLE :React.CSSProperties = { display: 'flex', flexDirection: 'column', lineHeight: 1.35 };
+const MENU_DESC_STYLE :React.CSSProperties = { color: '#999', fontSize: 12 };
 
 /** 原生全屏 API 的类型补充 (内嵌 WebView 只认 webkit 前缀) */
 type FullscreenElement = HTMLDivElement & { webkitRequestFullscreen?: () => Promise<void> | void };
@@ -297,6 +302,41 @@ const MindMap: React.FC = () => {
   );
   const canExport = !!box && !error;
 
+  // 「导出图片」下拉: 选格式后再导出 (原三个导出按钮合并为一个)
+  const exportItems = useMemo<MenuProps['items']>(() => ([
+    {
+      key: 'svg',
+      label: (
+        <div style={ MENU_ITEM_STYLE }>
+          <span>{t('SVG 图片')}</span>
+          <span style={ MENU_DESC_STYLE }>{t('矢量图, 始终透明背景')}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'png',
+      label: (
+        <div style={ MENU_ITEM_STYLE }>
+          <span>{t('PNG 图片')}</span>
+          <span style={ MENU_DESC_STYLE }>{t('位图, 按「背景 / 缩放」设置导出')}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'webp',
+      disabled: !webpOk,
+      label: (
+        <div style={ MENU_ITEM_STYLE }>
+          <span>{t('WebP 图片')}</span>
+          <span style={ MENU_DESC_STYLE }>{webpOk ? t('位图, 体积更小') : t('当前浏览器不支持, 请改用 PNG')}</span>
+        </div>
+      ),
+    },
+  ]), [
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    locale, webpOk,
+  ]);
+
   const copy = async (text: string, tip: string) => {
     try {
       await copyTextToClipboard(text);
@@ -425,13 +465,15 @@ const MindMap: React.FC = () => {
             title={t('预览')}
             extra={
               <Space size={8} wrap>
-                <Tooltip title={t('导出 SVG (矢量, 透明背景)')}>
-                  <Button size="small" icon={<DownloadOutlined />} disabled={!canExport} loading={busy === 'svg'} onClick={() => { void exportAs('svg'); }}>{t('导出 SVG')}</Button>
-                </Tooltip>
-                <Button size="small" type="primary" icon={<DownloadOutlined />} disabled={!canExport} loading={busy === 'png'} onClick={() => { void exportAs('png'); }}>{t('导出 PNG')}</Button>
-                <Tooltip title={webpOk ? t('「背景 / 缩放」仅作用于位图导出与预览; 矢量 SVG 导出时始终透明') : t('当前浏览器不支持 WebP 导出, 请改用 PNG')}>
-                  <Button size="small" icon={<DownloadOutlined />} disabled={!canExport || !webpOk} loading={busy === 'webp'} onClick={() => { void exportAs('webp'); }}>{t('导出 WebP')}</Button>
-                </Tooltip>
+                <Dropdown
+                  trigger={[ 'click' ]}
+                  disabled={!canExport}
+                  menu={{ items: exportItems, onClick: ({ key }) => { void exportAs(key as ExportFormat); } }}
+                >
+                  <Button size="small" type="primary" icon={<DownloadOutlined />} disabled={!canExport} loading={busy !== ''}>
+                    {t('导出图片')}<DownOutlined style={{ fontSize: 10, marginInlineStart: 4 }} />
+                  </Button>
+                </Dropdown>
                 <Button size="small" icon={<CopyOutlined />} disabled={!canExport} onClick={() => {
                   const el = svgRef.current;
                   const live = exportBoxOf(instRef.current?.mm.state.rect, EXPORT_PADDING) ?? box;

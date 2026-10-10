@@ -104,6 +104,18 @@ const openSelect = async (index: number) => {
   fireEvent.mouseDown(selectAt(index));
   await waitFor(() => expect(document.querySelector('.ant-select-dropdown')).not.toBeNull());
 };
+/** 「导出图片」下拉: 打开菜单 / 按格式点菜单项 (key 与 data.ts 的 ExportFormat 一致) */
+const EXPORT_LABEL: Record<string, string> = { svg: 'SVG 图片', png: 'PNG 图片', webp: 'WebP 图片' };
+const exportMenuItems = () => Array.from(document.querySelectorAll('.ant-dropdown-menu-item')) as HTMLElement[];
+const openExportMenu = () => { fireEvent.click(btn('导出图片')); };
+const menuItem = async (format: string) => waitFor(() => {
+  const target = EXPORT_LABEL[format].replace(/\s+/g, '');
+  const hit = exportMenuItems().find((el) => (el.textContent ?? '').replace(/\s+/g, '').startsWith(target));
+  if (!hit) throw new Error(`未找到导出格式: ${format}`);
+  return hit;
+});
+const exportAs = async (format: string) => { openExportMenu(); fireEvent.click(await menuItem(format)); };
+
 const clickOption = async (label: string) => {
   const option = await waitFor(() => {
     const hit = screen.getAllByText(label).find((el) => el.closest('.ant-select-item-option'))?.closest('.ant-select-item-option');
@@ -132,7 +144,7 @@ const WAIT = { timeout: 5000 };
  */
 const waitRendered = () => waitFor(() => {
   expect(mockInstances).toHaveLength(1);
-  expect(btn('导出 PNG')).toBeEnabled();
+  expect(btn('导出图片')).toBeEnabled();
 }, WAIT);
 /** 最近一次传给 markmap 的 options */
 const lastOptions = () => mockInstances[mockInstances.length - 1].options;
@@ -177,8 +189,7 @@ describe('MindMap 初始界面', () => {
     const stats = screen.getByText(/行 \/ .* 字符 \/ .* 个标题/);
     expect(stats.textContent).toContain(`${SAMPLES[0].code.replace(/\s+$/, '').split('\n').length} 行`);
     expect(stats.textContent).toContain('2 个节点 · 2 层');
-    expect(btn('导出 SVG')).toBeEnabled();
-    expect(btn('导出 PNG')).toBeEnabled();
+    expect(btn('导出图片')).toBeEnabled();
   });
 
   test('设置中心的默认配色 / 展开层级 / 示例在打开时生效', async () => {
@@ -261,7 +272,7 @@ describe('MindMap 初始界面', () => {
     fireEvent.change(codeArea(), { target: { value: '# 我的导图\n- 一\n- 二' } });
     await waitFor(() => expect(mockTransform.mock.calls[mockTransform.mock.calls.length - 1][0]).toBe('# 我的导图\n- 一\n- 二'));
 
-    fireEvent.click(btn('导出 SVG'));
+    await exportAs('svg');
     await waitFor(() => expect((saveTextFile as jest.Mock).mock.calls[0][0]).toBe('我的导图.svg'));
   });
 
@@ -270,14 +281,13 @@ describe('MindMap 初始界面', () => {
     render(<MindMap />);
     await waitFor(() => expect(screen.getByText('渲染失败')).toBeInTheDocument());
     expect(screen.getByText(/markmap 解析失败/)).toBeInTheDocument();
-    expect(btn('导出 SVG')).toBeDisabled();
-    expect(btn('导出 PNG')).toBeDisabled();
+    expect(btn('导出图片')).toBeDisabled();
     expect(btn('复制 SVG')).toBeDisabled();
 
     fireEvent.change(codeArea(), { target: { value: '# 修好了' } });
     await waitRendered();
     expect(screen.queryByText('渲染失败')).toBeNull();
-    expect(btn('导出 PNG')).toBeEnabled();
+    expect(btn('导出图片')).toBeEnabled();
   });
 
   test('清空大纲后回到占位提示并销毁实例', async () => {
@@ -290,16 +300,17 @@ describe('MindMap 初始界面', () => {
     // 画布容器保留 (常驻), 但隐藏起来
     expect(pane().style.display).toBe('none');
     expect(inst.destroy).toHaveBeenCalled();
-    expect(btn('导出 SVG')).toBeDisabled();
+    expect(btn('导出图片')).toBeDisabled();
     expect(btn('复制大纲')).toBeDisabled();
   });
 
-  test('浏览器不支持 WebP 时按钮禁用', async () => {
+  test('浏览器不支持 WebP 时对应菜单项禁用', async () => {
     stubCanvas(false);
     render(<MindMap />);
     await waitRendered();
-    expect(btn('导出 WebP')).toBeDisabled();
-    expect(btn('导出 PNG')).toBeEnabled();
+    openExportMenu();
+    expect(await menuItem('webp')).toHaveClass('ant-dropdown-menu-item-disabled');
+    expect(await menuItem('png')).not.toHaveClass('ant-dropdown-menu-item-disabled');
   });
 });
 
@@ -424,10 +435,30 @@ describe('MindMap 全屏', () => {
 });
 
 describe('MindMap 导出', () => {
+  test('「导出图片」下拉列出三种格式与说明', async () => {
+    render(<MindMap />);
+    await waitRendered();
+    openExportMenu();
+    const items = await waitFor(() => {
+      const list = exportMenuItems();
+      if (list.length !== 3) throw new Error(`菜单项数量: ${list.length}`);
+      return list;
+    });
+    const text = items.map((el) => (el.textContent ?? '').replace(/\s+/g, ''));
+    expect(text[0]).toContain('SVG图片');
+    expect(text[0]).toContain('矢量图,始终透明背景');
+    expect(text[1]).toContain('PNG图片');
+    expect(text[2]).toContain('WebP图片');
+    // 原来的三个导出按钮已合并, 卡片上不再有它们的文案
+    expect(screen.queryByText('导出 SVG')).toBeNull();
+    expect(screen.queryByText('导出 PNG')).toBeNull();
+    expect(screen.queryByText('导出 WebP')).toBeNull();
+  });
+
   test('导出 SVG: 按内容包围盒写入宽高与 viewBox', async () => {
     render(<MindMap />);
     await waitRendered();
-    fireEvent.click(btn('导出 SVG'));
+    await exportAs('svg');
 
     await waitFor(() => expect(saveTextFile).toHaveBeenCalledTimes(1));
     const [ name, content, title, opts ] = (saveTextFile as jest.Mock).mock.calls[0];
@@ -446,7 +477,7 @@ describe('MindMap 导出', () => {
   test('导出 PNG: 默认 1x + 白底', async () => {
     render(<MindMap />);
     await waitRendered();
-    fireEvent.click(btn('导出 PNG'));
+    await exportAs('png');
 
     await waitFor(() => expect(savePngFile).toHaveBeenCalledTimes(1), WAIT);
     expect((savePngFile as jest.Mock).mock.calls[0]).toEqual([ 'mindmap-project.png', pngUrl ]);
@@ -462,7 +493,7 @@ describe('MindMap 导出', () => {
     await waitRendered();
     fireEvent.click(screen.getByText('2x'));
     fireEvent.click(screen.getByText('透明'));
-    fireEvent.click(btn('导出 PNG'));
+    await exportAs('png');
 
     await waitFor(() => expect(savePngFile).toHaveBeenCalledTimes(1), WAIT);
     expect(ctxCalls).toEqual([{ op: 'drawImage', args: [ 0, 0, BOX_W * 2, BOX_H * 2 ] }]);
@@ -471,7 +502,7 @@ describe('MindMap 导出', () => {
   test('导出 WebP: 走字节写入并带扩展名过滤', async () => {
     render(<MindMap />);
     await waitRendered();
-    fireEvent.click(btn('导出 WebP'));
+    await exportAs('webp');
 
     await waitFor(() => expect(saveBytesFile).toHaveBeenCalledTimes(1), WAIT);
     const [ name, bytes, opts ] = (saveBytesFile as jest.Mock).mock.calls[0];
@@ -488,7 +519,7 @@ describe('MindMap 导出', () => {
     await clickOption('需求拆解');
     await waitFor(() => expect(codeArea().value).toBe(SAMPLES.find((s) => s.id === 'requirements')!.code));
 
-    fireEvent.click(btn('导出 SVG'));
+    await exportAs('svg');
     await waitFor(() => expect((saveTextFile as jest.Mock).mock.calls[0][0]).toBe('mindmap-requirements.svg'));
   });
 
@@ -496,7 +527,7 @@ describe('MindMap 导出', () => {
     (saveTextFile as jest.Mock).mockResolvedValue(false);
     render(<MindMap />);
     await waitRendered();
-    fireEvent.click(btn('导出 SVG'));
+    await exportAs('svg');
     await waitFor(() => expect(saveTextFile).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(screen.queryByText(/已导出/)).toBeNull());
   });
@@ -505,7 +536,7 @@ describe('MindMap 导出', () => {
     (savePngFile as jest.Mock).mockRejectedValue(new Error('磁盘已满'));
     render(<MindMap />);
     await waitRendered();
-    fireEvent.click(btn('导出 PNG'));
+    await exportAs('png');
     await waitFor(() => expect(screen.getByText('导出失败: 磁盘已满')).toBeInTheDocument(), WAIT);
   });
 
