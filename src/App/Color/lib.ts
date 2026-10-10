@@ -1,12 +1,54 @@
 import { hex, rgb } from "color-convert"
 import { colorTypeList } from "./data"
 
+// 规范化 hex 颜色: 去掉 # / 首尾空格, 三位简写展开为六位 (#ABC => #AABBCC)
+const normalizeHex = (color: string) :string => {
+  let value = color.replace("#","").trim();
+  if(/^[0-9a-fA-F]{3}$/.test(value)) {
+    value = value.split("").map((char) => char + char).join("");
+  }
+  return value;
+}
+
 // 获取 传入的 hex 的互补色的 hex #FF0000 => #00FFFF
 export const calcComplementaryColor = (color: string) :string => {
-  color = color.replace("#","").trim();
-  const colorRGB = hex.rgb(color);
+  const colorRGB = hex.rgb(normalizeHex(color));
 
   return "#" + rgb.hex([255 - colorRGB[0],255 - colorRGB[1],255 - colorRGB[2]]);
+}
+
+// 颜色的相对亮度 (WCAG 2.x)
+const relativeLuminance = (colorRGB: Array<number>) :number => {
+  const [r,g,b] = colorRGB.map((value) => {
+    const channel = value / 255;
+    return (channel <= 0.03928)? channel / 12.92 : Math.pow((channel + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+// 两个颜色的对比度 (WCAG 2.x) 取值 1 ~ 21
+const contrastRatio = (colorA: Array<number>, colorB: Array<number>) :number => {
+  const luminanceA = relativeLuminance(colorA);
+  const luminanceB = relativeLuminance(colorB);
+  const [high, low] = (luminanceA > luminanceB)? [luminanceA, luminanceB] : [luminanceB, luminanceA];
+  return (high + 0.05) / (low + 0.05);
+}
+
+// 反色与背景的对比度阈值: 低于该值时反色文字看不清, 回退到黑/白
+const READABLE_CONTRAST = 3;
+
+// 获取颜色块上文字的颜色: 优先使用背景色的反色, 反色对比度不足时取黑/白中更清晰的一个
+export const calcReadableTextColor = (color: string) :string => {
+  const backgroundColor = hex.rgb(normalizeHex(color));
+  const complementaryColor = calcComplementaryColor(color);
+
+  // 反色足够清晰, 直接使用反色
+  if(contrastRatio(backgroundColor, hex.rgb(normalizeHex(complementaryColor))) >= READABLE_CONTRAST) {
+    return complementaryColor;
+  }
+
+  // 中间色(如灰色)的反色与背景亮度接近, 此时黑/白更清晰
+  return (contrastRatio(backgroundColor, [0,0,0]) >= contrastRatio(backgroundColor, [255,255,255]))? "#000000" : "#FFFFFF";
 }
 
 // 获取要写入到粘贴板的数据

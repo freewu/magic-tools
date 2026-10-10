@@ -12,7 +12,7 @@
   border: 1px solid #fff;
   cursor: pointer;
   margin: 5px;
-  color: #000;
+  /* 文字颜色由样式动态计算 (背景色的反色) */
   text-align: center;
   padding-top:12px;
   opacity: 0.9;
