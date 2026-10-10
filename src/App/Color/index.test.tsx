@@ -38,13 +38,29 @@ describe('Color 页面', () => {
     });
   });
 
-  test('新增拼豆配色板标签已注册 (MARD/COCO/Artkal/Perler/Hama/DMC)', () => {
+  test('新增拼豆配色板标签已注册 (MARD/COCO/Artkal/Artkal Mini/Perler/Hama/DMC)', () => {
     const { container } = render(<Color />);
     const tabs = Array.from(container.querySelectorAll('.ant-tabs-tab')).map((el) => norm(el.textContent ?? ''));
     expect(tabs.length).toBeGreaterThan(0);
-    for (const name of ['MARD221拼豆', 'COCO291拼豆', 'Artkal拼豆', 'Perler拼豆', 'Hama拼豆', 'DMC绣线']) {
+    for (const name of ['MARD221拼豆', 'COCO291拼豆', 'Artkal拼豆', 'ArtkalMini拼豆', 'Perler拼豆', 'Hama拼豆', 'DMC绣线']) {
       expect(tabs.some((tab) => tab.includes(name))).toBe(true);
     }
+  });
+
+  test('切换到 MARD 配色板后按系列分组展示', async () => {
+    const { container } = render(<Color />);
+    const tab = Array.from(container.querySelectorAll('.ant-tabs-tab')).find((el) => norm(el.textContent ?? '').includes('MARD'));
+    expect(tab).toBeTruthy();
+    fireEvent.click(tab as Element);
+    await waitFor(() => {
+      const pane = container.querySelector('.ant-tabs-tabpane-active');
+      const dividers = Array.from(pane?.querySelectorAll('.color-pad .ant-divider') ?? []).map((el) => norm(el.textContent ?? ''));
+      // 9 个系列分割标题: A B C D E F G H M
+      expect(dividers).toEqual(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'M']);
+      const cards = Array.from(pane?.querySelectorAll('.color-card') ?? []);
+      expect(cards.length).toBe(221);
+      expect(cards.some((card) => norm(card.textContent ?? '').includes('A1'))).toBe(true);
+    });
   });
 
   test('切换到 Perler 配色板展示色号色卡', async () => {

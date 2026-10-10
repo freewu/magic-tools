@@ -9,6 +9,7 @@ export { default as NormalRGBColor } from './normal-rgb-color';
 export { default as MardColor } from './mard';
 export { default as CocoColor } from './coco';
 export { default as ArtkalColor } from './artkal';
+export { default as ArtkalMiniColor } from './artkal-mini';
 export { default as PerlerColor } from './perler';
 export { default as HamaColor } from './hama';
 export { default as DmcColor } from './dmc';

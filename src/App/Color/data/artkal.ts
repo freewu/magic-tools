@@ -1,10 +1,12 @@
 /**
  * 拼豆色卡: Artkal (共 176 色)
+ * 按系列分组: S(159) SE(17)
  *
  * 数据来源: https://www.bitbead.app/zh/colors/artkal
  * 由 scripts/fetch-bead-colors.mjs 生成 (抓取日期 2026-10-10)
  */
 export default [
+  { label: "S", code: "", info: "" },
   { label: "S01 White", code: "#FFFFFF", info: "White" },
   { label: "S02 Burning Sand", code: "#FFA38B", info: "Burning Sand" },
   { label: "S03 Tangerine", code: "#FF8200", info: "Tangerine" },
@@ -164,6 +166,7 @@ export default [
   { label: "S157 Iron Grey", code: "#46494C", info: "Iron Grey" },
   { label: "S158 Pepper", code: "#191D19", info: "Pepper" },
   { label: "S159 Oslo Gray", code: "#88888D", info: "Oslo Gray" },
+  { label: "SE", code: "", info: "" },
   { label: "SE01 Extended Pale Blue", code: "#D1DDE6", info: "Extended Pale Blue" },
   { label: "SE02 Extended Light Blue", code: "#9BB8E3", info: "Extended Light Blue" },
   { label: "SE03 Extended Medium Blue", code: "#5E8AB4", info: "Extended Medium Blue" },

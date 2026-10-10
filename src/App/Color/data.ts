@@ -28,6 +28,7 @@ import {
   MardColor,
   CocoColor,
   ArtkalColor,
+  ArtkalMiniColor,
   PerlerColor,
   HamaColor,
   DmcColor,
@@ -84,6 +85,11 @@ const colorDataList = [
     key: 'artkal',
     label: `Artkal 拼豆`,
     data: ArtkalColor
+  },
+  {
+    key: 'artkal-mini',
+    label: `Artkal Mini 拼豆`,
+    data: ArtkalMiniColor
   },
   {
     key: 'perler',
