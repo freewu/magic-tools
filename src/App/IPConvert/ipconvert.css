@@ -1,0 +1,8 @@
+/* 结果框可点击复制 (与「Hash 值计算」的 hash.css 一致) */
+.ip-form .ant-input {
+  cursor: pointer;
+}
+
+.ip-tag {
+  cursor: pointer;
+}

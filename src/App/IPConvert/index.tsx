@@ -1,13 +1,29 @@
-import { Card, Divider, Form, Input, Row, Col, Typography } from 'antd';
+import { Button, Col, Divider, Form, Input, message, Row, Space, Tag } from 'antd';
 import React, { useState } from 'react';
 import { SwapOutlined } from '@ant-design/icons';
 import { ipv4ToInt, ipv4Valid, intToIpv4, intTextValid, intToHex, intToBin, ipv4ToIpv6FormsSafe } from './lib';
 import type { InputStatus } from 'antd/es/_util/statusUtils';
+import { copyTextToClipboard } from "./../../lib";
 import ipLang from "./lang";
 import { useLocale } from "../../hook/locale-context";
 import { tr } from "../../i18n/lang";
+import "./ipconvert.css";
 
-const { Text } = Typography;
+// 常用示例 IP (点击标签即填入并换算)
+const SAMPLE_IPS = [
+  '0.0.0.0',
+  '127.0.0.1',
+  '10.0.0.1',
+  '172.16.0.1',
+  '192.168.1.1',
+  '169.254.1.1',
+  '224.0.0.1',
+  '255.255.255.255',
+  '8.8.8.8',
+];
+
+// 彩色标签底色 (与「Hash 值计算」一致, 4 色循环)
+const TAG_COLORS = [ '#ff5500', '#2db7f5', '#87d068', '#108ee9' ];
 
 const IPConvert :React.FC = () => {
   const { locale } = useLocale();
@@ -17,9 +33,16 @@ const IPConvert :React.FC = () => {
   const [ int, setInt ] = useState('');         // 整数输入
   const [ ipStatus, setIpStatus ] = useState('' as InputStatus);
   const [ intStatus, setIntStatus ] = useState('' as InputStatus);
+  const [ notice, contextHolder ] = message.useMessage();
 
-  // 展示辅助信息: 均合法时给出对应 HEX / BIN
-  const intValue = intTextValid(int) ? parseIntSafe(int) : null;
+  // 点击结果框, 把结果复制到粘贴板 (与「Hash 值计算」一致)
+  const inputClick = (e :React.MouseEvent<HTMLElement>) => {
+    const txt = (e.target as HTMLInputElement).value.trim();
+    if (txt != '') {
+      copyTextToClipboard(txt);
+      notice.success(t('copyOk','复制到粘贴板成功！！！'));
+    }
+  };
 
   const onIpChange = (e :React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
@@ -53,70 +76,93 @@ const IPConvert :React.FC = () => {
     }
   };
 
+  // 应用示例 IP
+  const applySample = (v :string) => {
+    setIp(v);
+    setIpStatus('');
+    setInt(String(ipv4ToInt(v)));
+    setIntStatus('');
+  };
+
+  // 清除输入与结果
+  const clear = () => {
+    setIp('');
+    setInt('');
+    setIpStatus('');
+    setIntStatus('');
+  };
+
   const valid = ipv4Valid(ip);
 
   return (
-    <>
-      <Card size="small" style={{ width: 640, marginBottom: 12 }}>
-        <Row align="middle" gutter={ 8 }>
-          <Col flex="auto">
-            <Input
-              allowClear
-              status={ ipStatus }
-              value={ ip }
-              onChange={ onIpChange }
-              placeholder={ t('ipPh','IPv4 地址, 如 192.168.1.1') }
-            />
-          </Col>
-          <Col>
-            <SwapOutlined style={{ color: '#999' }} />
-          </Col>
-          <Col flex="auto">
-            <Input
-              allowClear
-              status={ intStatus }
-              value={ int }
-              onChange={ onIntChange }
-              placeholder={ t('intPh','十进制整数, 支持 0x 前缀') }
-            />
-          </Col>
-        </Row>
-      </Card>
+    <div style={ { display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 } }>
+      {contextHolder}
+
+      <Space size={[0, 8]} wrap style={ { display: 'flex', marginBottom: 8 } }>
+        { SAMPLE_IPS.map((v, index) => (
+          <Tag
+            className="ip-tag"
+            key={ v }
+            color={ TAG_COLORS[index % TAG_COLORS.length] }
+            onClick={ () => applySample(v) }
+          >{ v }</Tag>
+        )) }
+      </Space>
+
+      <Row align="middle" gutter={ 8 } style={ { marginBottom: 8 } }>
+        <Col flex="auto">
+          <Input
+            allowClear
+            status={ ipStatus }
+            value={ ip }
+            onChange={ onIpChange }
+            placeholder={ t('ipPh','IPv4 地址, 如 192.168.1.1') }
+          />
+        </Col>
+        <Col>
+          <SwapOutlined style={{ color: '#999' }} />
+        </Col>
+        <Col flex="auto">
+          <Input
+            allowClear
+            status={ intStatus }
+            value={ int }
+            onChange={ onIntChange }
+            placeholder={ t('intPh','十进制整数, 支持 0x 前缀') }
+          />
+        </Col>
+      </Row>
+
+      <Space>
+        <Button
+          onClick={ clear }
+          style={ {"backgroundColor" : "#dc3545","color": "#fff"} }
+        >{ t('clear','清除') }</Button>
+      </Space>
+
+      <Divider dashed />
+
       { valid && (
-        <Card size="small" style={{ width: 640, marginBottom: 12 }}>
-          <Form layout="vertical" style={{ marginBottom: 0 }}>
-            <Form.Item label="HEX" style={{ marginBottom: 4 }}>
-              <Text copyable code>0x{ intToHex(int) }</Text>
+        <div className="ip-form" style={ { flex: 1, minHeight: 0, overflowY: 'auto', paddingRight: 12 } }>
+          <Form labelCol={{ span: 5 }} autoComplete="off">
+            <Form.Item label="HEX" style={{ marginBottom: 12 }}>
+              <Input readOnly showCount onClick={ inputClick } value={ `0x${intToHex(int)}` } />
             </Form.Item>
-            <Form.Item label="BIN" style={{ marginBottom: 0 }}>
-              <Text copyable style={{ fontSize: 12, fontFamily: 'monospace', wordBreak: 'break-all' }}>{ intToBin(int) }</Text>
+            <Form.Item label="BIN" style={{ marginBottom: 12 }}>
+              <Input readOnly showCount onClick={ inputClick } value={ intToBin(int) } />
             </Form.Item>
-          </Form>
-        </Card>
-      ) }
-      { valid && (
-        <Card size="small" style={{ width: 640 }}>
-          <Divider orientation="left" style={{ margin: '0 0 8px' }}>{ t('ipv6Title','对应的 IPv6 写法') }</Divider>
-          <Form layout="vertical" style={{ marginBottom: 0 }}>
+            <Divider orientation="left" style={{ margin: '0 0 12px' }}>{ t('ipv6Title','对应的 IPv6 写法') }</Divider>
             { ipv4ToIpv6FormsSafe(ip).map((form) => (
-              <Form.Item key={ form.key } label={ t(form.key, form.key) } style={{ marginBottom: 4 }}>
-                <Text copyable code style={{ wordBreak: 'break-all' }}>{ form.value }</Text>
+              <Form.Item key={ form.key } label={ t(form.key, form.key) } style={{ marginBottom: 12 }}>
+                <Input readOnly showCount onClick={ inputClick } value={ form.value } />
               </Form.Item>
             )) }
           </Form>
-          <Text type="secondary" style={{ fontSize: 12 }}>{ t('ipv6Hint','同一条 IPv4 在不同过渡方案下的写法, 点右侧图标可复制') }</Text>
-        </Card>
+          <div style={ { color: '#999', fontSize: 12 } }>{ t('ipv6Hint','同一条 IPv4 在不同过渡方案下的写法, 点输入框即可复制') }</div>
+        </div>
       ) }
-    </>
+    </div>
   );
 };
-
-// 仅在校验通过后调用
-function parseIntSafe(s :string) :number {
-  const t = s.trim();
-  if (/^0[xX]/u.test(t)) return parseInt(t.slice(2), 16);
-  if (/^0[bB]/u.test(t)) return parseInt(t.slice(2), 2);
-  return parseInt(t, 10);
-}
 
 export default IPConvert;
