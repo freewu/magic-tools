@@ -25,6 +25,12 @@ import {
   CSSColor, 
   HKSColor, 
   NormalRGBColor,
+  MardColor,
+  CocoColor,
+  ArtkalColor,
+  PerlerColor,
+  HamaColor,
+  DmcColor,
 } from "./data/index"
 
 // 颜色数据
@@ -63,6 +69,36 @@ const colorDataList = [
     key: 'normal-rgb-color',
     label: `Normal RGB Color`,
     data: NormalRGBColor
+  },
+  {
+    key: 'mard',
+    label: `MARD 221 拼豆`,
+    data: MardColor
+  },
+  {
+    key: 'coco',
+    label: `COCO 291 拼豆`,
+    data: CocoColor
+  },
+  {
+    key: 'artkal',
+    label: `Artkal 拼豆`,
+    data: ArtkalColor
+  },
+  {
+    key: 'perler',
+    label: `Perler 拼豆`,
+    data: PerlerColor
+  },
+  {
+    key: 'hama',
+    label: `Hama 拼豆`,
+    data: HamaColor
+  },
+  {
+    key: 'dmc',
+    label: `DMC 绣线`,
+    data: DmcColor
   },
 ];
 
