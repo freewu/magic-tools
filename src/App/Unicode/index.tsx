@@ -70,30 +70,32 @@ const Unicode = () => {
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setEncodeValue ); } }
       />
 
-      <Button 
-        onClick={ encode(escape) }
-        style={ {"backgroundColor" : "#007bff","color": "#fff" }} 
-        icon={<ArrowDownOutlined />}
-      >{ t('encode', '编码') }</Button>
-      <Button 
-        onClick={ decode(unescape) }
-        style={ {"backgroundColor" : "#28a745","color": "#fff" }} 
-        icon={<ArrowUpOutlined />}
-      >{ t('decode', '解码') }</Button>&nbsp;
-      <Button 
-        onClick={ encode(ascii2Unicode) }
-        style={ {"backgroundColor" : "#007bff","color": "#fff" }} 
-        icon={<ArrowDownOutlined />}
-      >{ t('asciiEncode', 'Ascii 编码') }</Button>
-      <Button 
-        onClick={ decode(unicode2Ascii) }
-        style={ {"backgroundColor" : "#28a745","color": "#fff" }} 
-        icon={<ArrowUpOutlined />}
-      >{ t('asciiDecode', 'Ascii 解码') }</Button>&nbsp;
-      <Button 
-        onClick={ () => { setEncodeValue(''); setDecodeValue(''); } }
-        style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-      >{ t('clear', '清除') }</Button>
+      <Space wrap>
+        <Button 
+          onClick={ encode(escape) }
+          style={ {"backgroundColor" : "#007bff","color": "#fff" }} 
+          icon={<ArrowDownOutlined />}
+        >{ t('encode', '编码') }</Button>
+        <Button 
+          onClick={ decode(unescape) }
+          style={ {"backgroundColor" : "#28a745","color": "#fff" }} 
+          icon={<ArrowUpOutlined />}
+        >{ t('decode', '解码') }</Button>
+        <Button 
+          onClick={ encode(ascii2Unicode) }
+          style={ {"backgroundColor" : "#007bff","color": "#fff" }} 
+          icon={<ArrowDownOutlined />}
+        >{ t('asciiEncode', 'Ascii 编码') }</Button>
+        <Button 
+          onClick={ decode(unicode2Ascii) }
+          style={ {"backgroundColor" : "#28a745","color": "#fff" }} 
+          icon={<ArrowUpOutlined />}
+        >{ t('asciiDecode', 'Ascii 解码') }</Button>
+        <Button 
+          onClick={ () => { setEncodeValue(''); setDecodeValue(''); } }
+          style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
+        >{ t('clear', '清除') }</Button>
+      </Space>
       
       <TextArea
         status={ decodeStatus as InputStatus }

@@ -89,23 +89,25 @@ There are several URL-safe variants: some keep the padding, some replace differe
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setEncodeValue ); } }
       />
 
-      <Button 
-        onClick={ encode }
-        style={ {"backgroundColor" : "#007bff","color": "#fff" }} 
-        icon={<ArrowDownOutlined />}
-      >{ t('encode', 'Base64 编码') }</Button>
-      <Button 
-        onClick={ decode }
-        style={ {"backgroundColor" : "#28a745","color": "#fff" }} 
-        icon={<ArrowUpOutlined />}
-      >{ t('decode', 'Base64 解码') }</Button>&nbsp;
-      <Tooltip placement="bottomRight" title={ tips }>
-        <Checkbox onChange={ (e) => { setSafe(e.target.checked); } } checked={ safe }>{ t('safe', '安全') }</Checkbox>
-      </Tooltip>&nbsp;
-      <Button 
-        onClick={ () => { setEncodeValue(''); setDecodeValue(''); } }
-        style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-      >{ t('clear', '清除') }</Button>
+      <Space wrap>
+        <Button 
+          onClick={ encode }
+          style={ {"backgroundColor" : "#007bff","color": "#fff" }} 
+          icon={<ArrowDownOutlined />}
+        >{ t('encode', 'Base64 编码') }</Button>
+        <Button 
+          onClick={ decode }
+          style={ {"backgroundColor" : "#28a745","color": "#fff" }} 
+          icon={<ArrowUpOutlined />}
+        >{ t('decode', 'Base64 解码') }</Button>
+        <Tooltip placement="bottomRight" title={ tips }>
+          <Checkbox onChange={ (e) => { setSafe(e.target.checked); } } checked={ safe }>{ t('safe', '安全') }</Checkbox>
+        </Tooltip>
+        <Button 
+          onClick={ () => { setEncodeValue(''); setDecodeValue(''); } }
+          style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
+        >{ t('clear', '清除') }</Button>
+      </Space>
       
       <TextArea
         style={ { margin: "5px 0 5px 0" }}

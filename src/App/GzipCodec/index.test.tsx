@@ -14,6 +14,17 @@ const norm = (s: string) => s.replace(/\s+/g, '');
 const buttons = (c: HTMLElement) => Array.from(c.querySelectorAll('button')).map((b) => norm(b.textContent ?? ''));
 
 describe('GzipCodec 页面', () => {
+  test('根容器宽度 100% (textarea 铺满可用宽度, 无 900px 限制)', () => {
+    const { container } = render(<GzipCodec />);
+    const root = container.firstElementChild as HTMLElement;
+    expect(root.style.width).toBe('100%');
+    expect(root.style.maxWidth).toBe('');
+    // 两个 textarea 都在该容器内, 不设固定宽度 (默认 width:100%)
+    const tas = Array.from(container.querySelectorAll('textarea'));
+    expect(tas.length).toBeGreaterThanOrEqual(2);
+    tas.forEach((ta) => expect((ta as HTMLTextAreaElement).style.width).toBe(''));
+  });
+
   test('渲染参数控件与操作区 (按钮 + 输入/选择)', () => {
     const { container } = render(<GzipCodec />);
     // 页面有实际内容

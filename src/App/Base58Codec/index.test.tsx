@@ -14,6 +14,16 @@ const norm = (s: string) => s.replace(/\s+/g, '');
 const buttons = (c: HTMLElement) => Array.from(c.querySelectorAll('button')).map((b) => norm(b.textContent ?? ''));
 
 describe('Base58Codec 页面', () => {
+  test('操作按钮包裹在同一个 Space 容器内 (按钮之间有间隔)', () => {
+    const { container } = render(<Base58Codec />);
+    const btns = Array.from(container.querySelectorAll('button'));
+    expect(btns.length).toBe(3);
+    const space = btns[0].closest('.ant-space');
+    expect(space).not.toBeNull();
+    // 所有按钮必须是同一个 Space 的子项, 由 Space 统一提供间距
+    btns.forEach((b) => expect(b.closest('.ant-space')).toBe(space));
+  });
+
   test('渲染参数控件与操作区 (按钮 + 输入/选择)', () => {
     const { container } = render(<Base58Codec />);
     // 页面有实际内容

@@ -84,7 +84,7 @@ const GzipCodec = () => {
     : '';
 
   return (
-    <div style={ { maxWidth: 900 } }>
+    <div style={ { width: '100%' } }>
       <Input.TextArea
         value={ plain }
         onChange={ (e) => setPlain(e.target.value) }

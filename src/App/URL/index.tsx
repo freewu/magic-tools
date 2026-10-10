@@ -65,30 +65,32 @@ const URL = () => {
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setEncodeValue ); } }
       />
 
-      <Button 
-        onClick={ encode(encodeURIComponent) }
-        style={ {"backgroundColor" : "#007bff","color": "#fff" }} 
-        icon={<ArrowDownOutlined />}
-      >encodeURIComponent</Button>
-      <Button 
-        onClick={ decode(decodeURIComponent) }
-        style={ {"backgroundColor" : "#28a745","color": "#fff" }} 
-        icon={<ArrowUpOutlined />}
-      >decodeURIComponent</Button>
-      <Button 
-        onClick={ encode(encodeURI) }
-        style={ {"backgroundColor" : "#007bff","color": "#fff" }} 
-        icon={<ArrowDownOutlined />}
-      >encodeURI</Button>
-      <Button 
-        onClick={ decode(decodeURI) }
-        style={ {"backgroundColor" : "#28a745","color": "#fff" }} 
-        icon={<ArrowUpOutlined />}
-      >decodeURI</Button>
-      <Button 
-        onClick={ () => { setEncodeValue(''); setDecodeValue(''); } }
-        style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-      >{ t('clear', '清除') }</Button>
+      <Space wrap>
+        <Button 
+          onClick={ encode(encodeURIComponent) }
+          style={ {"backgroundColor" : "#007bff","color": "#fff" }} 
+          icon={<ArrowDownOutlined />}
+        >encodeURIComponent</Button>
+        <Button 
+          onClick={ decode(decodeURIComponent) }
+          style={ {"backgroundColor" : "#28a745","color": "#fff" }} 
+          icon={<ArrowUpOutlined />}
+        >decodeURIComponent</Button>
+        <Button 
+          onClick={ encode(encodeURI) }
+          style={ {"backgroundColor" : "#007bff","color": "#fff" }} 
+          icon={<ArrowDownOutlined />}
+        >encodeURI</Button>
+        <Button 
+          onClick={ decode(decodeURI) }
+          style={ {"backgroundColor" : "#28a745","color": "#fff" }} 
+          icon={<ArrowUpOutlined />}
+        >decodeURI</Button>
+        <Button 
+          onClick={ () => { setEncodeValue(''); setDecodeValue(''); } }
+          style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
+        >{ t('clear', '清除') }</Button>
+      </Space>
   
       <TextArea
         style={ { margin: "5px 0 5px 0" }}

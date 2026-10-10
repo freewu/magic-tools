@@ -19,6 +19,16 @@ const btn = (name: string) => {
 };
 
 describe('Base64 页面', () => {
+  test('操作按钮包裹在同一个 Space 容器内 (按钮之间有间隔)', () => {
+    const { container } = render(<Base64 />);
+    const btns = Array.from(container.querySelectorAll('button'));
+    expect(btns.length).toBe(3);
+    const space = btns[0].closest('.ant-space');
+    expect(space).not.toBeNull();
+    // 所有按钮必须是同一个 Space 的子项, 由 Space 统一提供间距
+    btns.forEach((b) => expect(b.closest('.ant-space')).toBe(space));
+  });
+
   test('渲染编码/解码/清除按钮', () => {
     render(<Base64 />);
     expect(btn('Base64 编码')).toBeInTheDocument();

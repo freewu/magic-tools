@@ -62,20 +62,22 @@ const Base58Codec = () => {
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setEncodeValue ); } }
       />
 
-      <Button 
-        onClick={ encode }
-        style={ {"backgroundColor" : "#007bff","color": "#fff" }} 
-        icon={<ArrowDownOutlined />}
-      >{ t('encode', 'Base58 编码') }</Button>
-      <Button 
-        onClick={ decode }
-        style={ {"backgroundColor" : "#28a745","color": "#fff" }} 
-        icon={<ArrowUpOutlined />}
-      >{ t('decode', 'Base58 解码') }</Button>&nbsp;
-      <Button 
-        onClick={ () => { setEncodeValue(''); setDecodeValue(''); } }
-        style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
-      >{ t('clear', '清除') }</Button>
+      <Space wrap>
+        <Button 
+          onClick={ encode }
+          style={ {"backgroundColor" : "#007bff","color": "#fff" }} 
+          icon={<ArrowDownOutlined />}
+        >{ t('encode', 'Base58 编码') }</Button>
+        <Button 
+          onClick={ decode }
+          style={ {"backgroundColor" : "#28a745","color": "#fff" }} 
+          icon={<ArrowUpOutlined />}
+        >{ t('decode', 'Base58 解码') }</Button>
+        <Button 
+          onClick={ () => { setEncodeValue(''); setDecodeValue(''); } }
+          style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
+        >{ t('clear', '清除') }</Button>
+      </Space>
       
       <TextArea
         style={ { margin: "5px 0 5px 0" }}
