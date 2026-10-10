@@ -3,7 +3,6 @@ export default {
   default: 'zh-CN',
   'zh-CN': {
     // appName 缺省回退 define.tsx AppName (= '经纬度格式转换')
-    labelFormat: '输入格式',
     labelOrder: '书写顺序',
     fmt_AUTO: '自动识别',
     fmt_DD: '十进制 (DD)',
@@ -17,7 +16,6 @@ export default {
     ph_NMEA: '3912.3402N, 11607.4070E',
     order_latlng: '纬度在前',
     order_lnglat: '经度在前',
-    sampleTitle: '示例',
     sample_dd: '十进制',
     sample_dms: '度分秒',
     sample_dm: '度分',
@@ -46,7 +44,6 @@ export default {
   },
   'zh-TW': {
     appName: '經緯度格式轉換',
-    labelFormat: '輸入格式',
     labelOrder: '書寫順序',
     fmt_AUTO: '自動辨識',
     fmt_DD: '十進位 (DD)',
@@ -60,7 +57,6 @@ export default {
     ph_NMEA: '3912.3402N, 11607.4070E',
     order_latlng: '緯度在前',
     order_lnglat: '經度在前',
-    sampleTitle: '範例',
     sample_dd: '十進位',
     sample_dms: '度分秒',
     sample_dm: '度分',
@@ -89,7 +85,6 @@ export default {
   },
   en: {
     appName: 'Latitude / Longitude Format Converter',
-    labelFormat: 'Input format',
     labelOrder: 'Order',
     fmt_AUTO: 'Auto detect',
     fmt_DD: 'Decimal degrees (DD)',
@@ -103,7 +98,6 @@ export default {
     ph_NMEA: '3912.3402N, 11607.4070E',
     order_latlng: 'Latitude first',
     order_lnglat: 'Longitude first',
-    sampleTitle: 'Examples',
     sample_dd: 'Decimal',
     sample_dms: 'DMS',
     sample_dm: 'DM',
