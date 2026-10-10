@@ -1,18 +1,13 @@
-import { Checkbox, Form, Input, Divider, message, Space, Radio, Button, Row, Col } from "antd";
+import { Form, Input, Divider, message, Space, Radio, Button } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard, debounce } from "./../../lib";
-import { pickTypeList, getTypePlaceholder } from "./lib";
+import { pickTypeList, getTypePlaceholder, toCelsius, fromCelsius } from "./lib";
+import { typeList, presetList } from "./data";
 import type { RadioChangeEvent } from 'antd';
 import { getDefaultType } from "./lib";
+import { BigNumber, parseBN, formatBN } from "../../lib/bignumber";
 import { InputStatus } from "antd/es/_util/statusUtils";
-import { c2f,f2c } from "./lib";
-import { c2k,k2c } from "./lib";
-import { c2n,n2c } from "./lib";
-import { c2d,d2c } from "./lib";
-import { c2r,r2c } from "./lib";
-import { c2Re,re2c } from "./lib";
-import { c2Ra,ra2c } from "./lib";
 import { useLocale } from "../../hook/locale-context";
 import { tr } from "../../i18n/lang";
 import tempLang from "./lang";
@@ -21,13 +16,14 @@ const TemperatureConvert = () => {
   const { locale } = useLocale();
   const t = (key: string, fallback: string) => tr(tempLang, locale, key, fallback);
   const dtype = getDefaultType();
+  const getPlaceholder = (type :string) :string => t('ph_' + type, getTypePlaceholder(type) ?? '');
 
   const [ value, setValue ] = useState(''); // 输入数量
-  const [ typeList, setTypeList ] = useState(pickTypeList()); // 类型
+  const [ typeListState, setTypeList ] = useState(pickTypeList()); // 类型
   const [ status, setStatus ] = useState(''); // 输入是否合法
   const [ type, setType ] = useState(dtype); // 类型,
-  const [ placeholder, setPlaceholder ] = useState(t('ph_' + dtype, getTypePlaceholder(dtype) ?? '')); // 数字类型的输入提示
-  const [ data, setData ] = useState(0); // 转换的结果 统一转成 摄氏度 c
+  const [ placeholder, setPlaceholder ] = useState(getPlaceholder(dtype)); // 数字类型的输入提示
+  const [ celsius, setCelsius ] = useState<BigNumber>(new BigNumber(0)); // 转换的结果 统一转成 摄氏度 c
   const [ notice, contextHolder] = message.useMessage();
 
   // 窗体大小发生变化,改变窗口大小
@@ -35,11 +31,31 @@ const TemperatureConvert = () => {
 
   const inputStyle = { cursor: "pointer" };
 
+  const convert = (value :string, type :string) => {
+    const bn = parseBN(value);
+    if (bn === null) {
+      if (value === '') { setStatus(''); return; } // 没有内容直接返回不做下面的处理
+      setCelsius(new BigNumber(0));
+      setStatus('error');
+      return;
+    }
+    setCelsius(toCelsius(bn, type));
+    setStatus('');
+  }
+
   // 切换类型
   const onTypeChange = ({ target: { value: v } }: RadioChangeEvent) => {
     setType(v);
-    setValue('');
-    setPlaceholder(t('ph_' + v, getTypePlaceholder(v) ?? ''));
+    setPlaceholder(getPlaceholder(v));
+    convert(value, v);
+  };
+
+  // 应用常用温度预设 (自动切到对应温标并填入数值)
+  const applyPreset = (p :{ value :string; unit :string }) => {
+    setType(p.unit);
+    setPlaceholder(getPlaceholder(p.unit));
+    setValue(p.value);
+    convert(p.value, p.unit);
   };
 
   // 点击结果框,把结果复制到粘贴板
@@ -54,31 +70,13 @@ const TemperatureConvert = () => {
   const textAreaChange = (e :React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value.trim();
     setValue(value);
-    if("" == value) {
-      setStatus('');
-      return ; // 没有内家直接返回不做下面的处理
-    }
-    if(/^[0-9\.\-]+$/.test(value)) {
-      switch(dtype) {
-        case "c": setData(parseFloat(value)); break;
-        case "f": setData(f2c(parseFloat(value))); break;
-        case "k": setData(k2c(parseFloat(value))); break;
-        case "n": setData(n2c(parseFloat(value))); break;
-        case "d": setData(d2c(parseFloat(value))); break;
-        case "r": setData(r2c(parseFloat(value))); break;
-        case "re": setData(re2c(parseFloat(value))); break;
-        case "ra": setData(ra2c(parseFloat(value))); break;
-      }
-      setStatus('')
-    } else {
-      setData(0);
-      setStatus('error');
-    }
+    convert(value, type);
   }
 
-  const f = (v :number) :string => {
-    if(value === '') return '';
-    return v.toString();
+  // 统一由摄氏度换算成各温标显示
+  const f = (unit :string) :string => {
+    if(value === '' || status !== '') return '';
+    return formatBN(fromCelsius(celsius, unit));
   }
 
   return (
@@ -88,15 +86,22 @@ const TemperatureConvert = () => {
       <Space>
         <Radio.Group
           optionType = "button" buttonStyle="solid"
-          options = { typeList.map((it) => ({ ...it, label: t('unit_' + it.value, it.label) })) } 
+          options = { typeListState.map((it) => ({ ...it, label: t('unit_' + it.value, it.label) })) } 
           onChange={ onTypeChange } 
           value={ type } 
         />
         <Button 
-          onClick={ () => { setValue(''); setData(0); setStatus(''); } }
+          onClick={ () => { setValue(''); setCelsius(new BigNumber(0)); setStatus(''); } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
         >{ t('clear', '清除') }</Button>
       </Space>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+        <span style={{ lineHeight: '24px' }}>{ t('preset', '常用温度：') }</span>
+        { presetList.map((p) => (
+          <Button key={ p.id } size="small" onClick={ () => applyPreset(p) }>{ t('ps_' + p.id, p.label) }</Button>
+        )) }
+      </div>
 
       <TextArea
         status= { status as InputStatus }
@@ -109,31 +114,12 @@ const TemperatureConvert = () => {
 
       <Divider dashed />
 
-      <Form name="basic1" labelCol={{ span: 3 }} autoComplete="off">
-        <Form.Item label={ t('unit_c', '摄氏度 °C') }>
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(data) } />
-        </Form.Item>
-        <Form.Item label={ t('unit_f', '华氏度 °F') }>
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(c2f(data)) } />
-        </Form.Item>
-        <Form.Item label={ t('unit_k', '开尔文 K') }>
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(c2k(data)) } />
-        </Form.Item>
-        <Form.Item label={ t('unit_r', '兰金温标 °R') }>
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(c2r(data)) } />
-        </Form.Item>
-        <Form.Item label={ t('unit_d', '德利尔温标 °D') }>
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(c2d(data)) } />
-        </Form.Item>
-        <Form.Item label={ t('unit_n', '牛顿温标 °N') }>
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(c2n(data)) } />
-        </Form.Item>
-        <Form.Item label={ t('unit_re', '列氏温标 °Ré') }>
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(c2Re(data)) } />
-        </Form.Item>
-        <Form.Item label={ t('unit_ra', '罗氏温标 °Rø') }>
-          <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(c2Ra(data)) } />
-        </Form.Item>
+      <Form name="basic1" labelCol={{ span: 5 }} autoComplete="off">
+        { typeList.map((u) => (
+          <Form.Item key={ u.value } label={ t('unit_' + u.value, u.label) }>
+            <Input readOnly style={ inputStyle } onClick={ inputClick } value={ f(u.value) } />
+          </Form.Item>
+        )) }
       </Form>
     </div>
   );

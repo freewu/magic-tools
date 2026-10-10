@@ -1,5 +1,6 @@
 
 import { typeList } from "./data"
+import { BigNumber } from "../../lib/bignumber"
 // 为了展示美观 小窗口不展示 label太多细节
 export const pickTypeList = () :any[] => {
   if (window.innerWidth > 1200) return typeList;
@@ -27,75 +28,80 @@ export function setDefaultType(type: string) : void  {
     localStorage.setItem(DEFAULT_TYPE,type);
 }
 
-// [°F] = [°C] × 9⁄5 + 32
-export const c2f = (f :number) :number => {
-  return f * 9 / 5 + 32;
+// ---------- 温标换算 (BigNumber 精确计算, 统一以摄氏度为基准) ----------
+
+// 指定温标 → 摄氏度
+export const toCelsius = (value :BigNumber, type :string) :BigNumber => {
+  switch (type) {
+    case 'f':  return value.minus(32).times(5).div(9);                   // [°C] = ([°F] − 32) × 5⁄9
+    case 'k':  return value.minus(273.15);                               // [°C] = [K] − 273.15
+    case 'r':  return value.minus(491.67).times(5).div(9);               // [°C] = ([R] − 491.67) × 5⁄9
+    case 'd':  return new BigNumber(100).minus(value.times(2).div(3));   // [°C] = 100 − [°De] × 2⁄3
+    case 'n':  return value.times(100).div(33);                          // [°C] = [°N] × 100⁄33
+    case 're': return value.times(5).div(4);                             // [°C] = [°Ré] × 5⁄4
+    case 'ra': return value.minus(7.5).times(40).div(21);                // [°C] = ([°Rø] − 7.5) × 40⁄21
+    case 'c':
+    default:   return value;
+  }
 }
+
+// 摄氏度 → 指定温标
+export const fromCelsius = (c :BigNumber, type :string) :BigNumber => {
+  switch (type) {
+    case 'f':  return c.times(9).div(5).plus(32);                        // [°F] = [°C] × 9⁄5 + 32
+    case 'k':  return c.plus(273.15);                                    // [K] = [°C] + 273.15
+    case 'r':  return c.plus(273.15).times(9).div(5);                    // [R] = ([°C] + 273.15) × 9⁄5
+    case 'd':  return new BigNumber(100).minus(c).times(3).div(2);       // [°De] = (100 − [°C]) × 3⁄2
+    case 'n':  return c.times(33).div(100);                              // [°N] = [°C] × 33⁄100
+    case 're': return c.times(4).div(5);                                 // [°Ré] = [°C] × 4⁄5
+    case 'ra': return c.times(21).div(40).plus(7.5);                     // [°Rø] = [°C] × 21⁄40 + 7.5
+    case 'c':
+    default:   return c;
+  }
+}
+
+// ---------- 兼容旧接口 (返回 number) ----------
+// [°F] = [°C] × 9⁄5 + 32
+export const c2f = (c :number) :number => fromCelsius(new BigNumber(c), 'f').toNumber();
 
 // [°C] = ([°F] − 32) × 5⁄9
-export const f2c = (c :number) :number => {
-  return ( c - 32 ) * 5 / 9;
-}
+export const f2c = (f :number) :number => toCelsius(new BigNumber(f), 'f').toNumber();
 
 // [K] = [°C] + 273.15
-export const c2k = (c :number) :number => {
-  return c + 273.15;
-}
+export const c2k = (c :number) :number => fromCelsius(new BigNumber(c), 'k').toNumber();
 
 // [°C] = [K] − 273.15
-export const k2c = (k :number) :number => {
-  return k - 273.15;
-}
+export const k2c = (k :number) :number => toCelsius(new BigNumber(k), 'k').toNumber();
 
 // [R] = ([°C] + 273.15) × 9⁄5
-export const c2r = (c :number) :number => {
-  return (c + 273.15) * 9 /5;
-}
+export const c2r = (c :number) :number => fromCelsius(new BigNumber(c), 'r').toNumber();
 
 // [°C] = ([R] − 491.67) × 5⁄9
-export const r2c = (r :number) :number => {
-  return (r - 491.67) * 5 / 9;
-}
+export const r2c = (r :number) :number => toCelsius(new BigNumber(r), 'r').toNumber();
 
 // [°De] = (100 − [°C]) × 3⁄2
-export const c2d = (c :number) :number => {
-  return ( 100 - c) * 3 / 2;
-}
+export const c2d = (c :number) :number => fromCelsius(new BigNumber(c), 'd').toNumber();
 
 // [°C] = 100 − [°De] × 2⁄3
-export const d2c = (d :number) :number => {
-  return 100 - d * 2 / 3
-}
+export const d2c = (d :number) :number => toCelsius(new BigNumber(d), 'd').toNumber();
 
 // [°N] = [°C] × 33⁄100
-export const c2n = (c :number) :number => {
-  return c * 33 / 100;
-}
+export const c2n = (c :number) :number => fromCelsius(new BigNumber(c), 'n').toNumber();
 
 // [°C] = [°N] × 100⁄33
-export const n2c = (n :number) :number => {
-  return n * 100 / 33;
-}
+export const n2c = (n :number) :number => toCelsius(new BigNumber(n), 'n').toNumber();
 
 // [°Ré] = [°C] × 4⁄5
-export const c2Re = (c :number) :number => {
-  return c * 4 / 5;
-}
+export const c2Re = (c :number) :number => fromCelsius(new BigNumber(c), 're').toNumber();
 
 // [°C] = [°Ré] × 5⁄4
-export const re2c = (re :number) :number => {
-  return re * 5 / 4;
-}
+export const re2c = (re :number) :number => toCelsius(new BigNumber(re), 're').toNumber();
 
 // [°Rø] = [°C] × 21⁄40 + 7.5
-export const c2Ra = (c :number) :number => {
-  return c * 21 / 40 + 7.5;
-}
+export const c2Ra = (c :number) :number => fromCelsius(new BigNumber(c), 'ra').toNumber();
 
 // [°C] = ([°Rø] − 7.5) × 40⁄21
-export const ra2c = (ra :number) :number => {
-  return (ra - 7.5) * 40 / 21
-}
+export const ra2c = (ra :number) :number => toCelsius(new BigNumber(ra), 'ra').toNumber();
 
 /**
             从摄氏温标换算至其他温度单位	从其他温度单位换算至摄氏温标

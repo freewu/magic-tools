@@ -71,3 +71,17 @@ export const typeList = [
   { label: '勺', value: 'shao', type:'cn', placeholder: '0.0001市石 =	0.001市斗 =	0.01市升 =	0.1市合 =	1勺 =	10撮 =	0.01升'},
   { label: '撮', value: 'cuo', type:'cn', placeholder: '0.00001市石 =	0.0001市斗 =	0.001市升 =	0.01市合 =	0.1勺 =	1撮 =	0.001升'},
 ];
+
+// 常用容量预设 (点击后自动填入数量并切换到对应单位), 文案见 lang.ts 的 ps_<id>
+export const presetList = [
+  { id: 'teaspoon', label: '一茶匙 5 毫升', value: '5', unit: 'ml' },
+  { id: 'tablespoon', label: '一汤匙 15 毫升', value: '15', unit: 'ml' },
+  { id: 'can', label: '易拉罐 330 毫升', value: '330', unit: 'ml' },
+  { id: 'bottle', label: '矿泉水 550 毫升', value: '550', unit: 'ml' },
+  { id: 'oil', label: '食用油 5 升', value: '5', unit: 'l' },
+  { id: 'water', label: '桶装水 18.9 升', value: '18.9', unit: 'l' },
+  { id: 'bathtub', label: '浴缸 200 升', value: '200', unit: 'l' },
+  { id: 'usgallon', label: '1 美制加仑', value: '1', unit: 'us-gallon' },
+  { id: 'iugallon', label: '1 英制加仑', value: '1', unit: 'iu-gallon' },
+  { id: 'dou', label: '1 市斗 (10 升)', value: '1', unit: 'dou' },
+];

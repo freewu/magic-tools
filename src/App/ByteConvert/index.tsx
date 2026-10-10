@@ -1,15 +1,40 @@
-import { Checkbox, Form, Input, Divider, message, Space, Radio, Button, Row, Col } from "antd";
+import { Form, Input, Divider, message, Space, Radio, Button, Row, Col } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
-import { } from "./lib"
-import { typeList, emptyResult, ByteConvertResult } from "./data"
+import { typeList } from "./data"
 import type { RadioChangeEvent } from 'antd';
-import { convertToByte, convertFromByte, getDefaultType } from "./lib"
+import { toByte, fromByte, getDefaultType } from "./lib"
+import { BigNumber, parseBN, formatBN } from "../../lib/bignumber";
 import { InputStatus } from "antd/es/_util/statusUtils";
 import { useLocale } from "../../hook/locale-context";
 import { tr } from "../../i18n/lang";
 import byteLang from "./lang";
+
+// 结果区展示单位 (字节 / 位 两侧各一份)
+const BYTE_ROWS = [
+  { unit: '', label: 'B (Byte)' },
+  { unit: 'KB', label: 'KB (Kilo Byte)' },
+  { unit: 'MB', label: 'MB (Mega Byte)' },
+  { unit: 'GB', label: 'GB (Giga Byte)' },
+  { unit: 'TB', label: 'TB (Trillion Byte)' },
+  { unit: 'PB', label: 'PB (Peta Byte)' },
+  { unit: 'EB', label: 'EB (Exa Byte)' },
+  { unit: 'ZB', label: 'ZB (Zetta Byte)' },
+  { unit: 'YB', label: 'YB (Yotta Byte)' },
+];
+
+const BIT_ROWS = [
+  { unit: '', label: 'b (bit)' },
+  { unit: 'KB', label: 'Kb (Kilo bit)' },
+  { unit: 'MB', label: 'Mb (Mega bit)' },
+  { unit: 'GB', label: 'Gb (Giga bit)' },
+  { unit: 'TB', label: 'Tb (Trillion bit)' },
+  { unit: 'PB', label: 'Pb (Peta bit)' },
+  { unit: 'EB', label: 'Eb (Exa bit)' },
+  { unit: 'ZB', label: 'Zb (Zetta bit)' },
+  { unit: 'YB', label: 'Yb (Yotta bit)' },
+];
 
 const ByteConvert = () => {
   const { locale } = useLocale();
@@ -21,19 +46,35 @@ const ByteConvert = () => {
 
   const [ value, setValue ] = useState(''); // 输入数量
   const [ status, setStatus ] = useState(''); // 输入是否合法
-  const [ b, setB ] = useState(0); // 数量
+  const [ bytes, setBytes ] = useState<BigNumber>(new BigNumber(0)); // 统一换算成字节
   const [ type, setType ] = useState(dtype); // 类型,
   const [ placeholder, setPlaceholder ] = useState(getPlaceholder(dtype)); // 数字类型的输入提示
-  const [ data, setData ] = useState(emptyResult); // 转换的结果
   const [ notice, contextHolder] = message.useMessage();
 
   const inputStyle = { cursor: "pointer" };
+
+  const convert = (value :string, type :string) => {
+    const bn = parseBN(value);
+    if (bn === null) {
+      if (value === '') { setStatus(''); return; } // 没有内容直接返回不做下面的处理
+      setBytes(new BigNumber(0));
+      setStatus('error');
+      return;
+    }
+    if (bn.isNegative()) { // 字节数不允许为负
+      setBytes(new BigNumber(0));
+      setStatus('error');
+      return;
+    }
+    setBytes(toByte(bn, type));
+    setStatus('');
+  }
 
   // 切换类型
   const onTypeChange = ({ target: { value : t } }: RadioChangeEvent) => {
     setType(t);
     setPlaceholder(getPlaceholder(t));
-    if( value !== "" && /^\d+$/.test(value)) setB(convertToByte(parseInt(value), t));
+    convert(value, t);
   };
 
   // 点击结果框,把结果复制到粘贴板
@@ -48,22 +89,12 @@ const ByteConvert = () => {
   const textAreaChange = (e :React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value.trim();
     setValue(value);
-    if("" == value) {
-      setStatus('');
-      return ; // 没有内家直接返回不做下面的处理
-    }
-    if(/^\d+$/.test(value)) {
-      setB(convertToByte(parseInt(value), type));
-      setStatus('')
-    } else {
-      setB(0);
-      setStatus('error');
-    }
+    convert(value, type);
   }
 
-  const f = (v :number) :string => {
-    if(0 === v) return '';
-    return v.toString();
+  const f = (v :BigNumber) :string => {
+    if(value === '' || status !== '') return '';
+    return formatBN(v);
   }
 
   return (
@@ -78,7 +109,7 @@ const ByteConvert = () => {
           value={ type } 
         />
         <Button 
-          onClick={ () => { setValue(''); setB(0); setStatus(''); } }
+          onClick={ () => { setValue(''); setBytes(new BigNumber(0)); setStatus(''); } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
         >{ t('clear', '清除') }</Button>
       </Space>
@@ -96,65 +127,21 @@ const ByteConvert = () => {
         <Col span={12}>
           <Divider dashed plain>{ t('divByte', '字节 ( Byte )') }</Divider>
           <Form name="basic1" labelCol={{ span: 8 }} autoComplete="off">
-            <Form.Item label="B (Byte)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b,'')) } />
-            </Form.Item>
-            <Form.Item label="KB (Kilo Byte)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b,'KB')) } />
-            </Form.Item>
-            <Form.Item label="MB (Mega Byte)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b,'MB')) } />
-            </Form.Item>
-            <Form.Item label="GB (Giga Byte)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b,'GB')) }/>
-            </Form.Item>
-            <Form.Item label="TB (Trillion Byte)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b,'TB')) } />
-            </Form.Item>
-            <Form.Item label="PB (Peta Byte)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b,'PB')) } />
-            </Form.Item>
-            <Form.Item label="EB (Exa Byte)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b,'EB')) } />
-            </Form.Item>
-            <Form.Item label="ZB (Zetta Byte)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b,'ZB')) } />
-            </Form.Item>
-            <Form.Item label="YB Yotta Byte">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b,'YB')) } />
-            </Form.Item>
+            { BYTE_ROWS.map((row) => (
+              <Form.Item key={ row.label } label={ row.label }>
+                <Input readOnly style={ inputStyle } onClick={ inputClick } value={ f(fromByte(bytes, row.unit)) } />
+              </Form.Item>
+            )) }
           </Form>
         </Col>
         <Col span={12}>
           <Divider dashed plain>{ t('divBit', '位 ( bit )') }</Divider>
           <Form name="basic2" labelCol={{ span: 8 }} autoComplete="off">
-          <Form.Item label="b (bit)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b * 8,'')) } />
-            </Form.Item>
-            <Form.Item label="Kb (Kilo bit)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b * 8,'KB')) } />
-            </Form.Item>
-            <Form.Item label="Mb (Mega bit)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b * 8,'MB')) } />
-            </Form.Item>
-            <Form.Item label="Gb (Giga bit)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b * 8,'GB')) }/>
-            </Form.Item>
-            <Form.Item label="Tb (Trillion bit)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b * 8,'TB')) } />
-            </Form.Item>
-            <Form.Item label="Pb (Peta bit)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b * 8,'PB')) } />
-            </Form.Item>
-            <Form.Item label="Eb (Exa bit)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b * 8,'EB')) } />
-            </Form.Item>
-            <Form.Item label="Zb (Zetta bit)">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b * 8,'ZB')) } />
-            </Form.Item>
-            <Form.Item label="Yb Yotta bit">
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(convertFromByte(b * 8,'YB')) } />
-            </Form.Item>
+            { BIT_ROWS.map((row) => (
+              <Form.Item key={ row.label } label={ row.label }>
+                <Input readOnly style={ inputStyle } onClick={ inputClick } value={ f(fromByte(bytes.times(8), row.unit)) } />
+              </Form.Item>
+            )) }
           </Form>
         </Col>
       </Row>

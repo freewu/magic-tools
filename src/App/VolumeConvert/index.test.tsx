@@ -9,6 +9,8 @@ afterEach(() => cleanup());
 
 const norm = (s: string) => s.replace(/\s+/g, '');
 const buttons = (c: HTMLElement) => Array.from(c.querySelectorAll('button')).map((b) => norm(b.textContent ?? ''));
+const inputValues = (c: HTMLElement) => Array.from(c.querySelectorAll('input')).map((i) => (i as HTMLInputElement).value);
+const presetBtn = (c: HTMLElement, text: string) => Array.from(c.querySelectorAll('button')).find((b) => norm(b.textContent ?? '').includes(text));
 
 describe('VolumeConvert 页面', () => {
   test('渲染参数控件与操作区 (按钮 + 输入/选择)', () => {
@@ -26,5 +28,23 @@ describe('VolumeConvert 页面', () => {
     if (editable) fireEvent.change(editable, { target: { value: 'test' } });
     const btn = buttons(container).length ? Array.from(container.querySelectorAll('button'))[0] as HTMLButtonElement : null;
     if (btn) expect(() => fireEvent.click(btn)).not.toThrow();
+  });
+});
+
+describe('VolumeConvert 常用容量预设', () => {
+  test('点击「易拉罐 330 毫升」自动换算', () => {
+    const { container } = render(<VolumeConvert />);
+    fireEvent.click(presetBtn(container, '易拉罐330毫升') as HTMLButtonElement);
+    expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('330');
+    const values = inputValues(container);
+    expect(values).toContain('0.33');   // 升
+    expect(values).toContain('330');    // 毫升自身
+  });
+
+  test('点击「1 美制加仑」换算为 3785.41178 毫升', () => {
+    const { container } = render(<VolumeConvert />);
+    fireEvent.click(presetBtn(container, '1美制加仑') as HTMLButtonElement);
+    expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('1');
+    expect(inputValues(container)).toContain('3785.41178');
   });
 });

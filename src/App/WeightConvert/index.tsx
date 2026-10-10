@@ -2,13 +2,20 @@ import { Select, Form, Input, Divider, message, Space, Radio, Button, Row, Col }
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard } from "./../../lib"
-import { unitTypeList } from "./data"
+import { unitTypeList, typeList } from "./data"
 import type { RadioChangeEvent } from 'antd';
-import { getDefaultUnitType, getTypeList, getDefaultType, getTypePlaceholder } from "./lib"
+import { getDefaultUnitType, getTypeList, getDefaultType, getTypePlaceholder, toGram, fromGram } from "./lib"
+import { BigNumber, parseBN, formatBN } from "../../lib/bignumber";
 import { InputStatus } from "antd/es/_util/statusUtils";
 import { useLocale } from "../../hook/locale-context";
 import { tr } from "../../i18n/lang";
 import wLang from "./lang";
+
+// 结果区文案 key 与单位值不一致的单位 (沿用历史命名, 避免改动已有语言包)
+const RESULT_KEY_ALIAS :Record<string, string> = { mcg: 'ug', longton: 'lt', shortton: 'stn' };
+const resultKey = (value :string) :string => 'r_' + (RESULT_KEY_ALIAS[value] ?? value);
+
+const LABEL_SPAN :Record<string, number> = { ms: 8, iu: 10, cn: 8 };
 
 const WeightConvert = () => {
   const { locale } = useLocale();
@@ -19,17 +26,29 @@ const WeightConvert = () => {
 
   const ut = getDefaultUnitType();
   const [ unitType, setUnitType ] = useState(ut); // 制式 
-  const [ typeList, setTypeList ] = useState(getTypeList(ut)); // 类型
+  const [ typeListState, setTypeList ] = useState(getTypeList(ut)); // 类型
   const [ value, setValue ] = useState(''); // 输入数量
   const [ status, setStatus ] = useState(''); // 输入是否合法
 
   const dt = getDefaultType(ut);
   const [ type, setType ] = useState(dt); // 转换类型
   const [ placeholder, setPlaceholder ] = useState(getPlaceholder(dt)); // 数字类型的输入提示
-  const [ result, setResult ] = useState(0); // 转换的结果 统一转换成 米
-  const [ notice, contextHolder] = message.useMessage();
+  const [ gram, setGram ] = useState<BigNumber>(new BigNumber(0)); // 转换的结果 统一转换成 克 g
+  const [ notice, contextHolder ] = message.useMessage();
 
   const inputStyle = { cursor: "pointer" };
+
+  const convert = (value :string, type :string) => {
+    const bn = parseBN(value);
+    if (bn === null) {
+      if (value === '') { setStatus(''); return; } // 没有内容直接返回不做下面的处理
+      setGram(new BigNumber(0));
+      setStatus('error');
+      return;
+    }
+    setGram(toGram(bn, type));
+    setStatus('');
+  }
 
   // 切换类型
   const onTypeChange = ({ target: { value : v } }: RadioChangeEvent) => {
@@ -47,63 +66,15 @@ const WeightConvert = () => {
     }
   };
 
-  const convert = (value:string, type :string) => {
-    if("" == value) {
-      setStatus('');
-      return ; // 没有内容直接返回不做下面的处理
-    }
-    /*
-
-
-
-    */
-    if(/^[0-9\.\-]+$/.test(value)) {
-      // 统一转成 克 g
-      switch(type) {
-        case "kt": setResult(parseFloat(value) * 1000 * 1000 * 1000 ); break;
-        case "t": setResult(parseFloat(value) * 1000 * 1000); break;
-        case "kg": setResult(parseFloat(value) * 1000); break;
-        case "g": setResult(parseFloat(value) ); break;
-        case "mg": setResult(parseFloat(value) / 1000); break;
-        case "μg": setResult(parseFloat(value) / 1000 / 1000 ); break;
-        case "ng": setResult(parseFloat(value) / 1000 / 1000 / 1000); break;
-        case "pg": setResult(parseFloat(value) / 1000 / 1000 / 1000 / 1000); break;
-        case "ct": setResult(parseFloat(value) / 0.2 ); break;
-
-        case "oz": setResult(parseFloat(value) * 28.349523125 ); break; // 1 盎司 = 1/16 磅（pound）= 28.349523125 克
-        case "lb": setResult(parseFloat(value) * 453.59237); break; // 1 磅 = 7000 格令 = 453.59237 克
-        case "st": setResult(parseFloat(value) * 6.35 * 1000); break; // 1 英石（stone）= 14 磅 = 6.35 千克
-        case "gr": setResult(parseFloat(value) * 64.79891 / 1000); break; // 1 格令（grain）= 64.79891 毫克
-        case "hw": setResult(parseFloat(value) * 50.8 * 1000); break; // 1 英担（hundredweight）= 4 夸特 = 112 磅 = 50.8 千克
-        case "md": setResult(parseFloat(value) * 45.359237 * 1000); break; // 1 美担 = 45.359237 千克
-        case "dr": setResult(parseFloat(value) * 1.77); break; // 1 打兰（drachm）= 1/16 盎司（ounce） = 1.77 克
-        case "qr": setResult(parseFloat(value) * 12.7 * 1000); break; // 1 夸特（quarter）= 2 英石 = 28 磅 = 12.7 千克
-        case "longton": setResult(parseFloat(value) * 1016 * 1000); break; // 1 英吨（ton）= 20 英担 = 2240 磅 = 1016 千克 英吨（长吨long ton）是2240磅
-        case "shortton": setResult(parseFloat(value) * 907 * 1000); break; // 1 美吨（短吨short ton）是 2000磅（907千克）'},
-
-        case "dan": setResult(parseFloat(value) * 50000 ); break;
-        case "jin": setResult(parseFloat(value) * 500 ); break;
-        case "liang": setResult(parseFloat(value) * 50 ); break;
-        case "qian": setResult(parseFloat(value) * 5 ); break;
-        case "fen": setResult(parseFloat(value) * 0.5 ); break;
-        case "li": setResult(parseFloat(value) * 0.05 ); break;
-      }
-      setStatus('')
-    } else {
-      setResult(0);
-      setStatus('error');
-    }
-  }
-
   const textAreaChange = (e :React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value.trim();
     setValue(value);
     convert(value,type);
   }
 
-  const f = (v :number) :string => {
-    if(0 === v) return '';
-    return v.toString();
+  const f = (unit :string) :string => {
+    if(value === '' || status !== '') return '';
+    return formatBN(fromGram(gram, unit));
   }
 
   return (
@@ -126,12 +97,12 @@ const WeightConvert = () => {
         />
         <Radio.Group
           optionType = "button" buttonStyle="solid"
-          options = { typeList.map(i => ({ ...i, label: t('u_' + i.value, i.label) })) } 
+          options = { typeListState.map(i => ({ ...i, label: t('u_' + i.value, i.label) })) } 
           onChange={ onTypeChange } 
           value={ type } 
         />
         <Button 
-          onClick={ () => { setValue(''); setStatus(''); setResult(0); } }
+          onClick={ () => { setValue(''); setStatus(''); setGram(new BigNumber(0)); } }
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
         >{t('clear', '清除')}</Button>
       </Space>
@@ -146,96 +117,18 @@ const WeightConvert = () => {
       />
 
       <Row wrap>
-        <Col span={8}>
-          <Divider dashed plain>{t('ut_ms', '公制')}</Divider>
-          <Form name="basic1" labelCol={{ span: 8 }} autoComplete="off">
-            <Form.Item label={t('r_kt', '千吨(kt)')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000 / 1000 / 1000) } />
-            </Form.Item>
-            <Form.Item label={t('r_t', '吨(t)')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000 / 1000) } />
-            </Form.Item>
-            <Form.Item label={t('r_kg', '千克(kg)')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1000 ) } />
-            </Form.Item>
-            <Form.Item label={t('r_g', '克(g)')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result) }/>
-            </Form.Item>
-            <Form.Item label={t('r_mg', '毫克(mg)')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000) } />
-            </Form.Item>
-            <Form.Item label={t('r_ug', '微克(μg)')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000 * 1000) } />
-            </Form.Item>
-            <Form.Item label={t('r_ng', '纳克(ng)')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 1000 * 1000 * 1000) } />
-            </Form.Item>
-            <Form.Item label={t('r_ct', '克拉(ct)')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result * 0.2) } />
-            </Form.Item>
-
-          </Form>
-        </Col>
-
-        <Col span={8}>
-          <Divider dashed plain>{t('ut_iu', '英制')}</Divider>
-          <Form name="basic2" labelCol={{ span: 10 }} autoComplete="off" >
-            <Form.Item label={t('r_oz', '盎司(ounce)')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 28.349523125) } />
-            </Form.Item>
-            <Form.Item label={t('r_lb', '磅(pound)')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 453.59237) } />
-            </Form.Item>
-            <Form.Item label={t('r_st', '英石(stone)')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 6350) } />
-            </Form.Item>
-            <Form.Item label={t('r_gr', '格令(grain)')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 64.79891 * 1000)  }/>
-            </Form.Item>
-            <Form.Item label={t('r_dr', '打兰(drachm)')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1.77)  }/>
-            </Form.Item>
-            <Form.Item label={t('r_qr', '夸特(quarter)')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 12.7 / 1000)  }/>
-            </Form.Item>
-            <Form.Item label={t('r_hw', '英担')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 50.8 / 1000)  }/>
-            </Form.Item>
-            <Form.Item label={t('r_md', '美担')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 45.359237 / 1000)  }/>
-            </Form.Item>
-            <Form.Item label={t('r_lt', '英吨(long ton)')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 1016 / 1000)  }/>
-            </Form.Item>
-            <Form.Item label={t('r_stn', '美吨(short ton)')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 907 / 1000)  }/>
-            </Form.Item>
-          </Form>
-        </Col>
-
-        <Col span={8}>
-          <Divider dashed plain>{t('ut_cn', '市制')}</Divider>
-          <Form name="basic3" labelCol={{ span: 8 }} autoComplete="off">
-            <Form.Item label={t('r_dan', '担')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 50000) } />
-            </Form.Item>
-            <Form.Item label={t('r_jin', '斤')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 500 ) } />
-            </Form.Item>
-            <Form.Item label={t('r_liang', '两')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 50) } />
-            </Form.Item>
-            <Form.Item label={t('r_qian', '钱')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 ) }/>
-            </Form.Item>
-            <Form.Item label={t('r_fen', '分')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 10 ) }/>
-            </Form.Item>
-            <Form.Item label={t('r_li', '厘')}>
-              <Input readOnly style={ inputStyle } onClick={ inputClick } value= { f(result / 5 * 100 ) }/>
-            </Form.Item>
-          </Form>
-        </Col>
+        { unitTypeList.map((g) => (
+          <Col span={ 8 } key={ g.value }>
+            <Divider dashed plain>{t('ut_' + g.value, g.label)}</Divider>
+            <Form labelCol={{ span: LABEL_SPAN[g.value] ?? 8 }} autoComplete="off">
+              { getTypeList(g.value).map((u) => (
+                <Form.Item key={ u.value } label={ t(resultKey(u.value), u.label) }>
+                  <Input readOnly style={ inputStyle } onClick={ inputClick } value={ f(u.value) } />
+                </Form.Item>
+              )) }
+            </Form>
+          </Col>
+        )) }
       </Row>
     </div>
   );

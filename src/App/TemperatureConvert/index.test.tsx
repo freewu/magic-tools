@@ -9,6 +9,8 @@ afterEach(() => cleanup());
 
 const norm = (s: string) => s.replace(/\s+/g, '');
 const buttons = (c: HTMLElement) => Array.from(c.querySelectorAll('button')).map((b) => norm(b.textContent ?? ''));
+const inputValues = (c: HTMLElement) => Array.from(c.querySelectorAll('input')).map((i) => (i as HTMLInputElement).value);
+const presetBtn = (c: HTMLElement, text: string) => Array.from(c.querySelectorAll('button')).find((b) => norm(b.textContent ?? '').includes(text));
 
 describe('TemperatureConvert 页面', () => {
   test('渲染参数控件与操作区 (按钮 + 输入/选择)', () => {
@@ -26,5 +28,27 @@ describe('TemperatureConvert 页面', () => {
     if (editable) fireEvent.change(editable, { target: { value: 'test' } });
     const btn = buttons(container).length ? Array.from(container.querySelectorAll('button'))[0] as HTMLButtonElement : null;
     if (btn) expect(() => fireEvent.click(btn)).not.toThrow();
+  });
+});
+
+describe('TemperatureConvert 常用温度预设', () => {
+  test('点击「沸点 100 °C」自动换算其余温标', () => {
+    const { container } = render(<TemperatureConvert />);
+    const btn = presetBtn(container, '沸点100°C');
+    expect(btn).toBeTruthy();
+    fireEvent.click(btn as HTMLButtonElement);
+    expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('100');
+    const values = inputValues(container);
+    expect(values).toContain('100');    // 摄氏度
+    expect(values).toContain('212');    // 华氏度
+    expect(values).toContain('373.15'); // 开尔文
+    expect(values).toContain('80');     // 列氏度
+  });
+
+  test('点击「华氏沸点 212 °F」会切换到华氏并换算', () => {
+    const { container } = render(<TemperatureConvert />);
+    fireEvent.click(presetBtn(container, '华氏沸点212°F') as HTMLButtonElement);
+    expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('212');
+    expect(inputValues(container)).toContain('100'); // 摄氏度结果
   });
 });

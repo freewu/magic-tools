@@ -1,4 +1,5 @@
-import { c2f, f2c, c2k, k2c, c2r, r2c, c2d, d2c, c2n, n2c, c2Re, re2c, c2Ra, ra2c, getDefaultType, setDefaultType, getTypePlaceholder } from './lib';
+import { c2f, f2c, c2k, k2c, c2r, r2c, c2d, d2c, c2n, n2c, c2Re, re2c, c2Ra, ra2c, toCelsius, fromCelsius, getDefaultType, setDefaultType, getTypePlaceholder } from './lib';
+import { BigNumber } from '../../lib/bignumber';
 
 describe('TemperatureConvert lib', () => {
   beforeEach(() => localStorage.clear());
@@ -48,5 +49,22 @@ describe('TemperatureConvert lib', () => {
     expect(getDefaultType()).toBe('c');
     setDefaultType('f');
     expect(getDefaultType()).toBe('f');
+  });
+
+  test('fromCelsius / toCelsius 使用 BigNumber 精确换算', () => {
+    expect(fromCelsius(new BigNumber(37), 'f').toFixed()).toBe('98.6'); // 旧实现 37*9/5+32 = 98.60000000000001
+    expect(fromCelsius(new BigNumber(100), 'f').toFixed()).toBe('212');
+    expect(toCelsius(new BigNumber('98.6'), 'f').toFixed()).toBe('37');
+    expect(fromCelsius(new BigNumber('36.6'), 'f').toFixed()).toBe('97.88');
+    expect(toCelsius(new BigNumber('97.88'), 'f').toFixed()).toBe('36.6');
+    expect(fromCelsius(new BigNumber(0), 'k').toFixed()).toBe('273.15');
+    expect(toCelsius(new BigNumber('273.15'), 'k').toFixed()).toBe('0');
+  });
+
+  test('各温标互转可逆 (以摄氏度为基准)', () => {
+    const c = new BigNumber('36.6');
+    for (const type of ['f', 'k', 'r', 'd', 'n', 're', 'ra']) {
+      expect(toCelsius(fromCelsius(c, type), type).toFixed()).toBe('36.6');
+    }
   });
 });

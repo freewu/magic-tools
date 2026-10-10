@@ -8,3 +8,16 @@ export const typeList = [
   { label: '列氏温标 °Ré', value: 're', placeholder: '水的冰点被定为列氏 0 度，而沸点则为列氏 80 度' },
   { label: '罗氏温标 °Rø', value: 'ra', placeholder: '将水的冰点定为罗氏 7.5 度，沸点定为罗氏 60 度' },
 ];
+
+// 常用温度预设 (点击后自动填入数量并切换到对应温标), 文案见 lang.ts 的 ps_<id>
+export const presetList = [
+  { id: 'abszero', label: '绝对零度 -273.15 °C', value: '-273.15', unit: 'c' },
+  { id: 'ice', label: '冰点 0 °C', value: '0', unit: 'c' },
+  { id: 'room', label: '室温 25 °C', value: '25', unit: 'c' },
+  { id: 'body', label: '体温 37 °C', value: '37', unit: 'c' },
+  { id: 'boil', label: '沸点 100 °C', value: '100', unit: 'c' },
+  { id: 'fice', label: '华氏冰点 32 °F', value: '32', unit: 'f' },
+  { id: 'fboil', label: '华氏沸点 212 °F', value: '212', unit: 'f' },
+  { id: 'ln2', label: '液氮 -196 °C', value: '-196', unit: 'c' },
+  { id: 'oven', label: '烤箱 180 °C', value: '180', unit: 'c' },
+];

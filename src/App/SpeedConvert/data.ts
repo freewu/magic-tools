@@ -17,3 +17,17 @@ export const typeList = [
   { label: '英尺每分钟(ft/min)', value: 'ftmin', type:'iu', placeholder: ''},
   { label: '英寸每秒(in/s)', value: 'ins', type:'iu', placeholder: ''},
 ];
+
+// 常用速度预设 (点击后自动填入数量并切换到对应单位), 文案见 lang.ts 的 ps_<id>
+export const presetList = [
+  { id: 'gravity', label: '重力加速度 9.80665 m/s', value: '9.80665', unit: 'ms' },
+  { id: 'v1', label: '第一宇宙速度 7.9 km/s', value: '7.9', unit: 'kms' },
+  { id: 'v2', label: '第二宇宙速度 11.2 km/s', value: '11.2', unit: 'kms' },
+  { id: 'v3', label: '第三宇宙速度 16.7 km/s', value: '16.7', unit: 'kms' },
+  { id: 'light', label: '光速 299792.458 km/s', value: '299792.458', unit: 'kms' },
+  { id: 'sound', label: '音速 1 马赫', value: '1', unit: 'mach' },
+  { id: 'train', label: '高铁 350 km/h', value: '350', unit: 'kmh' },
+  { id: 'car', label: '高速限速 120 km/h', value: '120', unit: 'kmh' },
+  { id: 'walk', label: '步行 5 km/h', value: '5', unit: 'kmh' },
+  { id: 'knot', label: '1 节 (1.852 km/h)', value: '1', unit: 'knot' },
+];

@@ -1,4 +1,5 @@
-import { bytesToSize, convertToByte, convertFromByte, getDefaultType, setDefaultType } from './lib';
+import { bytesToSize, convertToByte, convertFromByte, toByte, fromByte, getDefaultType, setDefaultType } from './lib';
+import { BigNumber } from '../../lib/bignumber';
 
 describe('ByteConvert lib', () => {
   beforeEach(() => localStorage.clear());
@@ -32,5 +33,22 @@ describe('ByteConvert lib', () => {
     expect(getDefaultType()).toBe('GB');
     setDefaultType('MB');
     expect(getDefaultType()).toBe('MB');
+  });
+
+  test('toByte / fromByte 使用 BigNumber 精确换算 (不丢小数)', () => {
+    // 旧实现用 parseInt, 小数会被截断
+    expect(toByte(new BigNumber('0.1'), 'KB').toFixed()).toBe('102.4');
+    expect(toByte(new BigNumber(2), 'MB').toFixed()).toBe('2097152');
+    expect(toByte(new BigNumber(1), 'kB').toFixed()).toBe('1024'); // 大小写无关
+    expect(toByte(new BigNumber(5), 'unknown').toFixed()).toBe('5'); // 未知单位原样返回
+    expect(fromByte(new BigNumber(1024), 'KB').toFixed()).toBe('1');
+    expect(fromByte(new BigNumber(1), 'KB').toFixed()).toBe('0.0009765625'); // 有限小数, 完全精确
+  });
+
+  test('toByte 与 fromByte 互逆 (含小数, 无浮点误差)', () => {
+    const bytes = toByte(new BigNumber('123.456'), 'GB');
+    expect(fromByte(bytes, 'GB').toFixed()).toBe('123.456');
+    const kb = toByte(new BigNumber('1.5'), 'KB');
+    expect(fromByte(kb, 'KB').toFixed()).toBe('1.5');
   });
 });
