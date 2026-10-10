@@ -315,12 +315,12 @@ export interface ColorScheme {
 export const COLOR_SCHEME_KEYS: ColorSchemeKey[] = [ 'default', 'blue', 'green', 'mono', 'warm', 'cool' ];
 
 export const COLOR_SCHEMES: Record<ColorSchemeKey, ColorScheme> = {
-  default: { label: '默认多色', colors: [] },
-  blue: { label: '单色 · 蓝', colors: [ '#1971c2' ] },
-  green: { label: '单色 · 绿', colors: [ '#2f9e44' ] },
-  mono: { label: '单色 · 灰', colors: [ '#495057' ] },
-  warm: { label: '暖色系', colors: [ '#e8590c', '#f08c00', '#f59f00', '#fab005', '#ffd43b' ] },
-  cool: { label: '冷色系', colors: [ '#0c8599', '#1098ad', '#15aabf', '#22b8cf', '#66d9e8' ] },
+  default: { label: '多色', colors: [] },
+  blue: { label: '蓝', colors: [ '#1971c2' ] },
+  green: { label: '绿', colors: [ '#2f9e44' ] },
+  mono: { label: '灰', colors: [ '#495057' ] },
+  warm: { label: '暖色', colors: [ '#e8590c', '#f08c00', '#f59f00', '#fab005', '#ffd43b' ] },
+  cool: { label: '冷色', colors: [ '#0c8599', '#1098ad', '#15aabf', '#22b8cf', '#66d9e8' ] },
 };
 
 export const COLOR_DEFAULT: ColorSchemeKey = 'default';
@@ -332,10 +332,19 @@ export const DEPTH_ALL = -1;
 
 export const DEPTH_OPTIONS: number[] = [ DEPTH_ALL, 1, 2, 3, 4 ];
 
+/** 层级下拉显示名 (zh 原文, 走 u() 翻译) */
+export const DEPTH_LABELS: Record<number, string> = {
+  [DEPTH_ALL]: '全部',
+  1: '一层',
+  2: '两层',
+  3: '三层',
+  4: '四层',
+};
+
 export const DEPTH_DEFAULT = DEPTH_ALL;
 
 /** 节点字号 (px) */
-export const FONT_SIZES = [ 14, 16, 18, 20 ];
+export const FONT_SIZES = [ 12, 14, 16, 18, 20, 22 ];
 
 export const FONT_DEFAULT = 16;
 
@@ -370,6 +379,14 @@ export const BACKGROUND_OPTIONS: Array<{ value: RasterBackground; label: string;
 
 /** 位图导出倍率 (矢量导出不受影响) */
 export const SCALE_OPTIONS = [ 1, 2, 3, 4 ];
+
+/** 缩放下拉显示名: 百分比与倍率同时给出 (zh 原文, 走 u() 翻译) */
+export const SCALE_LABELS: Record<number, string> = {
+  1: '100% (x1)',
+  2: '200% (x2)',
+  3: '300% (x3)',
+  4: '400% (x4)',
+};
 
 export const DEFAULT_SCALE = 1;
 

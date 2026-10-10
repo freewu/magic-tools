@@ -98,11 +98,22 @@ const btn = (name: string): HTMLButtonElement => {
   return hit;
 };
 
-/** 变量下拉 (0 = 示例, 1 = 配色, 2 = 展开层级; 与 DOM 顺序一致) */
+/** 参数下拉 (0 = 示例, 1 = 配色, 2 = 展开层级, 3 = 字号, 4 = 背景, 5 = 缩放; 与 DOM 顺序一致) */
 const selectAt = (index: number) => document.querySelectorAll('.ant-select-selector')[index] as HTMLElement;
 const openSelect = async (index: number) => {
   fireEvent.mouseDown(selectAt(index));
   await waitFor(() => expect(document.querySelector('.ant-select-dropdown')).not.toBeNull());
+};
+/** 刚展开的下拉里的选项文案 (旧下拉带 ant-select-dropdown-hidden, 需取最后一个可见的) */
+const openSelectOptions = async (index: number) => {
+  await openSelect(index);
+  return waitFor(() => {
+    const drops = Array.from(document.querySelectorAll('.ant-select-dropdown'))
+      .filter((d) => !d.classList.contains('ant-select-dropdown-hidden'));
+    const list = drops[drops.length - 1]?.querySelectorAll('.ant-select-item-option') ?? [];
+    if (list.length === 0) throw new Error(`下拉 ${index} 未展开`);
+    return Array.from(list).map((el) => (el.textContent ?? '').trim());
+  });
 };
 /** 「导出图片」下拉: 打开菜单 / 按格式点菜单项 (key 与 data.ts 的 ExportFormat 一致) */
 const EXPORT_LABEL: Record<string, string> = { svg: 'SVG 图片', png: 'PNG 图片', webp: 'WebP 图片' };
@@ -173,6 +184,10 @@ describe('MindMap 初始界面', () => {
     }
     expect(btn('隐藏输入')).toBeInTheDocument();
     expect(btn('隐藏预览')).toBeInTheDocument();
+    // 「全屏」与两个面板开关在同一行工具条上
+    const toolbar = btn('隐藏输入').closest('.ant-space');
+    expect(btn('隐藏预览').closest('.ant-space')).toBe(toolbar);
+    expect(btn('全屏').closest('.ant-space')).toBe(toolbar);
     expect(codeArea().value).toBe(SAMPLES[0].code);
 
     await waitRendered();
@@ -190,6 +205,32 @@ describe('MindMap 初始界面', () => {
     expect(stats.textContent).toContain(`${SAMPLES[0].code.replace(/\s+$/, '').split('\n').length} 行`);
     expect(stats.textContent).toContain('2 个节点 · 2 层');
     expect(btn('导出图片')).toBeEnabled();
+  });
+
+  test('视图参数都是下拉, 选项文案为配色 / 层级 / 字号 / 背景 / 缩放', async () => {
+    render(<MindMap />);
+    await waitRendered();
+    expect(await openSelectOptions(1)).toEqual([ '多色', '蓝', '绿', '灰', '暖色', '冷色' ]);
+    expect(await openSelectOptions(2)).toEqual([ '全部', '一层', '两层', '三层', '四层' ]);
+    expect(await openSelectOptions(3)).toEqual([ '12', '14', '16', '18', '20', '22' ]);
+    expect(await openSelectOptions(4)).toEqual([ '白色', '深色', '透明' ]);
+    expect(await openSelectOptions(5)).toEqual([ '100% (x1)', '200% (x2)', '300% (x3)', '400% (x4)' ]);
+  });
+
+  test('输入区与预览区等高对齐, 输入框自动撑满卡片', async () => {
+    render(<MindMap />);
+    await waitRendered();
+    const inputCard = cardTitle('Markdown 大纲')!.closest('.ant-card') as HTMLElement;
+    const previewCard = cardTitle('预览')!.closest('.ant-card') as HTMLElement;
+    // 两张卡片都撑满同一行 (flex 拉伸), 输入卡正文用 flex 列把输入框拉到与预览同高
+    expect(inputCard.style.display).toBe('flex');
+    expect(inputCard.style.flexDirection).toBe('column');
+    expect(previewCard).not.toBeNull();
+    const body = codeArea().parentElement as HTMLElement;
+    expect(body.className).toContain('ant-card-body');
+    expect(body.style.display).toBe('flex');
+    expect(codeArea().style.flex).toContain('1 1 auto');
+    expect(codeArea().style.minHeight).toBe('420px');
   });
 
   test('设置中心的默认配色 / 展开层级 / 示例在打开时生效', async () => {
@@ -216,15 +257,17 @@ describe('MindMap 初始界面', () => {
     render(<MindMap />);
     await waitRendered();
 
-    fireEvent.click(screen.getByText(String(FONT_SIZES[3])));
-    await waitFor(() => expect(styleCss()).toContain(`--markmap-font:${FONT_SIZES[3]}px/`));
+    await openSelect(3);
+    await clickOption('18');
+    await waitFor(() => expect(styleCss()).toContain('--markmap-font:18px/'));
+    expect(FONT_SIZES).toContain(18);
 
     await openSelect(1);
-    await clickOption('单色 · 蓝');
+    await clickOption('蓝');
     await waitFor(() => expect(lastOptions().color).toEqual(COLOR_SCHEMES.blue.colors));
 
     await openSelect(2);
-    await clickOption('仅展开 2 层');
+    await clickOption('两层');
     await waitFor(() => expect(lastOptions().initialExpandLevel).toBe(2));
 
     // 参数变化走 setData 复用实例, 不重建
@@ -240,7 +283,8 @@ describe('MindMap 初始界面', () => {
     expect(styleCss()).toContain('--markmap-text-color:#e8e8e8');
 
     // 换成白底后文字同步改为深色, 避免导出「白底 + 浅字」
-    fireEvent.click(screen.getByText('白色'));
+    await openSelect(4);
+    await clickOption('白色');
     expect(getComputedStyle(pane()).backgroundColor).toBe('rgb(255, 255, 255)');
     await waitFor(() => expect(styleCss()).toContain('--markmap-text-color:#333'));
     expect(styleCss()).not.toContain('--markmap-text-color:#e8e8e8');
@@ -251,7 +295,8 @@ describe('MindMap 初始界面', () => {
     await waitRendered();
     expect(getComputedStyle(pane()).backgroundColor).toBe('rgb(255, 255, 255)');
 
-    fireEvent.click(screen.getByText('透明'));
+    await openSelect(4);
+    await clickOption('透明');
     expect(pane().className).toContain('mindmap-preview-checker');
     expect(getComputedStyle(pane()).backgroundColor).toBe('');
   });
@@ -315,7 +360,7 @@ describe('MindMap 初始界面', () => {
 });
 
 describe('MindMap 面板开关', () => {
-  test('可隐藏输入 / 隐藏预览, 并可随时恢复', async () => {
+  test('可隐藏输入 / 隐藏预览 (但不能同时隐藏, 另一个置灰), 并可随时恢复', async () => {
     render(<MindMap />);
     await waitRendered();
 
@@ -323,18 +368,26 @@ describe('MindMap 面板开关', () => {
     expect(cardTitle('Markdown 大纲')).toBeNull();
     expect(btn('显示输入')).toBeInTheDocument();
     expect(pane()).not.toBeNull();
+    // 输入已收起: 再收起预览就什么都不剩了, 因此置灰
+    expect(btn('隐藏预览')).toBeDisabled();
+
+    fireEvent.click(btn('显示输入'));
+    expect(cardTitle('Markdown 大纲')).not.toBeNull();
+    expect(btn('隐藏预览')).toBeEnabled();
 
     fireEvent.click(btn('隐藏预览'));
     expect(pane()).toBeNull();
     expect(cardTitle('预览')).toBeNull();
-    // 预览隐藏后实例被销毁 (markmap 依赖可见容器测量尺寸)
+    // 预览隐藏后实例被销毁 (markmap 依赖可见容器测量尺寸), 且全屏不再可用
     expect(mockInstances[0].destroy).toHaveBeenCalled();
     expect(btn('显示预览')).toBeInTheDocument();
+    expect(btn('隐藏输入')).toBeDisabled();
+    expect(btn('全屏')).toBeDisabled();
 
-    fireEvent.click(btn('显示输入'));
     fireEvent.click(btn('显示预览'));
-    expect(cardTitle('Markdown 大纲')).not.toBeNull();
     expect(cardTitle('预览')).not.toBeNull();
+    expect(btn('隐藏输入')).toBeEnabled();
+    expect(btn('全屏')).toBeEnabled();
     await waitFor(() => expect(mockInstances).toHaveLength(2));
   });
 
@@ -491,8 +544,10 @@ describe('MindMap 导出', () => {
   test('导出 PNG: 2x + 透明背景时不铺底色且尺寸翻倍', async () => {
     render(<MindMap />);
     await waitRendered();
-    fireEvent.click(screen.getByText('2x'));
-    fireEvent.click(screen.getByText('透明'));
+    await openSelect(5);
+    await clickOption('200% (x2)');
+    await openSelect(4);
+    await clickOption('透明');
     await exportAs('png');
 
     await waitFor(() => expect(savePngFile).toHaveBeenCalledTimes(1), WAIT);

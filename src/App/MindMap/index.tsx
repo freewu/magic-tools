@@ -1,4 +1,4 @@
-import { Alert, Button, Card, Divider, Dropdown, Input, Segmented, Select, Space, Tooltip, message } from 'antd';
+import { Alert, Button, Card, Divider, Dropdown, Input, Select, Space, Tooltip, message } from 'antd';
 import type { MenuProps } from 'antd';
 import { CopyOutlined, DownloadOutlined, DownOutlined, ExpandOutlined, EyeInvisibleOutlined, EyeOutlined, FullscreenExitOutlined, FullscreenOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -15,8 +15,8 @@ import {
   COLOR_SCHEME_KEYS,
   DEFAULT_FILE_BASE,
   DEFAULT_SCALE,
-  DEPTH_ALL,
   DEPTH_OPTIONS,
+  DEPTH_LABELS,
   EXPORT_PADDING,
   FONT_DEFAULT,
   FONT_SIZES,
@@ -24,6 +24,7 @@ import {
   RASTER_QUALITY,
   SAMPLES,
   SCALE_OPTIONS,
+  SCALE_LABELS,
   type RasterBackground,
 } from './data';
 import {
@@ -296,7 +297,19 @@ const MindMap: React.FC = () => {
     [ locale ],
   );
   const depthOptions = useMemo(
-    () => DEPTH_OPTIONS.map((n) => ({ value: n, label: n === DEPTH_ALL ? t('全部展开') : tt('仅展开 {n} 层', { n }) })),
+    () => DEPTH_OPTIONS.map((n) => ({ value: n, label: t(DEPTH_LABELS[n] ?? String(n)) })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [ locale ],
+  );
+  // 字号 / 背景 / 缩放与配色、层级一样用下拉, 保持参数区风格统一
+  const fontOptions = useMemo(() => FONT_SIZES.map((n) => ({ value: n, label: String(n) })), []);
+  const bgOptions = useMemo(
+    () => BACKGROUND_OPTIONS.map((o) => ({ value: o.value, label: t(o.label) })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [ locale ],
+  );
+  const scaleOptions = useMemo(
+    () => SCALE_OPTIONS.map((n) => ({ value: n, label: t(SCALE_LABELS[n] ?? `${n}x`) })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [ locale ],
   );
@@ -400,20 +413,33 @@ const MindMap: React.FC = () => {
         <Button
           size="small"
           icon={showEditor ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+          disabled={showEditor && !showPreview}
           onClick={() => setShowEditor(!showEditor)}
         >{t(showEditor ? '隐藏输入' : '显示输入')}</Button>
         <Button
           size="small"
           icon={showPreview ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+          disabled={showPreview && !showEditor}
           onClick={() => setShowPreview(!showPreview)}
         >{t(showPreview ? '隐藏预览' : '显示预览')}</Button>
+        {/* 全屏放在面板开关旁: 两个区域不会同时隐藏, 有预览就能全屏 */}
+        <Tooltip title={full ? t('按 Esc 退出全屏') : t('全屏查看导图, 画布更大更好拖拽')}>
+          <Button
+            size="small"
+            disabled={!showPreview}
+            icon={full ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+            onClick={full ? exitFull : enterFull}
+          >{t(full ? '退出全屏' : '全屏')}</Button>
+        </Tooltip>
       </Space>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
         {showEditor && (
           <Card
             size="small"
             title={t('Markdown 大纲')}
-            style={{ flex: '1 1 420px', minWidth: 320 }}
+            // 与右侧预览卡等高对齐: 卡片撑满这一行, 正文用 flex 把输入框拉到同高
+            style={{ flex: '1 1 420px', minWidth: 320, display: 'flex', flexDirection: 'column' }}
+            styles={{ body: { flex: '1 1 auto', display: 'flex', flexDirection: 'column', minHeight: 0 } }}
             extra={
               <Space size={8}>
                 <Select
@@ -439,7 +465,7 @@ const MindMap: React.FC = () => {
             <Input.TextArea
               value={code}
               onChange={(e) => { setCode(e.target.value); setSampleId(''); }}
-              style={{ minHeight: 420, fontFamily: MONO, fontSize: 13, lineHeight: 1.7, resize: 'vertical' }}
+              style={{ flex: '1 1 auto', minHeight: 420, fontFamily: MONO, fontSize: 13, lineHeight: 1.7, resize: 'vertical' }}
               placeholder={t('在此输入 Markdown 大纲…')}
             />
             <div style={{ marginTop: 6, color: '#888', fontSize: 12 }}>
@@ -481,13 +507,6 @@ const MindMap: React.FC = () => {
                   void copy(exportSvgFromCanvas(el, live), t('已复制 SVG'));
                 }}>{t('复制 SVG')}</Button>
                 <Button size="small" icon={<ExpandOutlined />} disabled={!canExport} onClick={() => { void fitView(); }}>{t('适应窗口')}</Button>
-                <Tooltip title={full ? t('按 Esc 退出全屏') : t('全屏查看导图, 画布更大更好拖拽')}>
-                  <Button
-                    size="small"
-                    icon={full ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
-                    onClick={full ? exitFull : enterFull}
-                  >{t(full ? '退出全屏' : '全屏')}</Button>
-                </Tooltip>
               </Space>
             }
           >
@@ -497,7 +516,7 @@ const MindMap: React.FC = () => {
                 <Select
                   size="small"
                   value={scheme}
-                  style={{ width: 130 }}
+                  style={{ width: 110 }}
                   onChange={(v) => setScheme(v)}
                   options={colorOptions}
                 />
@@ -507,36 +526,39 @@ const MindMap: React.FC = () => {
                 <Select
                   size="small"
                   value={depth}
-                  style={{ width: 140 }}
+                  style={{ width: 100 }}
                   onChange={(v) => setDepth(v)}
                   options={depthOptions}
                 />
               </Space>
               <Space size={6}>
                 <span style={{ color: '#888' }}>{t('字号')}</span>
-                <Segmented
+                <Select
                   size="small"
                   value={fontSize}
-                  onChange={(v) => setFontSize(Number(v))}
-                  options={FONT_SIZES.map((n) => ({ label: String(n), value: n }))}
+                  style={{ width: 80 }}
+                  onChange={(v) => setFontSize(v)}
+                  options={fontOptions}
                 />
               </Space>
               <Space size={6}>
                 <span style={{ color: '#888' }}>{t('背景')}</span>
-                <Segmented
+                <Select
                   size="small"
                   value={bg}
-                  onChange={(v) => { bgTouchedRef.current = true; setBg(v as RasterBackground); }}
-                  options={BACKGROUND_OPTIONS.map((o) => ({ label: t(o.label), value: o.value }))}
+                  style={{ width: 90 }}
+                  onChange={(v) => { bgTouchedRef.current = true; setBg(v); }}
+                  options={bgOptions}
                 />
               </Space>
               <Space size={6}>
                 <span style={{ color: '#888' }}>{t('缩放')}</span>
-                <Segmented
+                <Select
                   size="small"
                   value={scale}
-                  onChange={(v) => setScale(Number(v))}
-                  options={SCALE_OPTIONS.map((n) => ({ label: n === 1 ? t('1x (自适应)') : `${n}x`, value: n }))}
+                  style={{ width: 120 }}
+                  onChange={(v) => setScale(v)}
+                  options={scaleOptions}
                 />
               </Space>
             </Space>

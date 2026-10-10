@@ -1,6 +1,6 @@
 import { Divider, Form, Select } from 'antd';
 import { useState } from 'react';
-import { COLOR_DEFAULT, COLOR_SCHEMES, COLOR_SCHEME_KEYS, DEPTH_ALL, DEPTH_DEFAULT, DEPTH_OPTIONS, SAMPLES } from './data';
+import { COLOR_DEFAULT, COLOR_SCHEMES, COLOR_SCHEME_KEYS, DEPTH_DEFAULT, DEPTH_LABELS, DEPTH_OPTIONS, SAMPLES } from './data';
 import { getDefaultColorScheme, getDefaultDepth, getDefaultSample, setDefaultColorScheme, setDefaultDepth, setDefaultSample } from './lib';
 import { u } from './lang';
 import { useLocale } from '../../hook/locale-context';
@@ -10,7 +10,7 @@ import { row as _r, rowT } from '../Setting/rows-lang';
 export const MindMapSetting: React.FC = () => {
   const { locale } = useLocale();
   const st = (zh: string) => _r(locale, zh);
-  const depthText = (n: number) => (n === DEPTH_ALL ? st('全部展开') : rowT(locale, '仅展开 ${n} 层', { n }));
+  const depthText = (n: number) => u(locale, DEPTH_LABELS[n] ?? String(n));
 
   const [ scheme, setScheme ] = useState(() => getDefaultColorScheme());
   const [ depth, setDepth ] = useState(() => getDefaultDepth());

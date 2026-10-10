@@ -7,7 +7,7 @@
 // 本文件只做纯解析校验, 不涉及 DOM。
 import { Transformer, builtInPlugins } from 'markmap-lib';
 import { outlineInfo, type OutlineNode } from './lib';
-import { COLOR_SCHEMES, COLOR_SCHEME_KEYS, DEPTH_OPTIONS, FONT_SIZES, SAMPLES, SCALE_OPTIONS } from './data';
+import { COLOR_SCHEMES, COLOR_SCHEME_KEYS, DEPTH_LABELS, DEPTH_OPTIONS, FONT_SIZES, SAMPLES, SCALE_LABELS, SCALE_OPTIONS } from './data';
 
 // 用真实的 markmap-lib 解析内置示例:
 // markmap 的解析器在「同一父节点下混用标题与列表」时会覆盖旧条目, 这类问题只会静默丢内容,
@@ -117,12 +117,20 @@ describe('MindMap 静态选项', () => {
     expect(COLOR_SCHEMES.default.colors).toHaveLength(0);
   });
 
-  it('展开层级含「全部展开」(-1), 字号与倍率均为正数且递增', () => {
+  it('展开层级含「全部」(-1), 字号与倍率均为正数且递增', () => {
     expect(DEPTH_OPTIONS).toContain(-1);
     expect([ ...DEPTH_OPTIONS ].sort((a, b) => a - b)).toEqual(DEPTH_OPTIONS);
     expect([ ...FONT_SIZES ].sort((a, b) => a - b)).toEqual(FONT_SIZES);
     expect([ ...SCALE_OPTIONS ].sort((a, b) => a - b)).toEqual(SCALE_OPTIONS);
     expect(Math.min(...FONT_SIZES)).toBeGreaterThan(0);
     expect(Math.min(...SCALE_OPTIONS)).toBeGreaterThan(0);
+  });
+
+  it('层级 / 缩放的下拉文案覆盖全部选项', () => {
+    expect(Object.keys(DEPTH_LABELS)).toHaveLength(DEPTH_OPTIONS.length);
+    expect(Object.keys(SCALE_LABELS)).toHaveLength(SCALE_OPTIONS.length);
+    for (const n of DEPTH_OPTIONS) expect(DEPTH_LABELS[n]).toBeTruthy();
+    for (const n of SCALE_OPTIONS) expect(SCALE_LABELS[n]).toBeTruthy();
+    expect(SCALE_LABELS[2]).toContain('200%');
   });
 });
