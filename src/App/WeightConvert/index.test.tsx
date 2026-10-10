@@ -44,6 +44,10 @@ describe('WeightConvert 常用重量预设', () => {
     // 位于输入框上方
     const area = container.querySelector('textarea') as HTMLElement;
     expect(area.compareDocumentPosition(tags[0]) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
+    // 预设常量单独占一行: antd Space 默认 inline-flex, 会与下一行的单位/按钮挤在同一行
+    const row = tags[0].closest('.ant-space') as HTMLElement;
+    expect(row).toBeTruthy();
+    expect(row.style.display).toBe('flex');
   });
 
   test('点击「1 斤」切到市制并换算', () => {

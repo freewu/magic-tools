@@ -92,7 +92,7 @@ const SpeedConvert = () => {
     <div>
       {contextHolder}
 
-      <Space size={[0, 8]} wrap style={ { marginBottom: 8 } }>
+      <Space size={[0, 8]} wrap style={ { display: 'flex', marginBottom: 8 } }>
         { presetList.map((p, index) => (
           <Tag
             key={ p.id }
