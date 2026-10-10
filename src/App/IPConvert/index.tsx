@@ -1,7 +1,7 @@
 import { Button, Col, Divider, Form, Input, message, Row, Space, Tag } from 'antd';
 import React, { useState } from 'react';
 import { SwapOutlined } from '@ant-design/icons';
-import { ipv4ToInt, ipv4Valid, intToIpv4, intTextValid, intToHex, intToBin, ipv4ToIpv6FormsSafe } from './lib';
+import { ipv4ToInt, ipv4Valid, intToIpv4, intTextValid, intToHex, intToBin, ipv4ToIpv6RowsSafe } from './lib';
 import type { InputStatus } from 'antd/es/_util/statusUtils';
 import { copyTextToClipboard } from "./../../lib";
 import ipLang from "./lang";
@@ -142,25 +142,24 @@ const IPConvert :React.FC = () => {
 
       <Divider dashed />
 
-      { valid && (
-        <div className="ip-form" style={ { flex: 1, minHeight: 0, overflowY: 'auto', paddingRight: 12 } }>
-          <Form labelCol={{ span: 5 }} autoComplete="off">
-            <Form.Item label="HEX" style={{ marginBottom: 12 }}>
-              <Input readOnly showCount onClick={ inputClick } value={ `0x${intToHex(int)}` } />
+      {/* 结果区常驻显示: 值为空时各行为空串, 不隐藏也不跳动 */}
+      <div className="ip-form" style={ { flex: 1, minHeight: 0, overflowY: 'auto', paddingRight: 12 } }>
+        <Form labelCol={{ span: 5 }} autoComplete="off">
+          <Form.Item label="HEX" style={{ marginBottom: 12 }}>
+            <Input readOnly showCount onClick={ inputClick } value={ valid ? `0x${intToHex(int)}` : '' } />
+          </Form.Item>
+          <Form.Item label="BIN" style={{ marginBottom: 12 }}>
+            <Input readOnly showCount onClick={ inputClick } value={ valid ? intToBin(int) : '' } />
+          </Form.Item>
+          <Divider orientation="left" style={{ margin: '0 0 12px' }}>{ t('ipv6Title','对应的 IPv6 写法') }</Divider>
+          { ipv4ToIpv6RowsSafe(ip).map((form) => (
+            <Form.Item key={ form.key } label={ t(form.key, form.key) } style={{ marginBottom: 12 }}>
+              <Input readOnly showCount onClick={ inputClick } value={ form.value } />
             </Form.Item>
-            <Form.Item label="BIN" style={{ marginBottom: 12 }}>
-              <Input readOnly showCount onClick={ inputClick } value={ intToBin(int) } />
-            </Form.Item>
-            <Divider orientation="left" style={{ margin: '0 0 12px' }}>{ t('ipv6Title','对应的 IPv6 写法') }</Divider>
-            { ipv4ToIpv6FormsSafe(ip).map((form) => (
-              <Form.Item key={ form.key } label={ t(form.key, form.key) } style={{ marginBottom: 12 }}>
-                <Input readOnly showCount onClick={ inputClick } value={ form.value } />
-              </Form.Item>
-            )) }
-          </Form>
-          <div style={ { color: '#999', fontSize: 12 } }>{ t('ipv6Hint','同一条 IPv4 在不同过渡方案下的写法, 点输入框即可复制') }</div>
-        </div>
-      ) }
+          )) }
+        </Form>
+        <div style={ { color: '#999', fontSize: 12 } }>{ t('ipv6Hint','同一条 IPv4 在不同过渡方案下的写法, 点输入框即可复制') }</div>
+      </div>
     </div>
   );
 };

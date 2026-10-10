@@ -161,3 +161,16 @@ export const ipv4ToIpv6Forms = (ip :string) :Ipv6Form[] => {
 export const ipv4ToIpv6FormsSafe = (ip :string) :Ipv6Form[] => {
   try { return ipv4ToIpv6Forms(ip); } catch { return []; }
 };
+
+/** IPv6 写法行的固定顺序 (与 ipv4ToIpv6Forms 一致) */
+export const IPV6_FORM_KEYS :string[] = [
+  'ipv6Mapped', 'ipv6MappedHex', 'ipv6Compat', 'ipv6SixToFour', 'ipv6Nat64', 'ipv6Full',
+];
+
+/**
+ * 界面用安全版: 非法地址/空值时返回 6 行占位 (value 为空串),
+ * 这样值为空时下方结果区仍保持原样渲染, 布局不会跳动
+ */
+export const ipv4ToIpv6RowsSafe = (ip :string) :Ipv6Form[] => {
+  try { return ipv4ToIpv6Forms(ip); } catch { return IPV6_FORM_KEYS.map((key) => ({ key, value: '' })); }
+};

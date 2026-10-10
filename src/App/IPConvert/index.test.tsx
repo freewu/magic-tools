@@ -36,12 +36,20 @@ const resultValue = (c: HTMLElement, label: string): string => resultInput(c, la
 const clearButton = () => screen.getByRole('button', { name: (n: string) => norm(n) === '清除' });
 
 describe('IPConvert 基础互转', () => {
-  test('初始只有示例标签与两个输入框, HEX / BIN 与 IPv6 区都不出现', () => {
+  test('初始即显示结果区 (HEX / BIN / IPv6 行), 只是值为空', () => {
     const { container } = render(<IPConvert />);
     expect(ipInput()).toHaveValue('');
     expect(intInput()).toHaveValue('');
-    expect(within(container).queryByText('HEX')).not.toBeInTheDocument();
-    expect(within(container).queryByText('对应的 IPv6 写法')).not.toBeInTheDocument();
+    // 结果区常驻: 标签都在, 值为空串
+    expect(within(container).getByText('HEX')).toBeInTheDocument();
+    expect(within(container).getByText('对应的 IPv6 写法')).toBeInTheDocument();
+    expect(resultValue(container, 'HEX')).toBe('');
+    expect(resultValue(container, 'BIN')).toBe('');
+    expect(container.querySelectorAll('.ant-form-item')).toHaveLength(8);
+    // 6 条 IPv6 写法行也都占位显示, 值为空
+    for (const label of [ 'IPv4 映射地址', 'IPv4 映射地址 (十六进制)', 'IPv4 兼容地址 (已废弃)', '6to4', 'NAT64 / DNS64', '完整展开' ]) {
+      expect(resultValue(container, label)).toBe('');
+    }
   });
 
   test('输入 IPv4 后自动填整数并给出 HEX / BIN', async () => {
@@ -58,7 +66,7 @@ describe('IPConvert 基础互转', () => {
     await waitFor(() => expect(ipInput()).toHaveValue('192.168.1.1'));
   });
 
-  test('清除按钮清空输入并收起结果区', async () => {
+  test('清除按钮清空输入, 结果区保留但值清空', async () => {
     const { container } = render(<IPConvert />);
     typeIp('1.2.3.4');
     await waitFor(() => expect(resultValue(container, 'HEX')).toBe('0x01020304'));
@@ -66,7 +74,9 @@ describe('IPConvert 基础互转', () => {
     fireEvent.click(clearButton());
     await waitFor(() => expect(ipInput()).toHaveValue(''));
     expect(intInput()).toHaveValue('');
-    expect(within(container).queryByText('HEX')).not.toBeInTheDocument();
+    expect(within(container).getByText('HEX')).toBeInTheDocument();
+    expect(resultValue(container, 'HEX')).toBe('');
+    expect(resultValue(container, 'IPv4 映射地址')).toBe('');
   });
 });
 
@@ -137,16 +147,31 @@ describe('IPConvert IPv6 写法', () => {
     expect(resultValue(container, '完整展开')).toBe('0000:0000:0000:0000:0000:ffff:0102:0304');
   });
 
-  test('非法地址时收起结果区', async () => {
+  test('非法地址时结果区仍显示, 值清空不残留上次结果', async () => {
     const { container } = render(<IPConvert />);
     typeIp('192.168.1.1');
-    await waitFor(() => expect(within(container).getByText('对应的 IPv6 写法')).toBeInTheDocument());
+    await waitFor(() => expect(resultValue(container, 'HEX')).toBe('0xC0A80101'));
+
     typeIp('256.1.1.1');
-    await waitFor(() => expect(within(container).queryByText('对应的 IPv6 写法')).not.toBeInTheDocument());
-    // 清空后同样收起
+    await waitFor(() => expect(resultValue(container, 'HEX')).toBe(''));
+    expect(resultValue(container, 'BIN')).toBe('');
+    expect(within(container).getByText('对应的 IPv6 写法')).toBeInTheDocument();
+    expect(resultValue(container, 'IPv4 映射地址')).toBe('');
+
+    // 重新输入合法地址后恢复
+    typeIp('1.2.3.4');
+    await waitFor(() => expect(resultValue(container, 'IPv4 映射地址')).toBe('::ffff:1.2.3.4'));
+  });
+
+  test('清空输入后 IPv6 写法行依然占位 (值为空)', async () => {
+    const { container } = render(<IPConvert />);
     typeIp('192.168.1.1');
-    await waitFor(() => expect(within(container).getByText('对应的 IPv6 写法')).toBeInTheDocument());
+    await waitFor(() => expect(resultValue(container, 'IPv4 映射地址')).toBe('::ffff:192.168.1.1'));
+
     typeIp('');
-    await waitFor(() => expect(within(container).queryByText('对应的 IPv6 写法')).not.toBeInTheDocument());
+    await waitFor(() => expect(ipInput()).toHaveValue(''));
+    expect(within(container).getByText('对应的 IPv6 写法')).toBeInTheDocument();
+    expect(resultValue(container, '6to4')).toBe('');
+    expect(resultValue(container, '完整展开')).toBe('');
   });
 });

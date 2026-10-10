@@ -87,7 +87,7 @@ describe('intToHex / intToBin', () => {
 });
 
 // ---------- IPv4 -> IPv6 ----------
-import { compressIpv6, formatIpv6, ipv4ToIpv6Forms, ipv4ToIpv6FormsSafe } from './lib';
+import { compressIpv6, formatIpv6, ipv4ToIpv6Forms, ipv4ToIpv6FormsSafe, ipv4ToIpv6RowsSafe, IPV6_FORM_KEYS } from './lib';
 
 describe('compressIpv6', () => {
   it('最长连续 0 段压缩成 ::', () => {
@@ -176,6 +176,17 @@ describe('ipv4ToIpv6Forms', () => {
     expect(() => ipv4ToIpv6Forms('')).toThrow();
     expect(ipv4ToIpv6FormsSafe('256.1.1.1')).toEqual([]);
     expect(ipv4ToIpv6FormsSafe('8.8.8.8')).toHaveLength(6);
+  });
+
+  it('行顺序固定, 非法/空值时返回占位行 (界面布局不跳动)', () => {
+    expect(ipv4ToIpv6Forms('8.8.8.8').map((f) => f.key)).toEqual(IPV6_FORM_KEYS);
+    for (const bad of [ '', '256.1.1.1', '1.2.3' ]) {
+      const rows = ipv4ToIpv6RowsSafe(bad);
+      expect(rows.map((f) => f.key)).toEqual(IPV6_FORM_KEYS);
+      expect(rows.every((f) => f.value === '')).toBe(true);
+    }
+    // 合法时与 ipv4ToIpv6Forms 一致
+    expect(ipv4ToIpv6RowsSafe('1.2.3.4')).toEqual(ipv4ToIpv6Forms('1.2.3.4'));
   });
 
   it('映射地址与兼容地址的十六进制写法互不相同', () => {
