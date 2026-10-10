@@ -2,10 +2,12 @@ import '@testing-library/jest-dom';
 import { act, fireEvent, render, waitFor } from '@testing-library/react';
 import ScreenRecorder from './index';
 import { DEFAULTS_STORAGE_KEY, FPS_DEFAULT, TIMESLICE_MS } from './data';
+import { openUrl } from '../../lib/tauri';
 
 // ---- tauri 桩: 桌面版标记与保存调用 ----
 const mockSaveBytes = jest.fn().mockResolvedValue(true);
 let mockTauri = false;
+const mockOpenUrl = openUrl as jest.Mock;
 jest.mock('../../lib/tauri', () => ({
   isTauri: () => mockTauri,
   openUrl: jest.fn(),
@@ -204,6 +206,7 @@ beforeEach(() => {
   localStorage.clear();
   recorders.length = 0;
   mockSaveBytes.mockClear();
+  mockOpenUrl.mockClear();
   mockCreateObjectURL.mockClear();
   mockRevokeObjectURL.mockClear();
   mockTauri = false;
@@ -242,6 +245,9 @@ describe('屏幕录制 页面', () => {
     expect(container.querySelector('.web-only-notice')).not.toBeNull();
     expect(container.textContent).toContain('屏幕录制是浏览器专享功能');
     expect(btn(container, '开始录制')).toBeDisabled();
+    // 「打开 Web 版」直达本工具的 Web 版地址
+    fireEvent.click(btn(container, '打开 Web 版'));
+    expect(mockOpenUrl).toHaveBeenCalledWith('https://freewu.github.io/magic-tools/tools/#/ScreenRecorder');
   });
 
   it('空格键开始 / 停止', async () => {

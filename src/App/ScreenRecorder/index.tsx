@@ -8,7 +8,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocale } from '../../hook/locale-context';
 import { isTauri, saveBytesFile } from '../../lib/tauri';
-import WebOnlyNotice from '../../lib/web-only';
+import WebOnlyNotice, { webAppUrl } from '../../lib/web-only';
 import {
   AUDIO_BITRATE, AUDIO_OPTIONS, BITRATE_OPTIONS, CLOCK_INTERVAL_MS, FPS_OPTIONS, REC_DOT_MS,
   SIZE_OPTIONS, TIMESLICE_MS, type AudioMode, type SizeKey,
@@ -355,6 +355,7 @@ const ScreenRecorder: React.FC = () => {
           text={t('屏幕录制是浏览器专享功能')}
           hint={t('桌面版内嵌的 WebView 没有系统共享选择器, 请改用系统自带录屏工具 (Win+G / QuickTime / GNOME 截屏录制), 或打开 Web 版使用本工具')}
           action={t('打开 Web 版')}
+          url={ webAppUrl('ScreenRecorder') }
         />
       )}
 

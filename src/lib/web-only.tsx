@@ -10,6 +10,9 @@ import { openUrl } from './tauri';
 /** Web 版地址 (GitHub Pages 演示站, 与仓库 homepage 一致) */
 export const WEB_APP_URL = 'https://freewu.github.io/magic-tools/tools/';
 
+/** 某个工具在 Web 版里的深链 (Web 版用 HashRouter, 形如 .../tools/#/ScreenRecorder) */
+export const webAppUrl = (appKey :string) :string => `${WEB_APP_URL}#/${appKey}`;
+
 export type WebOnlyNoticeProps = {
   /** 主提示, 如「该功能仅在浏览器 (Web 版) 中可用」 */
   text: string;
@@ -17,13 +20,15 @@ export type WebOnlyNoticeProps = {
   hint?: string;
   /** 按钮文案, 如「打开 Web 版」 */
   action: string;
+  /** 按钮跳转地址 (缺省为 Web 版首页), 传 webAppUrl(appKey) 可直达对应工具 */
+  url?: string;
 };
 
 /**
  * Web 版专属功能提示条
  * 桌面环境下渲染; 浏览器环境下调用方应自行跳过渲染
  */
-const WebOnlyNotice = ({ text, hint, action }: WebOnlyNoticeProps) => {
+const WebOnlyNotice = ({ text, hint, action, url }: WebOnlyNoticeProps) => {
   const { token } = theme.useToken();
   return (
     <Alert
@@ -40,7 +45,7 @@ const WebOnlyNotice = ({ text, hint, action }: WebOnlyNoticeProps) => {
           size="small"
           type="primary"
           icon={ <LinkOutlined /> }
-          onClick={ () => { void openUrl(WEB_APP_URL); } }
+          onClick={ () => { void openUrl(url ?? WEB_APP_URL); } }
         >{ action }</Button>
       }
     />
