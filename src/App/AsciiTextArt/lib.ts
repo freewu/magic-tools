@@ -71,6 +71,31 @@ const ensureParsed = (name: string): void => {
   parsedFonts.add(name);
 };
 
+// ---- ASCII 校验 ----
+/** 允许出现的空白字符 (多行排版用, 不算未收录字符) */
+const ALLOWED_WS = [ '\n', '\r', '\t' ];
+
+/**
+ * 输入里 figlet 未收录的字符清单 (去重, 保持出现顺序)
+ * - ASCII 可打印字符 (0x20-0x7e) 与换行/制表符算合法
+ * - 中文 / 全角标点 / emoji / 其它控制字符均视为未收录 (按码点整体处理)
+ */
+export function nonAsciiChars(text :string): string[] {
+  const out :string[] = [];
+  for (const ch of text) {
+    if (ALLOWED_WS.includes(ch)) continue;
+    const code = ch.codePointAt(0) ?? 0;
+    if (code >= 0x20 && code <= 0x7e) continue;
+    if (!out.includes(ch)) out.push(ch);
+  }
+  return out;
+}
+
+/** 文本是否只含 ASCII 可打印字符 (空白按 ALLOWED_WS 放行) */
+export function isAsciiText(text :string): boolean {
+  return nonAsciiChars(text).length === 0;
+}
+
 /**
  * 文本 -> figlet 大字
  * - 字体名不合法时回退默认字体; 空文本返回空串

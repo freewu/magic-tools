@@ -3,7 +3,7 @@ import { CopyOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useEffect, useMemo, useState } from "react";
 import { copyTextToClipboard } from "../../lib";
 import { saveBytesFile } from "../../lib/tauri";
-import { FONT_NAMES, getDefaultFont, getDefaultText, renderText } from "./lib";
+import { FONT_NAMES, getDefaultFont, getDefaultText, nonAsciiChars, renderText } from "./lib";
 import FontPicker from './FontPicker';
 import { useLocale } from "../../hook/locale-context";
 import { u, uT } from './lang';
@@ -30,6 +30,13 @@ const AsciiTextArt: React.FC = () => {
   }, [ text, font ]);
 
   const artRows = useMemo(() => art.split('\n'), [ art ]);
+
+  // 非 ASCII 字符 (figlet 未收录): 红框 + 提示
+  const badChars = useMemo(() => nonAsciiChars(text), [ text ]);
+  const badPreview = useMemo(() => {
+    const shown = badChars.slice(0, 8).map((c) => `「${c}」`).join('');
+    return badChars.length > 8 ? `${shown} …` : shown;
+  }, [ badChars ]);
 
   const doCopy = async () => {
     if (!art) return;
@@ -62,9 +69,15 @@ const AsciiTextArt: React.FC = () => {
         <span style={ labelStyle }>{t('文字')}</span>
         <Input.TextArea
           value={ text } onChange={ (e) => setText(e.target.value) }
+          status={ badChars.length > 0 ? 'error' : undefined }
           placeholder={t('输入要生成大字的内容 (支持多行, 每行独立排版)')}
           autoSize={ { minRows: 2, maxRows: 8 } } style={ { width: 400, maxWidth: '100%' } }
         />
+        { badChars.length > 0 && (
+          <span style={ { color: '#ff4d4f', fontSize: 12, width: '100%' } }>
+            {tt('含 {n} 个非 ASCII 字符 {chars}; figlet 字体未收录, 会按字体回退显示 (通常为 ?)', { n: badChars.length, chars: badPreview })}
+          </span>
+        ) }
       </div>
       <div style={ row }>
         <span style={ labelStyle }>{t('字体')}</span>

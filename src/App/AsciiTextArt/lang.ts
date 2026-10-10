@@ -19,6 +19,7 @@ const uilangRows: Record<string, [string, string]> = {
   'p:': ['p:', 'p:'],
   '字符': ['字元', 'Characters'],
   '文字': ['文字', 'Text'],
+  '含 {n} 个非 ASCII 字符 {chars}; figlet 字体未收录, 会按字体回退显示 (通常为 ?)': ['含 {n} 個非 ASCII 字元 {chars}; figlet 字體未收錄, 會依字體回退顯示 (通常為 ?)', '{n} non-ASCII character(s) {chars}; not covered by figlet fonts — they fall back to the font default (usually ?)'],
   '输入要生成大字的内容 (支持多行, 每行独立排版)': ['輸入要產生大字內容 (支援多行, 每行獨立排版)', 'Enter the text to render as ASCII art (multi-line supported, each line typeset independently)'],
   '字体': ['字體', 'Font'],
   '选择 figlet 字体': ['選擇 figlet 字體', 'Select a figlet font'],
