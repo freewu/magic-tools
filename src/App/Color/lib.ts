@@ -164,18 +164,6 @@ export function setDefaultPickMax(max :number) : void  {
   localStorage.setItem(DEFAULT_PICK_MAX_ITEM, max.toString());
 }
 
-const DEFAULT_PINYIN_ITEM = 'color:default-pinyin';
-
-// 获取中文名称是否默认显示拼音注音 (汉字上方显示拼音)
-export function getDefaultPinyin() :boolean {
-  return localStorage.getItem(DEFAULT_PINYIN_ITEM) === "true";
-}
-
-// 设置中文名称是否默认显示拼音注音
-export function setDefaultPinyin(flag: boolean) :void {
-  localStorage.setItem(DEFAULT_PINYIN_ITEM, flag.toString());
-}
-
 export {
   getColorString,
   pickColorTypeList

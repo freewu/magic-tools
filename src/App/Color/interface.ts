@@ -9,7 +9,6 @@ export interface PickColorEntity {
 export interface ColorPadProps {
   colorList?: Array<any> // 颜色列表 [{label:"黑",code:"#000000"}]
   height: string, // 颜色盘高度 窗口缩放需要调整 "800px"
-  pinyin?: boolean, // 中文名称是否在汉字上方显示拼音
   colorClickEvent: Function, // 单击颜色的事件
 }
 
@@ -18,7 +17,6 @@ export interface ColorCardProps {
   color: string, // 颜色编码 #ffffff
   label: string, // 颜色名称 黑
   title?: string, // 颜色名称提示
-  pinyin?: boolean, // 中文名称是否在汉字上方显示拼音
   colorClickEvent: Function, // 单击颜色的事件
 }
 

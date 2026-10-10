@@ -1,12 +1,11 @@
-import { Tabs, message, Radio, Tooltip, Slider, Space, Badge, Switch } from "antd";
+import { Tabs, message, Radio, Tooltip, Slider, Space, Badge } from "antd";
 import { default as ColorPad } from "./color-pad"
 import { default as LevitationBox } from "./levitation-box"
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { RadioChangeEvent } from 'antd';
 import { copyTextToClipboard, debounce } from "../../lib";
 import { getColorString, pickColorTypeList,} from "./lib";
-import { getDefaultColorPad, getDefaultBatchSwitch, getDefaultOpacity, getDefaultPickMax, getDefaultPinyin, setDefaultPinyin } from "./lib";
-import { loadPinyin } from "./pinyin";
+import { getDefaultColorPad, getDefaultBatchSwitch, getDefaultOpacity, getDefaultPickMax } from "./lib";
 import "./color.css"
 import { colorDataList } from "./data"
 import type { PickColorEntity } from "./interface"
@@ -31,18 +30,8 @@ const Color = () => {
   const [ batchPickFlag, setBatchPickFlag ] = useState(getDefaultBatchSwitch()); // 是否开启批量取色
   const [ pickColorList, setPickColorList ] = useState(Array<PickColorEntity>); // 批量取色列表
   const [ colorPad, setColorPad ] = useState(getDefaultColorPad()); // 默认显示的颜色板
-  const [ pinyin, setPinyin ] = useState(getDefaultPinyin()); // 中文名称是否在汉字上方显示拼音
-  const [ pinyinReady, setPinyinReady ] = useState(false); // pinyin-pro 是否加载完成 (加载完重新渲染出注音)
 
   const pickMax = getDefaultPickMax();
-
-  // pinyin-pro 体积较大 (vendor-pinyin ~286KB), 只有开启拼音注音时才懒加载
-  useEffect(() => {
-    if(!pinyin || pinyinReady) return;
-    let alive = true;
-    loadPinyin().then((ok) => { if(alive && ok) setPinyinReady(true); });
-    return () => { alive = false; };
-  }, [pinyin, pinyinReady]);
 
   // 窗体大小发生变化,改变窗口大小
   window.addEventListener('resize',
@@ -70,12 +59,6 @@ const Color = () => {
 
   const onOpacityChange = (value :number) => {
     setOpacity(value);
-  }
-
-  // 切换中文名称的拼音注音
-  const onPinyinChange = (value :boolean) => {
-    setPinyin(value);
-    setDefaultPinyin(value);
   }
 
   const cardClick = (color :string , label :string) => {
@@ -122,7 +105,7 @@ const Color = () => {
     return {
       key : item.key,
       label : t('c_' + item.key.replace(/-/g, '_'), item.label),
-      children: <ColorPad colorList={ item.data } height = { height } pinyin = { pinyin } colorClickEvent={ cardClick } />,
+      children: <ColorPad colorList={ item.data } height = { height } colorClickEvent={ cardClick } />,
     }
   });
 
@@ -149,12 +132,6 @@ const Color = () => {
         onChange={ onOpacityChange }
       />
       </div>
-      <Tooltip placement="top" title={ t('pinyinTip','中文名称在汉字上方显示拼音') }>
-        <Space size={4}>
-          { t('pinyin','拼音') }
-          <Switch className="color-pinyin-switch" size="small" checked={ pinyin } onChange={ onPinyinChange } />
-        </Space>
-      </Tooltip>
     </Space>
     <Tabs activeKey={ colorPad } items={ items } onChange={ onTabChange } />
     {/* 悬浮框 */}

@@ -18,28 +18,6 @@
   opacity: 0.9;
 }
 
-/* 中文名称的拼音注音: 拼音显示在汉字上方 (ruby 布局) */
-.color-card ruby {
-  ruby-position: over; /* 注音在汉字上方 */
-  ruby-align: center;
-}
-
-.color-card ruby rt {
-  font-size: 9px;
-  line-height: 10px;
-  font-weight: normal;
-  letter-spacing: 0;
-}
-
-/* 开启拼音注音后卡片高度交给内容撑开 (注音需要额外一行空间,
-   注音绘制在基字上方, 顶部留白需大于注音高度, 否则会压到卡片上边框) */
-.color-card-pinyin {
-  height: auto;
-  min-height: 50px;
-  padding-top: 8px;
-  padding-bottom: 4px;
-}
-
 .levitation-box {
   opacity: 0.6;
   overflow: hidden;

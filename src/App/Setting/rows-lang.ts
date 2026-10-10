@@ -72,7 +72,6 @@ const ROWS: Record<string, Row> = {
   '默认开启批量取色': ['預設開啟批量取色', 'Batch color pick by default'],
   '默认最大批量取色个数': ['預設最大批量取色數量', 'Max batch color-pick count'],
   '默认展示配色板': ['預設顯示調色盤', 'Default color palette'],
-  '中文名称显示拼音': ['中文名稱顯示拼音', 'Show pinyin above Chinese names'],
   '默认 Opacity': ['預設 Opacity', 'Default opacity'],
   '默认编辑器风格': ['預設編輯器風格', 'Default editor theme'],
   // ---- 名称式 Divider ----
