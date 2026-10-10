@@ -4,7 +4,16 @@
 
 - 每完成一次用户要求的操作（功能实现、修复、文档更新等）后，**自动执行 `git add -A` + `git commit`**，提交信息用简洁中文概括本次改动（如 `feat:` / `fix:` / `docs:` 前缀）
 - 若改动属于同一任务的多个连续步骤，可在任务完成时统一提交一次
-- **commit 完成后自动 `git push origin master`**（默认分支为 `master`）；WSL 侧 git 通常可直接推送，若出现凭据卡认证，改用 Windows 侧执行：`cmd.exe /c "cd /d E:\work\github\magic-tools && git push origin master"`
+- **commit 完成后自动 `git push origin master`**（默认分支为 `master`）
+- **推送一律走本机代理 `127.0.0.1:7897`，并且只在 Windows 侧执行**（WSL 侧 git 用不了：NAT 模式不支持 localhost 转发，会报 `fatal: Unsupported SSL backend 'openssl'` / 连不上）：
+
+      cmd.exe /c "cd /d E:\work\github\magic-tools && git -c http.proxy=http://127.0.0.1:7897 push origin master"
+
+  首次在新机器上使用时，也可把代理写进仓库本地配置（只影响本仓库，`.git/config` 不入版本库），之后直接 `git push origin master` 即可走代理：
+
+      git config http.proxy http://127.0.0.1:7897
+
+- **推送失败只提示，不做其他操作**：若 `git push` 报错（超时 / TLS / 代理未启动等），**只向用户说明失败原因和本地 commit 情况**，不要反复重试、不要换用其他网络手段、不要改 remote/协议、不要 force push、不要 `reset`/修改提交，等用户指示
 - **不要擅自升版本号 / 打 tag / 发 GitHub Release**：日常功能、修复、文档改动只提交并推送代码即可，版本发布见下方「版本发布流程」
 - 构建产物（`release/*.exe`、`src-tauri/target`、`dist/`）已被 `.gitignore` 忽略，无需特殊处理
 
