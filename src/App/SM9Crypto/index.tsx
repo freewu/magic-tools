@@ -275,7 +275,7 @@ const SM9Crypto = () => {
           style={ { width: 320 } }
           value={ id }
           onChange={ (e) => setId(e.target.value) }
-          placeholder={t('例如 alice@example.com (UTF-8, 建议不超过 64 字节)') }
+          placeholder={t('例如 bluefrog (UTF-8, 建议不超过 64 字节)') }
         />
         <span style={ { color: "#999" } }>{tt('当前 ID 长度: {n} 字节', { n: utf8Length(id) })}</span>
         <Button size="small" icon={ <SafetyCertificateOutlined /> } onClick={ saveDefaults }>{t('保存为默认密钥')}</Button>

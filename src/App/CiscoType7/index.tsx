@@ -1,11 +1,12 @@
-import { Alert, Button, Divider, Input, Radio, Select, Space, message } from 'antd';
-import { useState } from 'react';
-import { copyTextToClipboard } from '../../lib';
-import { TYPE7_SALT_MAX, TYPE7_SALT_MIN, decryptType7, encryptType7 } from './lib';
-import { useLocale } from '../../hook/locale-context';
-import { cr, crT } from './lang';
-
+import { Alert, Select, Divider, Button, Input, Space, message, Row } from "antd";
+import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons';
+import { useState } from "react";
 const { TextArea } = Input;
+import { useLocale } from "../../hook/locale-context";
+import { cr, crT } from './lang';
+import { copyTextToClipboard } from "../../lib"
+import { openFile } from "../../lib/file"
+import { TYPE7_SALT_MAX, TYPE7_SALT_MIN, decryptType7, encryptType7 } from './lib';
 
 const CiscoType7 = () => {
   const { locale } = useLocale();
@@ -20,106 +21,125 @@ const CiscoType7 = () => {
     if (m.startsWith(P1) && m.endsWith(P2)) return tt('Type 7 第 {pos} 位起含非十六进制字符', { pos: m.slice(P1.length, m.length - P2.length) });
     return m;
   };
-  const [ direction, setDirection ] = useState<'encrypt' | 'decrypt'>('encrypt');
-  const [ value, setValue ] = useState('');
-  const [ salt, setSalt ] = useState<number | 'random'>('random'); // 加密时的盐偏移
-  const [ result, setResult ] = useState('');
-  const [ notice, contextHolder ] = message.useMessage();
 
-  const inputClick = (e: React.MouseEvent<HTMLElement>) => {
+  const [ notice, contextHolder ] = message.useMessage();
+  const [ encodeValue, setEncodeValue ] = useState(''); // 要加密的明文
+  const [ decodeValue, setDecodeValue ] = useState(''); // 要解密的 Type 7 串
+  const [ salt, setSalt ] = useState<number | 'random'>('random'); // 加密时的盐偏移
+
+  // 加密处理: 上框明文 -> 下框 Type 7
+  const encode = () => {
+    if(encodeValue.trim() === '') return ;
+    try {
+      setDecodeValue(encryptType7(encodeValue, salt === 'random' ? undefined : salt));
+    } catch (error) {
+      console.log(error);
+      notice.error(transErr((error as Error).message));
+      setDecodeValue('');
+    }
+  };
+
+  // 解密处理: 下框 Type 7 -> 上框明文
+  const decode = () => {
+    if(decodeValue.trim() === '') return ;
+    try {
+      setEncodeValue(decryptType7(decodeValue));
+    } catch (error) {
+      console.log(error);
+      notice.error(transErr((error as Error).message));
+    }
+  };
+
+  // 清除内容 有选择变化,清除结果?
+  const clear = () => {
+    setEncodeValue('');
+    setDecodeValue('');
+  };
+
+  const textareaDoubleClick = (e :React.MouseEvent<HTMLElement>) => {
     const txt = (e.target as HTMLInputElement).value.trim();
-    if (txt !== '') {
+    if(txt !== '') {
       copyTextToClipboard(txt);
       notice.success(t('复制到粘贴板成功！！！'));
     }
   };
 
-  const run = () => {
-    if (value === '') return;
-    try {
-      if (direction === 'encrypt') {
-        setResult(encryptType7(value, salt === 'random' ? undefined : salt));
-      } else {
-        setResult(decryptType7(value));
-      }
-    } catch (err) {
-      notice.error(transErr((err as Error).message));
-      setResult('');
-    }
-  };
-
-  const clearAll = () => {
-    setValue('');
-    setResult('');
-  };
-
-  const isEncrypt = direction === 'encrypt';
-
   return (
-    <div style={ { display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 } }>
-      {contextHolder}
+    <div>
+      { contextHolder }
+
       <Alert
         type="warning"
         showIcon
+        style={ { marginTop: 5 } }
         message={t('Cisco Type 7 使用固定公开密钥表做 XOR 弱加密, 可被任何工具还原, 不具备安全性; 仅用于与旧版 Cisco IOS 配置 (show running-config) 中的口令互通或查看')}
       />
-      <Divider dashed />
-      <Space wrap style={ { marginBottom: 8 } }>
-        <Radio.Group
-          value={ direction }
-          onChange={ (e) => { setDirection(e.target.value); setResult(''); } }
-          options={ [
-            { label: t('明文 → Type 7 (加密)'), value: 'encrypt' },
-            { label: t('Type 7 → 明文 (解密)'), value: 'decrypt' },
-          ] }
-          optionType="button"
-        />
-        { isEncrypt && (
-          <Space>
-            <span>{t('盐偏移 (首 2 位, 0~15)')}</span>
-            <Select
-              style={ { width: 160 } }
-              value={ salt }
-              onChange={ setSalt }
-              options={ [
-                { label: t('随机 (推荐)'), value: 'random' },
-                ...Array.from({ length: TYPE7_SALT_MAX - TYPE7_SALT_MIN + 1 }, (_, i) => ({
-                  label: `${i} (${i.toString(16).padStart(2, '0').toUpperCase()})`,
-                  value: i,
-                })),
-              ] }
-            />
-          </Space>
-        ) }
-      </Space>
-      <TextArea
-        style={ { margin: '5px 0 5px 0' } }
-        value={ value }
-        autoSize={ { minRows: 4, maxRows: 8 } }
-        placeholder={ isEncrypt
-          ? t('输入需要加密为 Type 7 的明文 (UTF-8, 支持中文与多行)')
-          : t('输入 Type 7 串 (例如 01050D480809, 支持大写/小写/空白分隔)') }
-        onChange={ (e) => setValue(e.target.value) }
-      />
-      <Space style={ { marginBottom: 8 } }>
-        <Button type="primary" disabled={ value === '' } onClick={ run }>
-          { isEncrypt ? t('加密为 Type 7') : t('解密为明文') }
-        </Button>
-        <Button onClick={ clearAll } style={ { backgroundColor: '#dc3545', color: '#fff' } }>{t('清除')}</Button>
-      </Space>
-      <Divider dashed />
-      <span style={ { color: '#999', fontSize: 12, marginBottom: 4 } }>
-        { isEncrypt ? t('Type 7 结果 (点击可复制)') : t('解密明文 (点击可复制)') }
-      </span>
-      <TextArea
-        readOnly
-        value={ result }
-        autoSize={ { minRows: 2, maxRows: 6 } }
-        placeholder={ isEncrypt ? t('加密结果: 2 位盐偏移 + 大写 hex') : t('解密结果') }
-        onClick={ inputClick }
-      />
-    </div>
-  );
-};
 
+      <Row style = { { marginTop: "5px" }}>
+        <Space wrap>
+          {t('盐偏移(加密):')}
+          <Select
+            value={ salt }
+            style={{ width: 160 }}
+            onChange={ setSalt }
+            options={ [
+              { label: t('随机 (推荐)'), value: 'random' },
+              ...Array.from({ length: TYPE7_SALT_MAX - TYPE7_SALT_MIN + 1 }, (_, i) => ({
+                label: `${i} (${i.toString(16).padStart(2, '0').toUpperCase()})`,
+                value: i,
+              })),
+            ] }
+          />
+          {t('位于首 2 位 (0~15); 随机更贴近设备实际输出')}
+        </Space>
+      </Row>
+
+      <TextArea
+        style={ { margin: "5px 0 5px 0" }}
+        onDoubleClick={ textareaDoubleClick }
+        onChange={ (e) => { setEncodeValue(e.target.value) } }
+        title={t('双击复制内容到粘贴板')}
+        value= { encodeValue }
+        placeholder={t('输入需要进行 Cisco Type 7 加密的明文 或 拖拽文件到框内打开 (UTF-8, 支持中文与多行)')}
+        autoSize={{ minRows: 8, maxRows: 8 }}
+        onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
+        onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setEncodeValue ); } }
+      />
+
+      <Space>
+        <Button
+          onClick={ encode }
+          style={ {"backgroundColor" : "#007bff","color": "#fff"} }
+          icon={<ArrowDownOutlined />}
+        >{t('加密为 Type 7')}</Button>
+        <Button
+          onClick={ decode }
+          style={ {"backgroundColor" : "#28a745","color": "#fff"} }
+          icon={<ArrowUpOutlined />}
+        >{t('解密为明文')}</Button>
+        <Button
+          onClick={ () =>clear() }
+          style={ {"backgroundColor" : "#dc3545","color": "#fff"} }
+        >{t('清除')}</Button>
+      </Space>
+
+      <TextArea
+        style={ { margin: "5px 0 5px 0" }}
+        onDoubleClick={ textareaDoubleClick }
+        onChange={ (e) => { setDecodeValue(e.target.value) } }
+        title={t('双击复制内容到粘贴板')}
+        value= { decodeValue }
+        placeholder={t('输入需要进行 Cisco Type 7 解密的密文 或 拖拽文件到框内打开 (例如 01050D480809, 支持大写/小写/空白分隔)')}
+        autoSize={{ minRows: 8, maxRows: 8 }}
+        onDragOver={ (e) => { e.preventDefault(); } } // 必须加上，否则无法触发下面的方法
+        onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setDecodeValue ); } }
+      />
+
+      <Divider dashed />
+      <div style={ { color: "#999", fontSize: 12 } }>
+        {t('盐偏移只影响加密输出: 前 2 位十六进制即盐值, 解密时自动从串首读取, 与上方选择无关。')}
+      </div>
+    </div>
+  )
+}
 export default CiscoType7;

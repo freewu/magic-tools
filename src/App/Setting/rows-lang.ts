@@ -186,7 +186,7 @@ const ROWS: Record<string, Row> = {
   'SM4 加解密': ['SM4 加解密', 'SM4 Encrypt & Decrypt'],
   'SM9 加解密': ['SM9 加解密', 'SM9 Encrypt / Decrypt'],
   '默认用户 ID': ['預設使用者 ID', 'Default user ID'],
-  '例如 alice@example.com; 解密/验签需与加密/签名时一致': ['例如 alice@example.com; 解密/驗簽需與加密/簽章時一致', 'e.g. alice@example.com; must match the ID used when encrypting/signing'],
+  '例如 bluefrog; 解密/验签需与加密/签名时一致': ['例如 bluefrog; 解密/驗簽需與加密/簽章時一致', 'e.g. bluefrog; must match the ID used when encrypting/signing'],
   '默认加密主私钥 (DER HEX)': ['預設加密主私鑰 (DER HEX)', 'Default SM9-Enc master private key (DER HEX)'],
   '用于导出主公钥与提取用户私钥; 留空表示不配置': ['用於匯出主公鑰與提取使用者私鑰; 留空表示不設定', 'Used to export the master public key and extract user keys; leave empty to skip'],
   '默认加密用户私钥 (DER HEX)': ['預設加密使用者私鑰 (DER HEX)', 'Default SM9-Enc user private key (DER HEX)'],

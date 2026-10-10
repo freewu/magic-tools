@@ -131,20 +131,22 @@ const XXTEACrypto = () => {
         onDrop={ (e) => { e.preventDefault(); openFile(e.dataTransfer.files, setEncodeValue ); } }
       />
 
-      <Button
-        onClick={ encode }
-        style={ { "backgroundColor" : "#007bff","color": "#fff" } }
-        icon={<ArrowDownOutlined />}
-      >{t('加密')}</Button>
-      <Button
-        onClick={ decode }
-        style={ { "backgroundColor" : "#28a745","color": "#fff" } }
-        icon={<ArrowUpOutlined />}
-      >{t('解密')}</Button>
-      <Button
-        onClick={ () =>clear() }
-        style={ { "backgroundColor" : "#dc3545","color": "#fff" } }
-      >{t('清除')}</Button>
+      <Space>
+        <Button
+          onClick={ encode }
+          style={ { "backgroundColor" : "#007bff","color": "#fff" } }
+          icon={<ArrowDownOutlined />}
+        >{t('加密')}</Button>
+        <Button
+          onClick={ decode }
+          style={ { "backgroundColor" : "#28a745","color": "#fff" } }
+          icon={<ArrowUpOutlined />}
+        >{t('解密')}</Button>
+        <Button
+          onClick={ () =>clear() }
+          style={ { "backgroundColor" : "#dc3545","color": "#fff" } }
+        >{t('清除')}</Button>
+      </Space>
 
       <TextArea
         showCount

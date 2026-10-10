@@ -10,7 +10,7 @@ export const tabList = [
 ];
 
 /** 默认用户 ID */
-export const DEFAULT_ID = 'alice@example.com';
+export const DEFAULT_ID = 'bluefrog';
 
 /** 示例明文 (UTF-8 字节数 ≤ 255) */
 export const SAMPLE_PLAIN = 'Hello SM9 国密标识密码!';

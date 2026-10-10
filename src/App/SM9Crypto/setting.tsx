@@ -62,7 +62,7 @@ export const SM9CryptoSetting = () => {
           style={ { width: "100%", maxWidth: 520 } }
           onChange={ onIdChange }
           value={ id }
-          placeholder={ st('例如 alice@example.com; 解密/验签需与加密/签名时一致') }
+          placeholder={ st('例如 bluefrog; 解密/验签需与加密/签名时一致') }
         />
       </Form.Item>
       <Form.Item label={ st('默认加密主私钥 (DER HEX)') }>

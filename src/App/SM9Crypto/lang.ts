@@ -64,7 +64,7 @@ const cryptolangRows: Record<string, [string, string]> = {
   'SM9 是标识密码 (IBC): 主公钥/主私钥由密钥中心生成, 用户私钥由「主私钥 + ID」提取。': ['SM9 是識別密碼 (IBC): 主公鑰/主私鑰由金鑰中心產生, 使用者私鑰由「主私鑰 + ID」提取。', 'SM9 is identity-based cryptography (IBC): the key center generates the master key pair, and a user private key is extracted from the master private key plus the ID.'],
   '加密与签名是两套独立的主密钥 (SM9-Enc / SM9-Sign), 不能混用; 发送方只需主公钥与接收方 ID, 接收方用自己的用户私钥解密。': ['加密與簽章是兩套獨立的主金鑰 (SM9-Enc / SM9-Sign), 不能混用; 傳送方只需主公鑰與接收方 ID, 接收方用自己的使用者私鑰解密。', 'Encryption and signature use two independent master key pairs (SM9-Enc / SM9-Sign) that must not be mixed. The sender needs only the master public key and the recipient ID; the recipient decrypts with their own user private key.'],
   '用户 ID': ['使用者 ID', 'User ID'],
-  '例如 alice@example.com (UTF-8, 建议不超过 64 字节)': ['例如 alice@example.com (UTF-8, 建議不超過 64 位元組)', 'e.g. alice@example.com (UTF-8, 64 bytes or fewer recommended)'],
+  '例如 bluefrog (UTF-8, 建议不超过 64 字节)': ['例如 bluefrog (UTF-8, 建議不超過 64 位元組)', 'e.g. bluefrog (UTF-8, 64 bytes or fewer recommended)'],
   '当前 ID 长度: {n} 字节': ['目前 ID 長度: {n} 位元組', 'Current ID length: {n} bytes'],
   '保存为默认密钥': ['儲存為預設金鑰', 'Save as default keys'],
   '清空默认密钥': ['清空預設金鑰', 'Clear default keys'],
@@ -150,7 +150,7 @@ const cryptolangRows: Record<string, [string, string]> = {
   // ---- 设置页 ----
   'SM9 加解密': ['SM9 加解密', 'SM9 Encrypt / Decrypt'],
   '默认用户 ID': ['預設使用者 ID', 'Default user ID'],
-  '例如 alice@example.com; 解密/验签需与加密/签名时一致': ['例如 alice@example.com; 解密/驗章需與加密/簽章時一致', 'e.g. alice@example.com; decryption / verification must use the same ID as encryption / signing'],
+  '例如 bluefrog; 解密/验签需与加密/签名时一致': ['例如 bluefrog; 解密/驗章需與加密/簽章時一致', 'e.g. bluefrog; decryption / verification must use the same ID as encryption / signing'],
   '默认加密主私钥 (DER HEX)': ['預設加密主私鑰 (DER HEX)', 'Default encryption master private key (DER HEX)'],
   '用于导出主公钥与提取用户私钥; 留空表示不配置': ['用於匯出主公鑰與提取使用者私鑰; 留空表示不設定', 'Used to export the master public key and extract user private keys; leave empty to skip'],
   '默认加密用户私钥 (DER HEX)': ['預設加密使用者私鑰 (DER HEX)', 'Default encryption user private key (DER HEX)'],

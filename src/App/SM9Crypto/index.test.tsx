@@ -5,7 +5,7 @@ import { LocaleProvider } from '../../hook/locale-context';
 import { copyTextToClipboard } from '../../lib';
 import * as gmssl from './gmssl';
 
-// wasm 无法在 jest 里运行: 用 GmSSL v3.2.0 真实输出 (hex 与 lib.test.ts 同一批) 替掉封装,
+// wasm 无法在 jest 里运行: 用 GmSSL v3.2.0 真实输出 (hex 与 lib.test.ts 同一批, 真实 ID 为 alice@example.com) 替掉封装,
 // 这样密钥/密文/签名的结构、长度与识别提示都与真实运行一致
 const mockMsk = '3066022013e34f5e44a36f833c2bd6eaf755c5a38f7fb9e362bc0d6597fa4f9f6511b0a1034200047c83c2860f283c515d36bc7971383522e5cc37faa555abecafd74f2cc3ed82dc56344a55bdca33dd5ed319025b0579e4ea412748a603f6b3fb30aaabfcc59181';
 const mockMpk = '047c83c2860f283c515d36bc7971383522e5cc37faa555abecafd74f2cc3ed82dc56344a55bdca33dd5ed319025b0579e4ea412748a603f6b3fb30aaabfcc59181';
@@ -62,7 +62,7 @@ describe('SM9Crypto 页面', () => {
     for (const name of [ '密钥生成', '加密', '解密', '签名验签' ]) {
       expect(screen.getByRole('tab', { name })).toBeTruthy();
     }
-    expect(screen.getAllByDisplayValue('alice@example.com').length).toBeGreaterThan(0);
+    expect(screen.getAllByDisplayValue('bluefrog').length).toBeGreaterThan(0);
   });
 
   it('生成加密主密钥 -> 导出主公钥 -> 提取用户私钥, 并显示识别结果', async () => {
@@ -82,7 +82,7 @@ describe('SM9Crypto 页面', () => {
 
     fireEvent.click(screen.getAllByRole('button', { name: /提取用户私钥/ })[0]);
     expect(await screen.findByDisplayValue(mockUsk)).toBeTruthy();
-    expect(gmssl.encExtractUserKey).toHaveBeenCalledWith(expect.anything(), 'alice@example.com');
+    expect(gmssl.encExtractUserKey).toHaveBeenCalledWith(expect.anything(), 'bluefrog');
     expect(valueOf(masterArea)).toBe(mockMsk);
     expect(valueOf(pubArea)).toBe(mockMpk);
     expect(valueOf(uskArea)).toBe(mockUsk);
@@ -166,7 +166,7 @@ describe('SM9Crypto 页面', () => {
     const verifyBtn = screen.getByRole('button', { name: /验签 \(主公钥 \+ ID\)/ });
     fireEvent.click(verifyBtn);
     expect(await screen.findByText('验签通过')).toBeTruthy();
-    expect(gmssl.verifyWithPublicKey).toHaveBeenCalledWith(expect.anything(), 'alice@example.com', expect.anything(), expect.anything());
+    expect(gmssl.verifyWithPublicKey).toHaveBeenCalledWith(expect.anything(), 'bluefrog', expect.anything(), expect.anything());
     expect(gmssl.verifyWithMasterKey).not.toHaveBeenCalled();
 
     await waitFor(() => expect(verifyBtn).not.toHaveClass('ant-btn-loading'));
@@ -203,7 +203,7 @@ describe('SM9Crypto 页面', () => {
     await screen.findByDisplayValue(mockMsk);
     fireEvent.click(screen.getByRole('button', { name: /保存为默认密钥/ }));
     expect(localStorage.getItem('sm9-crypto:default-enc-master-key')).toBe(mockMsk);
-    expect(localStorage.getItem('sm9-crypto:default-id')).toBe('alice@example.com');
+    expect(localStorage.getItem('sm9-crypto:default-id')).toBe('bluefrog');
 
     fireEvent.click(screen.getByRole('button', { name: /清空默认密钥/ }));
     expect(localStorage.getItem('sm9-crypto:default-enc-master-key')).toBeNull();
