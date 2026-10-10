@@ -79,7 +79,7 @@ Cloudflare Pages 的构建环境和本地不同（本地 Node 24 / npm 11），�
 
 > 记牢：**每次版本发布（收到发布指令后）= 打 tag → 三平台 Release (build-release.yml) + GitHub Pages 部署 (deploy-pages.yml) 双触发**
 
-> **防漏检查 3（教训：README 顶部版本徽章长期停在 `v2.7.0`，v2.19.0 只修了 docs 页面徽章而漏了 README）**：README 三语言的版本徽章（清单第 7 项）、docs 三个 HTML 的版本徽章（第 8 项）以及两个 lockfile 的顶层版本（第 9 项）都是**写死的版本号**，不影响功能但会直接对外露出「旧版本」。升版本时把旧版本号代入下面命令复核，确认只剩 `update.md` / `Help/data.tsx` 的历史版本节命中：
+> **防漏检查 3（教训：README 顶部版本徽章长期停在 `v2.7.0`，v2.19.0 只修了 docs 页面徽章而漏了 README）**：README 三语言的版本徽章（清单第 7 项）、docs 三个 HTML 的版本徽章（第 8 项）、两个 lockfile 的顶层版本（第 9 项）以及**客户端窗体标题**（第 10 项）都是**写死的版本号**，不影响功能但会直接对外露出「旧版本」。升版本时把旧版本号代入下面命令复核，确认只剩 `update.md` / `Help/data.tsx` 的历史版本节命中：
 
       grep -rn "2\.19\.0" --include="*.json" --include="*.ts" --include="*.tsx" --include="*.md" \
         --include="*.toml" --include="*.html" . | grep -v node_modules | grep -v '^./dist'
@@ -97,10 +97,11 @@ Cloudflare Pages 的构建环境和本地不同（本地 Node 24 / npm 11），�
 | 7 | `README.md` / `README.zh-CN.md` / `README.zh-TW.md` | 顶部标题下的 **shields.io 版本徽章**（**三个文件都要改**）：`https://img.shields.io/badge/magic--tools-vX.Y.Z-007EC6?style=flat-square&labelColor=24292F` 里的 `vX.Y.Z`。注意 shields.io 转义规则：**连字符写成 `--`**（`magic--tools`）、**空格写成 `_`**（`Ant_Design`）；漏改会让 README 对外长期显示旧版本（v2.20.0 之前一直写着 `v2.7.0`） |
 | 8 | `docs/index.html` / `docs/zh-CN.html` / `docs/zh-TW.html` | 第 71 行附近的版本徽章 `<span class="bv bv-blue">vX.Y.Z</span>`（**三个文件都要改**） |
 | 9 | `package-lock.json` / `src-tauri/Cargo.lock` | 顶层版本字段：`package-lock.json` 开头两处 `"version": "x.y.z"`（根包与 `packages[""]`）、`Cargo.lock` 中 `name = "magic-tools"` 的 `version = "x.y.z"`。仅升版本号（未动依赖）时直接同步这两处即可；**若本次改动过依赖，则必须按上文 npm9 命令重新生成 `package-lock.json`** |
+| 10 | `src-tauri/tauri.conf.json` 的 `app.windows[0].title` | **客户端窗体标题**：`"title": "Magic Tools vX.Y.Z"`（与清单 3 同文件，但属于另一个字段，两处都要改）。Rust `setup` 里另有 `window.set_title(format!("Magic Tools v{version}"))` 用 `package_info().version` 兜底（无需手改）；Web 版页面标题由 `src/Main.tsx` 的 `document.title` 读取 `src/version.ts` 生成，同样无需手改。漏改会让客户端顶栏长期显示旧版本号 |
 
 提示：
 
-- 清单第 1~9 项已被 `src/__tests__/version-consistency.test.ts` 自动校验：升完版本直接跑 `npm test -- src/__tests__` 即可一次性复核（建议升级前先跑一次，确认基线是绿的）
+- 清单第 1~10 项已被 `src/__tests__/version-consistency.test.ts` 自动校验：升完版本直接跑 `npm test -- src/__tests__` 即可一次性复核（建议升级前先跑一次，确认基线是绿的）
 - 全部改完后验证一遍：`npm test` && `npm run build:renderer`，必要时在 `src-tauri` 下 `cargo check`
 - 发布前建议在应用「帮助」页确认新增的 Vx.y.z 更新日志条目显示正常
 - 若本次仅收到普通的开发需求（未提及发布），**不要**触碰上述清单中的任何版本号文件

@@ -448,10 +448,10 @@ const ROWS: Record<string, Row> = {
   '打点音量 (0 即静音), 默认 ${n}': ['打點音量 (0 即靜音), 預設 ${n}', 'Click volume (0 = muted), default ${n}'],
   '三种本地合成音, 不加载任何音频文件': ['三種本機合成音, 不載入任何音訊檔', 'Three locally synthesised sounds — no audio files are loaded'],
   '开启后每小节第一拍更响, 便于听出小节线': ['開啟後每小節第一拍更響, 便於聽出小節線', 'Makes the first beat of each bar louder so the bar line is audible'],
-  '默认倒数拍数': ['預設倒數拍數', 'Default count-in beats'],
-  '开始前先打的预排拍数 (0 = 关闭); 预排拍用不同音高提示, 播完进入正拍': [
-    '開始前先打的預排拍數 (0 = 關閉); 預排拍用不同音高提示, 播完進入正拍',
-    'Count-in clicks played before the beat starts (0 = off); they use a different pitch, then the regular beat begins',
+  '默认倒计时秒数': ['預設倒計時秒數', 'Default count-in seconds'],
+  '开始前按秒倒计时 (0 = 关闭); 每秒一个预备拍, 圆点上跳动剩余秒数, 数完进入正拍': [
+    '開始前按秒倒數 (0 = 關閉); 每秒一個預備拍, 圓點上跳動剩餘秒數, 數完進入正拍',
+    'Counts in by seconds before the beat starts (0 = off); one cue click per second with the remaining seconds on the dot, then the regular beat begins',
   ],
   '{n} 拍': ['{n} 拍', '{n} beats'],
   // ---- 番茄时钟 ----

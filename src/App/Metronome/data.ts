@@ -28,9 +28,11 @@ export const BEAT_PRESETS: ReadonlyArray<{ beats: number; label: string }> = [
 export const SUBDIVISION_OPTIONS: readonly number[] = [ 1, 2, 3, 4 ];
 export const SUBDIVISION_DEFAULT = 1;
 
-/** 开始前的预排拍数 (倒计时): 0 = 关闭; 预排拍用不同音高与颜色提示, 播完进入正拍 */
-export const COUNTDOWN_OPTIONS: readonly number[] = [ 0, 1, 2, 4, 8 ];
-export const COUNTDOWN_DEFAULT = 2;
+/** 开始前的数字倒计时秒数: 0 = 关闭; 每秒一个预备拍 (音高与色彩和正拍不同), 圆点上跳动剩余秒数, 数完进入正拍 */
+export const COUNTDOWN_OPTIONS: readonly number[] = [ 0, 3, 4, 5, 6, 7, 8, 9, 10 ];
+export const COUNTDOWN_DEFAULT = 3;
+/** 倒计时预备拍间隔 (秒): 一秒一下, 与圆点上跳动的秒数同拍 */
+export const PREP_INTERVAL_SEC = 1;
 
 /** 音量 0 ~ 100 (0 = 静音) */
 export const VOLUME_MIN = 0;

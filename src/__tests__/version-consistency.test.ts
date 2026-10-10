@@ -47,6 +47,17 @@ describe('版本号一致性 (发布清单逐一校验)', () => {
     }
   });
 
+  test('客户端窗体标题带版本号 (清单 10)', () => {
+    // 桌面端窗口标题: tauri.conf.json 的初始 title + Rust setup 里 set_title 兜底, 两处都不能漏
+    const conf = JSON.parse(read('src-tauri/tauri.conf.json'));
+    expect(conf.app.windows[0].title).toBe(`Magic Tools ${TAG}`);
+    const rust = read('src-tauri/src/lib.rs');
+    expect(rust).toContain('set_title');
+    expect(rust).toContain('format!("Magic Tools v{version}")');
+    // Web 版页面标题 (Tauri 里 document.title 亦随之同步) 由 src/Main.tsx 生成, 无需手改
+    expect(read('src/Main.tsx')).toContain('`Magic Tools v${getVersion()}`');
+  });
+
   test('update.md 顶部版本节与 Help 时间线最新条目一致 (清单 5~6)', () => {
     // update.md 是 GitHub Release 说明的唯一来源, 取顶部第一个版本节
     expect(pick(read('update.md'), /^# MagicTools (v\d[\d.]*)$/m, 'update.md')).toBe(TAG);

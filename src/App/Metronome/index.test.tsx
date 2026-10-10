@@ -67,6 +67,8 @@ const dotOf = (c: HTMLElement) => c.querySelector('.mt-dot') as HTMLElement;
 const beatDotsOf = (c: HTMLElement) => Array.from(c.querySelectorAll('.mt-beat'));
 const tempoTextOf = (c: HTMLElement) => (c.querySelector('.mt-stage-tempo') as HTMLElement).textContent ?? '';
 const hintTextOf = (c: HTMLElement) => (c.querySelector('.mt-stage-hint') as HTMLElement).textContent ?? '';
+/** 圆点里的倒计时秒数 (不在倒计时阶段时为空) */
+const dotNumOf = (c: HTMLElement) => c.querySelector('.mt-dot-num')?.textContent ?? '';
 
 /** 按钮: 按可见文案查找 (antd 图标按钮的可访问名含图标名, 故直接比对文本) */
 const norm = (s: string) => s.replace(/\s+/g, '');
@@ -146,33 +148,35 @@ describe('节拍器 页面', () => {
     await startTool(container);
     const ctx = ctxOf();
     expect(FakeAudioContext.instances).toHaveLength(1);
-    expect(starts).toHaveLength(1);
+    // 默认 3 秒倒计时: 3 下预备拍已按秒排期 (0.06 / 1.06 / 2.06), 正拍从 3.06 开始
+    expect(starts).toHaveLength(3);
     expect(starts[0]).toBeCloseTo(0.06, 6); // START_DELAY_SEC
+    expect(starts[1]).toBeCloseTo(1.06, 6);
     // 进入运行态: 按钮变成「停止」
     expect(btn(container, '停止')).toBeInTheDocument();
 
-    // 前进 60ms: 首次打点的闪烁到期 —— 默认带 2 个预排拍, 先闪倒数色
+    // 前进 60ms: 第一下预备拍的闪烁到期 —— 数字倒计时里是倒数色
     await act(async () => {
       ctx.currentTime += 0.06;
       jest.advanceTimersByTime(60);
     });
     expect(dotOf(container).className).toContain('mt-dot-prep');
     expect(dotOf(container).style.background).toBe(PREP_RGB);
-    expect(hintTextOf(container)).toContain('倒数 2 拍');
+    expect(hintTextOf(container)).toContain('倒数 3 秒后开始');
 
-    // 预排拍走完 (90 BPM × 2 拍 ≈ 1.33s) 进入正拍: 首拍重音, 显示小节/拍
-    await tickClock(ctx, 1500);
+    // 倒计时走完 (3 秒) 进入正拍: 首拍重音, 显示小节/拍
+    await tickClock(ctx, 3100);
     expect(hintTextOf(container)).toMatch(/第 \d+ 小节 · 第 \d+ 拍/);
-    expect(starts.length).toBeGreaterThanOrEqual(3);
+    expect(starts.length).toBeGreaterThan(3);
   });
 
   it('暂停后不再排期, 已有排期不再发声', async () => {
     const { container } = render(<Metronome />);
     await startTool(container);
     const ctx = ctxOf();
-    await tickClock(ctx, 1500);
+    await tickClock(ctx, 3300);
     const before = starts.length;
-    expect(before).toBeGreaterThanOrEqual(2);
+    expect(before).toBeGreaterThanOrEqual(4);
     await stopTool(container);
     expect(btn(container, '开始')).toBeInTheDocument();
     await tickClock(ctx, 2000);
@@ -377,7 +381,7 @@ describe('节拍器 全屏与默认设置', () => {
   });
 });
 
-describe('节拍器 倒计时 (预排拍)', () => {
+describe('节拍器 倒计时 (按秒数字倒数)', () => {
   /** 点击倒计时档位 (antd Segmented 需要点内部的 radio) */
   const chooseCountdown = (c: HTMLElement, text: string) => {
     const label = Array.from(c.querySelectorAll('label.ant-segmented-item'))
@@ -386,26 +390,52 @@ describe('节拍器 倒计时 (预排拍)', () => {
     fireEvent.click(label.querySelector('input') ?? label);
   };
 
-  it('默认 2 个预排拍: 依次倒数 2 → 1, 之后进入正拍', async () => {
+  it('倒计时档位为 3 ~ 10 秒 (可关闭), 默认 3 秒', () => {
     const { container } = render(<Metronome />);
-    expect(container.querySelector('.ant-segmented-item-selected')?.textContent?.replace(/\s+/g, '')).toBe('2拍');
+    const field = Array.from(container.querySelectorAll('.mt-field'))
+      .find((el) => (el.querySelector('.mt-label')?.textContent ?? '') === '倒计时') as HTMLElement;
+    expect(field).toBeDefined();
+    const texts = Array.from(field.querySelectorAll('label.ant-segmented-item'))
+      .map((el) => (el.textContent ?? '').replace(/\s+/g, ''));
+    expect(texts).toEqual([ '关闭', '3秒', '4秒', '5秒', '6秒', '7秒', '8秒', '9秒', '10秒' ]);
+    expect(COUNTDOWN_DEFAULT).toBe(3);
+  });
+
+  it('默认 3 秒: 圆点上依次跳动 3 → 2 → 1, 数完进入正拍', async () => {
+    const { container } = render(<Metronome />);
     await startTool(container);
     const ctx = ctxOf();
 
-    // 第一下预排拍: 倒数剩 2 拍
+    // 开始瞬间: 圆点上就是总秒数, 3 下预备拍已按秒排期 (0.06 / 1.06 / 2.06)
+    expect(dotNumOf(container)).toBe('3');
+    expect(starts).toHaveLength(3);
+    expect(starts[1]).toBeCloseTo(1.06, 6);
+
+    // 第一下预备拍 (START_DELAY_SEC): 闪倒数色, 数字仍是 3
     await act(async () => {
       ctx.currentTime += 0.06;
       jest.advanceTimersByTime(60);
     });
-    expect(hintTextOf(container)).toContain('倒数 2 拍');
+    expect(dotOf(container).className).toContain('mt-dot-prep');
+    expect(dotOf(container).style.background).toBe(PREP_RGB);
+    expect(hintTextOf(container)).toContain('倒数 3 秒后开始');
+    expect(dotNumOf(container)).toBe('3');
 
-    // 第二下预排拍 (间隔一拍) : 倒数剩 1 拍
-    await tickClock(ctx, 700);
-    expect(hintTextOf(container)).toContain('倒数 1 拍');
+    // 第 1 秒末: 数字减到 2
+    await tickClock(ctx, 1000);
+    expect(dotNumOf(container)).toBe('2');
+    expect(hintTextOf(container)).toContain('倒数 2 秒后开始');
 
-    // 预排拍走完进入正拍
-    await tickClock(ctx, 800);
+    // 第 2 秒末: 数字减到 1
+    await tickClock(ctx, 1000);
+    expect(dotNumOf(container)).toBe('1');
+    expect(container.textContent).toContain('倒数中');
+
+    // 第 3 秒 (倒计时结束): 数字消失, 进入正拍 —— 首拍重音
+    await tickClock(ctx, 1000);
+    expect(container.querySelector('.mt-dot-num')).toBeNull();
     expect(hintTextOf(container)).toMatch(/第 \d+ 小节 · 第 \d+ 拍/);
+    expect(starts.length).toBeGreaterThan(3);
   });
 
   it('关闭倒计时 (countdown: 0) 后开始立即进入正拍', async () => {
@@ -419,18 +449,18 @@ describe('节拍器 倒计时 (预排拍)', () => {
     });
     expect(dotOf(container).className).toContain('mt-dot-accent');
     expect(dotOf(container).style.background).toBe(ACCENT_RGB);
+    expect(container.querySelector('.mt-dot-num')).toBeNull();
     expect(hintTextOf(container)).toContain('第 1 小节 · 第 1 拍');
   });
 
-  it('倒计时档位可切换预排拍数并计入「保存为默认设置」', async () => {
+  it('倒计时档位可切换秒数并计入「保存为默认设置」', async () => {
     const { container } = render(<Metronome />);
-    // 默认选中 2 拍
-    expect(container.querySelector('.ant-segmented-item-selected')?.textContent?.replace(/\s+/g, '')).toBe('2拍');
-    // 切换到 4 拍: 与默认不一致 → 可保存
-    await act(async () => { chooseCountdown(container, '4 拍'); });
+    // 默认选中 3 秒
+    expect(container.querySelector('.ant-segmented-item-selected')?.textContent?.replace(/\s+/g, '')).toBe('3秒');
+    // 切换到 5 秒: 与默认不一致 → 可保存
+    await act(async () => { chooseCountdown(container, '5 秒'); });
     expect(saveBtn(container)).toBeEnabled();
     await act(async () => { fireEvent.click(saveBtn(container)); });
-    expect(JSON.parse(localStorage.getItem(DEFAULTS_STORAGE_KEY) as string)).toMatchObject({ countdown: 4 });
-    expect(COUNTDOWN_DEFAULT).toBe(2);
+    expect(JSON.parse(localStorage.getItem(DEFAULTS_STORAGE_KEY) as string)).toMatchObject({ countdown: 5 });
   });
 });

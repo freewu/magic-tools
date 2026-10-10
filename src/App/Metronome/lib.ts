@@ -10,6 +10,7 @@ import {
   COUNTDOWN_DEFAULT,
   COUNTDOWN_OPTIONS,
   DEFAULTS_STORAGE_KEY,
+  PREP_INTERVAL_SEC,
   SUBDIVISION_DEFAULT,
   SUBDIVISION_OPTIONS,
   TAP_MAX_SAMPLES,
@@ -37,7 +38,7 @@ export interface MetronomeOptions {
   timbre: TimbreKey;
   /** 首拍重音 */
   accent: boolean;
-  /** 开始前的预排拍数 (0 = 关闭): 先打 N 个预排拍 (不同音高), 播完进入正拍 */
+  /** 开始前的数字倒计时秒数 (0 = 关闭): 每秒一个预备拍并在圆点上跳动剩余秒数, 数完进入正拍 */
   countdown: number;
 }
 
@@ -82,7 +83,7 @@ export const clampSubdivision = (v: unknown): number => {
   return best;
 };
 
-/** 倒计时预排拍数: 只取预设档位里最接近的一个, 非法值回退默认 */
+/** 倒计时秒数: 只取预设档位里最接近的一个, 非法值回退默认 */
 export const clampCountdown = (v: unknown): number => {
   const n = toNum(v);
   if (!Number.isFinite(n)) return COUNTDOWN_DEFAULT;
@@ -254,6 +255,23 @@ export const collectTickTimes = (
     t += step;
   }
   return { times, nextTime: t };
+};
+
+/**
+ * 倒计时预备拍的绝对时刻 (AudioContext 秒): 从 startAt 起每秒一下, 共 seconds 下
+ * 主拍从 startAt + prepDurationSec(seconds) 开始, 于是最后一下预备拍到第一下正拍正好隔一秒
+ */
+export const prepClickTimes = (startAt: number, seconds: unknown): number[] => {
+  const t0 = Number.isFinite(startAt) ? startAt : 0;
+  const n = toNum(seconds);
+  const count = Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
+  return Array.from({ length: count }, (_, k) => t0 + k * PREP_INTERVAL_SEC);
+};
+
+/** 倒计时总时长 (秒): 每秒一下预备拍, 0 = 关闭 */
+export const prepDurationSec = (seconds: unknown): number => {
+  const n = toNum(seconds);
+  return (Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0) * PREP_INTERVAL_SEC;
 };
 
 /** 待闪烁事件 (时间是 AudioContext 时钟) */

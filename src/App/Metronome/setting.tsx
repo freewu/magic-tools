@@ -77,15 +77,15 @@ export const MetronomeSetting: React.FC = () => {
         />
       </Form.Item>
       <Form.Item
-        label={ st('默认倒数拍数') }
-        extra={ st('开始前先打的预排拍数 (0 = 关闭); 预排拍用不同音高提示, 播完进入正拍') }
+        label={ st('默认倒计时秒数') }
+        extra={ st('开始前按秒倒计时 (0 = 关闭); 每秒一个预备拍, 圆点上跳动剩余秒数, 数完进入正拍') }
       >
         <Segmented
           value={ opts.countdown }
           onChange={ (v) => patch({ countdown: clampCountdown(v) }) }
           options={ COUNTDOWN_OPTIONS.map((n) => ({
             value: n,
-            label: n === 0 ? st('关闭') : uT(locale, '{n} 拍', { n }),
+            label: n === 0 ? st('关闭') : uT(locale, '{n} 秒', { n }),
           })) }
         />
       </Form.Item>

@@ -20,6 +20,8 @@ import {
   normalizeOptions,
   normalizeTimbre,
   patchDefaultOptions,
+  prepClickTimes,
+  prepDurationSec,
   setDefaultOptions,
   tapTempo,
   tempoTerm,
@@ -56,12 +58,13 @@ describe('clamp 系列', () => {
     expect(clampBeats('x')).toBe(BEATS_DEFAULT);
   });
 
-  it('倒计时预排拍数只取预设档位里最接近的一个', () => {
+  it('倒计时秒数只取预设档位里最接近的一个', () => {
     expect(clampCountdown(0)).toBe(0);
-    expect(clampCountdown(2)).toBe(2);
-    expect(clampCountdown(3)).toBe(2); // |3-2|=1 < |3-4|=1 (等距取更小)
-    expect(clampCountdown(6)).toBe(4); // |6-4|=2 < |6-8|=2 (等距取更小)
-    expect(clampCountdown(7)).toBe(8);
+    expect(clampCountdown(3)).toBe(3);
+    expect(clampCountdown(6)).toBe(6);
+    expect(clampCountdown(10)).toBe(10);
+    expect(clampCountdown(2)).toBe(3); // |2-3|=1 < |2-0|=2 → 3
+    expect(clampCountdown(11)).toBe(10);
     expect(clampCountdown(-5)).toBe(0);
     expect(clampCountdown('bad')).toBe(COUNTDOWN_DEFAULT);
     expect(clampCountdown(undefined)).toBe(COUNTDOWN_DEFAULT);
@@ -101,8 +104,8 @@ describe('normalizeOptions', () => {
   it('非法字段逐项回退, 合法字段保留', () => {
     const out = normalizeOptions({ bpm: 500, beats: 0, subdivision: 4, volume: -1, timbre: 'wood', accent: false });
     expect(out).toEqual({ bpm: 300, beats: 1, subdivision: 4, volume: 0, timbre: 'wood', accent: false, countdown: COUNTDOWN_DEFAULT });
-    expect(normalizeOptions({ countdown: 3 }).countdown).toBe(2); // 3 不是档位 → 夹到 2
-    expect(normalizeOptions({ countdown: 7 }).countdown).toBe(8);
+    expect(normalizeOptions({ countdown: 2 }).countdown).toBe(3); // 2 不是档位 → 夹到最近的 3
+    expect(normalizeOptions({ countdown: 12 }).countdown).toBe(10);
   });
 
   it('accent 只有显式 true 才为真', () => {
@@ -295,6 +298,30 @@ describe('tapTempo', () => {
   it('过滤掉非有限的历史样本', () => {
     const r = tapTempo([ Number.NaN, 1000 ], 1500);
     expect(r.taps).toEqual([ 1000, 1500 ]);
+  });
+});
+
+describe('倒计时 (按秒)', () => {
+  it('prepClickTimes: 从起始时刻起每秒一下, 共 seconds 下', () => {
+    expect(prepClickTimes(1, 0)).toEqual([]);
+    expect(prepClickTimes(1, 3)).toEqual([ 1, 2, 3 ]);
+    expect(prepClickTimes(0.06, 3).map((t) => Number(t.toFixed(2)))).toEqual([ 0.06, 1.06, 2.06 ]);
+    expect(prepClickTimes(1, 10)).toHaveLength(10);
+  });
+
+  it('prepClickTimes: 非法输入按 0 处理', () => {
+    expect(prepClickTimes(Number.NaN, 3)).toEqual([ 0, 1, 2 ]);
+    expect(prepClickTimes(1, Number.NaN)).toEqual([]);
+    expect(prepClickTimes(1, -2)).toEqual([]);
+    expect(prepClickTimes(1, 2.9)).toEqual([ 1, 2 ]); // 取整: 不足 3 秒不打第 3 下
+  });
+
+  it('prepDurationSec: 秒数即总时长 (最后一下预备拍与第一下正拍正好隔一秒)', () => {
+    expect(prepDurationSec(0)).toBe(0);
+    expect(prepDurationSec(3)).toBe(3);
+    expect(prepDurationSec(2.9)).toBe(2);
+    expect(prepDurationSec('bad')).toBe(0);
+    expect(prepDurationSec(-1)).toBe(0);
   });
 });
 

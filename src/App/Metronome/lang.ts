@@ -29,10 +29,10 @@ const uilangRows: Record<string, [string, string]> = {
   '背景闪烁': ['背景閃爍', 'Flash background'],
   '倒计时': ['倒計時', 'Count-in'],
   '关闭': ['關閉', 'Off'],
-  '{n} 拍': ['{n} 拍', '{n} beats'],
-  '开始前先打 N 个预排拍, 再用不同音高提示正拍开始': [
-    '開始前先打 N 個預排拍, 再用不同音高提示正拍開始',
-    'Plays N count-in clicks first, then the regular beat starts (with a different pitch)',
+  '{n} 秒': ['{n} 秒', '{n} s'],
+  '开始前先按秒倒计时 (圆点上显示剩余秒数), 每秒一个预备拍, 数完进入正拍': [
+    '開始前先按秒倒數 (圓點上顯示剩餘秒數), 每秒一個預備拍, 數完進入正拍',
+    'Counts in by seconds first (the remaining seconds show on the dot), one cue click per second, then the regular beat starts',
   ],
   '常用速度': ['常用速度', 'Common tempos'],
   '连击测速': ['連擊測速', 'Tap tempo'],
@@ -53,7 +53,7 @@ const uilangRows: Record<string, [string, string]> = {
   // 舞台
   '第 {bar} 小节 · 第 {beat} 拍': ['第 {bar} 小節 · 第 {beat} 拍', 'Bar {bar} · beat {beat}'],
   '已播放 {t} · {n} 拍': ['已播放 {t} · {n} 拍', '{t} · {n} beats'],
-  '倒数 {n} 拍': ['倒數 {n} 拍', '{n} beats to start'],
+  '倒数 {n} 秒后开始': ['倒數 {n} 秒後開始', 'Starting in {n}s'],
   '倒数中': ['倒數中', 'Counting in…'],
   '点击「开始」后这里会跟着节拍闪烁': ['點擊「開始」後這裡會跟著節拍閃爍', 'Hit Start and this dot will pulse with the beat'],
   '按 Esc 退出全屏': ['按 Esc 退出全屏', 'Press Esc to exit fullscreen'],

@@ -175,6 +175,11 @@ pub fn run() {
         .setup(|app| {
             let version = app.package_info().version.to_string();
 
+            // 主窗口标题带版本号 (与 tauri.conf.json 的 windows[0].title 同源, 升版本时两处一起改)
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.set_title(&format!("Magic Tools v{version}"));
+            }
+
             // 托盘菜单: [展示窗口, 设置, 帮助, 应用列表, 显示模式▸, 语言▸, MagicTools V{version}, 退出]
             let show_item =
                 MenuItem::with_id(app, "show", "展示窗口", true, None::<&str>)?;
