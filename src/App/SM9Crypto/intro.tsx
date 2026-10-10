@@ -14,10 +14,9 @@ const introZh = `
 <h2>使用流程</h2>
 <ul>
 <li><p><b>密钥生成</b>：设定用户 ID → 生成主密钥对 → 导出主公钥 (分发) → 提取用户私钥 (交付该 ID 用户)</p></li>
-<li><p><b>加密</b>：发送方需 <b>接收方主公钥 + 接收方 ID</b>, 明文单组上限 <b>255 字节</b>, 输出 DER HEX 密文</p></li>
-<li><p><b>解密</b>：接收方用 <b>自己的用户私钥 + 自己的 ID</b> 解密; ID 不一致会解密失败 (校验 C3 的 HMAC-SM3 标签)</p></li>
+<li><p><b>加解密</b>：同一页上下双框 —— 加密需 <b>接收方主公钥 + 接收方 ID</b> (明文单组上限 <b>255 字节</b>, 输出 DER HEX 密文); 解密用 <b>自己的用户私钥 + 自己的 ID</b>, ID 不一致会解密失败 (校验 C3 的 HMAC-SM3 标签)</p></li>
 <li><p><b>签名验签</b>：签名用签名用户私钥; 验签只需 <b>签名者主公钥 + 签名者 ID + 数据 + 签名值</b></p></li>
-<li><p>四个标签页<b>共享同一组密钥</b>与 ID; 「保存为默认密钥」存于浏览器本地 (localStorage), 不会上传</p></li>
+<li><p>三个标签页<b>共享同一组密钥</b>与 ID; 「保存为默认密钥」存于浏览器本地 (localStorage), 不会上传</p></li>
 </ul>
 <h2>数据格式</h2>
 <ul>
@@ -46,10 +45,9 @@ const introTw = `
 <h2>使用流程</h2>
 <ul>
 <li><p><b>金鑰產生</b>：設定使用者 ID → 產生主金鑰對 → 匯出主公鑰 (分發) → 提取使用者私鑰 (交付該 ID 使用者)</p></li>
-<li><p><b>加密</b>：傳送方需 <b>接收方主公鑰 + 接收方 ID</b>, 明文單組上限 <b>255 位元組</b>, 輸出 DER HEX 密文</p></li>
-<li><p><b>解密</b>：接收方用 <b>自己的使用者私鑰 + 自己的 ID</b> 解密; ID 不一致會解密失敗 (校驗 C3 的 HMAC-SM3 標籤)</p></li>
+<li><p><b>加解密</b>：同一頁上下雙框 —— 加密需 <b>接收方主公鑰 + 接收方 ID</b> (明文單組上限 <b>255 位元組</b>, 輸出 DER HEX 密文); 解密用 <b>自己的使用者私鑰 + 自己的 ID</b>, ID 不一致會解密失敗 (校驗 C3 的 HMAC-SM3 標籤)</p></li>
 <li><p><b>簽章驗章</b>：簽章用簽章使用者私鑰; 驗章只需 <b>簽章者主公鑰 + 簽章者 ID + 資料 + 簽章值</b></p></li>
-<li><p>四個頁籤<b>共用同一組金鑰</b>與 ID; 「儲存為預設金鑰」存於瀏覽器本機 (localStorage), 不會上傳</p></li>
+<li><p>三個頁籤<b>共用同一組金鑰</b>與 ID; 「儲存為預設金鑰」存於瀏覽器本機 (localStorage), 不會上傳</p></li>
 </ul>
 <h2>資料格式</h2>
 <ul>
@@ -78,10 +76,9 @@ const introEn = `
 <h2>Workflow</h2>
 <ul>
 <li><p><b>Key generation</b>: set the user ID → generate the master key pair → export the master public key (distribute it) → extract the user private key (deliver it to that ID's owner)</p></li>
-<li><p><b>Encryption</b>: the sender needs the <b>recipient's master public key + ID</b>; one group of plaintext is limited to <b>255 bytes</b>; the output is DER HEX ciphertext</p></li>
-<li><p><b>Decryption</b>: the recipient uses <b>their own user private key + ID</b>; a mismatching ID fails decryption (the C3 HMAC-SM3 tag is verified)</p></li>
+<li><p><b>Encrypt / Decrypt</b>: a single tab with two stacked boxes — encryption needs the <b>recipient's master public key + ID</b> (one group of plaintext is limited to <b>255 bytes</b>; the output is DER HEX ciphertext) and decryption uses <b>your own user private key + ID</b>; a mismatching ID fails decryption (the C3 HMAC-SM3 tag is verified)</p></li>
 <li><p><b>Signature / verification</b>: sign with the signature user private key; verification only needs the <b>signer's master public key + signer ID + data + signature</b></p></li>
-<li><p>All four tabs <b>share one key set</b> and ID; "Save as default keys" stores them only in your browser (localStorage) — nothing is uploaded</p></li>
+<li><p>All three tabs <b>share one key set</b> and ID; "Save as default keys" stores them only in your browser (localStorage) — nothing is uploaded</p></li>
 </ul>
 <h2>Data formats</h2>
 <ul>

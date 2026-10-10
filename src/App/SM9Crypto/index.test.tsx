@@ -57,9 +57,9 @@ describe('SM9Crypto 页面', () => {
     jest.clearAllMocks();
   });
 
-  it('四个页签齐全, 默认带出默认 ID', () => {
+  it('三个页签齐全 (加密 / 解密 已合并为「加解密」), 默认带出默认 ID', () => {
     renderPage();
-    for (const name of [ '密钥生成', '加密', '解密', '签名验签' ]) {
+    for (const name of [ '密钥生成', '加解密', '签名验签' ]) {
       expect(screen.getByRole('tab', { name })).toBeTruthy();
     }
     expect(screen.getAllByDisplayValue('bluefrog').length).toBeGreaterThan(0);
@@ -101,7 +101,7 @@ describe('SM9Crypto 页面', () => {
 
   it('加密: 主公钥 + ID + 明文 -> 密文', async () => {
     renderPage();
-    fireEvent.click(screen.getByRole('tab', { name: '加密' }));
+    fireEvent.click(screen.getByRole('tab', { name: '加解密' }));
     fireEvent.change(await screen.findByPlaceholderText(/04 开头 130 位 HEX/), { target: { value: mockMpk } });
     fireEvent.change(screen.getByPlaceholderText(/输入需要加密的明文/), { target: { value: 'SM9 测试' } });
     fireEvent.click(screen.getByRole('button', { name: /加密$/ }));
@@ -112,7 +112,7 @@ describe('SM9Crypto 页面', () => {
 
   it('加密: 明文超过 255 字节时拒绝并提示', async () => {
     renderPage();
-    fireEvent.click(screen.getByRole('tab', { name: '加密' }));
+    fireEvent.click(screen.getByRole('tab', { name: '加解密' }));
     fireEvent.change(await screen.findByPlaceholderText(/04 开头 130 位 HEX/), { target: { value: mockMpk } });
     fireEvent.change(screen.getByPlaceholderText(/输入需要加密的明文/), { target: { value: 'a'.repeat(256) } });
     fireEvent.click(screen.getByRole('button', { name: /加密$/ }));
@@ -122,7 +122,7 @@ describe('SM9Crypto 页面', () => {
 
   it('加密: 未配置主公钥 / 主私钥时提示先配置', async () => {
     renderPage();
-    fireEvent.click(screen.getByRole('tab', { name: '加密' }));
+    fireEvent.click(screen.getByRole('tab', { name: '加解密' }));
     fireEvent.change(await screen.findByPlaceholderText(/输入需要加密的明文/), { target: { value: 'abc' } });
     fireEvent.click(screen.getByRole('button', { name: /加密$/ }));
     expect(await screen.findByText(/未配置加密主公钥\/主私钥/)).toBeTruthy();
@@ -131,7 +131,7 @@ describe('SM9Crypto 页面', () => {
 
   it('解密: 用户私钥 + ID + 密文 -> 明文; 非法 HEX 给出提示', async () => {
     renderPage();
-    fireEvent.click(screen.getByRole('tab', { name: '解密' }));
+    fireEvent.click(screen.getByRole('tab', { name: '加解密' }));
     fireEvent.change(await screen.findByPlaceholderText(/粘贴用户私钥/), { target: { value: mockUsk } });
     fireEvent.change(screen.getByPlaceholderText(/粘贴密文/), { target: { value: mockCipher } });
     fireEvent.click(screen.getByRole('button', { name: /解密$/ }));
@@ -145,11 +145,32 @@ describe('SM9Crypto 页面', () => {
 
   it('解密: 用户私钥为空时提示先填写', async () => {
     renderPage();
-    fireEvent.click(screen.getByRole('tab', { name: '解密' }));
+    fireEvent.click(screen.getByRole('tab', { name: '加解密' }));
     fireEvent.change(await screen.findByPlaceholderText(/粘贴密文/), { target: { value: mockCipher } });
     fireEvent.click(screen.getByRole('button', { name: /解密$/ }));
     expect(await screen.findByText(/请先填写加密用户私钥/)).toBeTruthy();
     expect(gmssl.decrypt).not.toHaveBeenCalled();
+  });
+
+  it('加解密: 同一页完成 加密 -> 解密 -> 清除 (上下双框)', async () => {
+    renderPage();
+    fireEvent.click(screen.getByRole('tab', { name: '加解密' }));
+    fireEvent.change(await screen.findByPlaceholderText(/04 开头 130 位 HEX/), { target: { value: mockMpk } });
+    fireEvent.change(screen.getByPlaceholderText(/粘贴用户私钥/), { target: { value: mockUsk } });
+    fireEvent.change(screen.getByPlaceholderText(/输入需要加密的明文/), { target: { value: 'SM9 测试' } });
+    fireEvent.click(screen.getByRole('button', { name: /加密$/ }));
+    expect(await screen.findByDisplayValue(mockCipher)).toBeTruthy(); // 密文写入下方框
+    expect(gmssl.encryptWithPublicKey).toHaveBeenCalledTimes(1);
+
+    fireEvent.change(screen.getByPlaceholderText(/输入需要加密的明文/), { target: { value: '' } });
+    fireEvent.click(screen.getByRole('button', { name: /解密$/ }));
+    expect(await screen.findByDisplayValue(mockPlain)).toBeTruthy(); // 明文写回上方框
+    expect(gmssl.decrypt).toHaveBeenCalledTimes(1);
+
+    const clearBtn = screen.getByRole('button', { name: (n :string) => n.replace(/\s+/g, '') === '清除' });
+    fireEvent.click(clearBtn);
+    expect(valueOf(screen.getByPlaceholderText(/输入需要加密的明文/))).toBe('');
+    expect(valueOf(screen.getByPlaceholderText(/加密后自动显示在此/))).toBe('');
   });
 
   it('签名验签: 签名 -> 主公钥验签通过; 篡改后验签失败', async () => {
@@ -220,7 +241,7 @@ describe('SM9Crypto 页面', () => {
 
   it('无法识别的内容给出字节数提示', async () => {
     renderPage();
-    fireEvent.click(screen.getByRole('tab', { name: '加密' }));
+    fireEvent.click(screen.getByRole('tab', { name: '加解密' }));
     fireEvent.change(await screen.findByPlaceholderText(/04 开头 130 位 HEX/), { target: { value: '00'.repeat(10) } });
     expect((await screen.findAllByText('无法识别为 SM9 数据 (10 字节)')).length).toBeGreaterThan(0);
   });

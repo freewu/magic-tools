@@ -1,8 +1,8 @@
 // SM9 加解密 (GM/T 0044-2016) — 基于 GmSSL 编译的 WebAssembly
 //
-// 四个标签页共享同一组密钥 (密钥在各页之间互通):
+// 三个标签页共享同一组密钥 (密钥在各页之间互通):
 //   密钥生成: 分别生成/导出 加密 (SM9-Enc) 与 签名 (SM9-Sign) 两套主密钥 & 用户私钥
-//   加密 / 解密: 主公钥 (或主私钥) + ID 加密, 用户私钥 + ID 解密
+//   加解密: 上半区明文 (或解密输出) + 主公钥/用户私钥 + ID, 一键加密 / 解密 (上下双框)
 //   签名验签: 用户私钥签名, 主公钥 (或主私钥) + ID 验签
 import { Alert, Button, Divider, Input, Space, Tabs, Tag, Typography, message } from "antd";
 import { useEffect, useState } from "react";
@@ -91,12 +91,9 @@ const SM9Crypto = () => {
   const [ engineError, setEngineError ] = useState('');
   const [ notice, contextHolder ] = message.useMessage();
 
-  // 加密页
+  // 加解密页: 上方明文 / 下方密文 (加密 明文→密文; 解密 密文→明文)
   const [ plain, setPlain ] = useState('');
   const [ cipher, setCipher ] = useState('');
-  // 解密页
-  const [ decCipher, setDecCipher ] = useState('');
-  const [ decPlain, setDecPlain ] = useState('');
   // 签名验签页
   const [ signData, setSignData ] = useState('');
   const [ signValue, setSignValue ] = useState('');
@@ -312,16 +309,40 @@ const SM9Crypto = () => {
       out = await encryptWithMasterKey(master, id.trim(), plainBytes);
     } else {
       notice.warning(t('未配置加密主公钥/主私钥, 请先在「密钥生成」页生成或粘贴'));
+      setActiveTab('keygen');
       return;
     }
     setCipher(bytesToHex(out));
     notice.success(t('加密成功 (密文为 DER HEX, 可发给接收方)'));
   });
 
-  const encryptTab = (
+  // ---------------- 解密 ----------------
+  const doDecrypt = () => run(async () => {
+    const usk = readHex(keys.encUser, '加密用户私钥');
+    if (!usk) return;
+    if (id.trim() === '') { notice.warning(t('请先填写用户 ID (需与加密时一致)')); return; }
+    const ct = readHex(cipher, '密文');
+    if (!ct) return;
+    const out = await decrypt(usk, id.trim(), ct);
+    setPlain(bytesToText(out));
+    notice.success(t('解密成功'));
+  });
+
+  const clear = () => {
+    setPlain('');
+    setCipher('');
+  };
+
+  const exportCipher = async () => {
+    if (cipher.trim() === '') { notice.warning(t('没有可导出的内容, 请先生成')); return; }
+    if (await saveTextFile('sm9-ciphertext.txt', cipher.trim(), t('保存文件'))) notice.success(t('已保存到文件'));
+  };
+
+  // ---------------- 加解密 (加密 / 解密 合并为一页: 上下双框 + 加密 / 解密 / 清除) ----------------
+  const cryptoTab = (
     <div>
       <div style={ { color: "#999", fontSize: 12, margin: "8px 0" } }>
-        {t('加密只需接收方的主公钥与 ID; 主公钥留空时使用上方「加密主私钥」加密 (效果相同)。')}
+        {t('加密只需接收方的主公钥与 ID; 解密需要用户私钥与加密时相同的 ID (用户私钥可在「密钥生成」页用主私钥 + ID 提取)。')}
       </div>
       <div style={ { fontWeight: 600 } }>{t('加密主公钥 (65 字节 HEX)')}</div>
       <HexArea
@@ -332,9 +353,19 @@ const SM9Crypto = () => {
         placeholder={t('04 开头 130 位 HEX; 留空则用「加密主私钥」加密')}
       />
       <div style={ { color: "#999", fontSize: 12 } }>{kindHint(keys.encPublic)}</div>
+      <div style={ { fontWeight: 600 } }>{t('加密用户私钥 (DER HEX)')}</div>
+      <HexArea
+        value={ keys.encUser }
+        onChange={ (v) => setKey('encUser', v) }
+        onDoubleClick={ () => copy(keys.encUser, '用户私钥') }
+        rows={ 2 }
+        placeholder={t('粘贴用户私钥 (DER HEX), 或在上方「密钥生成」页提取')}
+      />
+      <div style={ { color: "#999", fontSize: 12 } }>{kindHint(keys.encUser)}</div>
       <Space wrap style={ { margin: "4px 0" } }>
         <span style={ { fontWeight: 600 } }>{t('用户 ID')}</span>
         <Input style={ { width: 320 } } value={ id } onChange={ (e) => setId(e.target.value) } />
+        <span style={ { color: "#999" } }>{tt('当前 ID 长度: {n} 字节', { n: utf8Length(id) })}</span>
       </Space>
       <div style={ { fontWeight: 600 } }>{t('明文 (UTF-8, 单组上限 255 字节)')}</div>
       <HexArea
@@ -356,66 +387,22 @@ const SM9Crypto = () => {
       </div>
       <Space style={ { margin: "4px 0" } }>
         <Button onClick={ doEncrypt } loading={ busy } style={ { backgroundColor: "#007bff", color: "#fff" } } icon={ <ArrowDownOutlined /> }>{t('加密')}</Button>
-        <Button onClick={ () => setPlain('') }>{t('清空明文')}</Button>
+        <Button onClick={ doDecrypt } loading={ busy } style={ { backgroundColor: "#28a745", color: "#fff" } } icon={ <ArrowUpOutlined /> }>{t('解密')}</Button>
+        <Button onClick={ clear } style={ { backgroundColor: "#dc3545", color: "#fff" } }>{t('清除')}</Button>
       </Space>
       <div style={ { fontWeight: 600 } }>{t('密文 (DER HEX)')}</div>
-      <HexArea value={ cipher } rows={ 4 } placeholder={t('加密后自动显示在此; 可粘贴密文用于「解密」页')} />
+      <HexArea
+        value={ cipher }
+        onChange={ setCipher }
+        onDoubleClick={ () => copy(cipher, '密文') }
+        onDropFile={ (files) => openFile(files, setCipher) }
+        rows={ 5 }
+        placeholder={t('加密后自动显示在此; 也可粘贴密文后点「解密」  或 拖拽文件到框内打开')}
+      />
       <Space>
         <Button size="small" icon={ <CopyOutlined /> } onClick={ () => copy(cipher, '密文') }>{t('复制密文')}</Button>
-        <Button size="small" icon={ <DownloadOutlined /> } onClick={ async () => {
-          if (cipher.trim() === '') { notice.warning(t('没有可导出的内容, 请先生成')); return; }
-          if (await saveTextFile('sm9-ciphertext.txt', cipher.trim(), t('保存文件'))) notice.success(t('已保存到文件'));
-        } }>{t('导出密文')}</Button>
+        <Button size="small" icon={ <DownloadOutlined /> } onClick={ exportCipher }>{t('导出密文')}</Button>
       </Space>
-    </div>
-  );
-
-  // ---------------- 解密 ----------------
-  const doDecrypt = () => run(async () => {
-    const usk = readHex(keys.encUser, '加密用户私钥');
-    if (!usk) return;
-    if (id.trim() === '') { notice.warning(t('请先填写用户 ID (需与加密时一致)')); return; }
-    const ct = readHex(decCipher, '密文');
-    if (!ct) return;
-    const out = await decrypt(usk, id.trim(), ct);
-    setDecPlain(bytesToText(out));
-    notice.success(t('解密成功'));
-  });
-
-  const decryptTab = (
-    <div>
-      <div style={ { color: "#999", fontSize: 12, margin: "8px 0" } }>
-        {t('解密需要「用户私钥」与加密时相同的 ID; 用户私钥由接收方从主私钥提取 (见「密钥生成」页)。')}
-      </div>
-      <div style={ { fontWeight: 600 } }>{t('加密用户私钥 (DER HEX)')}</div>
-      <HexArea
-        value={ keys.encUser }
-        onChange={ (v) => setKey('encUser', v) }
-        onDoubleClick={ () => copy(keys.encUser, '用户私钥') }
-        rows={ 3 }
-        placeholder={t('粘贴用户私钥 (DER HEX), 或在上方「密钥生成」页提取')}
-      />
-      <div style={ { color: "#999", fontSize: 12 } }>{kindHint(keys.encUser)}</div>
-      <Space wrap style={ { margin: "4px 0" } }>
-        <span style={ { fontWeight: 600 } }>{t('用户 ID')}</span>
-        <Input style={ { width: 320 } } value={ id } onChange={ (e) => setId(e.target.value) } />
-      </Space>
-      <div style={ { fontWeight: 600 } }>{t('密文 (DER HEX)')}</div>
-      <HexArea
-        value={ decCipher }
-        onChange={ setDecCipher }
-        onDoubleClick={ () => copy(decCipher, '密文') }
-        onDropFile={ (files) => openFile(files, setDecCipher) }
-        rows={ 4}
-        placeholder={t('粘贴密文 (DER HEX)  或 拖拽文件到框内打开')}
-      />
-      <Space style={ { margin: "4px 0" } }>
-        <Button onClick={ doDecrypt } loading={ busy } style={ { backgroundColor: "#28a745", color: "#fff" } } icon={ <ArrowUpOutlined /> }>{t('解密')}</Button>
-        <Button onClick={ () => { setDecCipher(''); setDecPlain(''); } }>{t('清除')}</Button>
-      </Space>
-      <div style={ { fontWeight: 600 } }>{t('明文 (非文本内容按 HEX 显示)')}</div>
-      <HexArea value={ decPlain } rows={ 5 } placeholder={t('解密后自动显示在此')} />
-      <Button size="small" icon={ <CopyOutlined /> } onClick={ () => copy(decPlain, '明文') }>{t('复制明文')}</Button>
     </div>
   );
 
@@ -532,7 +519,7 @@ const SM9Crypto = () => {
         items={ tabList.map(({ key, label }) => ({
           key,
           label: t(label),
-          children: key === 'keygen' ? keygenTab : key === 'encrypt' ? encryptTab : key === 'decrypt' ? decryptTab : signTab,
+          children: key === 'keygen' ? keygenTab : key === 'crypto' ? cryptoTab : signTab,
         })) }
       />
 
