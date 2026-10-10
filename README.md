@@ -28,7 +28,7 @@
 > Click the language switcher at the top to read this document in **简体中文** or **繁體中文**.
 
 ### 🔐 Cryptography *(23)*
-AES · DES · 3DES · RSA · SM2 · SM4 · SM9 · ChaCha20 · Blowfish · Rabbit · RC2 · RC4 · RC5 · RC6 · TEA · XTEA · XXTEA · Caesar · Rail Fence · Vigenère · Hill · Cisco Type 7 · ZUC sequence cipher (Zu Chongzhi)
+AES · DES · 3DES · RSA · SM2 · SM4 · SM9 · ChaCha20 · Blowfish · Rabbit · RC2 · RC4 · RC5 · RC6 · TEA · XTEA · XXTEA · Caesar · Rail Fence · Vigenère · Hill · Cisco Type 7 Encrypt / Decrypt · ZUC sequence cipher (Zu Chongzhi)
 
 ### 🧮 Hash, MAC & Value Calculators *(15)*
 Hash (MD5/SHA1/SHA2/SM3/…) · HMAC · SHA-3 · Keccak · BCrypt · Scrypt · PBKDF2 · CMAC · HKDF · KMAC · PPI · Complement (sign-magnitude / 1's / 2's) · BCC checksum · LRC checksum · CRC checksum (30+ parameterised standards)

@@ -1,7 +1,7 @@
 // CiscoType7 语言包: 名称 (zh-CN = define.tsx AppName 默认; 缺省回退 zh-CN)
 export default {
   default: 'zh-CN',
-  en: { appName: "Cisco Type 7" },
+  en: { appName: "Cisco Type 7 Encrypt / Decrypt" },
 } as const;
 
 // 界面文案词条 (zh 短语即 key; 缺 zh-CN 时回退原文)
@@ -12,8 +12,6 @@ const cryptolangRows: Record<string, [string, string]> = {
   '清除': ['清除', 'Clear'],
   'Cisco Type 7 使用固定公开密钥表做 XOR 弱加密, 可被任何工具还原, 不具备安全性; 仅用于与旧版 Cisco IOS 配置 (show running-config) 中的口令互通或查看': ['Cisco Type 7 使用固定公開金鑰表做 XOR 弱加密, 可被任何工具還原, 不具安全性; 僅用於與舊版 Cisco IOS 設定 (show running-config) 中的口令互通或檢視', 'Cisco Type 7 is a weak XOR obfuscation that uses a fixed, public key table — any tool can reverse it, so it provides no real security; it is only for interop with, or inspecting, passwords in legacy Cisco IOS configs (show running-config)'],
   '随机 (推荐)': ['隨機 (推薦)', 'Random (recommended)'],
-  '加密为 Type 7': ['加密為 Type 7', 'Encrypt to Type 7'],
-  '解密为明文': ['解密為明文', 'Decrypt to plaintext'],
   '双击复制内容到粘贴板': ['雙擊複製內容到剪貼簿', 'Double-click to copy'],
   '盐偏移(加密):': ['鹽偏移(加密):', 'Salt offset (encrypt):'],
   '位于首 2 位 (0~15); 随机更贴近设备实际输出': ['位於前 2 位 (0~15); 隨機更貼近裝置實際輸出', 'Placed in the first 2 digits (0~15); random matches real device output more closely'],

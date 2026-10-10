@@ -65,6 +65,12 @@ const RENDER_DELAY = 250;
 /** 全屏切换后等布局稳定再重新 fit (原生全屏与窗口内全屏都受这一帧延迟影响) */
 const FIT_DELAY = 80;
 
+/** 重新适应窗口, 再按当前缩放倍率放大 / 缩小预览 (rescale 是绝对倍率, 以视口中心为锚点, 与导出倍率同一个值) */
+const fitWithScale = async (inst: MindMapInstance, scale: number) => {
+  await inst.fit();
+  if (scale !== 1) await inst.rescale?.(scale);
+};
+
 /** 全屏态样式: 未进入原生全屏时用 position: fixed 铺满窗口兜底 (内嵌 webview 可能拒绝原生全屏)。
  *  全屏是**整个页面**全屏 (工具栏 / 大纲 / 预览一起铺满视口), 下方说明区在全屏时隐藏 */
 const STAGE_CSS = [
@@ -120,6 +126,11 @@ const MindMap: React.FC = () => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const instRef = useRef<{ el: SVGSVGElement; mm: MindMapInstance } | null>(null);
+  // 缩放值只影响视图, 不该重建整棵树: 供渲染 / 全屏等 effect 读取最新值
+  const scaleRef = useRef(scale);
+  useEffect(() => { scaleRef.current = scale; }, [ scale ]);
+  // 首次渲染不需要为「缩放」额外 fit 一次 (渲染本身已经 fit 过)
+  const scaleTouchedRef = useRef(false);
   const seqRef = useRef(0);
   const bgTouchedRef = useRef(false);
   const fullTouchedRef = useRef(false);
@@ -205,7 +216,7 @@ const MindMap: React.FC = () => {
     if (!inst) return;
     let cancelled = false;
     const timer = window.setTimeout(() => {
-      void inst.fit().then(() => {
+      void fitWithScale(inst, scaleRef.current).then(() => {
         if (!cancelled) setBox(exportBoxOf(inst.state.rect));
       }).catch(() => undefined);
     }, FIT_DELAY);
@@ -257,7 +268,7 @@ const MindMap: React.FC = () => {
           // setData 会重建整棵树 (含折叠状态), 因此配色 / 层级 / 字号 / 主题变化也走这里
           else await inst.setData(root, options);
           if (cancelled || seq !== seqRef.current) return;
-          await inst.fit();
+          await fitWithScale(inst, scaleRef.current);
           if (cancelled || seq !== seqRef.current) return;
           setBox(exportBoxOf(inst.state.rect));
           setInfo(outlineInfo(root));
@@ -360,10 +371,25 @@ const MindMap: React.FC = () => {
   const fitView = async () => {
     const inst = instRef.current?.mm;
     if (!inst) return;
-    await inst.fit();
+    await fitWithScale(inst, scale);
     setBox(exportBoxOf(inst.state.rect));
     message.success(t('已适应窗口'));
   };
+
+  // 缩放: 在适应窗口的基础上按倍率放大 (不重建树, 折叠状态不受影响)
+  useEffect(() => {
+    if (!scaleTouchedRef.current) {
+      scaleTouchedRef.current = true;
+      return;
+    }
+    const inst = instRef.current?.mm;
+    if (!inst) return;
+    let cancelled = false;
+    void fitWithScale(inst, scale).then(() => {
+      if (!cancelled) setBox(exportBoxOf(inst.state.rect));
+    }).catch(() => undefined);
+    return () => { cancelled = true; };
+  }, [ scale ]);
 
   const exportAs = async (format: ExportFormat) => {
     const el = svgRef.current;

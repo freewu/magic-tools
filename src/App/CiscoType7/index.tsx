@@ -111,12 +111,12 @@ const CiscoType7 = () => {
           onClick={ encode }
           style={ {"backgroundColor" : "#007bff","color": "#fff"} }
           icon={<ArrowDownOutlined />}
-        >{t('加密为 Type 7')}</Button>
+        >{t('加密')}</Button>
         <Button
           onClick={ decode }
           style={ {"backgroundColor" : "#28a745","color": "#fff"} }
           icon={<ArrowUpOutlined />}
-        >{t('解密为明文')}</Button>
+        >{t('解密')}</Button>
         <Button
           onClick={ () =>clear() }
           style={ {"backgroundColor" : "#dc3545","color": "#fff"} }

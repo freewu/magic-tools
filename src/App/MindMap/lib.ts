@@ -173,6 +173,8 @@ export interface MindMapInstance {
   setData: (data: unknown, options?: Record<string, unknown>) => Promise<void>;
   setOptions?: (options: Record<string, unknown>) => void;
   fit: () => Promise<void>;
+  /** 以视口中心为锚点把内容缩放到指定倍率 (markmap 0.18 起提供) */
+  rescale?: (scale: number) => Promise<void>;
   destroy: () => void;
 }
 

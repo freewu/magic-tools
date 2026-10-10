@@ -14,6 +14,7 @@ const mockInstances: Array<{
   state: { rect: { x1: number; y1: number; x2: number; y2: number } };
   setData: jest.Mock;
   fit: jest.Mock;
+  rescale: jest.Mock;
   destroy: jest.Mock;
 }> = [];
 
@@ -43,6 +44,7 @@ jest.mock('markmap-view', () => ({
         state: { rect: { ...{ x1: -60, y1: -40, x2: 180, y2: 60 } } },
         setData: jest.fn(async (d: unknown, o?: Record<string, unknown>) => { mm.data = d; if (o) mm.options = o; }),
         fit: jest.fn(async () => {}),
+        rescale: jest.fn(async () => {}),
         destroy: jest.fn(),
       };
       mockInstances.push(mm);
@@ -217,6 +219,32 @@ describe('MindMap 初始界面', () => {
     expect(await openSelectOptions(3)).toEqual([ '12', '14', '16', '18', '20', '22' ]);
     expect(await openSelectOptions(4)).toEqual([ '白色', '深色', '透明' ]);
     expect(await openSelectOptions(5)).toEqual([ '100%', '150%', '200%', '250%', '300%', '400%' ]);
+  });
+
+  test('「缩放」按倍率放大预览画面 (fit 后 rescale, 不重建整棵树)', async () => {
+    render(<MindMap />);
+    await waitRendered();
+    const inst = mockInstances[0];
+    expect(inst.rescale).not.toHaveBeenCalled();
+
+    await openSelect(5);
+    await clickOption('200%');
+    await waitFor(() => expect(inst.rescale).toHaveBeenCalledWith(2));
+
+    inst.fit.mockClear();
+    await openSelect(5);
+    await clickOption('150%');
+    await waitFor(() => expect(inst.rescale).toHaveBeenLastCalledWith(1.5));
+    expect(inst.fit).toHaveBeenCalledTimes(1);
+    // 只改视图参数: 实例不被重建
+    expect(mockInstances).toHaveLength(1);
+
+    // 回到 100% 只重新适应窗口, 不再额外缩放
+    inst.fit.mockClear();
+    await openSelect(5);
+    await clickOption('100%');
+    await waitFor(() => expect(inst.fit).toHaveBeenCalledTimes(1));
+    expect(inst.rescale).toHaveBeenCalledTimes(2);
   });
 
   test('输入区与预览区等高对齐, 输入框自动撑满卡片', async () => {

@@ -40,14 +40,14 @@ describe('CiscoType7 页面', () => {
     const [ plain, type7 ] = areas(container);
 
     fireEvent.change(plain, { target: { value: 'cisco' } });
-    fireEvent.click(btn('加密为 Type 7'));
+    fireEvent.click(btn('加密'));
     await waitFor(() => expect(type7.value).not.toBe(''));
     // 2 位盐偏移 + 大写 hex
     expect(type7.value).toMatch(/^[0-9A-F]{2}([0-9A-F]{2})+$/);
 
     // 改掉上框, 再点解密: 应从上框下方那个框 (Type 7) 还原出原文
     fireEvent.change(plain, { target: { value: '覆盖内容' } });
-    fireEvent.click(btn('解密为明文'));
+    fireEvent.click(btn('解密'));
     await waitFor(() => expect(plain.value).toBe('cisco'));
   });
 
@@ -56,7 +56,7 @@ describe('CiscoType7 页面', () => {
     const [ plain, type7 ] = areas(container);
 
     fireEvent.change(plain, { target: { value: 'cisco' } });
-    fireEvent.click(btn('加密为 Type 7'));
+    fireEvent.click(btn('加密'));
     await waitFor(() => expect(type7.value).not.toBe(''));
 
     fireEvent.click(btn('清除'));
@@ -69,7 +69,7 @@ describe('CiscoType7 页面', () => {
     const type7 = areas(container)[1];
 
     fireEvent.change(type7, { target: { value: 'GG11' } });
-    fireEvent.click(btn('解密为明文'));
+    fireEvent.click(btn('解密'));
     expect(await screen.findByText(/Type 7 盐偏移不合法/)).toBeInTheDocument();
   });
 

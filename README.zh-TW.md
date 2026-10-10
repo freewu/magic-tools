@@ -28,7 +28,7 @@
 > 頂部可切換 **English** 與 **简体中文** 版本。
 
 ### 🔐 加解密 *(23)*
-AES 加解密 · RSA 加解密 · SM2 加解密 · SM4 加解密 · SM9 加解密 · 凱撒加解密 · 柵欄加解密 · 維吉尼亞加解密 · 希爾加解密 · Cisco Type 7 · DES 加解密 · Blowfish 加解密 · Rabbit 加解密 · RC2 加解密 · RC4 加解密 · RC5 加解密 · RC6 加解密 · ChaCha20 加解密 · 3DES 加解密 · TEA 加解密 · XTEA 加解密 · XXTEA 加解密 · 祖沖之序列密碼
+AES 加解密 · RSA 加解密 · SM2 加解密 · SM4 加解密 · SM9 加解密 · 凱撒加解密 · 柵欄加解密 · 維吉尼亞加解密 · 希爾加解密 · Cisco Type 7 加解密 · DES 加解密 · Blowfish 加解密 · Rabbit 加解密 · RC2 加解密 · RC4 加解密 · RC5 加解密 · RC6 加解密 · ChaCha20 加解密 · 3DES 加解密 · TEA 加解密 · XTEA 加解密 · XXTEA 加解密 · 祖沖之序列密碼
 
 ### 🧮 值計算 *(15)*
 Hash 值計算 · HmacHash 值計算 · SHA3 Hash 值計算 · Keccak Hash 值計算 · BCrypt · Scrypt · PBKDF2 值計算 · CMAC 計算 · HKDF 計算 · KMAC 計算 · PPI 計算 · 原碼/反碼/補碼計算 · BCC 校驗 · LRC 校驗 · CRC 校驗
