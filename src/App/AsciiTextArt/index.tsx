@@ -1,9 +1,10 @@
-import { Button, Input, InputNumber, Select, Space, message } from "antd";
+import { Button, Input, InputNumber, Space, message } from "antd";
 import { CopyOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useEffect, useMemo, useState } from "react";
 import { copyTextToClipboard } from "../../lib";
 import { saveBytesFile } from "../../lib/tauri";
 import { FONT_NAMES, getDefaultFont, getDefaultText, renderText } from "./lib";
+import FontPicker from './FontPicker';
 import { useLocale } from "../../hook/locale-context";
 import { u, uT } from './lang';
 
@@ -67,16 +68,8 @@ const AsciiTextArt: React.FC = () => {
       </div>
       <div style={ row }>
         <span style={ labelStyle }>{t('字体')}</span>
-        <Select
-          value={ font }
-          style={ { width: 340, maxWidth: '100%' } }
-          showSearch
-          onChange={ setFont }
-          placeholder={t('选择 figlet 字体')}
-          options={ FONT_NAMES.map((v) => ({ value: v, label: v })) }
-          filterOption={ (kw, opt) => String(opt?.label ?? '').toLowerCase().includes(kw.toLowerCase()) }
-        />
-        <span style={ { color: '#bbb', fontSize: 12 } }>{tt('共 {n} 款 figlet 字体', { n: FONT_NAMES.length })}</span>
+        <FontPicker value={ font } onChange={ setFont } width={ 340 } />
+        <span style={ { color: '#bbb', fontSize: 12 } }>{tt('共 {n} 款 figlet 字体, 点开可按 26 个字母预览', { n: FONT_NAMES.length })}</span>
       </div>
       <div style={ row }>
         <span style={ labelStyle }>{t('预览字号')}</span>

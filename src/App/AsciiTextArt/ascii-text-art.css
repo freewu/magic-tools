@@ -1,0 +1,17 @@
+/* ASCII 文字: 字体选择弹窗 */
+
+.figlet-font-item {
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.figlet-font-item:hover {
+  border-color: #1677ff !important;
+}
+
+.figlet-font-item-active:hover {
+  border-color: #1677ff !important;
+}
+
+.figlet-font-preview {
+  scrollbar-width: thin;
+}

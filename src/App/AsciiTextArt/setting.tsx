@@ -1,6 +1,7 @@
-import { Divider, Form, Input, Select } from 'antd';
+import { Divider, Form, Input } from 'antd';
 import { useState } from 'react';
 import { FONT_NAMES, getDefaultFont, getDefaultText, setDefaultFont, setDefaultText, DEFAULT_TEXT } from './lib';
+import FontPicker from './FontPicker';
 import { useLocale } from "../../hook/locale-context";
 import { row as _r, rowT } from "../Setting/rows-lang";
 
@@ -30,13 +31,10 @@ export const AsciiTextArtSetting: React.FC = () => {
         label={ st('默认字体') }
         extra={ rowT(locale, '共收录 ${FONT_NAMES.length} 款 figlet 字体', { 'FONT_NAMES.length': FONT_NAMES.length }) }
       >
-        <Select
-          style={{ width: 320 }}
+        <FontPicker
+          width={ 320 }
           value={font}
-          showSearch
           onChange={(v) => { setFont(v); setDefaultFont(v); }}
-          filterOption={(kw, opt) => String(opt?.label ?? '').toLowerCase().includes(kw.toLowerCase())}
-          options={FONT_NAMES.map((v) => ({ value: v, label: v }))}
         />
       </Form.Item>
     </>
