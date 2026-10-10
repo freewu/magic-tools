@@ -10,7 +10,8 @@ afterEach(() => cleanup());
 const norm = (s: string) => s.replace(/\s+/g, '');
 const buttons = (c: HTMLElement) => Array.from(c.querySelectorAll('button')).map((b) => norm(b.textContent ?? ''));
 const inputValues = (c: HTMLElement) => Array.from(c.querySelectorAll('input')).map((i) => (i as HTMLInputElement).value);
-const presetBtn = (c: HTMLElement, text: string) => Array.from(c.querySelectorAll('button')).find((b) => norm(b.textContent ?? '').includes(text));
+const presetTags = (c: HTMLElement) => Array.from(c.querySelectorAll('.ant-tag')) as HTMLElement[];
+const presetTag = (c: HTMLElement, text: string) => presetTags(c).find((el) => norm(el.textContent ?? '').includes(text));
 
 describe('SpeedConvert 页面', () => {
   test('渲染参数控件与操作区 (按钮 + 输入/选择)', () => {
@@ -32,9 +33,22 @@ describe('SpeedConvert 页面', () => {
 });
 
 describe('SpeedConvert 常用速度预设', () => {
+  test('常用预设为彩色标签, 且位于输入框上方', () => {
+    const { container } = render(<SpeedConvert />);
+    const tags = presetTags(container);
+    expect(tags.length).toBeGreaterThan(0);
+    // antd Tag 的彩色底纹走 inline style
+    expect(tags[0].getAttribute('style') ?? '').toMatch(/background/);
+    // 4 色循环: 前 4 个标签底色互不相同
+    expect(new Set(tags.slice(0, 4).map((el) => el.getAttribute('style'))).size).toBe(4);
+    // 位于输入框上方
+    const area = container.querySelector('textarea') as HTMLElement;
+    expect(area.compareDocumentPosition(tags[0]) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
+  });
+
   test('点击「第一宇宙速度 7.9 km/s」自动换算', () => {
     const { container } = render(<SpeedConvert />);
-    fireEvent.click(presetBtn(container, '第一宇宙速度7.9km/s') as HTMLButtonElement);
+    fireEvent.click(presetTag(container, '第一宇宙速度7.9km/s') as HTMLElement);
     expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('7.9');
     const values = inputValues(container);
     expect(values).toContain('28440');  // 千米/时
@@ -43,7 +57,7 @@ describe('SpeedConvert 常用速度预设', () => {
 
   test('点击「重力加速度 9.80665 m/s」自动换算', () => {
     const { container } = render(<SpeedConvert />);
-    fireEvent.click(presetBtn(container, '重力加速度9.80665m/s') as HTMLButtonElement);
+    fireEvent.click(presetTag(container, '重力加速度9.80665m/s') as HTMLElement);
     expect((container.querySelector('textarea') as HTMLTextAreaElement).value).toBe('9.80665');
     const values = inputValues(container);
     expect(values).toContain('9.80665');   // 米/秒自身

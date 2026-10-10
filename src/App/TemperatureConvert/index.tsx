@@ -1,4 +1,4 @@
-import { Form, Input, Divider, message, Space, Radio, Button } from "antd";
+import { Form, Input, Divider, message, Space, Radio, Button, Tag } from "antd";
 import { useState } from "react";
 const { TextArea } = Input;
 import { copyTextToClipboard, debounce } from "./../../lib";
@@ -11,6 +11,10 @@ import { InputStatus } from "antd/es/_util/statusUtils";
 import { useLocale } from "../../hook/locale-context";
 import { tr } from "../../i18n/lang";
 import tempLang from "./lang";
+
+// 常用预设的彩色标签底色 (与「Hash 值计算」一致, 4 色循环)
+const TAG_COLORS = [ '#ff5500', '#2db7f5', '#87d068', '#108ee9' ];
+const calcTagColor = (index :number) :string => TAG_COLORS[index % TAG_COLORS.length];
 
 const TemperatureConvert = () => {
   const { locale } = useLocale();
@@ -83,6 +87,18 @@ const TemperatureConvert = () => {
     <div>
       {contextHolder}
 
+      <Space size={[0, 8]} wrap style={ { marginBottom: 8 } }>
+        <span style={{ lineHeight: '24px' }}>{ t('preset', '常用温度：') }</span>
+        { presetList.map((p, index) => (
+          <Tag
+            key={ p.id }
+            color={ calcTagColor(index) }
+            style={ { cursor: 'pointer' } }
+            onClick={ () => applyPreset(p) }
+          >{ t('ps_' + p.id, p.label) }</Tag>
+        )) }
+      </Space>
+
       <Space>
         <Radio.Group
           optionType = "button" buttonStyle="solid"
@@ -95,13 +111,6 @@ const TemperatureConvert = () => {
           style={ {"backgroundColor" : "#dc3545","color": "#fff" }} 
         >{ t('clear', '清除') }</Button>
       </Space>
-
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
-        <span style={{ lineHeight: '24px' }}>{ t('preset', '常用温度：') }</span>
-        { presetList.map((p) => (
-          <Button key={ p.id } size="small" onClick={ () => applyPreset(p) }>{ t('ps_' + p.id, p.label) }</Button>
-        )) }
-      </div>
 
       <TextArea
         status= { status as InputStatus }
