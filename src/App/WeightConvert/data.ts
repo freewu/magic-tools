@@ -38,3 +38,19 @@ export const typeList = [
   { label: '厘', value: 'li', type:'cn', placeholder: '' },
   
 ];
+
+// 常用重量预设 (最上方的彩色标签, 点击后自动切到对应制式与单位并换算)
+export const presetList = [
+  { id: 'jin', label: '1 斤 500 克', value: '1', unit: 'jin' },
+  { id: 'liang', label: '1 两 50 克', value: '1', unit: 'liang' },
+  { id: 'kg', label: '1 千克 1000 克', value: '1', unit: 'kg' },
+  { id: 't', label: '1 吨 100 万克', value: '1', unit: 't' },
+  { id: 'lb', label: '1 磅 453.59237 克', value: '1', unit: 'lb' },
+  { id: 'oz', label: '1 盎司 28.3495 克', value: '1', unit: 'oz' },
+  { id: 'ct', label: '1 克拉 0.2 克', value: '1', unit: 'ct' },
+  { id: 'egg', label: '鸡蛋 50 克', value: '50', unit: 'g' },
+  { id: 'rice', label: '一袋大米 25 千克', value: '25', unit: 'kg' },
+  { id: 'adult', label: '成年人 65 千克', value: '65', unit: 'kg' },
+  { id: 'car', label: '家用轿车 1.5 吨', value: '1.5', unit: 't' },
+  { id: 'elephant', label: '大象 5 吨', value: '5', unit: 't' },
+];

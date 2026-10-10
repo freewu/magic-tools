@@ -88,7 +88,6 @@ const TemperatureConvert = () => {
       {contextHolder}
 
       <Space size={[0, 8]} wrap style={ { marginBottom: 8 } }>
-        <span style={{ lineHeight: '24px' }}>{ t('preset', '常用温度：') }</span>
         { presetList.map((p, index) => (
           <Tag
             key={ p.id }
