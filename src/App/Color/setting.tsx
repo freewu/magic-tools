@@ -3,6 +3,7 @@ import { getDefaultColorPad, setDefaultColorPad } from "./lib";
 import { getDefaultBatchSwitch, setDefaultBatchSwitch } from "./lib";
 import { getDefaultOpacity, setDefaultOpacity } from "./lib";
 import { getDefaultPickMax, setDefaultPickMax } from "./lib";
+import { getDefaultPinyin, setDefaultPinyin } from "./lib";
 import { colorDataList } from "./data";
 import { useState } from "react";
 import { useLocale } from "../../hook/locale-context";
@@ -18,6 +19,7 @@ export const ColorSetting = () => {
   const [ batchSwitch, setBatchSwitch ] = useState(getDefaultBatchSwitch()); // 默认是否开启批量取色
   const [ opacity, setOpacity ] = useState(getDefaultOpacity()); // 默认 opacity
   const [ pickMax, setPickMax ] = useState(getDefaultPickMax()); // 默认最大批量取色个数
+  const [ pinyin, setPinyin ] = useState(getDefaultPinyin()); // 中文名称是否显示拼音注音
 
   // 颜色板列表
   const getColorPadList = () => {
@@ -72,6 +74,12 @@ export const ColorSetting = () => {
           </div>
           { pickMax }
         </Space>
+      </Form.Item>
+      <Form.Item label={ st('中文名称显示拼音') }>
+        <Switch 
+          onChange={ (value: boolean) => { setPinyin(value); setDefaultPinyin(value); } }
+          checkedChildren={ st('开启') } unCheckedChildren={ st('关闭') } 
+          checked={ pinyin } />
       </Form.Item>
     </>
   );

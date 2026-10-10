@@ -2,7 +2,7 @@ import { Divider } from "antd";
 import { default as ColorCard } from "./color-card"
 import type { ColorPadProps } from "./interface"
 
-const ColorPad = ({ colorList, height, colorClickEvent } :ColorPadProps ) => {
+const ColorPad = ({ colorList, height, pinyin, colorClickEvent } :ColorPadProps ) => {
 
   return (
     <div className="color-pad" style={ { height: height} }>
@@ -15,7 +15,7 @@ const ColorPad = ({ colorList, height, colorClickEvent } :ColorPadProps ) => {
           );
         } else {
           return (
-            <ColorCard key={ item.code + index } color={ item.code } label={ item.label } colorClickEvent={ colorClickEvent } />
+            <ColorCard key={ item.code + index } color={ item.code } label={ item.label } pinyin={ pinyin } colorClickEvent={ colorClickEvent } />
           );
         }
       })

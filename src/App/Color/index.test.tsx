@@ -6,7 +6,7 @@ jest.mock('../../lib', () => ({
   ...jest.requireActual('../../lib'),
   copyTextToClipboard: jest.fn().mockResolvedValue(undefined),
 }));
-afterEach(() => cleanup());
+afterEach(() => { cleanup(); localStorage.clear(); });
 
 const norm = (s: string) => s.replace(/\s+/g, '');
 // 浏览器归一化后的颜色 (rgb(255, 0, 0) / rgba(255, 0, 0, 1) / #FF0000) 统一为 #RRGGBB
@@ -72,6 +72,48 @@ describe('Color 页面', () => {
       const cards = Array.from(container.querySelectorAll('.color-card'));
       expect(cards.some((card) => norm(card.textContent ?? '').includes('P01White'))).toBe(true);
     });
+  });
+
+  test('开启拼音后中文名称在汉字上方显示拼音 (ruby 注音)', async () => {
+    const { container } = render(<Color />);
+    const activePane = () => container.querySelector('.ant-tabs-tabpane-active');
+    const sw = container.querySelector('.color-pinyin-switch') as HTMLElement;
+    expect(sw).toBeTruthy();
+    // 默认关闭: 不渲染注音
+    expect(activePane()?.querySelector('.color-card ruby')).toBeNull();
+
+    fireEvent.click(sw);
+    await waitFor(() => {
+      expect(activePane()?.querySelectorAll('.color-card ruby').length ?? 0).toBeGreaterThan(0);
+    }, { timeout: 10000 });
+
+    // 粉红 => 每个汉字上方分别是 fěn / hóng
+    // 注: ruby 的 textContent 会把注音串在汉字后面, 故用「基字」定位该卡片
+    const baseText = (el: Element) => Array.from(el.querySelectorAll('ruby')).map((r) => norm(r.childNodes[0]?.textContent ?? '')).join('');
+    const card = Array.from(activePane()?.querySelectorAll('.color-card') ?? [])
+      .find((el) => baseText(el) === '粉红') as HTMLElement;
+    expect(card).toBeTruthy();
+    expect(card.className).toContain('color-card-pinyin');
+    const rubies = Array.from(card.querySelectorAll('ruby'));
+    expect(rubies.map((r) => norm(r.querySelector('rt')?.textContent ?? ''))).toEqual(['fěn', 'hóng']);
+    expect(rubies.map((r) => norm(r.childNodes[0]?.textContent ?? ''))).toEqual(['粉', '红']);
+    // 汉字上方的拼音是注音 rt, 基字仍是汉字, 色值仍在卡片上
+    expect(norm(card.textContent ?? '')).toContain('fěn');
+    expect(norm(card.textContent ?? '')).toContain('hóng');
+    expect(norm(card.textContent ?? '')).toContain('#ffb3a7');
+  });
+
+  test('纯英文名称的配色板开启拼音后不渲染注音', async () => {
+    const { container } = render(<Color />);
+    fireEvent.click(container.querySelector('.color-pinyin-switch') as HTMLElement);
+    const tab = Array.from(container.querySelectorAll('.ant-tabs-tab')).find((el) => norm(el.textContent ?? '').includes('Perler'));
+    fireEvent.click(tab as Element);
+    await waitFor(() => {
+      const pane = container.querySelector('.ant-tabs-tabpane-active');
+      expect(pane?.querySelectorAll('.color-card').length ?? 0).toBeGreaterThan(0);
+    });
+    expect(container.querySelector('.ant-tabs-tabpane-active .color-card ruby')).toBeNull();
+    expect(container.querySelector('.ant-tabs-tabpane-active .color-card-pinyin')).toBeNull();
   });
 
   test('输入内容后点击操作按钮不抛异常', () => {

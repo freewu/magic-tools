@@ -1,4 +1,4 @@
-import { calcComplementaryColor, calcReadableTextColor, getDefaultColorPad, setDefaultColorPad, getDefaultBatchSwitch, setDefaultBatchSwitch, getDefaultOpacity, setDefaultOpacity, getDefaultPickMax, setDefaultPickMax } from './lib';
+import { calcComplementaryColor, calcReadableTextColor, getDefaultColorPad, setDefaultColorPad, getDefaultBatchSwitch, setDefaultBatchSwitch, getDefaultOpacity, setDefaultOpacity, getDefaultPickMax, setDefaultPickMax, getDefaultPinyin, setDefaultPinyin } from './lib';
 
 describe('Color lib', () => {
   beforeEach(() => localStorage.clear());
@@ -40,5 +40,13 @@ describe('Color lib', () => {
     expect(getDefaultPickMax()).toBeGreaterThan(0);
     setDefaultPickMax(6);
     expect(getDefaultPickMax()).toBe(6);
+  });
+
+  test('中文名称拼音注音开关持久化 (默认关闭)', () => {
+    expect(getDefaultPinyin()).toBe(false);
+    setDefaultPinyin(true);
+    expect(getDefaultPinyin()).toBe(true);
+    setDefaultPinyin(false);
+    expect(getDefaultPinyin()).toBe(false);
   });
 });
