@@ -126,6 +126,11 @@ describe('MindMap 静态选项', () => {
     expect(Math.min(...SCALE_OPTIONS)).toBeGreaterThan(0);
   });
 
+  it('缩放以百分之二十五为步长从 100% 到 400% (与下拉文案一致)', () => {
+    expect(SCALE_OPTIONS).toEqual([ 1, 1.5, 2, 2.5, 3, 4 ]);
+    expect(SCALE_OPTIONS.map((n) => SCALE_LABELS[n])).toEqual([ '100%', '150%', '200%', '250%', '300%', '400%' ]);
+  });
+
   it('层级 / 缩放的下拉文案覆盖全部选项', () => {
     expect(Object.keys(DEPTH_LABELS)).toHaveLength(DEPTH_OPTIONS.length);
     expect(Object.keys(SCALE_LABELS)).toHaveLength(SCALE_OPTIONS.length);

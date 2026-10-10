@@ -8,8 +8,8 @@ const zh = `<h2>这个工具做什么</h2>
 <li><p>从「示例」下拉里选一个模板 (项目计划 / 学习路线 / 会议纪要 / 知识体系 / 需求拆解 / markmap 语法速查), 下拉框可直接输入关键字筛选</p></li>
 <li><p>在左侧「Markdown 大纲」里编辑, 右侧会自动刷新 (输入停顿约 250ms 后重排, 避免频繁重绘)</p></li>
 <li><p>用「<b>配色</b>」换一套颜色 (多色 / 蓝 / 绿 / 灰 / 暖色 / 冷色), 「<b>展开层级</b>」(全部 / 一层 / 两层 / 三层 / 四层) 控制默认展开几层, 「<b>字号</b>」调节点文字大小 (12 - 22 px)</p></li>
-<li><p>预览区可以<b>滚轮缩放、拖拽平移</b>; 点节点旁的圆点即可折叠或展开该分支; 点「适应窗口」把整棵树重新摆正; 点「<b>全屏</b>」让画布铺满整个屏幕 (按 <code>Esc</code> 或点「退出全屏」返回, 全屏后会自动重新适应窗口)</p></li>
-<li><p>「背景」(白色 / 深色 / 透明) 与「缩放」(100% ~ 400%, 即 x1 ~ x4) 作用于<b>位图导出与预览</b>; 之后点「导出图片」选一种格式 (SVG / PNG / WebP) 保存, 或用「复制 SVG / 复制大纲」直接粘贴到别处</p></li>
+<li><p>预览区可以<b>滚轮缩放、拖拽平移</b>; 点节点旁的圆点即可折叠或展开该分支; 点「适应窗口」把整棵树重新摆正; 点「<b>全屏</b>」让<b>整个页面</b>铺满屏幕 (工具栏 / 大纲 / 预览一起放大, 下方说明区自动隐藏; 按 <code>Esc</code> 或点「退出全屏」返回, 全屏后会自动重新适应窗口)</p></li>
+<li><p>「背景」(白色 / 深色 / 透明) 与「缩放」(100% / 150% / 200% / 250% / 300% / 400%) 作用于<b>位图导出与预览</b>; 之后点「导出图片」选一种格式 (SVG / PNG / WebP) 保存, 或用「复制 SVG / 复制大纲」直接粘贴到别处</p></li>
 <li><p>左上角的开关可单独收起左右两栏: 只看结果时收起大纲栏, 专注写大纲时收起预览栏 (两者不会同时收起, 其中一个已收起时另一个会置灰); 「<b>全屏</b>」就在这两个开关旁边</p></li>
 </ul>
 
@@ -37,7 +37,7 @@ const zh = `<h2>这个工具做什么</h2>
 <li><p>深色模式下预览使用浅色文字, 位图导出的背景默认跟随主题 (深色模式→深色底), 也可以在预览区手动切换</p></li>
 <li><p>预览区用 <b>foreignObject</b> 排版文字, 导出 SVG 在主流浏览器与设计工具里都能正常显示; 个别老旧工具 (如早期的 Office 版本) 可能不渲染 foreignObject, 这种情况请改用 PNG / WebP</p></li>
 <li><p>为保证离线可用, 本工具<b>不加载任何 CDN 资源</b>: 数学公式插件 (KaTeX) 被移除, <code>$公式$</code> 会按纯文本原样显示; 代码高亮使用内置的极简配色, 与 VS Code 主题不必完全一致</p></li>
-<li><p>导出的位图尺寸 = 内容包围盒 × 缩放倍率, 与预览窗口大小无关 (全屏只改预览视口, 不影响导出结果); 排版是纯本地计算, 同样的输入在任何环境下都得到同一张图</p></li>
+<li><p>导出的位图尺寸 = 内容包围盒 × 缩放倍率, 与预览窗口大小无关 (全屏只是显示方式, 不影响导出结果); 排版是纯本地计算, 同样的输入在任何环境下都得到同一张图</p></li>
 </ul>`;
 
 const tw = `<h2>這個工具做什麼</h2>
@@ -48,8 +48,8 @@ const tw = `<h2>這個工具做什麼</h2>
 <li><p>從「範例」下拉裡選一個模板 (專案計畫 / 學習路線 / 會議紀錄 / 知識體系 / 需求拆解 / markmap 語法速查), 下拉框可直接輸入關鍵字篩選</p></li>
 <li><p>在左側「Markdown 大綱」裡編輯, 右側會自動更新 (輸入停頓約 250ms 後重排, 避免頻繁重繪)</p></li>
 <li><p>用「<b>配色</b>」換一套顏色 (多色 / 藍 / 綠 / 灰 / 暖色 / 冷色), 「<b>展開層級</b>」(全部 / 一層 / 兩層 / 三層 / 四層) 控制預設展開幾層, 「<b>字號</b>」調整節點文字大小 (12 - 22 px)</p></li>
-<li><p>預覽區可以<b>滾輪縮放、拖曳平移</b>; 點節點旁的圓點即可折疊或展開該分支; 點「適應視窗」把整棵樹重新擺正; 點「<b>全螢幕</b>」讓畫布鋪滿整個螢幕 (按 <code>Esc</code> 或點「退出全螢幕」返回, 全螢幕後會自動重新適應視窗)</p></li>
-<li><p>「背景」(白色 / 深色 / 透明) 與「縮放」(100% ~ 400%, 即 x1 ~ x4) 作用於<b>點陣圖匯出與預覽</b>; 之後點「匯出圖片」選一種格式 (SVG / PNG / WebP) 儲存, 或用「複製 SVG / 複製大綱」直接貼到別處</p></li>
+<li><p>預覽區可以<b>滾輪縮放、拖曳平移</b>; 點節點旁的圓點即可折疊或展開該分支; 點「適應視窗」把整棵樹重新擺正; 點「<b>全螢幕</b>」讓<b>整個頁面</b>鋪滿螢幕 (工具列 / 大綱 / 預覽一起放大, 下方說明區自動隱藏; 按 <code>Esc</code> 或點「退出全螢幕」返回, 全螢幕後會自動重新適應視窗)</p></li>
+<li><p>「背景」(白色 / 深色 / 透明) 與「縮放」(100% / 150% / 200% / 250% / 300% / 400%) 作用於<b>點陣圖匯出與預覽</b>; 之後點「匯出圖片」選一種格式 (SVG / PNG / WebP) 儲存, 或用「複製 SVG / 複製大綱」直接貼到別處</p></li>
 <li><p>左上角的開關可單獨收起左右兩欄: 只看結果時收起大綱欄, 專心寫大綱時收起預覽欄 (兩者不會同時收起, 其中一個已收起時另一個會變灰); 「<b>全螢幕</b>」就在這兩個開關旁邊</p></li>
 </ul>
 
@@ -88,8 +88,8 @@ const en = `<h2>What this tool does</h2>
 <li><p>Pick a template from the “Sample” dropdown (project plan, learning path, meeting notes, knowledge map, requirement breakdown, markmap syntax reference) — you can type to filter</p></li>
 <li><p>Edit the outline on the left; the preview refreshes automatically (re-layout waits ~250&nbsp;ms after you stop typing)</p></li>
 <li><p>Use <b>Color</b> for the palette (multicolour / blue / green / gray / warm / cool), <b>Expand level</b> (all / 1 / 2 / 3 / 4 levels) for how many levels start expanded and <b>Font size</b> for the text size (12 – 22 px)</p></li>
-<li><p>The canvas supports <b>wheel zoom and drag panning</b>; click the circle next to a node to fold or unfold that branch; press “Fit” to re-centre the whole tree, or “<b>Fullscreen</b>” to blow the canvas up to the whole screen (leave it with <code>Esc</code> or “Exit fullscreen” — the map re-fits automatically)</p></li>
-<li><p><b>Background</b> (white / dark / transparent) and <b>Scale</b> (100% – 400%, i.e. x1 – x4) apply to the <b>preview and raster export</b>. Then use “Export image” to pick a format (SVG / PNG / WebP), or “Copy SVG / Copy outline” to paste elsewhere</p></li>
+<li><p>The canvas supports <b>wheel zoom and drag panning</b>; click the circle next to a node to fold or unfold that branch; press “Fit” to re-centre the whole tree, or “<b>Fullscreen</b>” to blow the <b>whole page</b> up to the full screen (toolbar, outline and preview together; the notes below are hidden) — leave it with <code>Esc</code> or “Exit fullscreen”, and the map re-fits automatically</p></li>
+<li><p><b>Background</b> (white / dark / transparent) and <b>Scale</b> (100% / 150% / 200% / 250% / 300% / 400%) apply to the <b>preview and raster export</b>. Then use “Export image” to pick a format (SVG / PNG / WebP), or “Copy SVG / Copy outline” to paste elsewhere</p></li>
 <li><p>The toggles in the top-left corner collapse the outline or the preview pane so you can focus on either side; they can never both be collapsed (whichever would hide everything is greyed out), and <b>Fullscreen</b> sits right next to them</p></li>
 </ul>
 
@@ -117,7 +117,7 @@ const en = `<h2>What this tool does</h2>
 <li><p>In dark mode the preview uses light text and raster exports default to the matching dark background; the toggle still lets you override it</p></li>
 <li><p>The preview lays text out with <b>foreignObject</b>, which the exported SVG renders in all mainstream browsers and design tools; a few legacy tools (older Office versions, for example) ignore it — export PNG / WebP there instead</p></li>
 <li><p>To stay fully offline this tool loads <b>no CDN assets</b>: the maths plugin (KaTeX) is removed, so <code>$formula$</code> stays plain text, and code highlighting uses a minimal built-in palette rather than a full highlight.js theme</p></li>
-<li><p>The raster size is content-bounds × scale, independent of the on-screen pane size (fullscreen only changes the preview viewport, never the export); layout is pure local computation, so identical input always yields the same image</p></li>
+<li><p>The raster size is content-bounds × scale, independent of the on-screen pane size (fullscreen only changes how it is displayed, never the export); layout is pure local computation, so identical input always yields the same image</p></li>
 </ul>`;
 
 const MindMapIntro: React.FC = () => {

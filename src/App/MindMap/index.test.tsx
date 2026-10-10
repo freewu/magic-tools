@@ -214,7 +214,7 @@ describe('MindMap 初始界面', () => {
     expect(await openSelectOptions(2)).toEqual([ '全部', '一层', '两层', '三层', '四层' ]);
     expect(await openSelectOptions(3)).toEqual([ '12', '14', '16', '18', '20', '22' ]);
     expect(await openSelectOptions(4)).toEqual([ '白色', '深色', '透明' ]);
-    expect(await openSelectOptions(5)).toEqual([ '100% (x1)', '200% (x2)', '300% (x3)', '400% (x4)' ]);
+    expect(await openSelectOptions(5)).toEqual([ '100%', '150%', '200%', '250%', '300%', '400%' ]);
   });
 
   test('输入区与预览区等高对齐, 输入框自动撑满卡片', async () => {
@@ -225,7 +225,14 @@ describe('MindMap 初始界面', () => {
     // 两张卡片都撑满同一行 (flex 拉伸), 输入卡正文用 flex 列把输入框拉到与预览同高
     expect(inputCard.style.display).toBe('flex');
     expect(inputCard.style.flexDirection).toBe('column');
-    expect(previewCard).not.toBeNull();
+    // 预览卡同样由「面板容器 -> 卡片 -> 卡身」三层 flex 撑满行高, 与输入卡等高
+    expect(previewCard.style.display).toBe('flex');
+    expect(previewCard.style.flexDirection).toBe('column');
+    expect(previewCard.style.flex).toBe('1 1 auto');
+    const paneBox = previewCard.parentElement as HTMLElement;
+    expect(paneBox.className).toContain('mindmap-pane');
+    expect(paneBox.style.display).toBe('flex');
+    expect(paneBox.style.flexDirection).toBe('column');
     const body = codeArea().parentElement as HTMLElement;
     expect(body.className).toContain('ant-card-body');
     expect(body.style.display).toBe('flex');
@@ -403,17 +410,39 @@ describe('MindMap 面板开关', () => {
 });
 
 describe('MindMap 全屏', () => {
-  test('全屏按钮切换画布全屏 (原生全屏不可用时的窗口内兜底)', async () => {
+  test('全屏时隐藏输入区也照样全屏, 两栏开关在全屏里仍旧可用', async () => {
+    const { container } = render(<MindMap />);
+    await waitRendered();
+    fireEvent.click(btn('隐藏输入'));
+    fireEvent.click(btn('全屏'));
+    const stage = stageOf(container);
+    expect(stage.className).toContain('mindmap-full');
+    // 全屏容器始终是整页外壳: 预览卡与工具条都还在里面
+    expect(stage).toContainElement(btn('隐藏预览'));
+    expect(pane().closest('.mindmap-stage')).toBe(stage);
+    expect(cardTitle('预览')).not.toBeNull();
+    expect(cardTitle('Markdown 大纲')).toBeNull();
+  });
+
+  test('全屏按钮让整个页面全屏 (原生全屏不可用时的窗口内兜底)', async () => {
     const { container } = render(<MindMap />);
     await waitRendered();
     const stage = stageOf(container);
     expect(stage.className).not.toContain('mindmap-full');
     // 普通模式: 画布固定高度
     expect(pane().style.height).toBe(`${PREVIEW_HEIGHT}px`);
+    expect(screen.getByText('思维导图说明')).toBeInTheDocument();
 
     fireEvent.click(btn('全屏'));
     expect(stage.className).toContain('mindmap-full');
     expect(btn('退出全屏')).toBeInTheDocument();
+    // 整个页面全屏: 工具栏 / 输入区 / 预览都在同一个全屏容器里 (不是只有预览铺满)
+    expect(stage).toContainElement(btn('退出全屏'));
+    expect(cardTitle('Markdown 大纲')).not.toBeNull();
+    expect(cardTitle('预览')).not.toBeNull();
+    expect(pane().closest('.mindmap-stage')).toBe(stage);
+    // 全屏时隐藏下方说明区, 把高度全让给画布
+    expect(screen.queryByText('思维导图说明')).toBeNull();
     // 全屏模式: 高度交给 flex 撑满, 由 CSS 类控制
     expect(pane().style.height).toBe('');
     expect((pane().querySelector('svg') as SVGElement).style.height).toBe('100%');
@@ -421,6 +450,7 @@ describe('MindMap 全屏', () => {
     fireEvent.click(btn('退出全屏'));
     expect(stage.className).not.toContain('mindmap-full');
     expect(btn('全屏')).toBeInTheDocument();
+    expect(screen.getByText('思维导图说明')).toBeInTheDocument();
     expect(pane().style.height).toBe(`${PREVIEW_HEIGHT}px`);
     expect((pane().querySelector('svg') as SVGElement).style.height).toBe(`${PREVIEW_HEIGHT}px`);
   });
@@ -545,13 +575,28 @@ describe('MindMap 导出', () => {
     render(<MindMap />);
     await waitRendered();
     await openSelect(5);
-    await clickOption('200% (x2)');
+    await clickOption('200%');
     await openSelect(4);
     await clickOption('透明');
     await exportAs('png');
 
     await waitFor(() => expect(savePngFile).toHaveBeenCalledTimes(1), WAIT);
     expect(ctxCalls).toEqual([{ op: 'drawImage', args: [ 0, 0, BOX_W * 2, BOX_H * 2 ] }]);
+  });
+
+  test('导出 PNG: 150% 非整数倍率同样生效', async () => {
+    render(<MindMap />);
+    await waitRendered();
+    await openSelect(5);
+    await clickOption('150%');
+    await exportAs('png');
+
+    await waitFor(() => expect(savePngFile).toHaveBeenCalledTimes(1), WAIT);
+    // 默认白底: 先铺底色再贴图, 尺寸都按 150% 取整
+    expect(ctxCalls).toEqual([
+      { op: 'fillRect', args: [ 0, 0, 408, 198 ] },
+      { op: 'drawImage', args: [ 0, 0, 408, 198 ] },
+    ]);
   });
 
   test('导出 WebP: 走字节写入并带扩展名过滤', async () => {

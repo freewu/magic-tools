@@ -378,14 +378,16 @@ export const BACKGROUND_OPTIONS: Array<{ value: RasterBackground; label: string;
 ];
 
 /** 位图导出倍率 (矢量导出不受影响) */
-export const SCALE_OPTIONS = [ 1, 2, 3, 4 ];
+export const SCALE_OPTIONS = [ 1, 1.5, 2, 2.5, 3, 4 ];
 
-/** 缩放下拉显示名: 百分比与倍率同时给出 (zh 原文, 走 u() 翻译) */
+/** 缩放下拉显示名 (zh 原文, 走 u() 翻译) */
 export const SCALE_LABELS: Record<number, string> = {
-  1: '100% (x1)',
-  2: '200% (x2)',
-  3: '300% (x3)',
-  4: '400% (x4)',
+  1: '100%',
+  1.5: '150%',
+  2: '200%',
+  2.5: '250%',
+  3: '300%',
+  4: '400%',
 };
 
 export const DEFAULT_SCALE = 1;

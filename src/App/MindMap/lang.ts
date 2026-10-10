@@ -46,7 +46,7 @@ const uilangRows: Record<string, [string, string]> = {
   '全屏': ['全螢幕', 'Fullscreen'],
   '退出全屏': ['退出全螢幕', 'Exit fullscreen'],
   '按 Esc 退出全屏': ['按 Esc 退出全螢幕', 'Press Esc to exit fullscreen'],
-  '全屏查看导图, 画布更大更好拖拽': ['全螢幕檢視心智圖, 畫布更大更好拖曳', 'View the map fullscreen — a bigger canvas is easier to pan'],
+  '整个页面全屏 (工具栏 / 大纲 / 预览一起放大), 画布更大更好拖拽': ['整個頁面全螢幕 (工具列 / 大綱 / 預覽一起放大), 畫布更大更好拖曳', 'Fullscreen the whole page (toolbar, outline and preview) — a bigger canvas is easier to pan'],
 
   // 视图参数
   '配色': ['配色', 'Color'],

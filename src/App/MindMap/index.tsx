@@ -65,16 +65,14 @@ const RENDER_DELAY = 250;
 /** 全屏切换后等布局稳定再重新 fit (原生全屏与窗口内全屏都受这一帧延迟影响) */
 const FIT_DELAY = 80;
 
-/** 全屏态样式: 未进入原生全屏时用 position: fixed 铺满窗口兜底 (内嵌 webview 可能拒绝原生全屏) */
+/** 全屏态样式: 未进入原生全屏时用 position: fixed 铺满窗口兜底 (内嵌 webview 可能拒绝原生全屏)。
+ *  全屏是**整个页面**全屏 (工具栏 / 大纲 / 预览一起铺满视口), 下方说明区在全屏时隐藏 */
 const STAGE_CSS = [
-  '.mindmap-stage { display: flex; flex-direction: column; }',
-  '.mindmap-stage > .ant-card { width: 100%; }',
-  '.mindmap-stage.mindmap-full { position: fixed; inset: 0; z-index: 1000; overflow: hidden; }',
-  '.mindmap-stage.mindmap-full > .ant-card { flex: 1 1 auto; min-height: 0; border-radius: 0; display: flex; flex-direction: column; }',
-  '.mindmap-stage.mindmap-full > .ant-card > .ant-card-head { flex: 0 0 auto; }',
-  '.mindmap-stage.mindmap-full > .ant-card > .ant-card-body { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }',
-  // 参数区 / 提示条保持自然高度, 只让画布吃掉剩余空间
-  '.mindmap-stage.mindmap-full > .ant-card > .ant-card-body > *:not(.mindmap-canvas) { flex: 0 0 auto; }',
+  '.mindmap-stage.mindmap-full { position: fixed; inset: 0; z-index: 1000; overflow: auto; padding: 12px; }',
+  // 卡片行吃掉工具栏与内边距之外的剩余高度 (两个区域都不会被隐藏)
+  '.mindmap-stage.mindmap-full .mindmap-row { flex: 1 1 auto; min-height: 0; }',
+  '.mindmap-stage.mindmap-full .mindmap-pane > .ant-card { border-radius: 0; }',
+  // 画布吃掉预览卡剩余高度, 其余 (标题 / 参数 / 提示条) 保持自然高度
   '.mindmap-stage.mindmap-full .mindmap-canvas { flex: 1 1 auto; min-height: 0; }',
 ].join('\n');
 
@@ -408,7 +406,19 @@ const MindMap: React.FC = () => {
   };
 
   return (
-    <Space direction="vertical" size={16} style={{ width: '100%' }}>
+    <div
+      ref={stageRef}
+      className={full ? 'mindmap-stage mindmap-full' : 'mindmap-stage'}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 16,
+        width: '100%',
+        // 窗口内全屏 (兜底) 时铺满视口, 底色跟随预览背景, 深色模式下不闪白
+        background: full ? bgColor ?? (isDark ? '#141414' : '#fff') : undefined,
+      }}
+    >
+      <style>{STAGE_CSS}</style>
       <Space size={8} wrap>
         <Button
           size="small"
@@ -423,7 +433,7 @@ const MindMap: React.FC = () => {
           onClick={() => setShowPreview(!showPreview)}
         >{t(showPreview ? '隐藏预览' : '显示预览')}</Button>
         {/* 全屏放在面板开关旁: 两个区域不会同时隐藏, 有预览就能全屏 */}
-        <Tooltip title={full ? t('按 Esc 退出全屏') : t('全屏查看导图, 画布更大更好拖拽')}>
+        <Tooltip title={full ? t('按 Esc 退出全屏') : t('整个页面全屏 (工具栏 / 大纲 / 预览一起放大), 画布更大更好拖拽')}>
           <Button
             size="small"
             disabled={!showPreview}
@@ -432,7 +442,7 @@ const MindMap: React.FC = () => {
           >{t(full ? '退出全屏' : '全屏')}</Button>
         </Tooltip>
       </Space>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+      <div className="mindmap-row" style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
         {showEditor && (
           <Card
             size="small"
@@ -476,19 +486,14 @@ const MindMap: React.FC = () => {
         )}
         {showPreview && (
           <div
-            ref={stageRef}
-            className={full ? 'mindmap-stage mindmap-full' : 'mindmap-stage'}
-            style={{
-              flex: '1 1 460px',
-              minWidth: 320,
-              // 窗口内全屏 (兜底) 时铺满视口, 底色跟随预览背景, 深色模式下不闪白
-              background: full ? bgColor ?? (isDark ? '#141414' : '#fff') : undefined,
-            }}
+            className="mindmap-pane"
+            style={{ flex: '1 1 460px', minWidth: 320, display: 'flex', flexDirection: 'column' }}
           >
-          <style>{STAGE_CSS}</style>
           <Card
             size="small"
             title={t('预览')}
+            style={{ flex: '1 1 auto', display: 'flex', flexDirection: 'column', minHeight: 0 }}
+            styles={{ body: { flex: '1 1 auto', minHeight: 0, display: 'flex', flexDirection: 'column' } }}
             extra={
               <Space size={8} wrap>
                 <Dropdown
@@ -516,7 +521,7 @@ const MindMap: React.FC = () => {
                 <Select
                   size="small"
                   value={scheme}
-                  style={{ width: 110 }}
+                  style={{ width: 80 }}
                   onChange={(v) => setScheme(v)}
                   options={colorOptions}
                 />
@@ -526,7 +531,7 @@ const MindMap: React.FC = () => {
                 <Select
                   size="small"
                   value={depth}
-                  style={{ width: 100 }}
+                  style={{ width: 80 }}
                   onChange={(v) => setDepth(v)}
                   options={depthOptions}
                 />
@@ -536,7 +541,7 @@ const MindMap: React.FC = () => {
                 <Select
                   size="small"
                   value={fontSize}
-                  style={{ width: 80 }}
+                  style={{ width: 66 }}
                   onChange={(v) => setFontSize(v)}
                   options={fontOptions}
                 />
@@ -546,7 +551,7 @@ const MindMap: React.FC = () => {
                 <Select
                   size="small"
                   value={bg}
-                  style={{ width: 90 }}
+                  style={{ width: 78 }}
                   onChange={(v) => { bgTouchedRef.current = true; setBg(v); }}
                   options={bgOptions}
                 />
@@ -556,7 +561,7 @@ const MindMap: React.FC = () => {
                 <Select
                   size="small"
                   value={scale}
-                  style={{ width: 120 }}
+                  style={{ width: 88 }}
                   onChange={(v) => setScale(v)}
                   options={scaleOptions}
                 />
@@ -605,9 +610,13 @@ const MindMap: React.FC = () => {
           </div>
         )}
       </div>
-      <Divider>{t(' 思维导图说明 ')}</Divider>
-      <MindMapIntro />
-    </Space>
+      {!full && (
+        <>
+          <Divider>{t(' 思维导图说明 ')}</Divider>
+          <MindMapIntro />
+        </>
+      )}
+    </div>
   );
 };
 
