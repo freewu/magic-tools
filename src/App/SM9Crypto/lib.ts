@@ -213,16 +213,20 @@ export const describeBytes = (n :number) :string => `${n} 字节`;
 
 export type Sm9Defaults = {
   encMaster :string;  // 加密主私钥 (DER HEX)
+  encPublic :string;  // 加密主公钥 (未压缩点 HEX, 65 字节)
   encUser :string;    // 加密用户私钥 (DER HEX)
   signMaster :string; // 签名主私钥 (DER HEX)
+  signPublic :string; // 签名主公钥 (未压缩点 HEX, 129 字节)
   signUser :string;   // 签名用户私钥 (DER HEX)
   id :string;         // 默认 ID
 };
 
 const ITEMS :Record<keyof Sm9Defaults, string> = {
   encMaster: 'sm9-crypto:default-enc-master-key',
+  encPublic: 'sm9-crypto:default-enc-public-key',
   encUser: 'sm9-crypto:default-enc-user-key',
   signMaster: 'sm9-crypto:default-sign-master-key',
+  signPublic: 'sm9-crypto:default-sign-public-key',
   signUser: 'sm9-crypto:default-sign-user-key',
   id: 'sm9-crypto:default-id',
 };
@@ -241,8 +245,10 @@ const writeItem = (k :string, v :string) :void => {
 /** 读取默认密钥/ID */
 export const getSm9Defaults = () :Sm9Defaults => ({
   encMaster: readItem(ITEMS.encMaster),
+  encPublic: readItem(ITEMS.encPublic),
   encUser: readItem(ITEMS.encUser),
   signMaster: readItem(ITEMS.signMaster),
+  signPublic: readItem(ITEMS.signPublic),
   signUser: readItem(ITEMS.signUser),
   id: readItem(ITEMS.id),
 });

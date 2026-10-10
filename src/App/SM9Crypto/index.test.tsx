@@ -218,18 +218,54 @@ describe('SM9Crypto 页面', () => {
     expect(await screen.findByText(/请先填写签名值/)).toBeTruthy();
   });
 
+  it('加解密页的用户 ID 只读, 与「密钥生成」页共用 (改 ID 需回密钥生成页)', async () => {
+    renderPage();
+    fireEvent.change(screen.getByPlaceholderText(/例如 bluefrog/), { target: { value: 'alice@example.com' } });
+    fireEvent.click(screen.getByRole('tab', { name: '加解密' }));
+    expect((await screen.findAllByDisplayValue('alice@example.com')).length).toBeGreaterThan(0);
+    const readonlyInputs = (screen.getAllByDisplayValue('alice@example.com') as HTMLInputElement[]).filter((el) => el.readOnly);
+    expect(readonlyInputs).toHaveLength(1);                       // 加解密页的 ID 框只读
+    expect(screen.getByText(/此处 ID 只读/)).toBeTruthy();
+
+    // 密钥生成完毕的密钥在本页直接可用
+    expect(screen.getByText(/密钥生成完毕的密钥在本页直接可用/)).toBeTruthy();
+
+    // 改 ID 的入口: 跳回「密钥生成」页
+    fireEvent.click(screen.getByRole('button', { name: /去「密钥生成」页修改 ID/ }));
+    const keygenId = screen.getByPlaceholderText(/例如 bluefrog/) as HTMLInputElement;
+    expect(keygenId.readOnly).toBe(false);
+    expect(keygenId.value).toBe('alice@example.com');
+  });
+
+  it('默认密钥里的主公钥 / 用户私钥打开时自动带出, 可直接加密', async () => {
+    localStorage.setItem('sm9-crypto:default-enc-public-key', mockMpk);
+    localStorage.setItem('sm9-crypto:default-enc-user-key', mockUsk);
+    renderPage();
+    fireEvent.click(screen.getByRole('tab', { name: '加解密' }));
+    expect((await screen.findAllByDisplayValue(mockMpk)).length).toBeGreaterThan(0);
+    fireEvent.change(screen.getByPlaceholderText(/输入需要加密的明文/), { target: { value: 'SM9 测试' } });
+    fireEvent.click(screen.getByRole('button', { name: /加密$/ }));
+    expect(await screen.findByDisplayValue(mockCipher)).toBeTruthy();
+    expect(gmssl.encryptWithPublicKey).toHaveBeenCalledTimes(1);
+  });
+
   it('保存为默认密钥 / 清空默认密钥 写入与清除 localStorage', async () => {
     renderPage();
     fireEvent.click(screen.getAllByRole('button', { name: /生成主密钥对/ })[0]);
     await screen.findByDisplayValue(mockMsk);
+    fireEvent.click(screen.getAllByRole('button', { name: /导出主公钥/ })[0]);
+    await screen.findByDisplayValue(mockMpk);
     fireEvent.click(screen.getByRole('button', { name: /保存为默认密钥/ }));
     expect(localStorage.getItem('sm9-crypto:default-enc-master-key')).toBe(mockMsk);
+    expect(localStorage.getItem('sm9-crypto:default-enc-public-key')).toBe(mockMpk);
     expect(localStorage.getItem('sm9-crypto:default-id')).toBe('bluefrog');
 
     fireEvent.click(screen.getByRole('button', { name: /清空默认密钥/ }));
     expect(localStorage.getItem('sm9-crypto:default-enc-master-key')).toBeNull();
+    expect(localStorage.getItem('sm9-crypto:default-enc-public-key')).toBeNull();
     expect(localStorage.getItem('sm9-crypto:default-id')).toBeNull();
     expect(screen.queryByDisplayValue(mockMsk)).toBeNull(); // 界面密钥也被清空
+    expect(screen.queryByDisplayValue(mockMpk)).toBeNull();
   });
 
   it('双击密钥框复制到粘贴板', async () => {

@@ -150,7 +150,7 @@ describe('SM9Crypto lib - 默认密钥', () => {
   beforeEach(() => localStorage.clear());
 
   it('保存 / 读取 / 清空', () => {
-    expect(getSm9Defaults()).toEqual({ encMaster: '', encUser: '', signMaster: '', signUser: '', id: '' });
+    expect(getSm9Defaults()).toEqual({ encMaster: '', encPublic: '', encUser: '', signMaster: '', signPublic: '', signUser: '', id: '' });
     setSm9Default('encMaster', ` ${MSK_ENC} `);
     setSm9Default('encUser', USK_ENC);
     setSm9Default('signMaster', MSK_SIGN);
@@ -164,8 +164,22 @@ describe('SM9Crypto lib - 默认密钥', () => {
     expect(d.id).toBe('alice@example.com');
     expect(localStorage.getItem(SM9_DEFAULT_ITEMS.encMaster)).toBe(MSK_ENC);
     clearSm9Defaults();
-    expect(getSm9Defaults()).toEqual({ encMaster: '', encUser: '', signMaster: '', signUser: '', id: '' });
+    expect(getSm9Defaults()).toEqual({ encMaster: '', encPublic: '', encUser: '', signMaster: '', signPublic: '', signUser: '', id: '' });
     expect(localStorage.getItem(SM9_DEFAULT_ITEMS.encMaster)).toBeNull();
+  });
+
+  it('主公钥独立存取 (用于打开页面时带出密钥生成结果)', () => {
+    expect(SM9_DEFAULT_ITEMS.encPublic).toBe('sm9-crypto:default-enc-public-key');
+    expect(SM9_DEFAULT_ITEMS.signPublic).toBe('sm9-crypto:default-sign-public-key');
+    setSm9Default('encPublic', ` ${MPK_ENC} `);
+    setSm9Default('signPublic', MPK_SIGN);
+    expect(getSm9Defaults().encPublic).toBe(MPK_ENC);   // 自动 trim
+    expect(getSm9Defaults().signPublic).toBe(MPK_SIGN);
+    // 与私钥互不影响
+    expect(getSm9Defaults().encMaster).toBe('');
+    setSm9Default('encPublic', '');                 // 空串 = 清除
+    expect(getSm9Defaults().encPublic).toBe('');
+    expect(getSm9Defaults().signPublic).toBe(MPK_SIGN);
   });
 
   it('传空串等于清除该项', () => {

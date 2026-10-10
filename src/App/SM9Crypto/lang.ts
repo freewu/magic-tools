@@ -70,6 +70,7 @@ const cryptolangRows: Record<string, [string, string]> = {
   '保存为默认密钥': ['儲存為預設金鑰', 'Save as default keys'],
   '清空默认密钥': ['清空預設金鑰', 'Clear default keys'],
   '默认密钥只保存在浏览器本地 (localStorage), 不会上传; 三个标签页共享同一组密钥, 解密/签名用的用户私钥必须是同一 ID 提取的。': ['預設金鑰只儲存在瀏覽器本機 (localStorage), 不會上傳; 三個頁籤共用同一組金鑰, 解密/簽章用的使用者私鑰必須由同一 ID 提取。', 'Default keys are stored only in your browser (localStorage) and are never uploaded. All three tabs share one key set, and the user private key used for decryption/signing must have been extracted from the same ID.'],
+  '点「保存为默认密钥」后, 主密钥 / 主公钥 / 用户私钥与 ID 下次打开自动带出 (也可在「设置 → SM9 加解密」里配置)。': ['點「儲存為預設金鑰」後, 主金鑰 / 主公鑰 / 使用者私鑰與 ID 下次開啟自動帶出 (也可在「設定 → SM9 加解密」裡設定)。', 'After clicking "Save as default keys", the master keys / master public keys / user private keys and the ID are restored automatically next time (they can also be configured in Settings → SM9 Encrypt / Decrypt).'],
   '{label}主密钥 (SM9-{alg})': ['{label}主金鑰 (SM9-{alg})', '{label} master key (SM9-{alg})'],
   ' 用于加密 / 解密': [' 用於加密 / 解密', ' for encryption / decryption'],
   ' 用于签名 / 验签': [' 用於簽章 / 驗章', ' for signing / verification'],
@@ -100,6 +101,9 @@ const cryptolangRows: Record<string, [string, string]> = {
   // ---- 加解密页 (加密 / 解密 合并) ----
   '加密只需接收方的主公钥与 ID; 解密需要用户私钥与加密时相同的 ID (用户私钥可在「密钥生成」页用主私钥 + ID 提取)。': ['加密只需接收方的主公鑰與 ID; 解密需要使用者私鑰與加密時相同的 ID (使用者私鑰可在「金鑰產生」頁用主私鑰 + ID 提取)。', 'Encryption needs only the recipient master public key and ID; decryption needs a user private key and the same ID used for encryption (extract one on the Key generation tab with the master private key + ID).'],
   '加密只需接收方的主公钥与 ID; 主公钥留空时使用上方「加密主私钥」加密 (效果相同)。': ['加密只需接收方的主公鑰與 ID; 主公鑰留空時使用上方「加密主私鑰」加密 (效果相同)。', 'Encryption needs only the recipient master public key and ID; when the master public key is empty, the encryption master private key above is used instead (same result).'],
+  '密钥生成完毕的密钥在本页直接可用; ID 与「密钥生成」页共用。': ['金鑰產生完成的結果在本頁直接可用; ID 與「金鑰產生」頁共用。', 'Keys generated on the Key generation tab are immediately usable here; the ID is shared with that tab.'],
+  '去「密钥生成」页修改 ID': ['去「金鑰產生」頁修改 ID', 'Change the ID on the Key generation tab'],
+  '此处 ID 只读, 与「密钥生成」页共用: 解密用的用户私钥必须由该 ID 提取 (需改 ID 请到「密钥生成」页)。': ['此處 ID 唯讀, 與「金鑰產生」頁共用: 解密用的使用者私鑰必須由該 ID 提取 (需改 ID 請到「金鑰產生」頁)。', 'The ID is read-only here and shared with the Key generation tab: the user private key used for decryption must be extracted from this ID (go to the Key generation tab to change it).'],
   '加密主公钥 (65 字节 HEX)': ['加密主公鑰 (65 位元組 HEX)', 'Encryption master public key (65 bytes HEX)'],
   '04 开头 130 位 HEX; 留空则用「加密主私钥」加密': ['04 開頭 130 位 HEX; 留空則用「加密主私鑰」加密', '130 HEX digits starting with 04; leave empty to encrypt with the encryption master private key'],
   '明文 (UTF-8, 单组上限 255 字节)': ['明文 (UTF-8, 單組上限 255 位元組)', 'Plaintext (UTF-8, max 255 bytes per group)'],
@@ -155,6 +159,18 @@ const cryptolangRows: Record<string, [string, string]> = {
   '默认签名用户私钥 (DER HEX)': ['預設簽章使用者私鑰 (DER HEX)', 'Default signature user private key (DER HEX)'],
   'SM9 页「签名验签」使用; 留空表示不配置': ['SM9 頁「簽章驗章」使用; 留空表示不設定', 'Used by the Sign / Verify tab of the SM9 page; leave empty to skip'],
   '默认密钥保存在浏览器本地, 打开 SM9 页会自动带出': ['預設金鑰儲存在瀏覽器本機, 開啟 SM9 頁會自動帶出', 'Default keys are stored in your browser and loaded automatically when the SM9 page opens'],
+  // ---- 设置页: 按用户 ID 生成公钥 / 私钥 ----
+  '按此 ID 生成加密公钥 / 私钥': ['依此 ID 產生加密公鑰 / 私鑰', 'Generate encryption public / private key with this ID'],
+  '按此 ID 生成签名公钥 / 私钥': ['依此 ID 產生簽章公鑰 / 私鑰', 'Generate signature public / private key with this ID'],
+  '用下方对应的「主私钥」+ 该 ID 生成主公钥与用户私钥, 结果自动保存为本页默认值': ['用下方對應的「主私鑰」+ 該 ID 產生主公鑰與使用者私鑰, 結果自動儲存為本頁預設值', 'Generates the master public key and user private key from the matching master private key below plus this ID; the result is saved as the defaults on this page'],
+  '请先填写「默认加密主私钥」': ['請先填寫「預設加密主私鑰」', 'Please fill in the "Default SM9-Enc master private key" first'],
+  '请先填写「默认签名主私钥」': ['請先填寫「預設簽章主私鑰」', 'Please fill in the "Default SM9-Sign master private key" first'],
+  '默认加密主公钥 (HEX)': ['預設加密主公鑰 (HEX)', 'Default SM9-Enc master public key (HEX)'],
+  '按用户 ID 生成后自动填入 (04 开头 65 字节); 留空表示不配置': ['依使用者 ID 產生後自動填入 (04 開頭 65 位元組); 留空表示不設定', 'Filled in automatically after generating with a user ID (65 bytes, starting with 04); leave empty to skip'],
+  '默认签名主公钥 (HEX)': ['預設簽章主公鑰 (HEX)', 'Default SM9-Sign master public key (HEX)'],
+  '按用户 ID 生成后自动填入 (04 开头 129 字节); 留空表示不配置': ['依使用者 ID 產生後自動填入 (04 開頭 129 位元組); 留空表示不設定', 'Filled in automatically after generating with a user ID (129 bytes, starting with 04); leave empty to skip'],
+  '已按用户 ID「${id}」生成${label}主公钥与用户私钥': ['已依使用者 ID「{id}」產生{label}主公鑰與使用者私鑰', 'Generated the {label} master public key and user private key for ID "{id}"'],
+  '生成失败: ${m}': ['產生失敗: {m}', 'Generation failed: {m}'],
 };
 
 // 取词: 无命中回退 zh 原文 (与共享 crypto-lang 行为一致)

@@ -82,8 +82,8 @@ const SM9Crypto = () => {
   const [ keys, setKeys ] = useState<KeySet>(() => {
     const d = getSm9Defaults();
     return {
-      encMaster: d.encMaster, encPublic: '', encUser: d.encUser,
-      signMaster: d.signMaster, signPublic: '', signUser: d.signUser,
+      encMaster: d.encMaster, encPublic: d.encPublic, encUser: d.encUser,
+      signMaster: d.signMaster, signPublic: d.signPublic, signUser: d.signUser,
     };
   });
   const [ id, setId ] = useState<string>(() => getSm9Defaults().id || DEFAULT_ID);
@@ -157,8 +157,10 @@ const SM9Crypto = () => {
 
   const saveDefaults = () => {
     setSm9Default('encMaster', keys.encMaster);
+    setSm9Default('encPublic', keys.encPublic);
     setSm9Default('encUser', keys.encUser);
     setSm9Default('signMaster', keys.signMaster);
+    setSm9Default('signPublic', keys.signPublic);
     setSm9Default('signUser', keys.signUser);
     setSm9Default('id', id);
     notice.success(t('已保存为默认密钥与 ID (下次打开自动填充)'));
@@ -279,7 +281,9 @@ const SM9Crypto = () => {
         <Button size="small" danger onClick={ clearDefaults }>{t('清空默认密钥')}</Button>
       </Space>
       <div style={ { color: "#999", fontSize: 12, marginBottom: 8 } }>
-        {t('默认密钥只保存在浏览器本地 (localStorage), 不会上传; 四个标签页共享同一组密钥, 解密/签名用的用户私钥必须是同一 ID 提取的。')}
+        {t('默认密钥只保存在浏览器本地 (localStorage), 不会上传; 三个标签页共享同一组密钥, 解密/签名用的用户私钥必须是同一 ID 提取的。')}
+        <br />
+        {t('点「保存为默认密钥」后, 主密钥 / 主公钥 / 用户私钥与 ID 下次打开自动带出 (也可在「设置 → SM9 加解密」里配置)。')}
       </div>
       <Divider style={ { margin: "8px 0" } } />
       {keyBlock('enc')}
@@ -343,6 +347,8 @@ const SM9Crypto = () => {
     <div>
       <div style={ { color: "#999", fontSize: 12, margin: "8px 0" } }>
         {t('加密只需接收方的主公钥与 ID; 解密需要用户私钥与加密时相同的 ID (用户私钥可在「密钥生成」页用主私钥 + ID 提取)。')}
+        <br />
+        {t('密钥生成完毕的密钥在本页直接可用; ID 与「密钥生成」页共用。')}
       </div>
       <div style={ { fontWeight: 600 } }>{t('加密主公钥 (65 字节 HEX)')}</div>
       <HexArea
@@ -364,9 +370,14 @@ const SM9Crypto = () => {
       <div style={ { color: "#999", fontSize: 12 } }>{kindHint(keys.encUser)}</div>
       <Space wrap style={ { margin: "4px 0" } }>
         <span style={ { fontWeight: 600 } }>{t('用户 ID')}</span>
-        <Input style={ { width: 320 } } value={ id } onChange={ (e) => setId(e.target.value) } />
+        {/* ID 与「密钥生成」页共用 (用户私钥按它提取), 这里只读以避免改出不一致的 ID */}
+        <Input style={ { width: 320 } } value={ id } readOnly />
         <span style={ { color: "#999" } }>{tt('当前 ID 长度: {n} 字节', { n: utf8Length(id) })}</span>
+        <Button size="small" type="link" style={ { padding: 0 } } onClick={ () => setActiveTab('keygen') }>{t('去「密钥生成」页修改 ID')}</Button>
       </Space>
+      <div style={ { color: "#999", fontSize: 12 } }>
+        {t('此处 ID 只读, 与「密钥生成」页共用: 解密用的用户私钥必须由该 ID 提取 (需改 ID 请到「密钥生成」页)。')}
+      </div>
       <div style={ { fontWeight: 600 } }>{t('明文 (UTF-8, 单组上限 255 字节)')}</div>
       <HexArea
         value={ plain }
