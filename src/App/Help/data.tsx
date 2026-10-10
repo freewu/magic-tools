@@ -80,6 +80,39 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-10-10 V2.22.1 Release", "2026-10-10 V2.22.1 Release", "2026-10-10 V2.22.1 Release"),
+    items: trio(
+      [
+        "七个单位换算工具 (字节 / 温度 / 距离 / 速度 / 容量 / 面积 / 重量) 改用 bignumber.js 精确计算, 消除浮点误差; 温度 / 距离 / 速度 / 容量 / 面积 / 重量换算页最上方新增「常用预设」彩色标签 (参考 Hash 值计算), 一键套用常见值 (体温 / 马拉松 42.195km / 第一宇宙速度 7.9km/s / 光速 / 1 标准大气压等), 标签独占一行",
+        "思维导图全面升级: 支持整页全屏 (工具栏 / 输入 / 预览一起铺满, 全屏时隐藏说明区), 参数改为下拉 (配色 / 展开层级 / 字号 / 背景 / 缩放), 三个导出按钮合并为「导出图片」下拉选格式 (SVG / PNG / WebP), 输入区与预览区等高对齐, 统计信息 (行 / 字符 / 标题与节点 / 层数) 移到输入框上方, 缩放 (100%-400%) 真正放大预览画面",
+        "即时渲染 Markdown 支持全屏 (原生全屏 + 窗口内兜底, 编辑器自动填满屏幕); 15 个加解密工具 (Rabbit / AES / SM4 / DES / Blowfish / ZUC / RC2 / RC4 / RC5 / RC6 / ChaCha20 / 3DES / TEA / XTEA / XXTEA) 按钮之间增加间距",
+        "SM9 加解密: 「加密」「解密」合并为「加解密」单页 (上下双框 + 加密 / 解密 / 清除), 加解密页用户 ID 只读 (与密钥生成共用), 设置页新增按用户 ID 生成主公钥与用户私钥, 默认用户 ID 改为 bluefrog",
+        "Cisco Type 7 更名为「Cisco Type 7 加解密」并改为上下双框 + 加密 / 解密 / 清除; IP 转换展示效果对齐 Hash 值计算 (彩色示例标签 + 只读结果列表点击复制) 且值为空时结果区不再隐藏; 屏幕录制「打开 Web 版」直达本工具网址",
+        "ASCII 文字: 字体选择改为弹窗, 289 款 figlet 字体按 26 个字母 A-Z 预览后点击选用 (搜索框固定 + 全部 / 数字 / A-Z 首字母快捷查询, 没有字体的字母不显示), 工具页与设置页共用; 输入含非 ASCII 字符时输入框红框并逐字提示",
+        "工程: 新增 bignumber.js 依赖 (lockfile 按 npm 9 重新生成以兼容 Cloudflare Pages); 全量测试 3163 → 3264 条; 工具总数保持 145",
+      ],
+      [
+        "七個單位換算工具 (位元組 / 溫度 / 距離 / 速度 / 容量 / 面積 / 重量) 改用 bignumber.js 精確計算, 消除浮點誤差; 溫度 / 距離 / 速度 / 容量 / 面積 / 重量換算頁最上方新增「常用預設」彩色標籤 (參考 Hash 值計算), 一鍵套用常見值 (體溫 / 馬拉松 42.195km / 第一宇宙速度 7.9km/s / 光速 / 1 標準大氣壓等), 標籤獨占一行",
+        "思維導圖全面升級: 支援整頁全螢幕 (工具列 / 輸入 / 預覽一起鋪滿, 全螢幕時隱藏說明區), 參數改為下拉 (配色 / 展開層級 / 字號 / 背景 / 縮放), 三個匯出按鈕合併為「匯出圖片」下拉選格式 (SVG / PNG / WebP), 輸入區與預覽區等高對齊, 統計資訊 (行 / 字元 / 標題與節點 / 層數) 移到輸入框上方, 縮放 (100%-400%) 真正放大預覽畫面",
+        "即時渲染 Markdown 支援全螢幕 (原生全螢幕 + 視窗內後備, 編輯器自動填滿螢幕); 15 個加解密工具 (Rabbit / AES / SM4 / DES / Blowfish / ZUC / RC2 / RC4 / RC5 / RC6 / ChaCha20 / 3DES / TEA / XTEA / XXTEA) 按鈕之間增加間距",
+        "SM9 加解密: 「加密」「解密」合併為「加解密」單頁 (上下雙框 + 加密 / 解密 / 清除), 加解密頁使用者 ID 唯讀 (與金鑰產生共用), 設定頁新增依使用者 ID 產生主公鑰與使用者私鑰, 預設使用者 ID 改為 bluefrog",
+        "Cisco Type 7 更名為「Cisco Type 7 加解密」並改為上下雙框 + 加密 / 解密 / 清除; IP 轉換顯示效果對齊 Hash 值計算 (彩色範例標籤 + 唯讀結果清單點擊複製) 且值為空時結果區不再隱藏; 螢幕錄影「開啟 Web 版」直達本工具網址",
+        "ASCII 文字: 字型選擇改為彈窗, 289 款 figlet 字型依 26 個字母 A-Z 預覽後點擊選用 (搜尋框固定 + 全部 / 數字 / A-Z 首字母快速查詢, 沒有字型的字母不顯示), 工具頁與設定頁共用; 輸入含非 ASCII 字元時輸入框紅框並逐字提示",
+        "工程: 新增 bignumber.js 依賴 (lockfile 依 npm 9 重新產生以相容 Cloudflare Pages); 全量測試 3163 → 3264 筆; 工具總數保持 145",
+      ],
+      [
+        "All seven unit converters (byte / temperature / distance / speed / volume / area / weight) now use bignumber.js for exact maths, removing floating-point drift; the temperature / distance / speed / volume / area / weight pages gained a row of coloured “common preset” tags at the top (styled after the Hash tool) that apply typical values in one click (body temperature, a 42.195 km marathon, the 7.9 km/s first cosmic velocity, the speed of light, 1 standard atmosphere, …), on a line of their own",
+        "Mind Map overhaul: whole-page fullscreen (toolbar, editor and preview all fill the screen, the intro is hidden while fullscreen), dropdown controls (colour scheme / depth / font size / background / zoom), the three export buttons merged into a single “Export image” button with an SVG / PNG / WebP menu, an equal-height editor and preview, the stats line (lines / characters / topics · nodes · depth) moved above the input, and zoom (100%–400%) now really zooms the preview",
+        "Vditor Markdown gained fullscreen (native fullscreen with an in-window fallback; the editor fills the screen); the 15 crypto tools (Rabbit / AES / SM4 / DES / Blowfish / ZUC / RC2 / RC4 / RC5 / RC6 / ChaCha20 / 3DES / TEA / XTEA / XXTEA) now space their buttons apart",
+        "SM9: the encrypt and decrypt tabs merged into one “Encrypt / Decrypt” tab (two stacked boxes plus encrypt / decrypt / clear), the user ID on that tab is read-only (shared with key generation), and Settings → SM9 can now derive the master public key and the user private key from a user ID; the default user ID is bluefrog",
+        "“Cisco Type 7” renamed to “Cisco Type 7 Encrypt / Decrypt” with the same two-box encrypt / decrypt / clear layout; IP Convert now matches the Hash tool (coloured sample tags plus a read-only result list with click-to-copy) and keeps its result area visible when the value is empty; the Screen Recorder “Open web version” button deep-links to this tool",
+        "ASCII Text: font selection is now a popup that previews all 289 figlet fonts with the 26 letters A–Z and picks on click (fixed search box plus All / Numeric / A–Z quick filters by initial letter, letters without fonts are hidden), shared by the tool and the settings page; non-ASCII input now shows a red border with a per-character hint",
+        "Engineering: added the bignumber.js dependency (lockfile regenerated with npm 9 for Cloudflare Pages compatibility); total tests 3163 → 3264; tool count stays at 145",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-10-09 V2.22.0 Release", "2026-10-09 V2.22.0 Release", "2026-10-09 V2.22.0 Release"),
     items: trio(
       [
