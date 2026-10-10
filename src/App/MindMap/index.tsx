@@ -1,6 +1,6 @@
 import { Alert, Button, Card, Divider, Input, Segmented, Select, Space, Tooltip, message } from 'antd';
-import { CopyOutlined, DownloadOutlined, ExpandOutlined, EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { CopyOutlined, DownloadOutlined, ExpandOutlined, EyeInvisibleOutlined, EyeOutlined, FullscreenExitOutlined, FullscreenOutlined } from '@ant-design/icons';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocale } from '../../hook/locale-context';
 import { useTheme } from '../../hook/theme-context';
 import { copyTextToClipboard } from '../../lib';
@@ -44,10 +44,33 @@ import MindMapIntro from './intro';
 
 const MONO = 'ui-monospace, SFMono-Regular, Consolas, "Courier New", monospace';
 
+/** 原生全屏 API 的类型补充 (内嵌 WebView 只认 webkit 前缀) */
+type FullscreenElement = HTMLDivElement & { webkitRequestFullscreen?: () => Promise<void> | void };
+type FullscreenDocument = Document & {
+  webkitFullscreenElement?: Element | null;
+  webkitExitFullscreen?: () => Promise<void> | void;
+};
+
 type ExportFormat = 'svg' | 'png' | 'webp';
 
 /** Markdown 变化后延迟渲染 (输入停顿再重排, 避免每敲一个字符重绘整棵树) */
 const RENDER_DELAY = 250;
+
+/** 全屏切换后等布局稳定再重新 fit (原生全屏与窗口内全屏都受这一帧延迟影响) */
+const FIT_DELAY = 80;
+
+/** 全屏态样式: 未进入原生全屏时用 position: fixed 铺满窗口兜底 (内嵌 webview 可能拒绝原生全屏) */
+const STAGE_CSS = [
+  '.mindmap-stage { display: flex; flex-direction: column; }',
+  '.mindmap-stage > .ant-card { width: 100%; }',
+  '.mindmap-stage.mindmap-full { position: fixed; inset: 0; z-index: 1000; overflow: hidden; }',
+  '.mindmap-stage.mindmap-full > .ant-card { flex: 1 1 auto; min-height: 0; border-radius: 0; display: flex; flex-direction: column; }',
+  '.mindmap-stage.mindmap-full > .ant-card > .ant-card-head { flex: 0 0 auto; }',
+  '.mindmap-stage.mindmap-full > .ant-card > .ant-card-body { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }',
+  // 参数区 / 提示条保持自然高度, 只让画布吃掉剩余空间
+  '.mindmap-stage.mindmap-full > .ant-card > .ant-card-body > *:not(.mindmap-canvas) { flex: 0 0 auto; }',
+  '.mindmap-stage.mindmap-full .mindmap-canvas { flex: 1 1 auto; min-height: 0; }',
+].join('\n');
 
 /** 透明背景用棋盘格表示 (与位图导出的透明通道对应) */
 const PREVIEW_CSS = [
@@ -88,11 +111,14 @@ const MindMap: React.FC = () => {
   const [box, setBox] = useState<SvgBox | null>(null);
   const [info, setInfo] = useState<OutlineInfo>(EMPTY_INFO);
   const [webpOk] = useState(() => supportsWebp());
+  const [full, setFull] = useState(false);
 
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const stageRef = useRef<HTMLDivElement | null>(null);
   const instRef = useRef<{ el: SVGSVGElement; mm: MindMapInstance } | null>(null);
   const seqRef = useRef(0);
   const bgTouchedRef = useRef(false);
+  const fullTouchedRef = useRef(false);
   const blank = isBlankMarkdown(code);
   // 深色底配浅色文字 (与「背景」联动, 否则深色模式下导出白底 + 浅字会看不清)
   const darkBg = bg === 'dark';
@@ -101,6 +127,89 @@ const MindMap: React.FC = () => {
   useEffect(() => {
     if (!bgTouchedRef.current) setBg(isDark ? 'dark' : 'white');
   }, [isDark]);
+
+  // ---- 全屏: 先请求原生全屏, 失败 (内嵌 webview / 非用户手势) 时用窗口内全屏兜底 ----
+  const enterFull = useCallback(() => {
+    setFull(true);
+    const el = stageRef.current as FullscreenElement | null;
+    const request = el?.requestFullscreen?.bind(el) ?? el?.webkitRequestFullscreen?.bind(el);
+    if (!request) return;
+    try {
+      void Promise.resolve(request()).catch(() => undefined);
+    } catch {
+      /* 忽略: 已有 CSS 全屏兜底 */
+    }
+  }, []);
+
+  const exitFull = useCallback(() => {
+    setFull(false);
+    const doc = document as FullscreenDocument;
+    const active = doc.fullscreenElement ?? doc.webkitFullscreenElement;
+    if (!active) return;
+    try {
+      const exit = doc.exitFullscreen?.bind(doc) ?? doc.webkitExitFullscreen?.bind(doc);
+      void Promise.resolve(exit?.()).catch(() => undefined);
+    } catch {
+      /* 忽略 */
+    }
+  }, []);
+
+  // 浏览器(含 Esc / F11)退出原生全屏时同步状态, 避免按钮卡在「退出全屏」
+  useEffect(() => {
+    const doc = document as FullscreenDocument;
+    const onChange = () => { if (!doc.fullscreenElement && !doc.webkitFullscreenElement) setFull(false); };
+    document.addEventListener('fullscreenchange', onChange);
+    document.addEventListener('webkitfullscreenchange', onChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', onChange);
+      document.removeEventListener('webkitfullscreenchange', onChange);
+    };
+  }, []);
+
+  // 卸载时退出原生全屏, 避免切到别的工具后还停在全屏层
+  useEffect(() => () => {
+    const doc = document as FullscreenDocument;
+    if (!(doc.fullscreenElement ?? doc.webkitFullscreenElement)) return;
+    try {
+      const exit = doc.exitFullscreen?.bind(doc) ?? doc.webkitExitFullscreen?.bind(doc);
+      void Promise.resolve(exit?.()).catch(() => undefined);
+    } catch {
+      /* 忽略 */
+    }
+  }, []);
+
+  // Esc 退出窗口内全屏 (原生全屏由浏览器自己处理)
+  useEffect(() => {
+    if (!full) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      const doc = document as FullscreenDocument;
+      if (doc.fullscreenElement ?? doc.webkitFullscreenElement) return;
+      exitFull();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [ full, exitFull ]);
+
+  // 进入 / 退出全屏后画布尺寸变化, 重新 fit 把整棵树收回视野 (markmap 只在内容变化时自动重排)
+  useEffect(() => {
+    if (!fullTouchedRef.current) {
+      fullTouchedRef.current = true;
+      return;
+    }
+    const inst = instRef.current?.mm;
+    if (!inst) return;
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      void inst.fit().then(() => {
+        if (!cancelled) setBox(exportBoxOf(inst.state.rect));
+      }).catch(() => undefined);
+    }, FIT_DELAY);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [ full ]);
 
   // 渲染: markmap 实例按「预览是否显示」创建/销毁, 数据与参数每次都重建 (fit 后记录内容包围盒用于导出)
   useEffect(() => {
@@ -300,10 +409,20 @@ const MindMap: React.FC = () => {
           </Card>
         )}
         {showPreview && (
+          <div
+            ref={stageRef}
+            className={full ? 'mindmap-stage mindmap-full' : 'mindmap-stage'}
+            style={{
+              flex: '1 1 460px',
+              minWidth: 320,
+              // 窗口内全屏 (兜底) 时铺满视口, 底色跟随预览背景, 深色模式下不闪白
+              background: full ? bgColor ?? (isDark ? '#141414' : '#fff') : undefined,
+            }}
+          >
+          <style>{STAGE_CSS}</style>
           <Card
             size="small"
             title={t('预览')}
-            style={{ flex: '1 1 460px', minWidth: 320 }}
             extra={
               <Space size={8} wrap>
                 <Tooltip title={t('导出 SVG (矢量, 透明背景)')}>
@@ -320,6 +439,13 @@ const MindMap: React.FC = () => {
                   void copy(exportSvgFromCanvas(el, live), t('已复制 SVG'));
                 }}>{t('复制 SVG')}</Button>
                 <Button size="small" icon={<ExpandOutlined />} disabled={!canExport} onClick={() => { void fitView(); }}>{t('适应窗口')}</Button>
+                <Tooltip title={full ? t('按 Esc 退出全屏') : t('全屏查看导图, 画布更大更好拖拽')}>
+                  <Button
+                    size="small"
+                    icon={full ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+                    onClick={full ? exitFull : enterFull}
+                  >{t(full ? '退出全屏' : '全屏')}</Button>
+                </Tooltip>
               </Space>
             }
           >
@@ -390,10 +516,11 @@ const MindMap: React.FC = () => {
             )}
             {/* 画布容器常驻 (出错 / 空大纲时只是不可见), 否则 svg 被卸载后无法重新渲染 */}
             <div
-              className={bgColor ? 'mindmap-preview' : 'mindmap-preview mindmap-preview-checker'}
+              className={[ 'mindmap-canvas', bgColor ? 'mindmap-preview' : 'mindmap-preview mindmap-preview-checker' ].join(' ')}
               style={{
                 position: 'relative',
-                height: PREVIEW_HEIGHT,
+                // 全屏时高度交给 flex 撑满 (见 STAGE_CSS), 普通模式用固定高度
+                height: full ? undefined : PREVIEW_HEIGHT,
                 overflow: 'auto',
                 border: '1px solid rgba(128,128,128,0.2)',
                 borderRadius: 6,
@@ -405,12 +532,13 @@ const MindMap: React.FC = () => {
             >
               <style>{PREVIEW_CSS}</style>
               {/* markmap 会往这个 svg 上挂缩放 / 平移与 ResizeObserver; 尺寸必须为实际像素, 布局才准确 */}
-              <svg ref={svgRef} style={{ width: '100%', height: PREVIEW_HEIGHT, display: 'block' }} />
+              <svg ref={svgRef} style={{ width: '100%', height: full ? '100%' : PREVIEW_HEIGHT, display: 'block' }} />
               {rendering && !error && (
                 <div style={{ position: 'absolute', right: 8, bottom: 6, color: '#999', fontSize: 12 }}>{t('渲染中...')}</div>
               )}
             </div>
           </Card>
+          </div>
         )}
       </div>
       <Divider>{t(' 思维导图说明 ')}</Divider>

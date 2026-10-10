@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { message } from 'antd';
 import { ThemeProvider } from '../../hook/theme-context';
 import MindMap from './index';
-import { COLOR_SCHEMES, EXPORT_PADDING, FONT_SIZES, SAMPLES } from './data';
+import { COLOR_SCHEMES, EXPORT_PADDING, FONT_SIZES, PREVIEW_HEIGHT, SAMPLES } from './data';
 import { saveBytesFile, savePngFile, saveTextFile } from '../../lib/tauri';
 
 // markmap-view 只有 ESM 产物, jest 无法加载 -> 两个 markmap 包都 mock 掉
@@ -120,6 +120,8 @@ const viewLabel = (text: string): Element | null =>
 const cardTitle = (text: string): Element | null =>
   screen.queryAllByText(text).find((el) => el.classList.contains('ant-card-head-title')) ?? null;
 const pane = () => document.querySelector('.mindmap-preview') as HTMLElement;
+/** 预览 / 全屏的舞台容器 */
+const stageOf = (c: HTMLElement) => c.querySelector('.mindmap-stage') as HTMLElement;
 const codeArea = () => screen.getByPlaceholderText('在此输入 Markdown 大纲…') as HTMLTextAreaElement;
 /** 全量测试并行跑时定时器会被拖慢, 关键等待放宽到 5s */
 const WAIT = { timeout: 5000 };
@@ -333,6 +335,91 @@ describe('MindMap 面板开关', () => {
     fireEvent.click(btn('适应窗口'));
     await waitFor(() => expect(inst.fit).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(screen.getByText('已适应窗口')).toBeInTheDocument());
+  });
+});
+
+describe('MindMap 全屏', () => {
+  test('全屏按钮切换画布全屏 (原生全屏不可用时的窗口内兜底)', async () => {
+    const { container } = render(<MindMap />);
+    await waitRendered();
+    const stage = stageOf(container);
+    expect(stage.className).not.toContain('mindmap-full');
+    // 普通模式: 画布固定高度
+    expect(pane().style.height).toBe(`${PREVIEW_HEIGHT}px`);
+
+    fireEvent.click(btn('全屏'));
+    expect(stage.className).toContain('mindmap-full');
+    expect(btn('退出全屏')).toBeInTheDocument();
+    // 全屏模式: 高度交给 flex 撑满, 由 CSS 类控制
+    expect(pane().style.height).toBe('');
+    expect((pane().querySelector('svg') as SVGElement).style.height).toBe('100%');
+
+    fireEvent.click(btn('退出全屏'));
+    expect(stage.className).not.toContain('mindmap-full');
+    expect(btn('全屏')).toBeInTheDocument();
+    expect(pane().style.height).toBe(`${PREVIEW_HEIGHT}px`);
+    expect((pane().querySelector('svg') as SVGElement).style.height).toBe(`${PREVIEW_HEIGHT}px`);
+  });
+
+  test('进入 / 退出全屏后重新 fit 整棵树', async () => {
+    const { container } = render(<MindMap />);
+    await waitRendered();
+    const inst = mockInstances[0];
+    inst.fit.mockClear();
+
+    fireEvent.click(btn('全屏'));
+    await waitFor(() => expect(inst.fit).toHaveBeenCalledTimes(1), WAIT);
+
+    inst.fit.mockClear();
+    fireEvent.click(btn('退出全屏'));
+    await waitFor(() => expect(inst.fit).toHaveBeenCalledTimes(1), WAIT);
+    expect(stageOf(container).className).not.toContain('mindmap-full');
+  });
+
+  test('窗口内全屏下按 Esc 退出', async () => {
+    const { container } = render(<MindMap />);
+    await waitRendered();
+    fireEvent.click(btn('全屏'));
+    expect(stageOf(container).className).toContain('mindmap-full');
+
+    fireEvent.keyDown(document.body, { key: 'Escape' });
+    expect(stageOf(container).className).not.toContain('mindmap-full');
+  });
+
+  test('支持原生全屏时调用 Fullscreen API, 浏览器退出后同步状态', async () => {
+    const request = jest.fn().mockResolvedValue(undefined);
+    const exit = jest.fn().mockResolvedValue(undefined);
+    let nativeEl: Element | null = null;
+    Object.defineProperty(HTMLElement.prototype, 'requestFullscreen', { configurable: true, value: request });
+    Object.defineProperty(document, 'fullscreenElement', { configurable: true, get: () => nativeEl });
+    Object.defineProperty(document, 'exitFullscreen', { configurable: true, value: exit });
+    try {
+      const { container } = render(<MindMap />);
+      await waitRendered();
+      fireEvent.click(btn('全屏'));
+      nativeEl = stageOf(container);
+      expect(request).toHaveBeenCalledTimes(1);
+      expect(stageOf(container).className).toContain('mindmap-full');
+
+      // 原生全屏中按 Esc 由浏览器处理: 不应自己再调 exitFullscreen
+      fireEvent.keyDown(document.body, { key: 'Escape' });
+      expect(exit).not.toHaveBeenCalled();
+
+      // 浏览器退出原生全屏 -> fullscreenchange 同步按钮状态
+      nativeEl = null;
+      fireEvent(document, new Event('fullscreenchange'));
+      await waitFor(() => expect(stageOf(container).className).not.toContain('mindmap-full'));
+
+      // 点「退出全屏」时才真的调 exitFullscreen
+      fireEvent.click(btn('全屏'));
+      nativeEl = stageOf(container);
+      fireEvent.click(btn('退出全屏'));
+      expect(exit).toHaveBeenCalledTimes(1);
+    } finally {
+      delete (HTMLElement.prototype as unknown as Record<string, unknown>).requestFullscreen;
+      delete (document as unknown as Record<string, unknown>).fullscreenElement;
+      delete (document as unknown as Record<string, unknown>).exitFullscreen;
+    }
   });
 });
 

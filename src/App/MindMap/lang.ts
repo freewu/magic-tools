@@ -37,6 +37,10 @@ const uilangRows: Record<string, [string, string]> = {
   '「背景 / 缩放」仅作用于位图导出与预览; 矢量 SVG 导出时始终透明': ['「背景 / 縮放」僅作用於點陣圖匯出與預覽; 向量 SVG 匯出時始終透明', 'Background & scale affect raster export and the preview only — SVG stays transparent'],
   '适应窗口': ['適應視窗', 'Fit'],
   '已适应窗口': ['已適應視窗', 'Fitted'],
+  '全屏': ['全螢幕', 'Fullscreen'],
+  '退出全屏': ['退出全螢幕', 'Exit fullscreen'],
+  '按 Esc 退出全屏': ['按 Esc 退出全螢幕', 'Press Esc to exit fullscreen'],
+  '全屏查看导图, 画布更大更好拖拽': ['全螢幕檢視心智圖, 畫布更大更好拖曳', 'View the map fullscreen — a bigger canvas is easier to pan'],
   '当前浏览器不支持 WebP 导出, 请改用 PNG': ['目前瀏覽器不支援 WebP 匯出, 請改用 PNG', 'This browser cannot export WebP — use PNG instead'],
 
   // 视图参数
