@@ -1,4 +1,4 @@
-import { FONT_NAMES, DEFAULT_FONT, DEFAULT_TEXT, getDefaultFont, setDefaultFont, getDefaultText, setDefaultText, nonAsciiChars, isAsciiText } from './lib';
+import { FONT_NAMES, DEFAULT_FONT, DEFAULT_TEXT, getDefaultFont, setDefaultFont, getDefaultText, setDefaultText, nonAsciiChars, isAsciiText, fontInitial } from './lib';
 
 describe('ASCII 文字', () => {
   it('字体清单完整: 289 款, 无重复, 含默认字体', () => {
@@ -64,5 +64,29 @@ describe('nonAsciiChars / isAsciiText', () => {
   it('首个未收录字符就能判定为非法', () => {
     expect(isAsciiText('中文')).toBe(false);
     expect(isAsciiText('')).toBe(true);
+  });
+});
+
+describe('fontInitial', () => {
+  it('字母开头取大写首字母', () => {
+    expect(fontInitial('Standard')).toBe('S');
+    expect(fontInitial('big')).toBe('B');
+    expect(fontInitial("Patorjk's Cheese")).toBe('P');
+    expect(fontInitial('  3D-ASCII')).toBe('#');   // 容忍首尾空白
+  });
+
+  it('数字 / 符号 / 空串归入 # 分组', () => {
+    for (const n of [ '1Row', '3-D', '3x5', '4Max', '5 Line Oblique' ]) {
+      expect(fontInitial(n)).toBe('#');
+    }
+    expect(fontInitial('-no-letter-')).toBe('#');
+    expect(fontInitial('')).toBe('#');
+  });
+
+  it('所有字体都能分组, # 分组正好是 7 款', () => {
+    const buckets = FONT_NAMES.map((n) => fontInitial(n));
+    expect(buckets.every((b) => b === '#' || /^[A-Z]$/.test(b))).toBe(true);
+    expect(buckets.filter((b) => b === '#')).toHaveLength(7);
+    expect(FONT_NAMES.filter((n) => fontInitial(n) === 'S').length).toBeGreaterThan(30);
   });
 });

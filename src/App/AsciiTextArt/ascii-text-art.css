@@ -15,3 +15,8 @@
 .figlet-font-preview {
   scrollbar-width: thin;
 }
+
+/* 只有字体列表滚动, 上方搜索框 / 首字母快捷查询固定 */
+.figlet-font-list {
+  scrollbar-width: thin;
+}

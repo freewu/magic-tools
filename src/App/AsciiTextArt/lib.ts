@@ -71,6 +71,12 @@ const ensureParsed = (name: string): void => {
   parsedFonts.add(name);
 };
 
+/** 字体名首字母分组: A-Z 为对应字母, 其余 (数字/符号开头) 归入 '#' */
+export function fontInitial(name :string): string {
+  const ch = (name.trim()[0] ?? '').toUpperCase();
+  return ch >= 'A' && ch <= 'Z' ? ch : '#';
+}
+
 // ---- ASCII 校验 ----
 /** 允许出现的空白字符 (多行排版用, 不算未收录字符) */
 const ALLOWED_WS = [ '\n', '\r', '\t' ];
