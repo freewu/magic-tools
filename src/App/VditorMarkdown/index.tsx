@@ -1,12 +1,14 @@
-import { Alert, Button, Card, Segmented, Select, Space, Spin, Typography, message } from 'antd';
+import { Alert, Button, Card, Segmented, Select, Space, Spin, Tooltip, Typography, message } from 'antd';
 import {
   CopyOutlined,
+  DeleteOutlined,
   DownloadOutlined,
   FileTextOutlined,
+  FullscreenExitOutlined,
+  FullscreenOutlined,
   OrderedListOutlined,
-  DeleteOutlined,
 } from '@ant-design/icons';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import 'vditor/dist/index.css';
 import { useLocale } from '../../hook/locale-context';
 import { useTheme } from '../../hook/theme-context';
@@ -79,6 +81,31 @@ const HINT_TEXT =
 /** 内联图片上限 (base64 会让文档迅速变大) */
 const MAX_INLINE_IMAGE = 2 * 1024 * 1024;
 
+/** 原生全屏 API 的类型补充 (内嵌 WebView 只认 webkit 前缀) */
+type FullscreenElement = HTMLDivElement & { webkitRequestFullscreen?: () => Promise<void> | void };
+type FullscreenDocument = Document & {
+  webkitFullscreenElement?: Element | null;
+  webkitExitFullscreen?: () => Promise<void> | void;
+};
+
+/**
+ * 全屏态样式: 未进入原生全屏时用 position: fixed 铺满窗口兜底 (内嵌 webview 可能拒绡原生全屏)。
+ * Vditor 会把 options.height 写成元素的行内 height, 全屏时需要用 !important 覆盖才能撑满。
+ */
+const STAGE_CSS = [
+  '.vmd-stage { display: flex; flex-direction: column; }',
+  '.vmd-stage > .ant-card { width: 100%; }',
+  '.vmd-stage.vmd-full { position: fixed; inset: 0; z-index: 1000; overflow: hidden; }',
+  '.vmd-stage.vmd-full > .ant-card { flex: 1 1 auto; min-height: 0; border-radius: 0; display: flex; flex-direction: column; }',
+  '.vmd-stage.vmd-full > .ant-card > .ant-card-head { flex: 0 0 auto; }',
+  '.vmd-stage.vmd-full > .ant-card > .ant-card-body { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }',
+  // 错误提示 / 统计条 / 说明行保持自然高度, 只让编辑器吃掉剩余空间
+  '.vmd-stage.vmd-full > .ant-card > .ant-card-body > *:not(.vmd-editor) { flex: 0 0 auto; }',
+  '.vmd-stage.vmd-full .vmd-editor { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }',
+  '.vmd-stage.vmd-full .vmd-host { flex: 1 1 auto; min-height: 0; }',
+  '.vmd-stage.vmd-full .vmd-host > .vditor { height: 100% !important; }',
+].join('\n');
+
 /** 读取为 data URL (粘贴 / 上传的图片内联到 Markdown 里, 不依赖后端) */
 const readAsDataUrl = (file: File): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -117,8 +144,10 @@ const VditorMarkdown: React.FC = () => {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState<'copyHtml' | 'saveMd' | 'saveHtml' | ''>('');
+  const [full, setFull] = useState(false);
 
   const hostRef = useRef<HTMLDivElement | null>(null);
+  const stageRef = useRef<HTMLDivElement | null>(null);
   const vditorRef = useRef<VditorInstance | null>(null);
   // 重建编辑器 / 导出时读取最新值, 避免把 markdown 放进 effect 依赖导致频繁重建
   const markdownRef = useRef(markdown);
@@ -214,6 +243,68 @@ const VditorMarkdown: React.FC = () => {
     const dark = isDark;
     vditorRef.current?.setTheme(dark ? 'dark' : 'classic', contentTheme(dark), hljsStyle(dark), themePath);
   }, [isDark, ready, themePath]);
+
+  // ---- 全屏: 先请求原生全屏, 失败 (内嵌 webview / 非用户手势) 时用窗口内全屏兜底 ----
+  const enterFull = useCallback(() => {
+    setFull(true);
+    const el = stageRef.current as FullscreenElement | null;
+    const request = el?.requestFullscreen?.bind(el) ?? el?.webkitRequestFullscreen?.bind(el);
+    if (!request) return;
+    try {
+      void Promise.resolve(request()).catch(() => undefined);
+    } catch {
+      /* 忽略: 已有 CSS 全屏兜底 */
+    }
+  }, []);
+
+  const exitFull = useCallback(() => {
+    setFull(false);
+    const doc = document as FullscreenDocument;
+    if (!(doc.fullscreenElement ?? doc.webkitFullscreenElement)) return;
+    try {
+      const exit = doc.exitFullscreen?.bind(doc) ?? doc.webkitExitFullscreen?.bind(doc);
+      void Promise.resolve(exit?.()).catch(() => undefined);
+    } catch {
+      /* 忽略 */
+    }
+  }, []);
+
+  // 浏览器(含 Esc)退出原生全屏时同步状态, 避免按钮卡在「退出全屏」
+  useEffect(() => {
+    const doc = document as FullscreenDocument;
+    const onChange = () => { if (!doc.fullscreenElement && !doc.webkitFullscreenElement) setFull(false); };
+    document.addEventListener('fullscreenchange', onChange);
+    document.addEventListener('webkitfullscreenchange', onChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', onChange);
+      document.removeEventListener('webkitfullscreenchange', onChange);
+    };
+  }, []);
+
+  // Esc 退出窗口内全屏 (原生全屏由浏览器自己处理)
+  useEffect(() => {
+    if (!full) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      const doc = document as FullscreenDocument;
+      if (doc.fullscreenElement ?? doc.webkitFullscreenElement) return;
+      exitFull();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [ full, exitFull ]);
+
+  // 卸载时退出原生全屏, 避免切到别的工具后还停在全屏层
+  useEffect(() => () => {
+    const doc = document as FullscreenDocument;
+    if (!(doc.fullscreenElement ?? doc.webkitFullscreenElement)) return;
+    try {
+      const exit = doc.exitFullscreen?.bind(doc) ?? doc.webkitExitFullscreen?.bind(doc);
+      void Promise.resolve(exit?.()).catch(() => undefined);
+    } catch {
+      /* 忽略 */
+    }
+  }, []);
 
   const applySample = (id: string) => {
     const sample = findSample(id);
@@ -317,6 +408,15 @@ const VditorMarkdown: React.FC = () => {
   };
 
   return (
+    <div
+      ref={stageRef}
+      className={full ? 'vmd-stage vmd-full' : 'vmd-stage'}
+      style={{
+        // 窗口内全屏 (兜底) 时铺满视口, 底色跟随主题, 深色模式下不闪白
+        background: full ? (isDark ? '#141414' : '#fff') : undefined,
+      }}
+    >
+    <style>{STAGE_CSS}</style>
     <Card
       size="small"
       title={t('即时渲染 Markdown')}
@@ -376,6 +476,15 @@ const VditorMarkdown: React.FC = () => {
           >
             {t('导出 .html')}
           </Button>
+          <Tooltip title={full ? t('按 Esc 退出全屏') : t('全屏编辑, 屏幕更大更好写')}>
+            <Button
+              size="small"
+              icon={full ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+              onClick={full ? exitFull : enterFull}
+            >
+              {t(full ? '退出全屏' : '全屏')}
+            </Button>
+          </Tooltip>
           <Button size="small" danger icon={<DeleteOutlined />} disabled={markdown === ''} onClick={clearAll}>
             {t('清空')}
           </Button>
@@ -391,8 +500,8 @@ const VditorMarkdown: React.FC = () => {
           description={error}
         />
       )}
-      <div style={{ position: 'relative' }}>
-        <div ref={hostRef} />
+      <div className="vmd-editor" style={{ position: 'relative' }}>
+        <div className="vmd-host" ref={hostRef} />
         {!ready && error === '' && (
           <div
             style={{
@@ -440,6 +549,7 @@ const VditorMarkdown: React.FC = () => {
         </Text>
       </div>
     </Card>
+    </div>
   );
 };
 

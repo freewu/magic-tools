@@ -93,6 +93,8 @@ const btn = (name: string): HTMLButtonElement => {
 };
 
 const notice = (): string => document.querySelector('.ant-message')?.textContent ?? '';
+/** 全屏舞台容器 */
+const stage = (): HTMLElement => document.querySelector('.vmd-stage') as HTMLElement;
 const writeText = (): jest.Mock =>
   (navigator as unknown as { clipboard: { writeText: jest.Mock } }).clipboard.writeText;
 
@@ -269,5 +271,78 @@ describe('VditorMarkdown 页面交互', () => {
     const instance = await waitEditor();
     expect(instance.options.mode).toBe('ir');
     expect(screen.queryByText('编辑器加载失败, 请刷新页面重试')).toBeNull();
+  });
+});
+
+describe('VditorMarkdown 全屏', () => {
+  beforeEach(() => {
+    message.destroy();
+    created.length = 0;
+    md2htmlCalls.length = 0;
+    ctorError = '';
+    Object.assign(navigator, { clipboard: { writeText: jest.fn().mockResolvedValue(undefined) } });
+  });
+
+  test('全屏按钮切换舞台全屏, 且不重建编辑器', async () => {
+    render(<VditorMarkdown />);
+    const instance = await waitEditor();
+    expect(stage().className).not.toContain('vmd-full');
+    // 编辑器容器保留在全屏舞台内 (全屏只是加了一个类名, 由 CSS 控制尺寸)
+    expect(stage().querySelector('.vmd-host')).not.toBeNull();
+
+    fireEvent.click(btn('全屏'));
+    expect(stage().className).toContain('vmd-full');
+    expect(btn('退出全屏')).toBeInTheDocument();
+    // 全屏不重建编辑器, 内容与撤销历史都保留
+    expect(created).toHaveLength(1);
+    expect(instance.destroyed).toBe(false);
+
+    fireEvent.click(btn('退出全屏'));
+    expect(stage().className).not.toContain('vmd-full');
+    expect(btn('全屏')).toBeInTheDocument();
+  });
+
+  test('窗口内全屏下按 Esc 退出', async () => {
+    render(<VditorMarkdown />);
+    await waitEditor();
+    fireEvent.click(btn('全屏'));
+    expect(stage().className).toContain('vmd-full');
+
+    fireEvent.keyDown(document.body, { key: 'Escape' });
+    expect(stage().className).not.toContain('vmd-full');
+  });
+
+  test('支持原生全屏时调用 Fullscreen API, 浏览器退出后同步状态', async () => {
+    const request = jest.fn().mockResolvedValue(undefined);
+    const exit = jest.fn().mockResolvedValue(undefined);
+    let nativeEl: Element | null = null;
+    Object.defineProperty(HTMLElement.prototype, 'requestFullscreen', { configurable: true, value: request });
+    Object.defineProperty(document, 'fullscreenElement', { configurable: true, get: () => nativeEl });
+    Object.defineProperty(document, 'exitFullscreen', { configurable: true, value: exit });
+    try {
+      render(<VditorMarkdown />);
+      await waitEditor();
+      fireEvent.click(btn('全屏'));
+      nativeEl = stage();
+      expect(request).toHaveBeenCalledTimes(1);
+      expect(stage().className).toContain('vmd-full');
+
+      // 原生全屏中按 Esc 由浏览器处理: 不应自己再调 exitFullscreen
+      fireEvent.keyDown(document.body, { key: 'Escape' });
+      expect(exit).not.toHaveBeenCalled();
+
+      nativeEl = null;
+      fireEvent(document, new Event('fullscreenchange'));
+      await waitFor(() => expect(stage().className).not.toContain('vmd-full'));
+
+      fireEvent.click(btn('全屏'));
+      nativeEl = stage();
+      fireEvent.click(btn('退出全屏'));
+      expect(exit).toHaveBeenCalledTimes(1);
+    } finally {
+      delete (HTMLElement.prototype as unknown as Record<string, unknown>).requestFullscreen;
+      delete (document as unknown as Record<string, unknown>).fullscreenElement;
+      delete (document as unknown as Record<string, unknown>).exitFullscreen;
+    }
   });
 });
