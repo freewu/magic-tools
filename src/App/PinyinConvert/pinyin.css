@@ -1,0 +1,46 @@
+/* 中文拼音 - 拼音注音排版 (拼音显示在汉字上方) */
+
+.pinyin-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pinyin-ruby-box {
+  min-height: 96px;
+  margin: 0 0 5px 0;
+  padding: 10px 12px;
+  border: 1px solid var(--app-border, rgba(5, 5, 5, 0.12));
+  border-radius: 6px;
+  background: var(--app-input-bg, #ffffff);
+  color: var(--app-text, rgba(0, 0, 0, 0.88));
+  font-size: 18px;
+  /* 行高需要给上方的注音留出空间, 否则上一行的注音会压到下一行的汉字 */
+  line-height: 2.2;
+  cursor: pointer;
+}
+
+.pinyin-ruby-box ruby {
+  /* 注音显示在汉字上方 (CJK 默认值, 显式声明避免被其他样式覆盖) */
+  ruby-position: over;
+  ruby-align: center;
+}
+
+.pinyin-ruby-box ruby rt {
+  font-size: 10px;
+  line-height: 10px;
+  font-weight: normal;
+  letter-spacing: 0;
+  /* 注音比正文浅一些, 不抢汉字的视线 */
+  opacity: 0.65;
+  /* 浏览器默认把注音框压在汉字框顶部, 带降部笔画的拼音 (jiǒng/yīng) 会贴到汉字上,
+     上移 2px 让拼音与汉字之间留出空隙 (实测 2px 空白, 不与上一行注音相撞) */
+  position: relative;
+  top: -2px;
+}
+
+.pinyin-ruby-empty {
+  font-size: 14px;
+  opacity: 0.45;
+}

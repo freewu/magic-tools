@@ -8,6 +8,10 @@ export default {
     divider: '转换的结果',
     phInput: '请输入中文',
     phResult: '点击复制内容到粘贴板',
+    modeRuby: '拼音注音',
+    modeText: '拼音文本',
+    modeTip: '拼音注音: 拼音显示在汉字正上方',
+    phRuby: '输入中文后, 拼音会显示在汉字上方',
   },
   'zh-TW': {
     appName: '中文拼音',
@@ -18,6 +22,10 @@ export default {
     divider: '轉換的結果',
     phInput: '請輸入中文',
     phResult: '點擊複製內容到剪貼簿',
+    modeRuby: '拼音注音',
+    modeText: '拼音文字',
+    modeTip: '拼音注音: 拼音顯示在漢字正上方',
+    phRuby: '輸入中文後, 拼音會顯示在漢字上方',
   },
   en: {
     appName: 'Chinese Pinyin',
@@ -28,5 +36,9 @@ export default {
     divider: 'Conversion Result',
     phInput: 'Enter Chinese text',
     phResult: 'Click to copy the content to clipboard',
+    modeRuby: 'Pinyin Ruby',
+    modeText: 'Pinyin Text',
+    modeTip: 'Pinyin Ruby: pinyin is shown above each Chinese character',
+    phRuby: 'Enter Chinese text to show pinyin above the characters',
   },
 } as const;
