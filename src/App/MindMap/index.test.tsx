@@ -204,6 +204,8 @@ describe('MindMap 初始界面', () => {
     const stats = screen.getByText(/行 \/ .* 字符 \/ .* 个标题/);
     expect(stats.textContent).toContain(`${SAMPLES[0].code.replace(/\s+$/, '').split('\n').length} 行`);
     expect(stats.textContent).toContain('2 个节点 · 2 层');
+    // 统计信息在输入框上方
+    expect(stats.compareDocumentPosition(codeArea()) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(btn('导出图片')).toBeEnabled();
   });
 

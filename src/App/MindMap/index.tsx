@@ -472,16 +472,16 @@ const MindMap: React.FC = () => {
               </Space>
             }
           >
+            <div style={{ marginBottom: 6, color: '#888', fontSize: 12 }}>
+              {tt('{l} 行 / {c} 字符 / {h} 个标题', { l: stats.lines, c: stats.chars, h: stats.headings })}
+              {info.total > 0 ? ` · ${tt('{n} 个节点 · {d} 层', { n: info.total, d: info.depth })}` : ''}
+            </div>
             <Input.TextArea
               value={code}
               onChange={(e) => { setCode(e.target.value); setSampleId(''); }}
               style={{ flex: '1 1 auto', minHeight: 420, fontFamily: MONO, fontSize: 13, lineHeight: 1.7, resize: 'vertical' }}
               placeholder={t('在此输入 Markdown 大纲…')}
             />
-            <div style={{ marginTop: 6, color: '#888', fontSize: 12 }}>
-              {tt('{l} 行 / {c} 字符 / {h} 个标题', { l: stats.lines, c: stats.chars, h: stats.headings })}
-              {info.total > 0 ? ` · ${tt('{n} 个节点 · {d} 层', { n: info.total, d: info.depth })}` : ''}
-            </div>
           </Card>
         )}
         {showPreview && (
