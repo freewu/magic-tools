@@ -16,7 +16,7 @@ import { row as _r, rowT } from "../Setting/rows-lang";
 /** 可手动填写的 HEX 默认值项 (主公钥同样可粘贴他人的, 用于本机加密 / 验签) */
 type HexKey = 'encMaster' | 'encPublic' | 'encUser' | 'signMaster' | 'signPublic' | 'signUser';
 
-// SM9 默认密钥设置 (与 SM9 页「密钥生成」共用同一 localStorage 槽位)
+// SM9 默认密钥设置 (与 SM9 页「密钥管理」共用同一 localStorage 槽位)
 export const SM9CryptoSetting = () => {
   const { locale } = useLocale();
   const st = (zh: string) => _r(locale, zh);

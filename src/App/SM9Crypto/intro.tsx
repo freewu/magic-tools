@@ -13,10 +13,10 @@ const introZh = `
 </ul>
 <h2>使用流程</h2>
 <ul>
-<li><p><b>密钥生成</b>：设定用户 ID → 生成主密钥对 → 导出主公钥 (分发) → 提取用户私钥 (交付该 ID 用户)</p></li>
+<li><p><b>密钥管理</b>：设定用户 ID → 生成主密钥对 → 导出主公钥 (分发) → 提取用户私钥 (交付该 ID 用户)</p></li>
 <li><p><b>加解密</b>：同一页上下双框 —— 加密需 <b>接收方主公钥 + 接收方 ID</b> (明文单组上限 <b>255 字节</b>, 输出 DER HEX 密文); 解密用 <b>自己的用户私钥 + 自己的 ID</b>, ID 不一致会解密失败 (校验 C3 的 HMAC-SM3 标签)</p></li>
 <li><p><b>签名验签</b>：签名用签名用户私钥; 验签只需 <b>签名者主公钥 + 签名者 ID + 数据 + 签名值</b></p></li>
-<li><p>三个标签页<b>共享同一组密钥</b>与 ID; 「加解密」页的 ID <b>只读</b> (需修改请回「密钥生成」页), 避免提取用户私钥的 ID 与解密时不一致; 「保存为默认密钥」存于浏览器本地 (localStorage), 不会上传, 下次打开自动带出 (主密钥 / 主公钥 / 用户私钥均会保存)</p></li>
+<li><p>三个标签页<b>共享同一组密钥</b>与 ID; 「加解密」页的 ID <b>只读</b> (需修改请回「密钥管理」页), 避免提取用户私钥的 ID 与解密时不一致; 「保存为默认密钥」存于浏览器本地 (localStorage), 不会上传, 下次打开自动带出 (主密钥 / 主公钥 / 用户私钥均会保存)</p></li>
 <li><p><b>设置 → SM9 加解密</b>：可预置默认密钥, 并<b>按用户 ID 一键生成主公钥与用户私钥</b> (用已填写的主私钥派生, 结果自动保存)</p></li>
 </ul>
 <h2>数据格式</h2>
@@ -28,7 +28,7 @@ const introZh = `
 <li><p>明文以 UTF-8 编码参与运算, 因此字节数按 UTF-8 计 (中文 1 字 = 3 字节)</p></li>
 </ul>
 <h2>安全提醒</h2>
-<blockquote><p>主私钥 / 用户私钥切勿泄露; 全部运算在浏览器本地完成 (WebAssembly), 密钥不会上传。密钥生成需要安全随机数, 非 HTTPS/localhost 环境下浏览器会禁用 <code>crypto.getRandomValues</code>, 此时工具会直接报错而不会使用弱随机 (无 HTTPS 时可用桌面版或 GitHub Pages 版本)。</p>
+<blockquote><p>主私钥 / 用户私钥切勿泄露; 全部运算在浏览器本地完成 (WebAssembly), 密钥不会上传。生成密钥需要安全随机数, 非 HTTPS/localhost 环境下浏览器会禁用 <code>crypto.getRandomValues</code>, 此时工具会直接报错而不会使用弱随机 (无 HTTPS 时可用桌面版或 GitHub Pages 版本)。</p>
 </blockquote>
 `;
 
@@ -45,10 +45,10 @@ const introTw = `
 </ul>
 <h2>使用流程</h2>
 <ul>
-<li><p><b>金鑰產生</b>：設定使用者 ID → 產生主金鑰對 → 匯出主公鑰 (分發) → 提取使用者私鑰 (交付該 ID 使用者)</p></li>
+<li><p><b>金鑰管理</b>：設定使用者 ID → 產生主金鑰對 → 匯出主公鑰 (分發) → 提取使用者私鑰 (交付該 ID 使用者)</p></li>
 <li><p><b>加解密</b>：同一頁上下雙框 —— 加密需 <b>接收方主公鑰 + 接收方 ID</b> (明文單組上限 <b>255 位元組</b>, 輸出 DER HEX 密文); 解密用 <b>自己的使用者私鑰 + 自己的 ID</b>, ID 不一致會解密失敗 (校驗 C3 的 HMAC-SM3 標籤)</p></li>
 <li><p><b>簽章驗章</b>：簽章用簽章使用者私鑰; 驗章只需 <b>簽章者主公鑰 + 簽章者 ID + 資料 + 簽章值</b></p></li>
-<li><p>三個頁籤<b>共用同一組金鑰</b>與 ID; 「加解密」頁的 ID <b>唯讀</b> (需修改請回「金鑰產生」頁), 避免提取使用者私鑰的 ID 與解密時不一致; 「儲存為預設金鑰」存於瀏覽器本機 (localStorage), 不會上傳, 下次開啟自動帶出 (主金鑰 / 主公鑰 / 使用者私鑰均會儲存)</p></li>
+<li><p>三個頁籤<b>共用同一組金鑰</b>與 ID; 「加解密」頁的 ID <b>唯讀</b> (需修改請回「金鑰管理」頁), 避免提取使用者私鑰的 ID 與解密時不一致; 「儲存為預設金鑰」存於瀏覽器本機 (localStorage), 不會上傳, 下次開啟自動帶出 (主金鑰 / 主公鑰 / 使用者私鑰均會儲存)</p></li>
 <li><p><b>設定 → SM9 加解密</b>：可預先設定預設金鑰, 並<b>依使用者 ID 一鍵產生主公鑰與使用者私鑰</b> (用已填寫的主私鑰派生, 結果自動儲存)</p></li>
 </ul>
 <h2>資料格式</h2>
@@ -60,7 +60,7 @@ const introTw = `
 <li><p>明文以 UTF-8 編碼參與運算, 因此位元組數按 UTF-8 計 (中文 1 字 = 3 位元組)</p></li>
 </ul>
 <h2>安全提醒</h2>
-<blockquote><p>主私鑰 / 使用者私鑰切勿洩漏; 全部運算在瀏覽器本機完成 (WebAssembly), 金鑰不會上傳。金鑰產生需要安全隨機數, 非 HTTPS/localhost 環境下瀏覽器會停用 <code>crypto.getRandomValues</code>, 此時工具會直接報錯而不會使用弱隨機 (無 HTTPS 時可用桌面版或 GitHub Pages 版本)。</p>
+<blockquote><p>主私鑰 / 使用者私鑰切勿洩漏; 全部運算在瀏覽器本機完成 (WebAssembly), 金鑰不會上傳。產生金鑰需要安全隨機數, 非 HTTPS/localhost 環境下瀏覽器會停用 <code>crypto.getRandomValues</code>, 此時工具會直接報錯而不會使用弱隨機 (無 HTTPS 時可用桌面版或 GitHub Pages 版本)。</p>
 </blockquote>
 `;
 
@@ -77,10 +77,10 @@ const introEn = `
 </ul>
 <h2>Workflow</h2>
 <ul>
-<li><p><b>Key generation</b>: set the user ID → generate the master key pair → export the master public key (distribute it) → extract the user private key (deliver it to that ID's owner)</p></li>
+<li><p><b>Key Management</b>: set the user ID → generate the master key pair → export the master public key (distribute it) → extract the user private key (deliver it to that ID's owner)</p></li>
 <li><p><b>Encrypt / Decrypt</b>: a single tab with two stacked boxes — encryption needs the <b>recipient's master public key + ID</b> (one group of plaintext is limited to <b>255 bytes</b>; the output is DER HEX ciphertext) and decryption uses <b>your own user private key + ID</b>; a mismatching ID fails decryption (the C3 HMAC-SM3 tag is verified)</p></li>
 <li><p><b>Signature / verification</b>: sign with the signature user private key; verification only needs the <b>signer's master public key + signer ID + data + signature</b></p></li>
-<li><p>All three tabs <b>share one key set</b> and ID; the ID on the Encrypt / Decrypt tab is <b>read-only</b> (change it on the Key generation tab) so that the ID a user private key was extracted from always matches the one used for decryption; "Save as default keys" stores them only in your browser (localStorage) — nothing is uploaded, and the master keys, master public keys and user private keys are restored next time</p></li>
+<li><p>All three tabs <b>share one key set</b> and ID; the ID on the Encrypt / Decrypt tab is <b>read-only</b> (change it on the Key Management tab) so that the ID a user private key was extracted from always matches the one used for decryption; "Save as default keys" stores them only in your browser (localStorage) — nothing is uploaded, and the master keys, master public keys and user private keys are restored next time</p></li>
 <li><p><b>Settings → SM9 Encrypt / Decrypt</b>: preconfigure the default keys and <b>generate the master public key and user private key for a user ID in one click</b> (derived from the master private key you entered; the result is saved automatically)</p></li>
 </ul>
 <h2>Data formats</h2>
@@ -92,7 +92,7 @@ const introEn = `
 <li><p>Plaintext is processed as UTF-8, so sizes are counted in UTF-8 bytes (one Chinese character = 3 bytes)</p></li>
 </ul>
 <h2>Security note</h2>
-<blockquote><p>Never leak master or user private keys. All computation happens locally in your browser (WebAssembly); keys are never uploaded. Key generation needs a secure random source — outside HTTPS/localhost browsers disable <code>crypto.getRandomValues</code> and this tool fails loudly instead of using weak randomness (use the desktop build or the GitHub Pages version when HTTPS is unavailable).</p>
+<blockquote><p>Never leak master or user private keys. All computation happens locally in your browser (WebAssembly); keys are never uploaded. Generating keys needs a secure random source — outside HTTPS/localhost browsers disable <code>crypto.getRandomValues</code> and this tool fails loudly instead of using weak randomness (use the desktop build or the GitHub Pages version when HTTPS is unavailable).</p>
 </blockquote>
 `;
 

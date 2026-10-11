@@ -1,7 +1,7 @@
 // SM9 加解密 (GM/T 0044-2016) — 基于 GmSSL 编译的 WebAssembly
 //
 // 三个标签页共享同一组密钥 (密钥在各页之间互通):
-//   密钥生成: 分别生成/导出 加密 (SM9-Enc) 与 签名 (SM9-Sign) 两套主密钥 & 用户私钥
+//   密钥管理: 分别生成/导出 加密 (SM9-Enc) 与 签名 (SM9-Sign) 两套主密钥 & 用户私钥
 //   加解密: 上半区明文 (或解密输出) + 主公钥/用户私钥 + ID, 一键加密 / 解密 (上下双框)
 //   签名验签: 用户私钥签名, 主公钥 (或主私钥) + ID 验签
 import { Alert, Button, Divider, Input, Space, Tabs, Tag, Typography, message } from "antd";
@@ -78,7 +78,7 @@ const SM9Crypto = () => {
   const t = (zh :string) => sr(locale, zh);
   const tt = (zh :string, v? :Record<string, string | number>) => srT(locale, zh, v);
 
-  const [ activeTab, setActiveTab ] = useState<string>('keygen');
+  const [ activeTab, setActiveTab ] = useState<string>('manage');
   const [ keys, setKeys ] = useState<KeySet>(() => {
     const d = getSm9Defaults();
     return {
@@ -172,7 +172,7 @@ const SM9Crypto = () => {
     notice.success(t('已清空默认密钥'));
   };
 
-  // ---------------- 密钥生成 ----------------
+  // ---------------- 密钥管理 ----------------
   const generateMaster = (use :'enc' | 'sign') => run(async () => {
     if (use === 'enc') {
       const der = await encGenerateMasterKey();
@@ -259,7 +259,7 @@ const SM9Crypto = () => {
     );
   };
 
-  const keygenTab = (
+  const manageTab = (
     <div>
       <Alert
         type="info"
@@ -312,8 +312,8 @@ const SM9Crypto = () => {
       if (!master) return;
       out = await encryptWithMasterKey(master, id.trim(), plainBytes);
     } else {
-      notice.warning(t('未配置加密主公钥/主私钥, 请先在「密钥生成」页生成或粘贴'));
-      setActiveTab('keygen');
+      notice.warning(t('未配置加密主公钥/主私钥, 请先在「密钥管理」页生成或粘贴'));
+      setActiveTab('manage');
       return;
     }
     setCipher(bytesToHex(out));
@@ -346,9 +346,9 @@ const SM9Crypto = () => {
   const cryptoTab = (
     <div>
       <div style={ { color: "#999", fontSize: 12, margin: "8px 0" } }>
-        {t('加密只需接收方的主公钥与 ID; 解密需要用户私钥与加密时相同的 ID (用户私钥可在「密钥生成」页用主私钥 + ID 提取)。')}
+        {t('加密只需接收方的主公钥与 ID; 解密需要用户私钥与加密时相同的 ID (用户私钥可在「密钥管理」页用主私钥 + ID 提取)。')}
         <br />
-        {t('密钥生成完毕的密钥在本页直接可用; ID 与「密钥生成」页共用。')}
+        {t('在「密钥管理」页生成或导入的密钥, 本页直接可用; ID 与该页共用。')}
       </div>
       <div style={ { fontWeight: 600 } }>{t('加密主公钥 (65 字节 HEX)')}</div>
       <HexArea
@@ -365,18 +365,18 @@ const SM9Crypto = () => {
         onChange={ (v) => setKey('encUser', v) }
         onDoubleClick={ () => copy(keys.encUser, '用户私钥') }
         rows={ 2 }
-        placeholder={t('粘贴用户私钥 (DER HEX), 或在上方「密钥生成」页提取')}
+        placeholder={t('粘贴用户私钥 (DER HEX), 或在上方「密钥管理」页提取')}
       />
       <div style={ { color: "#999", fontSize: 12 } }>{kindHint(keys.encUser)}</div>
       <Space wrap style={ { margin: "4px 0" } }>
         <span style={ { fontWeight: 600 } }>{t('用户 ID')}</span>
-        {/* ID 与「密钥生成」页共用 (用户私钥按它提取), 这里只读以避免改出不一致的 ID */}
+        {/* ID 与「密钥管理」页共用 (用户私钥按它提取), 这里只读以避免改出不一致的 ID */}
         <Input style={ { width: 320 } } value={ id } readOnly />
         <span style={ { color: "#999" } }>{tt('当前 ID 长度: {n} 字节', { n: utf8Length(id) })}</span>
-        <Button size="small" type="link" style={ { padding: 0 } } onClick={ () => setActiveTab('keygen') }>{t('去「密钥生成」页修改 ID')}</Button>
+        <Button size="small" type="link" style={ { padding: 0 } } onClick={ () => setActiveTab('manage') }>{t('去「密钥管理」页修改 ID')}</Button>
       </Space>
       <div style={ { color: "#999", fontSize: 12 } }>
-        {t('此处 ID 只读, 与「密钥生成」页共用: 解密用的用户私钥必须由该 ID 提取 (需改 ID 请到「密钥生成」页)。')}
+        {t('此处 ID 只读, 与「密钥管理」页共用: 解密用的用户私钥必须由该 ID 提取 (需改 ID 请到「密钥管理」页)。')}
       </div>
       <div style={ { fontWeight: 600 } }>{t('明文 (UTF-8, 单组上限 255 字节)')}</div>
       <HexArea
@@ -445,7 +445,7 @@ const SM9Crypto = () => {
       if (!master) return;
       ok = await verifyWithMasterKey(master, id.trim(), data, sig);
     } else {
-      notice.warning(t('未配置签名主公钥/主私钥, 请先在「密钥生成」页生成或粘贴'));
+      notice.warning(t('未配置签名主公钥/主私钥, 请先在「密钥管理」页生成或粘贴'));
       return;
     }
     setVerifyResult(ok ? 'ok' : 'fail');
@@ -464,7 +464,7 @@ const SM9Crypto = () => {
         onChange={ (v) => setKey('signUser', v) }
         onDoubleClick={ () => copy(keys.signUser, '用户私钥') }
         rows={ 3}
-        placeholder={t('粘贴签名用户私钥 (DER HEX), 或在上方「密钥生成」页提取')}
+        placeholder={t('粘贴签名用户私钥 (DER HEX), 或在上方「密钥管理」页提取')}
       />
       <div style={ { color: "#999", fontSize: 12 } }>{kindHint(keys.signUser)}</div>
       <div style={ { fontWeight: 600 } }>{t('数据 (待签名 / 待验签, UTF-8)')}</div>
@@ -530,7 +530,7 @@ const SM9Crypto = () => {
         items={ tabList.map(({ key, label }) => ({
           key,
           label: t(label),
-          children: key === 'keygen' ? keygenTab : key === 'crypto' ? cryptoTab : signTab,
+          children: key === 'manage' ? manageTab : key === 'crypto' ? cryptoTab : signTab,
         })) }
       />
 

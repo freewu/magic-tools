@@ -3,6 +3,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import SM9Crypto from './index';
 import { LocaleProvider } from '../../hook/locale-context';
 import { copyTextToClipboard } from '../../lib';
+import { sr } from './lang';
+import { cr } from '../RSACrypto/lang';
 import * as gmssl from './gmssl';
 
 // wasm 无法在 jest 里运行: 用 GmSSL v3.2.0 真实输出 (hex 与 lib.test.ts 同一批, 真实 ID 为 alice@example.com) 替掉封装,
@@ -59,10 +61,25 @@ describe('SM9Crypto 页面', () => {
 
   it('三个页签齐全 (加密 / 解密 已合并为「加解密」), 默认带出默认 ID', () => {
     renderPage();
-    for (const name of [ '密钥生成', '加解密', '签名验签' ]) {
+    for (const name of [ '密钥管理', '加解密', '签名验签' ]) {
       expect(screen.getByRole('tab', { name })).toBeTruthy();
     }
+    // 页签名与「RSA 加解密」的密钥管理保持一致 (不再是「密钥生成」)
+    expect(screen.queryByRole('tab', { name: '密钥生成' })).toBeNull();
     expect(screen.getAllByDisplayValue('bluefrog').length).toBeGreaterThan(0);
+  });
+
+  it('页签名与「RSA 加解密」的密钥管理完全一致 (三语同名页签)', () => {
+    for (const loc of [ 'zh-CN', 'zh-TW', 'en' ]) {
+      expect(sr(loc, '密钥管理')).toBe(cr(loc, '密钥管理'));
+    }
+    localStorage.setItem('app-locale', 'zh-TW');
+    const first = renderPage();
+    expect(screen.getByRole('tab', { name: '金鑰管理' })).toBeTruthy();
+    first.unmount();
+    localStorage.setItem('app-locale', 'en');
+    renderPage();
+    expect(screen.getByRole('tab', { name: 'Key Management' })).toBeTruthy();
   });
 
   it('生成加密主密钥 -> 导出主公钥 -> 提取用户私钥, 并显示识别结果', async () => {
@@ -218,7 +235,7 @@ describe('SM9Crypto 页面', () => {
     expect(await screen.findByText(/请先填写签名值/)).toBeTruthy();
   });
 
-  it('加解密页的用户 ID 只读, 与「密钥生成」页共用 (改 ID 需回密钥生成页)', async () => {
+  it('加解密页的用户 ID 只读, 与「密钥管理」页共用 (改 ID 需回密钥管理页)', async () => {
     renderPage();
     fireEvent.change(screen.getByPlaceholderText(/例如 bluefrog/), { target: { value: 'alice@example.com' } });
     fireEvent.click(screen.getByRole('tab', { name: '加解密' }));
@@ -227,14 +244,14 @@ describe('SM9Crypto 页面', () => {
     expect(readonlyInputs).toHaveLength(1);                       // 加解密页的 ID 框只读
     expect(screen.getByText(/此处 ID 只读/)).toBeTruthy();
 
-    // 密钥生成完毕的密钥在本页直接可用
-    expect(screen.getByText(/密钥生成完毕的密钥在本页直接可用/)).toBeTruthy();
+    // 密钥管理页生成 / 导入的密钥在本页直接可用
+    expect(screen.getByText(/在「密钥管理」页生成或导入的密钥, 本页直接可用/)).toBeTruthy();
 
-    // 改 ID 的入口: 跳回「密钥生成」页
-    fireEvent.click(screen.getByRole('button', { name: /去「密钥生成」页修改 ID/ }));
-    const keygenId = screen.getByPlaceholderText(/例如 bluefrog/) as HTMLInputElement;
-    expect(keygenId.readOnly).toBe(false);
-    expect(keygenId.value).toBe('alice@example.com');
+    // 改 ID 的入口: 跳回「密钥管理」页
+    fireEvent.click(screen.getByRole('button', { name: /去「密钥管理」页修改 ID/ }));
+    const manageId = screen.getByPlaceholderText(/例如 bluefrog/) as HTMLInputElement;
+    expect(manageId.readOnly).toBe(false);
+    expect(manageId.value).toBe('alice@example.com');
   });
 
   it('默认密钥里的主公钥 / 用户私钥打开时自动带出, 可直接加密', async () => {

@@ -3,7 +3,7 @@
 
 /** 标签页列表 (index.tsx 与测试共用) */
 export const tabList = [
-  { key: 'keygen', label: '密钥生成' },
+  { key: 'manage', label: '密钥管理' },
   { key: 'crypto', label: '加解密' },
   { key: 'sign', label: '签名验签' },
 ];
