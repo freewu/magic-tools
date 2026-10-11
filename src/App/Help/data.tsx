@@ -80,6 +80,39 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-10-11 V2.22.2 Release", "2026-10-11 V2.22.2 Release", "2026-10-11 V2.22.2 Release"),
+    items: trio(
+      [
+        "中文拼音新增拼音注音排版: 拼音以小字显示在汉字正上方 (ruby 注音), 可切换「拼音注音 / 拼音文本」两种展示方式; 整段文本统一转换以保留多音字上下文 (「第二行」读 háng), 英文 / 数字连续片段不被拆开; 点击可复制纯拼音文本",
+        "CSS 配色新增拼豆 / 绣线色卡: MARD 221 / COCO 291 / Artkal 176 / Artkal Mini 221 / Perler 117 / Hama 89 / DMC 489 色 (数据来自 bitbead, 均带色号与英文名), 并支持按系列分组展示 (MARD A~H / M, COCO 19 组, Artkal S / SE, Artkal Mini MA~MM), 系列名以分隔线呈现为组标题",
+        "CSS 配色色块上的色号文字改为背景色的反色显示 (互补色与原色对比度低于 3:1 时回退黑 / 白), 深色与中间色色块不再看不清字",
+        "节拍器倒计时改为 3~10 秒数字倒计时: 每秒一个预备拍 (音高与色彩区别于正拍), 圆点上跳动显示剩余秒数, 数完进入正拍",
+        "经纬度格式转换: 示例移到最上方单独一行并改为彩色标签 (按格式配色, 去掉「示例」二字), 点击即载入并转换; 去掉「输入格式」文字; 修复输入为空时结果区整块消失 (现在始终展示结果区, 空值以灰色占位示例提示每种格式长什么样)",
+        "Base64 / URL / Unicode / Base58 编解码四个工具的操作按钮统一收进 Space 容器, 按钮之间不再挤在一起; Gzip 编解码输入 / 输出框铺满内容区整宽 (去掉 900px 限制)",
+        "SM9 加解密「密钥生成」页签更名为「密钥管理」(与 RSA 加解密命名完全对齐, 页内提示同步更新); 工程: 新增 scripts/fetch-bead-colors.mjs 抓取脚本, 全量测试 3264 → 3300 条; 工具总数保持 145",
+      ],
+      [
+        "中文拼音新增拼音注音排版: 拼音以小字顯示在漢字正上方 (ruby 注音), 可切換「拼音注音 / 拼音文字」兩種顯示方式; 整段文字統一轉換以保留多音字上下文 (「第二行」讀 háng), 英文 / 數字連續片段不會被拆開; 點擊可複製純拼音文字",
+        "CSS 配色新增拼豆 / 繡線色卡: MARD 221 / COCO 291 / Artkal 176 / Artkal Mini 221 / Perler 117 / Hama 89 / DMC 489 色 (資料來自 bitbead, 均帶色號與英文名), 並支援依系列分組顯示 (MARD A~H / M, COCO 19 組, Artkal S / SE, Artkal Mini MA~MM), 系列名以分隔線呈現為組標題",
+        "CSS 配色色塊上的色號文字改為背景色的反色顯示 (互補色與原色對比度低於 3:1 時回退黑 / 白), 深色與中間色色塊不再看不清字",
+        "節拍器倒計時改為 3~10 秒數字倒計時: 每秒一個預備拍 (音高與色彩區別於正拍), 圓點上跳動顯示剩餘秒數, 數完進入正拍",
+        "經緯度格式轉換: 範例移到最上方單獨一行並改為彩色標籤 (依格式配色, 去掉「範例」二字), 點擊即載入並轉換; 去掉「輸入格式」文字; 修復輸入為空時結果區整塊消失 (現在始終顯示結果區, 空值以灰色佔位範例提示每種格式長什麼樣)",
+        "Base64 / URL / Unicode / Base58 編解碼四個工具的操作按鈕統一收進 Space 容器, 按鈕之間不再擠在一起; Gzip 編解碼輸入 / 輸出框鋪滿內容區整寬 (去掉 900px 限制)",
+        "SM9 加解密「金鑰產生」頁籤更名為「金鑰管理」(與 RSA 加解密命名完全對齊, 頁內提示同步更新); 工程: 新增 scripts/fetch-bead-colors.mjs 抓取腳本, 全量測試 3264 → 3300 筆; 工具總數保持 145",
+      ],
+      [
+        "Chinese Pinyin gained ruby-style annotation: the pinyin renders in small type directly above each hanzi, with a “Pinyin annotation / Pinyin text” view switch; the whole text is converted at once so polyphone context is kept (“第二行” reads háng) and runs of Latin letters or digits stay intact; click to copy the plain pinyin",
+        "CSS Colors gained bead and embroidery floss palettes: MARD 221, COCO 291, Artkal 176, Artkal Mini 221, Perler 117, Hama 89 and DMC 489 colours (data from bitbead, each with its code and English name), plus series grouping (MARD A–H / M, 19 COCO series, Artkal S / SE, Artkal Mini MA–MM) shown as divider headings",
+        "CSS Colors now draws the code on each swatch in the inverse of its background colour (falling back to black or white when the complementary colour has less than 3:1 contrast), so dark and mid-tone swatches stay readable",
+        "Metronome count-in is now a 3–10 second numeric countdown: one cue click per second (different pitch and colour from the regular beat) with the remaining seconds ticking on the dot, then the regular beat starts",
+        "Latitude / Longitude Convert: the examples moved to their own line at the top as coloured tags (coloured per format, the “Examples” heading removed) that load and convert on click, and the “Input format” label is gone; fixed the result area vanishing when the input is empty — it now always shows the four output formats, with grey placeholder examples",
+        "The action buttons of the four codec tools (Base64 / URL / Unicode / Base58) are wrapped in a Space container so they are no longer crammed together; the Gzip codec input / output boxes now span the full content width (the 900 px cap is gone)",
+        "SM9: the “Key generation” tab is renamed to “Key Management”, matching the RSA tool exactly (every in-page hint updated too); Engineering: added the scripts/fetch-bead-colors.mjs fetch script; total tests 3264 → 3300; tool count stays at 145",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-10-10 V2.22.1 Release", "2026-10-10 V2.22.1 Release", "2026-10-10 V2.22.1 Release"),
     items: trio(
       [

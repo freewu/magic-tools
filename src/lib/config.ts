@@ -4,7 +4,7 @@
 // {
 //   "app": "magic-tools",
 //   "fileVersion": 2,
-//   "appVersion": "2.22.1",
+//   "appVersion": "2.22.2",
 //   "exportedAt": "2025-01-02T03:04:05.000Z",
 //   "settings": { "theme-mode": "dark", "app-locale": "zh-CN", ... },
 //   "apps": { "AESCrypto": { "Mode": "CBC", ... }, ... }
