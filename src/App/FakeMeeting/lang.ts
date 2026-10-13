@@ -11,6 +11,7 @@ const fmLangRows: Record<string, [string, string]> = {
   '界面风格': ['介面風格', 'Interface'],
   '会议主题': ['會議主題', 'Meeting topic'],
   '我的名字': ['我的名字', 'My name'],
+  '点击改名': ['點擊改名', 'Click to rename'],
   '参会人数': ['參會人數', 'Participants'],
   '会议号': ['會議號', 'Meeting ID'],
   '起始时长 (分钟)': ['起始時長 (分鐘)', 'Start offset (min)'],

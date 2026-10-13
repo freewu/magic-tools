@@ -217,6 +217,20 @@ describe('假装开会 控制项', () => {
     expect(container.querySelector('.fm-stage')).not.toHaveClass('fm-immersive');
     expect(container.querySelector('.fm-exit')).toBeNull();
   });
+
+  test('沉浸模式请求浏览器全屏, 浏览器原生退出时同步收起', () => {
+    const { container } = render(<FakeMeeting />);
+    const stage = container.querySelector('.fm-stage') as HTMLElement;
+    const request = jest.fn().mockResolvedValue(undefined);
+    Object.defineProperty(stage, 'requestFullscreen', { configurable: true, value: request });
+    fireEvent.click(btn('沉浸模式'));
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(stage).toHaveClass('fm-immersive');
+    // 模拟浏览器原生退出全屏 (Esc) 触发的 fullscreenchange
+    Object.defineProperty(document, 'fullscreenElement', { configurable: true, value: null });
+    act(() => { document.dispatchEvent(new Event('fullscreenchange')); });
+    expect(stage).not.toHaveClass('fm-immersive');
+  });
 });
 
 describe('假装开会 我的画面与背景人声', () => {
@@ -284,6 +298,64 @@ describe('假装开会 组件交互与纯函数一致性', () => {
     const expected = pickParticipants(6, 'zh-CN', '我');
     const names = gridTiles(container).map((t) => t.querySelector('.fm-name')?.textContent ?? '');
     expect(names).toEqual(expected.map((p) => p.name));
+  });
+
+  test('点击瓦片名字可改名, 空值回退, 人数与语言变化时保留', () => {
+    const { container } = render(<FakeMeeting />);
+    const first = () => gridTiles(container)[0];
+    const nameEl = () => first().querySelector('.fm-name') as HTMLElement;
+    const original = nameEl().textContent;
+    // 改名
+    fireEvent.click(nameEl());
+    const input = first().querySelector('.fm-name-input') as HTMLInputElement;
+    expect(input).toBeTruthy();
+    fireEvent.change(input, { target: { value: '  老板  ' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(nameEl().textContent).toBe('老板');
+    expect(nameEl()).toHaveClass('is-edited');
+    // 空输入保留旧名
+    fireEvent.click(nameEl());
+    const empty = first().querySelector('.fm-name-input') as HTMLInputElement;
+    fireEvent.change(empty, { target: { value: '   ' } });
+    fireEvent.keyDown(empty, { key: 'Enter' });
+    expect(nameEl().textContent).toBe('老板');
+    // 切换皮肤 (网格重排) 与语言后手动改的名字仍在
+    segment('Zoom');
+    expect(gridTiles(container)[0].querySelector('.fm-name')?.textContent).toBe('老板');
+    expect(original).not.toBe('老板');
+  });
+
+  test('参会者面板里点名字同样可改名, 并同步到网格瓦片', () => {
+    const { container } = render(<FakeMeeting />);
+    fireEvent.click(btn('成员'));
+    const row = container.querySelector('.fm-prow') as HTMLElement;
+    fireEvent.click(row.querySelector('.fm-name') as HTMLElement);
+    const input = row.querySelector('.fm-name-input') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: '主持人甲' } });
+    fireEvent.blur(input);
+    expect(row.querySelector('.fm-name')?.textContent).toBe('主持人甲');
+    expect(gridTiles(container)[0].querySelector('.fm-name')?.textContent).toBe('主持人甲');
+  });
+
+  test('改「我」的名字会同步到顶部「我的名字」输入框', () => {
+    const { container } = render(<FakeMeeting />);
+    const tiles = gridTiles(container);
+    const meTile = tiles[tiles.length - 1];
+    fireEvent.click(meTile.querySelector('.fm-name') as HTMLElement);
+    const input = meTile.querySelector('.fm-name-input') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: '老王' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(screen.getByDisplayValue('老王')).toBeInTheDocument();
+    expect(container.textContent).toContain('老王');
+  });
+
+  test('参会者面板打开时, 网格里不再重复出现改名输入框', () => {
+    const { container } = render(<FakeMeeting />);
+    fireEvent.click(btn('成员'));
+    const tileName = gridTiles(container)[0].querySelector('.fm-name') as HTMLElement;
+    expect(tileName).not.toHaveClass('is-editable');
+    fireEvent.click(tileName);
+    expect(container.querySelectorAll('.fm-name-input')).toHaveLength(0);
   });
 
   test('离开会议结束计时', () => {

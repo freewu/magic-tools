@@ -1,7 +1,8 @@
 import '@testing-library/jest-dom';
 import {
   CHAT_LINES_MIN, PARTICIPANTS_MAX, PARTICIPANTS_MIN, SHARE_SLIDE, SKIN_CONTROLS, SKIN_DIVIDERS,
-  SKIN_META, SKINS, chatLine, clockText, formatClock, gridColumns, initialOf, pickParticipants, trio,
+  SKIN_META, SKINS, chatLine, clampCount, clockText, formatClock, gridColumns, initialOf, normalizeName,
+  pickParticipants, trio,
 } from './lib';
 
 describe('假装开会 皮肤配置', () => {
@@ -71,6 +72,24 @@ describe('假装开会 参会者', () => {
     expect(pickParticipants(99, 'zh-CN', '我')).toHaveLength(PARTICIPANTS_MAX);
     const names = pickParticipants(12, 'zh-CN', '我').map((p) => p.name);
     expect(new Set(names).size).toBe(names.length);
+  });
+
+  test('clampCount 收敛到上下限并向下取整, 非法值回退下限', () => {
+    expect(clampCount(4.8)).toBe(4);
+    expect(clampCount(0)).toBe(PARTICIPANTS_MIN);
+    expect(clampCount(-3)).toBe(PARTICIPANTS_MIN);
+    expect(clampCount(99)).toBe(PARTICIPANTS_MAX);
+    expect(clampCount(Number.NaN)).toBe(PARTICIPANTS_MIN);
+  });
+
+  test('normalizeName 去除首尾空白, 空值回退旧名', () => {
+    expect(normalizeName('  小林  ', '张伟')).toBe('小林');
+    expect(normalizeName('', '张伟')).toBe('张伟');
+    expect(normalizeName('   ', '张伟')).toBe('张伟');
+  });
+
+  test('生成的参会者默认未标记 edited, 便于手动改名后按 id 保留', () => {
+    expect(pickParticipants(5, 'zh-CN', '我').every((p) => !p.edited)).toBe(true);
   });
 
   test('相同输入产生相同结果 (便于复现同一个「会议」)', () => {

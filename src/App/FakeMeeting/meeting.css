@@ -233,6 +233,13 @@
 }
 
 .fm-tag .fm-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 参会者改名: 可点击的名字, 改过的名字带虚线下划线 */
+.fm-name.is-editable { cursor: text; }
+.fm-name.is-editable:hover { text-decoration: underline dotted; }
+.fm-name.is-edited { text-decoration: underline dashed; }
+.fm-name-input { width: 8em; max-width: 100%; }
+.fm-prow .fm-name-input { width: 100%; }
 .fm-tag .fm-icon { display: inline-grid; place-items: center; font-size: 1.05em; }
 .fm-tag .fm-icon.is-off { color: #ff6b6b; }
 

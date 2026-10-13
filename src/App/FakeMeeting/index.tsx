@@ -1,9 +1,10 @@
 import { Button, Checkbox, Input, InputNumber, Segmented, Slider, message } from "antd";
 import {
-  AppstoreOutlined, AudioMutedOutlined, AudioOutlined, CommentOutlined, CompressOutlined,
-  DeleteOutlined, DesktopOutlined, ExpandOutlined, EyeInvisibleOutlined, FundProjectionScreenOutlined,
-  InfoCircleOutlined, MoreOutlined, PauseCircleOutlined, PhoneOutlined, PlayCircleOutlined,
-  SafetyCertificateOutlined, StopOutlined, TeamOutlined, UploadOutlined, VideoCameraOutlined, WifiOutlined,
+  AppstoreOutlined, AudioMutedOutlined, AudioOutlined, CommentOutlined,
+  DeleteOutlined, DesktopOutlined, EyeInvisibleOutlined, FullscreenExitOutlined, FullscreenOutlined,
+  FundProjectionScreenOutlined, InfoCircleOutlined, MoreOutlined, PauseCircleOutlined, PhoneOutlined,
+  PlayCircleOutlined, SafetyCertificateOutlined, StopOutlined, TeamOutlined, UploadOutlined,
+  VideoCameraOutlined, WifiOutlined,
 } from '@ant-design/icons';
 import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useLocale } from "../../hook/locale-context";
@@ -12,8 +13,8 @@ import { im } from './lang';
 import {
   SKIN_CONTROLS, SKIN_DIVIDERS, SKIN_META, SKINS, SKIN_TOP_ICONS, SHARE_SLIDE,
   PARTICIPANTS_MAX, PARTICIPANTS_MIN,
-  chatLine, clockText, gridColumns, pickParticipants, trio,
-  type Control, type ControlAction, type IconKey, type Skin,
+  chatLine, clockText, gridColumns, initialOf, normalizeName, pickParticipants, trio,
+  type Control, type ControlAction, type IconKey, type Participant, type Skin,
 } from "./lib";
 import "./meeting.css";
 
@@ -35,6 +36,24 @@ const ICONS: Record<IconKey, ReactNode> = {
   shield: <SafetyCertificateOutlined />,
   grid: <AppstoreOutlined />,
   signal: <WifiOutlined />,
+};
+
+/** 全屏 API 在部分内嵌 webview / 老浏览器上不存在, 统一按可选处理 */
+type FullscreenElement = HTMLDivElement & { webkitRequestFullscreen?: () => Promise<void> | void };
+type FullscreenDocument = Document & {
+  webkitFullscreenElement?: Element | null;
+  webkitExitFullscreen?: () => Promise<void> | void;
+};
+
+/** 调用全屏 API: 环境差异大, 不支持或抛错时静默忽略 (退化为仅 CSS 铺满) */
+const callFullscreen = (fn?: () => Promise<void> | void) => {
+  if (!fn) return;
+  try {
+    const r = fn();
+    if (r && typeof r.catch === 'function') void r.catch(() => undefined);
+  } catch {
+    // 某些内嵌 webview / 老浏览器没有全屏能力, 忽略
+  }
 };
 
 /** 聊天消息出现的间隔 / 发言者轮换间隔 (毫秒) */
@@ -74,14 +93,29 @@ const FakeMeeting: React.FC = () => {
   const [ unread, setUnread ] = useState(0);
   const [ murmur, setMurmur ] = useState(false);
   const [ murmurVol, setMurmurVol ] = useState(35);
+  /** 手动改过的名字 (按参会者 id 保留) */
+  const [ nameEdits, setNameEdits ] = useState<Record<string, string>>({});
+  const [ editingId, setEditingId ] = useState<string | null>(null);
+  const [ draft, setDraft ] = useState('');
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const audioRef = useRef<{ ctx: AudioContext; gain: GainNode } | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
+  const stageRef = useRef<HTMLDivElement | null>(null);
 
   const meta = SKIN_META[skin];
-  const participants = useMemo(() => pickParticipants(count, locale, myName), [ count, locale, myName ]);
+  const baseParty = useMemo(() => pickParticipants(count, locale, myName), [ count, locale, myName ]);
+  /** 手动改过的名字不被自动生成的名字覆盖 (人数 / 语言变化时按 id 保留) */
+  const participants = useMemo(
+    () => baseParty.map((p) => {
+      const renamed = nameEdits[p.id];
+      return renamed && renamed !== p.name
+        ? { ...p, name: renamed, initial: initialOf(renamed), edited: true }
+        : p;
+    }),
+    [ baseParty, nameEdits ]
+  );
   const me = participants[participants.length - 1];
   const others = useMemo(() => participants.filter((p) => !p.isMe), [ participants ]);
   /** Zoom 把「我」放在独立的右上角小窗里, 其余皮肤混排 */
@@ -136,6 +170,37 @@ const FakeMeeting: React.FC = () => {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [ immersive ]);
+
+  // 沉浸模式同步浏览器全屏 (不支持全屏 API 的环境退化为仅 CSS 铺满)
+  useEffect(() => {
+    const el = stageRef.current as FullscreenElement | null;
+    const d = document as FullscreenDocument;
+    const active = d.fullscreenElement ?? d.webkitFullscreenElement ?? null;
+    if (immersive) {
+      if (active || !el) return;
+      callFullscreen(typeof el.requestFullscreen === 'function'
+        ? () => el.requestFullscreen()
+        : el.webkitRequestFullscreen ? () => el.webkitRequestFullscreen?.() : undefined);
+    } else if (active) {
+      callFullscreen(typeof d.exitFullscreen === 'function'
+        ? () => d.exitFullscreen()
+        : d.webkitExitFullscreen ? () => d.webkitExitFullscreen?.() : undefined);
+    }
+  }, [ immersive ]);
+
+  // 浏览器原生退出全屏 (Esc) 时同步收起沉浸模式
+  useEffect(() => {
+    const onChange = () => {
+      const d = document as FullscreenDocument;
+      if (!(d.fullscreenElement ?? d.webkitFullscreenElement)) setImmersive(false);
+    };
+    document.addEventListener('fullscreenchange', onChange);
+    document.addEventListener('webkitfullscreenchange', onChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', onChange);
+      document.removeEventListener('webkitfullscreenchange', onChange);
+    };
+  }, []);
 
   // 摄像头流挂载 / 卸载
   useEffect(() => {
@@ -308,6 +373,54 @@ const FakeMeeting: React.FC = () => {
     }
   };
 
+  /** 进入改名: 用当前名字填充草稿 */
+  const startEdit = (p: Participant) => {
+    setEditingId(p.id);
+    setDraft(p.name);
+  };
+
+  /** 提交改名: 空值回退旧名; 「我」直接改顶部输入框的名字 */
+  const commitEdit = () => {
+    if (!editingId) return;
+    const current = participants.find((p) => p.id === editingId);
+    const next = normalizeName(draft, current?.name ?? '');
+    if (editingId === 'me') {
+      if (next) setMyName(next);
+    } else if (next && next !== current?.name) {
+      setNameEdits((m) => ({ ...m, [editingId]: next }));
+    }
+    setEditingId(null);
+  };
+
+  /** 名字节点: 可点击改名; 同一参会者只渲染一个输入框 (网格与面板同时打开时取面板) */
+  const nameNode = (p: Participant, editable = true) => {
+    if (editable && editingId === p.id) {
+      return (
+        <Input
+          className="fm-name-input"
+          size="small"
+          value={ draft }
+          autoFocus
+          onChange={ (e) => setDraft(e.target.value) }
+          onBlur={ commitEdit }
+          onKeyDown={ (e) => {
+            if (e.key === 'Enter') commitEdit();
+            else if (e.key === 'Escape') setEditingId(null);
+          } }
+        />
+      );
+    }
+    return (
+      <span
+        className={ [ 'fm-name', p.edited ? 'is-edited' : '', editable ? 'is-editable' : '' ].filter(Boolean).join(' ') }
+        title={ editable ? t('点击改名') : undefined }
+        onClick={ editable ? () => startEdit(p) : undefined }
+      >
+        { p.name }
+      </span>
+    );
+  };
+
   const labelOf = (c: Control) => trio(activeOf(c.action) && c.labelActive ? c.labelActive : c.label, locale);
   const iconOf = (c: Control) => ICONS[activeOf(c.action) && c.iconActive ? c.iconActive : c.icon];
 
@@ -328,7 +441,7 @@ const FakeMeeting: React.FC = () => {
           <span className={ mutedOf(p) ? 'fm-icon is-off' : 'fm-icon' }>
             { mutedOf(p) ? ICONS.micOff : ICONS.mic }
           </span>
-          <span className="fm-name">{ p.name }</span>
+          { nameNode(p, panel !== 'people') }
           { p.isMe && <span className="fm-badge">{ t('我') }</span> }
           { p.host && <span className="fm-badge is-host">{ t('主持人') }</span> }
         </div>
@@ -386,7 +499,7 @@ const FakeMeeting: React.FC = () => {
         <Checkbox checked={ rec } onChange={ (e) => setRec(e.target.checked) }>{ t('录制红点') }</Checkbox>
         <Button
           size="small"
-          icon={ immersive ? <CompressOutlined /> : <ExpandOutlined /> }
+          icon={ immersive ? <FullscreenExitOutlined /> : <FullscreenOutlined /> }
           onClick={ () => setImmersive((v) => !v) }
         >
           { t('沉浸模式') }
@@ -421,7 +534,7 @@ const FakeMeeting: React.FC = () => {
 
       <div style={ noteStyle }>{ t('一键演示: 点击「沉浸模式」全屏展示, 按 Esc 退出; 界面完全在本地渲染, 不上传任何数据') }</div>
 
-      <div className={ immersive ? 'fm-stage fm-immersive' : 'fm-stage' }>
+      <div className={ immersive ? 'fm-stage fm-immersive' : 'fm-stage' } ref={ stageRef }>
         <div className={ `fm-app fm-${skin}` }>
           <div className="fm-top">
             <span className="fm-logo">{ meta.badge }</span>
@@ -493,7 +606,10 @@ const FakeMeeting: React.FC = () => {
                   { participants.map((p) => (
                     <div className="fm-prow" key={ p.id }>
                       <span className="fm-pdot" style={{ background: `hsl(${p.hue} 45% 45%)` }}>{ p.initial }</span>
-                      <span className="fm-pname">{ p.isMe ? `${p.name} ${t('(我)')}` : p.name }</span>
+                      <span className="fm-pname">
+                        { nameNode(p) }
+                        { p.isMe && ` ${t('(我)')}` }
+                      </span>
                       { p.host && <span className="fm-badge is-host">{ t('主持人') }</span> }
                       <span className="fm-picons">
                         <span className={ mutedOf(p) ? 'is-off' : '' }>{ mutedOf(p) ? ICONS.micOff : ICONS.mic }</span>

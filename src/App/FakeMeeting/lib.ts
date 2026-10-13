@@ -158,8 +158,10 @@ export type Participant = {
   isMe: boolean;
   host: boolean;
   muted: boolean;
-  /** 画面偏暗 (模拟光线不佳的摄像头) */
+  /** 画面偏暗 (模拟光线不佳的摄像头 / 关掉画面) */
   dim: boolean;
+  /** 姓名被手动改过: 语言 / 人数变化时不再被自动生成的名字覆盖 */
+  edited?: boolean;
 };
 
 const NAMES_ZH = [
@@ -190,9 +192,16 @@ export const initialOf = (name: string): string => {
 
 export const useEnglishNames = (locale: string): boolean => locale === 'en';
 
+/** 人数夹到允许区间 (非法值回退到下限) */
+export const clampCount = (count: number): number =>
+  Math.max(PARTICIPANTS_MIN, Math.min(PARTICIPANTS_MAX, Math.floor(count) || PARTICIPANTS_MIN));
+
+/** 姓名去空白, 空字符串回退旧名 (手动清空不会导致匿名成员) */
+export const normalizeName = (name: string, fallback: string): string => (name || '').trim() || fallback;
+
 /** 生成参会者: 前 count-1 位是「别人」, 最后一位是「我」 */
 export const pickParticipants = (count: number, locale: string, myName: string): Participant[] => {
-  const total = Math.max(PARTICIPANTS_MIN, Math.min(PARTICIPANTS_MAX, Math.floor(count) || PARTICIPANTS_MIN));
+  const total = clampCount(count);
   const en = useEnglishNames(locale);
   const pool = en ? NAMES_EN : NAMES_ZH;
   const rand = lcg(2024 + total * 131 + (en ? 17 : 0));
@@ -215,7 +224,7 @@ export const pickParticipants = (count: number, locale: string, myName: string):
       dim: rand() < 0.35,
     });
   }
-  const me = (myName || '').trim() || (en ? 'Me' : '我');
+  const me = normalizeName(myName, en ? 'Me' : '我');
   list.push({
     id: 'me',
     name: me,
