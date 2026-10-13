@@ -287,7 +287,7 @@ const BeadPatternGenerator: React.FC = () => {
   const row = { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 10 } as const;
   const labelStyle = { color: '#666', whiteSpace: 'nowrap' } as const;
   const sliderStyle = { width: 120, margin: '0 4px' } as const;
-  const wideSliderStyle = { width: 150, margin: '0 4px' } as const;
+  const wideSliderStyle = { width: 200, margin: '0 4px' } as const;
   const valueStyle = { minWidth: 26, textAlign: 'right', fontFamily: 'monospace' } as const;
   const noteStyle = { color: '#888', fontSize: 12, lineHeight: '20px' } as const;
 
@@ -317,11 +317,11 @@ const BeadPatternGenerator: React.FC = () => {
           : <div style={ { color: '#666' } }>{t('点击或拖拽图片到此处')}</div> }
       </div>
       <div style={ { ...noteStyle, marginBottom: 12 } }>
-        <div>{t('支持 png / jpg / webp / gif (首帧), 自动按图纸豆数缩放; 纯色/透明背景自动留空')}</div>
+        <div>{t('支持 png / jpg / webp / gif (首帧), 自动按颗粒数缩放; 纯色/透明背景自动留空')}</div>
         <div>{t('载入图片后自动生成拼豆图纸: 按真实色卡匹配色号, 可手工改色后导出打印')}</div>
       </div>
 
-      {/* 参数 */}
+      {/* 配色参数 */}
       <div style={ row }>
         <span style={ labelStyle }>{t('品牌色卡')}:</span>
         <Select
@@ -330,6 +330,15 @@ const BeadPatternGenerator: React.FC = () => {
           style={ { width: 200 } }
           options={ BEAD_BRANDS.map((b) => ({ value: b.key, label: `${b.name} · ${sizeLabel(b)}` })) }
         />
+        <span style={ labelStyle }>{t('用色数')}:</span>
+        <Slider min={ COLORS_MIN } max={ COLORS_MAX } value={ maxColors } onChange={ setMaxColors } style={ sliderStyle } />
+        <span style={ { width: 20 } }>{maxColors}</span>
+        <Checkbox checked={ dither } onChange={ (e) => setDither(e.target.checked) }>{t('抖动')}</Checkbox>
+        <Checkbox checked={ removeBg } onChange={ (e) => setRemoveBg(e.target.checked) }>{t('去背景')}</Checkbox>
+      </div>
+
+      {/* 图纸宽高 (单独一行) */}
+      <div style={ row }>
         <span style={ labelStyle }>{t('图纸宽 (颗粒数)')}:</span>
         <Slider
           min={ WIDTH_MIN } max={ WIDTH_MAX } value={ width } onChange={ setWidth }
@@ -343,11 +352,6 @@ const BeadPatternGenerator: React.FC = () => {
         />
         <span style={ valueStyle }>{height}</span>
         <Checkbox checked={ keepRatio } onChange={ (e) => setKeepRatio(e.target.checked) }>{t('按原图比例')}</Checkbox>
-        <span style={ labelStyle }>{t('用色数')}:</span>
-        <Slider min={ COLORS_MIN } max={ COLORS_MAX } value={ maxColors } onChange={ setMaxColors } style={ sliderStyle } />
-        <span style={ { width: 20 } }>{maxColors}</span>
-        <Checkbox checked={ dither } onChange={ (e) => setDither(e.target.checked) }>{t('抖动')}</Checkbox>
-        <Checkbox checked={ removeBg } onChange={ (e) => setRemoveBg(e.target.checked) }>{t('去背景')}</Checkbox>
       </div>
 
       <div style={ row }>

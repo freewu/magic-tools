@@ -72,6 +72,19 @@ const file = (name = 'photo.png', type = 'image/png') => new File([ 'x' ], name,
 
 /** 拖拽区 */
 const zone = (container: HTMLElement) => container.querySelector('div[style*="dashed"]') as HTMLElement;
+/**
+ * 按取值范围取滑块 (与行内位置无关):
+ * 图纸宽 8~200 / 图纸高 1~200 / 用色数 2~48 / 亮度・对比度・饱和度 -100~100
+ */
+const slider = (container: HTMLElement, min: number, max: number): HTMLElement => {
+  const hit = [ ...container.querySelectorAll('[role="slider"]') ].find(
+    (el) => el.getAttribute('aria-valuemin') === String(min) && el.getAttribute('aria-valuemax') === String(max)
+  );
+  if (!hit) throw new Error(`未找到滑块: ${min}~${max}`);
+  return hit as HTMLElement;
+};
+const widthSlider = (container: HTMLElement) => slider(container, 8, 200);
+const heightSlider = (container: HTMLElement) => slider(container, 1, 200);
 /** 预览画布 (重采样用的画布不在文档里, 所以 DOM 中只有一个 canvas) */
 const canvas = (container: HTMLElement) => container.querySelector('canvas') as HTMLCanvasElement;
 const btn = (name: string): HTMLButtonElement => {
@@ -127,12 +140,11 @@ describe('拼豆图纸 初始界面', () => {
 
   test('默认参数: 宽 58 颗粒 / 16 色 / 去背景开启 / 自动格子', () => {
     const { container } = render(<BeadPatternGenerator />);
-    // 图纸宽/高改为滑块 (颗粒数)
+    // 图纸宽/高改为滑块 (颗粒数), 单独一行
     expect(screen.getByText('图纸宽 (颗粒数):')).toBeInTheDocument();
     expect(screen.getByText('图纸高 (颗粒数):')).toBeInTheDocument();
-    const sliders = container.querySelectorAll('[role="slider"]');
-    expect(sliders[0].getAttribute('aria-valuenow')).toBe('58');
-    expect(sliders[1].getAttribute('aria-valuenow')).toBe('58');
+    expect(widthSlider(container).getAttribute('aria-valuenow')).toBe('58');
+    expect(heightSlider(container).getAttribute('aria-valuenow')).toBe('58');
     expect(container.querySelector('input.ant-input-number-input')).toBeNull();
     expect(screen.getByText('16')).toBeInTheDocument();
     expect(screen.getByText(/小豆/)).toBeInTheDocument();
@@ -217,11 +229,11 @@ describe('拼豆图纸 生成与编辑', () => {
     const { container } = render(<BeadPatternGenerator />);
     await upload(container);
     await waitFor(() => expect(container.textContent).toContain('3364'));
-    const sliders = container.querySelectorAll('[role="slider"]');
+    const w = widthSlider(container);
     // HOME 键把宽度拉到最小 (8 颗粒), 4x4 原图 -> 高度同步为 8
-    fireEvent.keyDown(sliders[0], { keyCode: 36 });
-    await waitFor(() => expect(sliders[0].getAttribute('aria-valuenow')).toBe('8'));
-    await waitFor(() => expect(sliders[1].getAttribute('aria-valuenow')).toBe('8'));
+    fireEvent.keyDown(w, { keyCode: 36 });
+    await waitFor(() => expect(w.getAttribute('aria-valuenow')).toBe('8'));
+    await waitFor(() => expect(heightSlider(container).getAttribute('aria-valuenow')).toBe('8'));
     // 8x8 = 64 颗粒
     await waitFor(() => expect(container.textContent).toContain('64'));
     expect(container.textContent).not.toContain('3364');
