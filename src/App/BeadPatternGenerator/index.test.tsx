@@ -215,6 +215,45 @@ describe('拼豆图纸 生成与编辑', () => {
     await waitFor(() => expect(container.textContent).toContain('3364'));
   });
 
+  test('预览可放大/缩小, 归位回到 100% 且滚动回原点', async () => {
+    const { container } = render(<BeadPatternGenerator />);
+    await upload(container);
+    await waitFor(() => expect(container.textContent).toContain('3364'));
+    const cv = canvas(container);
+    const view = cv.parentElement as HTMLElement;
+    const base = cv.style.width;
+    expect(screen.getByText('100%')).toBeInTheDocument();
+
+    // 放大一档 25%: 画布显示尺寸随之变大 (位图尺寸不变)
+    fireEvent.click(screen.getByLabelText('放大'));
+    expect(screen.getByText('125%')).toBeInTheDocument();
+    expect(cv.style.width).toBe(`${Math.round(parseFloat(base) * 1.25)}px`);
+    expect(cv.width).toBe(Math.round(parseFloat(base)));
+
+    // 缩小回 100%
+    fireEvent.click(screen.getByLabelText('缩小'));
+    expect(screen.getByText('100%')).toBeInTheDocument();
+    expect(cv.style.width).toBe(base);
+
+    // 连续放大到上限 400% (按钮禁用) 与下限 25%
+    for (let i = 0; i < 20; i++) fireEvent.click(screen.getByLabelText('放大'));
+    expect(screen.getByText('400%')).toBeInTheDocument();
+    expect(screen.getByLabelText('放大')).toBeDisabled();
+    for (let i = 0; i < 40; i++) fireEvent.click(screen.getByLabelText('缩小'));
+    expect(screen.getByText('25%')).toBeInTheDocument();
+    expect(screen.getByLabelText('缩小')).toBeDisabled();
+
+    // 归位: 缩放回 100%, 滚动位置回原点
+    fireEvent.click(screen.getByLabelText('放大'));
+    view.scrollLeft = 120;
+    view.scrollTop = 80;
+    fireEvent.click(btn('归位'));
+    expect(screen.getByText('100%')).toBeInTheDocument();
+    expect(cv.style.width).toBe(base);
+    expect(view.scrollLeft).toBe(0);
+    expect(view.scrollTop).toBe(0);
+  });
+
   test('镜像开关不改变豆数, 但会重绘预览', async () => {
     const { container } = render(<BeadPatternGenerator />);
     await upload(container);

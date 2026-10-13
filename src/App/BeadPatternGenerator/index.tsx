@@ -1,5 +1,5 @@
 import { Button, Checkbox, Segmented, Select, Slider, message } from "antd";
-import { CopyOutlined, DownloadOutlined, RedoOutlined, UndoOutlined } from '@ant-design/icons';
+import { CopyOutlined, DownloadOutlined, RedoOutlined, UndoOutlined, ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
 import { useEffect, useMemo, useRef, useState } from "react";
 import { copyTextToClipboard } from "../../lib";
 import { ImageError, loadImageFile, type ImageFile } from "../../lib/image";
@@ -17,6 +17,11 @@ import {
 } from "./draw";
 
 type Tool = 'brush' | 'eraser' | 'recolor' | 'fill';
+
+/** 预览缩放范围/步进 */
+const ZOOM_MIN = 0.25;
+const ZOOM_MAX = 4;
+const ZOOM_STEP = 0.25;
 
 /**
  * 图片 -> 目标豆数 (w x h) 的像素数据
@@ -75,6 +80,7 @@ const BeadPatternGenerator: React.FC = () => {
   const [ showGrid, setShowGrid ] = useState(true);
   const [ showAxis, setShowAxis ] = useState(true);
   const [ cellSize, setCellSize ] = useState(0);
+  const [ zoom, setZoom ] = useState(1);
   const [ mirror, setMirror ] = useState(false);
   const [ tool, setTool ] = useState<Tool>('brush');
   const [ picked, setPicked ] = useState(-1);
@@ -84,6 +90,7 @@ const BeadPatternGenerator: React.FC = () => {
   const [ dragOver, setDragOver ] = useState(false);
   const fileRef = useRef<HTMLInputElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const previewRef = useRef<HTMLDivElement | null>(null);
 
   const brand = getBrand(brandKey);
   const sizeLabel = (b: typeof brand) => t(b.size === 'mini' ? '小豆' : '大豆');
@@ -215,6 +222,15 @@ const BeadPatternGenerator: React.FC = () => {
   };
   const resetEdit = () => { setManual(null); setPast([]); setFuture([]); };
 
+  // 预览缩放 (1 = 画布 1:1 像素) 与归位 (回到 100% 且滚动回原点)
+  const setZoomSafe = (z: number) =>
+    setZoom(Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, Math.round(z * 100) / 100)));
+  const resetView = () => {
+    setZoom(1);
+    const el = previewRef.current;
+    if (el) { el.scrollLeft = 0; el.scrollTop = 0; }
+  };
+
   /** 带用量图例的完整图纸画布 (导出 PNG 用) */
   const buildExportCanvas = (): HTMLCanvasElement | null => {
     if (!shown || !stats) return null;
@@ -288,6 +304,7 @@ const BeadPatternGenerator: React.FC = () => {
   const labelStyle = { color: '#666', whiteSpace: 'nowrap' } as const;
   const sliderStyle = { width: 120, margin: '0 4px' } as const;
   const wideSliderStyle = { width: 200, margin: '0 4px' } as const;
+  const zoomBtn = { paddingInline: 6 } as const;
   const valueStyle = { minWidth: 26, textAlign: 'right', fontFamily: 'monospace' } as const;
   const noteStyle = { color: '#888', fontSize: 12, lineHeight: '20px' } as const;
 
@@ -408,13 +425,36 @@ const BeadPatternGenerator: React.FC = () => {
       <div style={ { display: 'flex', gap: 16, alignItems: 'flex-start', flexWrap: 'wrap', marginTop: 4 } }>
         {/* 预览 */}
         <div style={ { flex: '1 1 420px', minWidth: 280 } }>
-          <div style={ { ...labelStyle, marginBottom: 6 } }>{t('图纸预览 (点击格子可用上方工具修改)')}</div>
+          <div style={ { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 } }>
+            <span style={ labelStyle }>{t('图纸预览 (点击格子可用上方工具修改)')}</span>
+            <Button
+              size="small" style={ zoomBtn } icon={ <ZoomOutOutlined /> }
+              aria-label={ t('缩小') } title={ t('缩小') }
+              disabled={ zoom <= ZOOM_MIN } onClick={ () => setZoomSafe(zoom - ZOOM_STEP) }
+            />
+            <span style={ { minWidth: 44, textAlign: 'center', fontFamily: 'monospace' } }>{Math.round(zoom * 100)}%</span>
+            <Button
+              size="small" style={ zoomBtn } icon={ <ZoomInOutlined /> }
+              aria-label={ t('放大') } title={ t('放大') }
+              disabled={ zoom >= ZOOM_MAX } onClick={ () => setZoomSafe(zoom + ZOOM_STEP) }
+            />
+            <Button size="small" onClick={ resetView } title={ t('归位') }>{t('归位')}</Button>
+          </div>
           { shown
-            ? <div style={ { overflow: 'auto', border: '1px solid #eee', borderRadius: 6, padding: 4, background: '#fff' } }>
+            ? <div
+              ref={ previewRef }
+              style={ {
+                overflow: 'auto', border: '1px solid #eee', borderRadius: 6, padding: 4,
+                background: '#fff', maxHeight: '70vh',
+              } }
+            >
               <canvas
                 ref={ canvasRef }
                 onClick={ onCanvasClick }
-                style={ { maxWidth: '100%', height: 'auto', display: 'block', cursor: 'crosshair' } }
+                style={ {
+                  width: layout.width * zoom, height: layout.height * zoom,
+                  imageRendering: 'pixelated', display: 'block', cursor: 'crosshair',
+                } }
               />
             </div>
             : <div style={ {
