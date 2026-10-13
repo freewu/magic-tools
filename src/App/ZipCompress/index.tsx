@@ -150,7 +150,7 @@ const ZipCompress = () => {
   const dropBorder = dragging ? '#1677ff' : '#d9d9d9';
 
   return (
-    <div style={ { maxWidth: 900 } }>
+    <div style={ { width: '100%' } }>
       { contextHolder }
 
       {/* 选择 / 拖拽区 */}

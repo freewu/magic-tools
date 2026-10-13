@@ -215,7 +215,7 @@ const ZipExtract = () => {
     entry.date ? entry.date.toLocaleString(locale === 'en' ? 'en-US' : 'zh-CN', { hour12: false }) : '-';
 
   return (
-    <div style={ { maxWidth: 980 } }>
+    <div style={ { width: '100%' } }>
       { contextHolder }
 
       {/* 选择 / 拖拽区 */}
