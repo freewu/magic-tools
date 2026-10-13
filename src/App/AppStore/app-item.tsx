@@ -17,9 +17,10 @@ export type AppItemProps = {
   label: string,
   desktop?: boolean, // 仅桌面版可用 (浏览器演示版无法提供该能力)
   web?: boolean, // 仅 Web 版可用 (桌面版内嵌 WebView 无法提供该能力)
+  isNew?: boolean, // 新版本新增的应用 (展示 NEW 徽标)
 }
 
-const AppItem = ({ uri, label, icon, desktop, web } :AppItemProps) => {
+const AppItem = ({ uri, label, icon, desktop, web, isNew } :AppItemProps) => {
 
   const navigate = useNavigate();
   const { app, setApp } = useContext(AppContext)!
@@ -74,6 +75,12 @@ const AppItem = ({ uri, label, icon, desktop, web } :AppItemProps) => {
           { faved ? <StarFilled /> : <StarOutlined /> }
         </button>
       </Tooltip>
+      {/* NEW 徽标: 新版本新增的应用, 下个版本新增应用时从这里撤下 (见 define.tsx 的 IsNew) */}
+      { isNew && (
+        <Tooltip title={ tr(appstoreLang, locale, 'newTip', '新上线') }>
+          <span className="app-new-badge">NEW</span>
+        </Tooltip>
+      ) }
       <Space className="app-name">
         {/* { icon } */}
         { label }

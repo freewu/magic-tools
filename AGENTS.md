@@ -114,3 +114,26 @@ Cloudflare Pages 的构建环境和本地不同（本地 Node 24 / npm 11），�
 - 全部改完后验证一遍：`npm test` && `npm run build:renderer`，必要时在 `src-tauri` 下 `cargo check`
 - 发布前建议在应用「帮助」页确认新增的 Vx.y.z 更新日志条目显示正常
 - 若本次仅收到普通的开发需求（未提及发布），**不要**触碰上述清单中的任何版本号文件
+
+### 应用中心 NEW 徽标（发布时若有新增应用）
+
+> 应用中心的「NEW」徽标用来标记**本版本新增的应用**，每个版本只应保留一个（最新新增的那一个）。
+
+- **是否展示 NEW 徽标，定义在该应用自己的 `src/App/<AppKey>/define.tsx` 里**：导出 `const IsNew = true;` 即展示（缺省 / `false` / 不导出则不展示）。`src/App/index.tsx` 读取 `IsNew` 写入 `appList[].isNew`，由应用中心卡片（`AppStore/app-item.tsx`）渲染徽标；
+- **升版本时（收到发布指令后）：**
+  1. 若本次版本新增了应用 → 在新应用的 `define.tsx` 里加上 `IsNew = true`；
+  2. 同时**把上个版本新增应用的 `IsNew` 撤下**（改为 `false` 或删掉该行），避免多个应用一直挂着 NEW；
+  3. 若本次版本没有新增应用 → 不新增徽标，但上一个版本的 NEW 徽标同样需要按第 2 步撤下。
+- 示例（`src/App/FakeMeeting/define.tsx`）：
+
+      const AppName = '假装开会';
+      const Icon = '';
+      const Type = 'generator';
+      // 新版本新增的应用: 应用中心展示 NEW 徽标 (下个版本新增应用时记得改回 false / 移除)
+      const IsNew = true;
+
+      export { AppName, Icon, Type, IsNew }
+
+- 复核命令（应只剩**当前最新**的那个应用命中）：
+
+      grep -rn "IsNew = true" src/App/*/define.tsx

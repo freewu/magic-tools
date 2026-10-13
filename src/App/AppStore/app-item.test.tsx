@@ -12,7 +12,7 @@ jest.mock('../../hook/app-context', () => ({
 
 const setApp = jest.fn();
 
-const renderItem = (desktop?: boolean, web?: boolean) => render(
+const renderItem = (desktop?: boolean, web?: boolean, isNew?: boolean) => render(
   <MemoryRouter initialEntries={ [ '/' ] }>
     <AppContext.Provider value={ {
       app: '',
@@ -23,7 +23,7 @@ const renderItem = (desktop?: boolean, web?: boolean) => render(
       closeRight: jest.fn(),
       closeOthers: jest.fn(),
     } }>
-      <AppItem uri="DnsQuery" icon="" label="DNS 查询" desktop={ desktop } web={ web } />
+      <AppItem uri="DnsQuery" icon="" label="DNS 查询" desktop={ desktop } web={ web } isNew={ isNew } />
     </AppContext.Provider>
   </MemoryRouter>
 );
@@ -48,6 +48,17 @@ describe('AppStore 应用卡片', () => {
     expect(screen.getByText('DNS 查询')).toBeInTheDocument();
     expect(screen.getByText('仅 Web')).toBeInTheDocument();
     expect(screen.queryByText('仅桌面版')).not.toBeInTheDocument();
+  });
+
+  test('新版本新增的应用展示 NEW 徽标', () => {
+    renderItem(false, false, true);
+    expect(screen.getByText('DNS 查询')).toBeInTheDocument();
+    expect(screen.getByText('NEW')).toBeInTheDocument();
+  });
+
+  test('普通应用不展示 NEW 徽标', () => {
+    renderItem(false);
+    expect(screen.queryByText('NEW')).not.toBeInTheDocument();
   });
 
   test('点击卡片切换当前应用', () => {

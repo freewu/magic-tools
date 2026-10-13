@@ -131,3 +131,18 @@
 .app-star-on:hover {
   color: #d48806;
 }
+
+/* NEW 徽标: 卡片右下角, 标记新版本新增的应用 (define.tsx 的 IsNew) */
+.app-new-badge {
+  position: absolute;
+  right: 4px;
+  bottom: 2px;
+  padding: 0 5px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 14px;
+  letter-spacing: 0.5px;
+  color: #fff;
+  background: linear-gradient(135deg, #ff7875, #f5222d);
+  border-radius: 999px;
+}

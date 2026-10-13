@@ -204,6 +204,7 @@ const Favorites = () => {
         label={ item.label }
         desktop={ item.desktop }
         web={ item.web }
+        isNew={ item.isNew }
       />
       { canDrag && (
         <span
