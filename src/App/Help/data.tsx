@@ -50,6 +50,8 @@ export const compomentList: HelpComponent[] = [
   { name: "toml-patch", version: "0.2.3", url: "https://github.com/timhall/toml-patch", color: "9C4121", logo: "toml" },
   { name: "deepmerge", version: "4.3.1", url: "https://github.com/TehShrike/deepmerge" },
   { name: "JSZip", version: "3.10.2", url: "https://stuk.github.io/jszip/", color: "F7DF1E", logo: "javascript" },
+  { name: "gifuct-js", version: "2.1.2", url: "https://github.com/matt-way/gifuct-js", color: "F7DF1E", logo: "javascript" },
+  { name: "modern-gif", version: "2.1.0", url: "https://github.com/qq15725/modern-gif", color: "F7DF1E", logo: "javascript" },
 ];
 
 // shields.io 静态 badge 文本转义: - -> --, _ -> __, 空格 -> _

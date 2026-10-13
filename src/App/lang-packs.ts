@@ -71,6 +71,8 @@ import ImageSharpen from './ImageSharpen/lang';
 import ImageColorPicker from './ImageColorPicker/lang';
 import ImageToSvg from './ImageToSvg/lang';
 import PixelArt from './PixelArt/lang';
+import GifSplit from './GifSplit/lang';
+import GifGenerator from './GifGenerator/lang';
 import GPSConvert from './GPSConvert/lang';
 import LatLngConvert from './LatLngConvert/lang';
 import DownloadLinkConvert from './DownloadLinkConvert/lang';
@@ -226,6 +228,8 @@ export const langPacks = {
   ImageColorPicker: ImageColorPicker,
   ImageToSvg: ImageToSvg,
   PixelArt: PixelArt,
+  GifSplit: GifSplit,
+  GifGenerator: GifGenerator,
   GPSConvert: GPSConvert,
   LatLngConvert: LatLngConvert,
   DownloadLinkConvert: DownloadLinkConvert,

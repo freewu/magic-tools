@@ -119,6 +119,8 @@ const list = [
   'ImageColorPicker',
   'ImageToSvg',
   'PixelArt',
+  'GifSplit',
+  'GifGenerator',
   'AsciiTextArt',
   'HtmlStripText',
   'CodeShot',

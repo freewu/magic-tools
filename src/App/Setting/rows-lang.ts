@@ -565,6 +565,53 @@ const ROWS: Record<string, Row> = {
     '氣泡樣式的平台是否預設在氣泡上方顯示暱稱 (Slack / Discord 始終顯示)',
     'Whether bubble platforms show the sender name above the bubble by default (Slack / Discord always show it)',
   ],
+
+  // ---- GIF 拆解 (GIF Splitter) ----
+  'GIF 拆解': ['GIF 拆解', 'GIF Splitter'],
+  '默认精灵图列数': ['預設精靈圖欄數', 'Default sprite columns'],
+  '默认精灵图间隔': ['預設精靈圖間隔', 'Default sprite gap'],
+  '打开「GIF 拆解」导出精灵图时默认的列数, 默认 ${d} 列': [
+    '開啟「GIF 拆解」匯出精靈圖時預設的欄數, 預設 ${d} 欄',
+    'Default number of columns when exporting a sprite sheet from the GIF splitter (default ${d})',
+  ],
+  '精灵图里帧与帧之间留出的像素间隔 (0 表示紧贴), 默认 ${d}': [
+    '精靈圖裡影格與影格之間留出的像素間隔 (0 表示緊貼), 預設 ${d}',
+    'Pixel gap kept between frames in the sprite sheet (0 means flush); default ${d}',
+  ],
+
+  // ---- GIF 生成 (GIF Generator) ----
+  'GIF 生成': ['GIF 產生', 'GIF Generator'],
+  '默认帧延时': ['預設影格延時', 'Default frame delay'],
+  '默认循环次数 (0 为无限)': ['預設循環次數 (0 為無限)', 'Default loop count (0 = endless)'],
+  '默认最大颜色数': ['預設最大顏色數', 'Default max colors'],
+  '默认抖动': ['預設抖動', 'Default dithering'],
+  '默认尺寸模式': ['預設尺寸模式', 'Default sizing mode'],
+  '默认背景色': ['預設背景色', 'Default background color'],
+  '打开「GIF 生成」时每帧的默认延时时长 (ms), 默认 ${d}': [
+    '開啟「GIF 產生」時每格的預設延時時長 (ms), 預設 ${d}',
+    'Default delay used for each frame when opening the GIF generator (ms, default ${d})',
+  ],
+  '默认循环次数 (0 = 无限循环), 默认 ${d}': [
+    '預設循環次數 (0 = 無限循環), 預設 ${d}',
+    'Default loop count (0 = loop forever), default ${d}',
+  ],
+  '调色板的最大颜色数 (2-255), 越少文件越小, 默认 ${d}': [
+    '調色盤的最大顏色數 (2-255), 越少檔案越小, 預設 ${d}',
+    'Maximum colours of the palette (2-255); fewer colours mean a smaller file (default ${d})',
+  ],
+  '减色时使用的抖动算法, 渐变色更细腻但文件略大': [
+    '減色時使用的抖動演算法, 漸層色更細膩但檔案略大',
+    'Dithering algorithm used when reducing colours — gradients look smoother but the file is slightly larger',
+  ],
+  '多张图片尺寸不一致时如何放入画布, 默认 ${d}': [
+    '多張圖片尺寸不一致時如何放入畫布, 預設 ${d}',
+    'How frames with different sizes are fitted onto the canvas (default ${d})',
+  ],
+  '画布留白处填充的颜色, 留空表示透明': [
+    '畫布留白處填充的顏色, 留空表示透明',
+    'Colour used to fill the empty parts of the canvas; leave empty for transparent',
+  ],
+  '透明': ['透明', 'Transparent'],
 };
 
 /**

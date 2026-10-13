@@ -46,6 +46,13 @@ console.error = (...args: unknown[]) => {
   setupConsoleError(...args);
 };
 
+// jsdom 未实现 Web Streams API, 而 modern-gif / modern-palette (GIF 生成) 依赖它
+// (浏览器与 Node 18+ 均有原生实现, 这里仅为让 ts-jest 单元测试正常运行)
+const webStreams = require('node:stream/web');
+for (const key of [ 'ReadableStream', 'WritableStream', 'TransformStream' ]) {
+  if (typeof global[ key ] === 'undefined') global[ key ] = webStreams[ key ];
+}
+
 // jsdom 未实现 window.matchMedia (主题 / 响应式组件需要)
 if(typeof global.matchMedia === 'undefined') {
   global.matchMedia = (query :string) => ({

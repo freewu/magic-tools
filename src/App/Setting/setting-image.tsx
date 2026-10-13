@@ -6,8 +6,10 @@ import { ImageColorSetting } from "../ImageColor/setting";
 import { ImageSplitSetting } from "../ImageSplit/setting";
 import { ImageResizeSetting } from "../ImageResize/setting";
 import { PixelArtSetting } from "../PixelArt/setting";
+import { GifSplitSetting } from "../GifSplit/setting";
+import { GifGeneratorSetting } from "../GifGenerator/setting";
 
-// 图片分类设置: 代码截图 / 占位图片 / ICO 生成 / 图片主题色 / 图片分割 / 图片调整 (二维码、条形码已归入生成器分类; ASCII 图片、App Icon 暂无设置项)
+// 图片分类设置: 代码截图 / 占位图片 / ICO 生成 / 图片主题色 / 图片分割 / 图片调整 / 像素图 / GIF 拆解 / GIF 生成 (二维码、条形码已归入生成器分类; ASCII 图片、App Icon 暂无设置项)
 export const SettingImage = () => {
 
   return (
@@ -19,6 +21,8 @@ export const SettingImage = () => {
       <ImageSplitSetting />
       <ImageResizeSetting />
       <PixelArtSetting />
+      <GifSplitSetting />
+      <GifGeneratorSetting />
     </Form>
   )
 }
