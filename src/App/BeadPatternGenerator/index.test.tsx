@@ -215,6 +215,40 @@ describe('拼豆图纸 生成与编辑', () => {
     await waitFor(() => expect(container.textContent).toContain('3364'));
   });
 
+  test('宽/高微调按钮每次 ±1, 到边界禁用且高度随宽度联动', async () => {
+    const { container } = render(<BeadPatternGenerator />);
+    await upload(container);
+    await waitFor(() => expect(container.textContent).toContain('3364'));
+    const w = widthSlider(container);
+    const h = heightSlider(container);
+    // 默认 58/58, 勾选按原图比例 -> 高度按钮禁用
+    expect(screen.getByLabelText('增大图纸宽')).toBeEnabled();
+    expect(screen.getByLabelText('增大图纸高')).toBeDisabled();
+    fireEvent.click(screen.getByLabelText('增大图纸宽'));
+    expect(w.getAttribute('aria-valuenow')).toBe('59');
+    // 宽度 +1 后高度按原图比例 (4x4) 同步为 59, 但 59 不是整数倍? heightForWidth 走四舍五入
+    expect(h.getAttribute('aria-valuenow')).toBe('59');
+    expect(container.textContent).toContain('3481'); // 59x59
+    fireEvent.click(screen.getByLabelText('减小图纸宽'));
+    expect(w.getAttribute('aria-valuenow')).toBe('58');
+    // 取消按原图比例后可单独微调高度
+    fireEvent.click(screen.getByText('按原图比例'));
+    expect(screen.getByLabelText('增大图纸高')).toBeEnabled();
+    fireEvent.click(screen.getByLabelText('减小图纸高'));
+    expect(h.getAttribute('aria-valuenow')).toBe('57');
+    expect(container.textContent).toContain('3306'); // 58x57
+    // 下限: 高度最小 1, 宽度最小 8
+    fireEvent.keyDown(h, { keyCode: 36 });
+    expect(h.getAttribute('aria-valuenow')).toBe('1');
+    expect(screen.getByLabelText('减小图纸高')).toBeDisabled();
+    fireEvent.keyDown(w, { keyCode: 36 });
+    expect(screen.getByLabelText('减小图纸宽')).toBeDisabled();
+    // 上限: 用 END 键把宽度拉满 200
+    fireEvent.keyDown(w, { keyCode: 35 });
+    expect(w.getAttribute('aria-valuenow')).toBe('200');
+    expect(screen.getByLabelText('增大图纸宽')).toBeDisabled();
+  });
+
   test('预览可放大/缩小, 归位回到 100% 且滚动回原点', async () => {
     const { container } = render(<BeadPatternGenerator />);
     await upload(container);

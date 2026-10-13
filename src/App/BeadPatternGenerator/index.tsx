@@ -1,5 +1,5 @@
 import { Button, Checkbox, Segmented, Select, Slider, message } from "antd";
-import { CopyOutlined, DownloadOutlined, RedoOutlined, UndoOutlined, ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
+import { CopyOutlined, DownloadOutlined, MinusOutlined, PlusOutlined, RedoOutlined, UndoOutlined, ZoomInOutlined, ZoomOutOutlined } from '@ant-design/icons';
 import { useEffect, useMemo, useRef, useState } from "react";
 import { copyTextToClipboard } from "../../lib";
 import { ImageError, loadImageFile, type ImageFile } from "../../lib/image";
@@ -222,6 +222,10 @@ const BeadPatternGenerator: React.FC = () => {
   };
   const resetEdit = () => { setManual(null); setPast([]); setFuture([]); };
 
+  // 宽/高滑块旁的微调按钮 (每次 ±1 颗粒, 到边界自动禁用)
+  const stepWidth = (d: number) => setWidth(Math.min(WIDTH_MAX, Math.max(WIDTH_MIN, width + d)));
+  const stepHeight = (d: number) => setHeight(Math.min(WIDTH_MAX, Math.max(1, height + d)));
+
   // 预览缩放 (1 = 画布 1:1 像素) 与归位 (回到 100% 且滚动回原点)
   const setZoomSafe = (z: number) =>
     setZoom(Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, Math.round(z * 100) / 100)));
@@ -305,6 +309,7 @@ const BeadPatternGenerator: React.FC = () => {
   const sliderStyle = { width: 120, margin: '0 4px' } as const;
   const wideSliderStyle = { width: 200, margin: '0 4px' } as const;
   const zoomBtn = { paddingInline: 6 } as const;
+  const stepBtn = { ...zoomBtn, marginLeft: 2 } as const;
   const valueStyle = { minWidth: 26, textAlign: 'right', fontFamily: 'monospace' } as const;
   const noteStyle = { color: '#888', fontSize: 12, lineHeight: '20px' } as const;
 
@@ -362,12 +367,32 @@ const BeadPatternGenerator: React.FC = () => {
           style={ wideSliderStyle } tooltip={ { open: false } }
         />
         <span style={ valueStyle }>{width}</span>
+        <Button
+          size="small" style={ stepBtn } icon={ <MinusOutlined /> }
+          aria-label={ t('减小图纸宽') } title={ t('减小图纸宽') }
+          onClick={ () => stepWidth(-1) } disabled={ width <= WIDTH_MIN }
+        />
+        <Button
+          size="small" style={ stepBtn } icon={ <PlusOutlined /> }
+          aria-label={ t('增大图纸宽') } title={ t('增大图纸宽') }
+          onClick={ () => stepWidth(1) } disabled={ width >= WIDTH_MAX }
+        />
         <span style={ labelStyle }>{t('图纸高 (颗粒数)')}:</span>
         <Slider
           min={ 1 } max={ WIDTH_MAX } value={ height } onChange={ setHeight } disabled={ keepRatio }
           style={ wideSliderStyle } tooltip={ { open: false } }
         />
         <span style={ valueStyle }>{height}</span>
+        <Button
+          size="small" style={ stepBtn } icon={ <MinusOutlined /> }
+          aria-label={ t('减小图纸高') } title={ t('减小图纸高') }
+          onClick={ () => stepHeight(-1) } disabled={ keepRatio || height <= 1 }
+        />
+        <Button
+          size="small" style={ stepBtn } icon={ <PlusOutlined /> }
+          aria-label={ t('增大图纸高') } title={ t('增大图纸高') }
+          onClick={ () => stepHeight(1) } disabled={ keepRatio || height >= WIDTH_MAX }
+        />
         <Checkbox checked={ keepRatio } onChange={ (e) => setKeepRatio(e.target.checked) }>{t('按原图比例')}</Checkbox>
       </div>
 
