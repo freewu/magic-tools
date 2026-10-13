@@ -30,6 +30,7 @@ const list = [
   'CronRules',
   'GitignoreGenerator',
   'Whiteboard',
+  'BeadPatternGenerator',
   'AESCrypto',
   'RSACrypto',
   'SM2Crypto',

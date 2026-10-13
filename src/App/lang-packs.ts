@@ -149,6 +149,7 @@ import TcRules from './TcRules/lang';
 import NginxConfig from './NginxConfig/lang';
 import GitignoreGenerator from './GitignoreGenerator/lang';
 import Whiteboard from './Whiteboard/lang';
+import BeadPatternGenerator from './BeadPatternGenerator/lang';
 
 export const langPacks = {
   Hash: Hash,
@@ -294,6 +295,7 @@ export const langPacks = {
   NginxConfig,
   GitignoreGenerator,
   Whiteboard,
+  BeadPatternGenerator,
   BOMCheck,
   Metronome,
   ScreenRecorder,
