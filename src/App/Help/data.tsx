@@ -49,6 +49,7 @@ export const compomentList: HelpComponent[] = [
   { name: "yaml", version: "2.9.0", url: "https://github.com/eemeli/yaml", color: "CB171E", logo: "yaml" },
   { name: "toml-patch", version: "0.2.3", url: "https://github.com/timhall/toml-patch", color: "9C4121", logo: "toml" },
   { name: "deepmerge", version: "4.3.1", url: "https://github.com/TehShrike/deepmerge" },
+  { name: "JSZip", version: "3.10.2", url: "https://stuk.github.io/jszip/", color: "F7DF1E", logo: "javascript" },
 ];
 
 // shields.io 静态 badge 文本转义: - -> --, _ -> __, 空格 -> _

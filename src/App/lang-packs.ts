@@ -140,6 +140,8 @@ import JSONLConvert from './JSONLConvert/lang';
 import Teleprompter from './Teleprompter/lang';
 import BOMCheck from './BOMCheck/lang';
 import Metronome from './Metronome/lang';
+import ZipCompress from './ZipCompress/lang';
+import ZipExtract from './ZipExtract/lang';
 import ScreenRecorder from './ScreenRecorder/lang';
 import QrDecode from './QrDecode/lang';
 import SensitiveWord from './SensitiveWord/lang';
@@ -300,6 +302,8 @@ export const langPacks = {
   FakeMeeting,
   BOMCheck,
   Metronome,
+  ZipCompress,
+  ZipExtract,
   ScreenRecorder,
   QrDecode,
   SensitiveWord,

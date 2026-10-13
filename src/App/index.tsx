@@ -147,6 +147,8 @@ const list = [
   'Teleprompter',
   'BOMCheck',
   'Metronome',
+  'ZipCompress',
+  'ZipExtract',
   'ScreenRecorder',
   'QrDecode',
   'SensitiveWord',

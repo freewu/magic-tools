@@ -232,6 +232,86 @@ export async function savePngBatch(defaultNames: string[], dataUrls: string[]): 
 }
 
 /**
+ * 批量保存任意文件 (Zip 解压等一次性导出多个文件)
+ * - Tauri 环境: 弹「选择文件夹」对话框, 按 dirName 建子目录后逐个写入 (保留包内层级)
+ * - 普通浏览器: 逐个触发 <a download> (浏览器会拍平层级, 只保留文件名)
+ * @param files 待保存文件 (name 为含子目录的相对路径, 如 'docs/a.txt')
+ * @param opts.title 选择文件夹对话框标题 / opts.dirName 顶层子目录名 (可选)
+ * @returns 实际保存/触发的文件数 (取消选择文件夹返回 0)
+ */
+export async function saveBytesBatch(
+  files: readonly { name: string; bytes: Uint8Array }[],
+  opts: { title?: string; dirName?: string } = {},
+): Promise<number> {
+  if (files.length === 0) return 0;
+
+  // 路径防御: 去掉 .. 与开头的 / (解压包可能是恶意的), 分隔符统一为 /
+  const safeName = (name: string): string =>
+    String(name ?? '').replace(/\\/g, '/').split('/').filter((p) => p !== '' && p !== '.' && p !== '..').join('/');
+  const join = (...parts: string[]): string => parts.filter((p) => p !== '').join('/');
+
+  if (isTauri()) {
+    try {
+      const { open } = await import('@tauri-apps/plugin-dialog');
+      const { mkdir, writeFile } = await import('@tauri-apps/plugin-fs');
+      const dir = await open({ directory: true, multiple: false, title: opts.title ?? '选择保存文件夹' });
+      // 用户取消文件夹选择
+      if (dir === null) return 0;
+      const root = join(String(dir), opts.dirName ?? '');
+      const made = new Set<string>();
+      let ok = 0;
+      for (const file of files) {
+        const rel = safeName(file.name);
+        if (rel === '') continue;
+        const full = join(root, rel);
+        const parent = full.slice(0, full.lastIndexOf('/'));
+        try {
+          // 按需建立上级目录 (mkdir recursive, 同一目录只建一次)
+          if (parent !== '' && !made.has(parent)) {
+            await mkdir(parent, { recursive: true });
+            made.add(parent);
+          }
+          await writeFile(full, file.bytes);
+          ok += 1;
+        } catch (err) {
+          console.error('write batch file failed:', rel, err);
+        }
+      }
+      return ok;
+    } catch (err) {
+      // 插件/权限异常时回退到浏览器逐个下载方式
+      console.error('tauri saveBytesBatch failed:', err);
+    }
+  }
+
+  // 浏览器回退: 逐个触发下载 (间隔 250ms, 避免被当成垃圾行为); 重名时加序号
+  let ok = 0;
+  const used = new Set<string>();
+  for (const file of files) {
+    const base = safeName(file.name).split('/').pop() ?? '';
+    if (base === '') continue;
+    let name = base;
+    for (let i = 2; used.has(name); i += 1) {
+      const dot = base.lastIndexOf('.');
+      name = dot > 0 ? `${base.slice(0, dot)} (${i})${base.slice(dot)}` : `${base} (${i})`;
+    }
+    used.add(name);
+    const blob = new Blob([ file.bytes as Uint8Array<ArrayBuffer> ], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.setTimeout(() => URL.revokeObjectURL(url), 10_000);
+    ok += 1;
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+  return ok;
+}
+
+/**
  * 通知 Tauri 主进程显示模式已变化 (同步托盘菜单勾选)
  * @param mode 'light' | 'dark' | 'system'
  */
