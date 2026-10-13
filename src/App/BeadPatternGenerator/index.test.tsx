@@ -152,6 +152,29 @@ describe('拼豆图纸 初始界面', () => {
     expect(screen.queryByText('导出图纸 PNG')).toBeNull();
   });
 
+  test('可以隐藏 / 显示已载入的原图 (不影响图纸与统计)', async () => {
+    const { container } = render(<BeadPatternGenerator />);
+    await upload(container);
+    await waitFor(() => expect(container.textContent).toContain('3364'));
+    const zoneEl = zone(container);
+    expect(zoneEl.querySelector('img')).not.toBeNull();
+    // 隐藏后缩略图消失, 只留提示 (文件名) 与「显示图片」按钮
+    const pickSpy = jest.spyOn(HTMLInputElement.prototype, 'click');
+    fireEvent.click(screen.getByText('隐藏图片'));
+    expect(zoneEl.querySelector('img')).toBeNull();
+    expect(screen.getByText(/图片已隐藏/)).toBeInTheDocument();
+    expect(screen.getByText(/fake/)).toBeInTheDocument();
+    // 点按钮不应冒泡到拖拽区 (不会再次弹出文件选择)
+    expect(pickSpy).not.toHaveBeenCalled();
+    pickSpy.mockRestore();
+    // 图纸与统计不受影响
+    expect(container.textContent).toContain('3364');
+    expect(canvas(container)).toBeInTheDocument();
+    fireEvent.click(screen.getByText('显示图片'));
+    expect(zoneEl.querySelector('img')).not.toBeNull();
+    expect(screen.queryByText(/图片已隐藏/)).toBeNull();
+  });
+
   test('非图片文件给出提示且不读取', async () => {
     const { container } = render(<BeadPatternGenerator />);
     fireEvent.drop(zone(container), { dataTransfer: { files: [ file('a.txt', 'text/plain') ] } });

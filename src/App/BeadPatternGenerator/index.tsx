@@ -81,6 +81,7 @@ const BeadPatternGenerator: React.FC = () => {
   const [ showAxis, setShowAxis ] = useState(true);
   const [ cellSize, setCellSize ] = useState(0);
   const [ zoom, setZoom ] = useState(1);
+  const [ showSrc, setShowSrc ] = useState(true);
   const [ mirror, setMirror ] = useState(false);
   const [ tool, setTool ] = useState<Tool>('brush');
   const [ picked, setPicked ] = useState(-1);
@@ -335,7 +336,17 @@ const BeadPatternGenerator: React.FC = () => {
         } }
       >
         { src
-          ? <img src={ src.url } alt="" style={ { maxHeight: 120, maxWidth: '100%' } } />
+          ? <div style={ { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 } }>
+            { showSrc
+              ? <img src={ src.url } alt="" style={ { maxHeight: 120, maxWidth: '100%' } } />
+              : <div style={ { color: '#999', fontSize: 12 } }>
+                {t('图片已隐藏')}{src.base ? ` · ${src.base}` : ''}
+              </div> }
+            <Button
+              size="small"
+              onClick={ (e) => { e.stopPropagation(); setShowSrc(!showSrc); } }
+            >{showSrc ? t('隐藏图片') : t('显示图片')}</Button>
+          </div>
           : <div style={ { color: '#666' } }>{t('点击或拖拽图片到此处')}</div> }
       </div>
       <div style={ { ...noteStyle, marginBottom: 12 } }>
