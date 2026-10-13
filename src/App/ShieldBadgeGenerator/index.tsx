@@ -1,10 +1,10 @@
-import { Button, ColorPicker, Input, InputNumber, Space, message, theme } from "antd";
+import { Button, ColorPicker, Input, InputNumber, Segmented, Space, Tooltip, message, theme } from "antd";
 import { CopyOutlined, DownloadOutlined, PictureOutlined } from '@ant-design/icons';
 import { useMemo, useState } from "react";
 import { copyTextToClipboard } from "../../lib";
 import { saveBytesFile, savePngFile } from "../../lib/tauri";
 import {
-  badgeFileName, buildBadgeSvg, svgToDataUrl, parseSvgSize,
+  badgeFileName, buildBadgeSvg, countSvgLines, formatBadgeSvg, svgToDataUrl, parseSvgSize,
   BADGE_DEFAULTS,
 } from "./lib";
 import { useLocale } from "../../hook/locale-context";
@@ -19,6 +19,7 @@ const ShieldBadgeGenerator: React.FC = () => {
   const [ fg, setFg ] = useState<string>(BADGE_DEFAULTS.fg);
   const [ status, setStatus ] = useState<string>(BADGE_DEFAULTS.status);
   const [ scale, setScale ] = useState<number>(2); // PNG 导出倍率 (图片尺寸)
+  const [ srcView, setSrcView ] = useState<'pretty' | 'raw'>('pretty'); // 源码区: 格式化多行 / 原始单行
   const { token } = theme.useToken();
 
   // 参数变化即实时生成
@@ -29,6 +30,11 @@ const ShieldBadgeGenerator: React.FC = () => {
   const empty = svg === '';
   const dataUrl = useMemo(() => svgToDataUrl(svg), [ svg ]);
 
+  // 源码格式化查看: 默认展开为缩进多行, 可切回原始单行
+  const prettySvg = useMemo(() => formatBadgeSvg(svg), [ svg ]);
+  const shownSvg = srcView === 'pretty' ? prettySvg : svg;
+  const svgLines = countSvgLines(shownSvg);
+
   // 按倍率换算的 PNG 输出像素尺寸 (badge 高 20, 宽随文字)
   const outSize = useMemo(() => {
     const s = parseSvgSize(svg);
@@ -38,6 +44,16 @@ const ShieldBadgeGenerator: React.FC = () => {
   const doCopy = async () => {
     try {
       await copyTextToClipboard(svg);
+      message.success(t('SVG 内容已复制到剪贴板'));
+    } catch (err) {
+      message.error(t('复制失败, 请手动选中下方代码复制'));
+    }
+  };
+
+  // 复制源码区当前显示的内容 (格式化或原始)
+  const doCopyShown = async () => {
+    try {
+      await copyTextToClipboard(shownSvg);
       message.success(t('SVG 内容已复制到剪贴板'));
     } catch (err) {
       message.error(t('复制失败, 请手动选中下方代码复制'));
@@ -156,13 +172,39 @@ const ShieldBadgeGenerator: React.FC = () => {
         <Button icon={ <PictureOutlined /> } disabled={ empty } onClick={ doSavePng }>{tt('导出 PNG ({s}×)', { s: scale })}</Button>
       </Space>
 
-      {/* SVG 源码 (方便整段选择) */}
-      <div style={ { color: token.colorTextSecondary, marginBottom: 4 } }>{t('SVG 源码:')}</div>
+      {/* SVG 源码: 默认格式化 (缩进多行) 查看, 可切回原始单行; 复制按钮复制当前显示内容 */}
+      <div style={ { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 } }>
+        <span style={ { color: token.colorTextSecondary } }>{t('SVG 源码:')}</span>
+        <Segmented
+          size="small"
+          value={ srcView }
+          onChange={ (v) => setSrcView(v as 'pretty' | 'raw') }
+          options={ [
+            { label: t('格式化'), value: 'pretty' },
+            { label: t('单行原始'), value: 'raw' },
+          ] }
+        />
+        { svgLines > 0 && (
+          <span style={ { color: token.colorTextTertiary, fontSize: 12 } }>
+            {tt('共 {n} 行 · {c} 字符', { n: svgLines, c: shownSvg.length })}
+          </span>
+        ) }
+        <Tooltip title={t('复制当前显示的内容')}>
+          <Button
+            size="small"
+            type="text"
+            icon={ <CopyOutlined /> }
+            disabled={ empty }
+            onClick={ doCopyShown }
+            style={ { marginLeft: 'auto' } }
+          />
+        </Tooltip>
+      </div>
       <pre style={ {
         background: '#0f1419', color: '#e6edf3', borderRadius: 8, padding: '10px 12px',
         fontSize: 12, overflowX: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-all',
-        lineHeight: 1.7, margin: 0, maxHeight: 240, overflowY: 'auto',
-      } }>{ svg }</pre>
+        lineHeight: 1.7, margin: 0, maxHeight: 320, overflowY: 'auto',
+      } }>{ shownSvg }</pre>
     </div>
   );
 }

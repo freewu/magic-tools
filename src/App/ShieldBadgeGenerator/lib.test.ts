@@ -1,6 +1,11 @@
 import {
   buildBadgeSvg, svgToDataUrl, badgeFileName, escapeXml, BADGE_DEFAULTS, parseSvgSize,
+  formatBadgeSvg, countSvgLines,
 } from './lib';
+
+/** 取出全部标签文本 (格式化只允许改变标签之间的空白, 标签序列与文本内容必须一模一样) */
+const tagsOf = (s: string) => s.match(/<[^>]+>/g) ?? [];
+const textOf = (s: string) => s.replace(/<[^>]+>/g, '').replace(/\s+/g, '');
 
 describe('Shield Badge 生成', () => {
   it('示例结构: 双段 path + 光泽 + 文字与阴影', () => {
@@ -88,5 +93,47 @@ describe('Shield Badge 生成', () => {
   it('escapeXml 映射正确', () => {
     expect(escapeXml('<a href="x">&</a>')).toBe('&lt;a href=&quot;x&quot;&gt;&amp;&lt;/a&gt;');
     expect(escapeXml("it's")).toBe('it&apos;s');
+  });
+
+  describe('格式化查看 (formatBadgeSvg)', () => {
+    const svg = buildBadgeSvg({ label: 'php', value: '8.0', fg: '#fff', status: '#007ec6' });
+    const pretty = formatBadgeSvg(svg);
+
+    it('原始输出为单行, 格式化后展开为多行缩进', () => {
+      expect(svg).not.toContain('\n');
+      expect(pretty).not.toContain('\n\n');
+      expect(countSvgLines(svg)).toBe(1);
+      expect(countSvgLines(pretty)).toBeGreaterThan(10);
+      expect(pretty.split('\n')[0]).toMatch(/^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" width="64" height="20">$/);
+      expect(pretty.endsWith('</svg>')).toBe(true);
+      // 多层结构逐层缩进
+      expect(pretty).toContain('\n  <linearGradient');
+      expect(pretty).toContain('\n    <stop');
+      expect(pretty).toContain('\n  <mask');
+      expect(pretty).toContain('\n    <rect');
+      expect(pretty).toContain('\n  <g mask="url(#a)">');
+      // 叶子文本保持单行, 不被拆开
+      expect(pretty).toContain('<text x="16.0" y="14">php</text>');
+      expect(pretty).toContain('<text x="48.0" y="14">8.0</text>');
+      // 自闭合元素单独成行
+      expect(pretty).toContain('<path fill="#555" d="M0 0h32v20H0z"/>');
+    });
+
+    it('格式化不改变 SVG 结构: 标签序列与文本内容完全一致', () => {
+      expect(tagsOf(pretty)).toEqual(tagsOf(svg));
+      expect(textOf(pretty)).toBe(textOf(svg));
+      expect(tagsOf(pretty).length).toBe(24); // svg(2) + linearGradient(2) + stop(2) + mask(2) + rect(1) + g(2) + path(3) + g(2) + text(8)
+    });
+
+    it('缩进可指定 (4 空格)', () => {
+      expect(formatBadgeSvg(svg, 4)).toContain('\n    <linearGradient');
+    });
+
+    it('空串返回空串; 非法 XML 原样返回 (不丢内容)', () => {
+      expect(formatBadgeSvg('')).toBe('');
+      expect(countSvgLines('')).toBe(0);
+      const broken = '<svg><g></svg>';
+      expect(formatBadgeSvg(broken)).toBe(broken);
+    });
   });
 });

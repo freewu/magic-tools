@@ -1,5 +1,7 @@
 // Shield Badge 生成: shields.io 风格 SVG badge
 
+import { formatXml } from '../XmlFormatter/lib';
+
 export interface BadgeOpts {
   /** 左侧文字 (如 php) */
   label: string;
@@ -94,3 +96,23 @@ export const parseSvgSize = (svg: string): { w: number; h: number } | null => {
 /** 导出文件名: 文字-状态.svg (去非法文件名字符) */
 export const badgeFileName = (label: string, value: string): string =>
   ((label || 'badge') + '-' + (value || 'status')).replace(/[\\/:*?"<>|]/g, '') + '.svg';
+
+/**
+ * 源码格式化查看: 把单行 SVG 展开为缩进多行 (复用「XML 格式化」的手写 pretty printer,
+ * 多层元素逐层缩进, <text> 等叶子文本保持单行); 空串返回空串, 解析失败时原样返回 (不失信息)
+ */
+export const formatBadgeSvg = (svg: string, indentSize = 2): string => {
+  const src = String(svg ?? '');
+  if (!src) return '';
+  try {
+    return formatXml(src, { indentSize }).replace(/\s+$/, '');
+  } catch (err) {
+    return src;
+  }
+};
+
+/** 源码行数 (格式化查看时显示; 空串为 0) */
+export const countSvgLines = (svg: string): number => {
+  const src = String(svg ?? '');
+  return src ? src.split('\n').length : 0;
+};
