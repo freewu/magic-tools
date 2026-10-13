@@ -75,13 +75,13 @@
   border-radius: 4px;
 }
 
-/* 仅桌面版 / 仅 Web 标识: 卡片左上角小图标 + 文案 (悬停显示完整提示)
-   (右上角留给收藏星标) */
+/* 仅桌面版 / 仅 Web 标识: 卡片右下角小图标 + 文案 (悬停显示完整提示)
+   (左上角留给 NEW 徽标, 右上角留给收藏星标) */
 .app-desktop-badge,
 .app-web-badge {
   position: absolute;
-  top: 2px;
-  left: 4px;
+  right: 4px;
+  bottom: 2px;
   display: inline-flex;
   align-items: center;
   gap: 2px;
@@ -132,11 +132,11 @@
   color: #d48806;
 }
 
-/* NEW 徽标: 卡片右下角, 标记新版本新增的应用 (define.tsx 的 IsNew) */
+/* NEW 徽标: 卡片左上角, 标记新版本新增的应用 (define.tsx 的 IsNew) */
 .app-new-badge {
   position: absolute;
-  right: 4px;
-  bottom: 2px;
+  top: 2px;
+  left: 4px;
   padding: 0 5px;
   font-size: 10px;
   font-weight: 700;
