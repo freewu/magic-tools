@@ -320,6 +320,7 @@ const BeadPatternGenerator: React.FC = () => {
         ref={ fileRef } type="file" accept="image/*" style={ { display: 'none' } }
         onChange={ (e) => { load(e.target.files?.[0]); e.target.value = ''; } }
       />
+      { (!src || showSrc) && <>
       <div
         onClick={ () => fileRef.current?.click() }
         onDragOver={ (e) => { e.preventDefault(); setDragOver(true); } }
@@ -337,15 +338,11 @@ const BeadPatternGenerator: React.FC = () => {
       >
         { src
           ? <div style={ { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 } }>
-            { showSrc
-              ? <img src={ src.url } alt="" style={ { maxHeight: 120, maxWidth: '100%' } } />
-              : <div style={ { color: '#999', fontSize: 12 } }>
-                {t('图片已隐藏')}{src.base ? ` · ${src.base}` : ''}
-              </div> }
+            <img src={ src.url } alt="" style={ { maxHeight: 120, maxWidth: '100%' } } />
             <Button
               size="small"
-              onClick={ (e) => { e.stopPropagation(); setShowSrc(!showSrc); } }
-            >{showSrc ? t('隐藏图片') : t('显示图片')}</Button>
+              onClick={ (e) => { e.stopPropagation(); setShowSrc(false); } }
+            >{t('隐藏图片')}</Button>
           </div>
           : <div style={ { color: '#666' } }>{t('点击或拖拽图片到此处')}</div> }
       </div>
@@ -353,6 +350,7 @@ const BeadPatternGenerator: React.FC = () => {
         <div>{t('支持 png / jpg / webp / gif (首帧), 自动按颗粒数缩放; 纯色/透明背景自动留空')}</div>
         <div>{t('载入图片后自动生成拼豆图纸: 按真实色卡匹配色号, 可手工改色后导出打印')}</div>
       </div>
+      </> }
 
       {/* 配色参数 */}
       <div style={ row }>
@@ -368,6 +366,9 @@ const BeadPatternGenerator: React.FC = () => {
         <span style={ { width: 20 } }>{maxColors}</span>
         <Checkbox checked={ dither } onChange={ (e) => setDither(e.target.checked) }>{t('抖动')}</Checkbox>
         <Checkbox checked={ removeBg } onChange={ (e) => setRemoveBg(e.target.checked) }>{t('去背景')}</Checkbox>
+        { src && !showSrc && (
+          <Button size="small" title={ src.base } onClick={ () => setShowSrc(true) }>{t('显示图片')}</Button>
+        )}
       </div>
 
       {/* 图纸宽高 (单独一行) */}

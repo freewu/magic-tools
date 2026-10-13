@@ -152,27 +152,31 @@ describe('拼豆图纸 初始界面', () => {
     expect(screen.queryByText('导出图纸 PNG')).toBeNull();
   });
 
-  test('可以隐藏 / 显示已载入的原图 (不影响图纸与统计)', async () => {
+  test('可以隐藏 / 显示已载入的原图 (隐藏时上传区与说明一并收起)', async () => {
     const { container } = render(<BeadPatternGenerator />);
     await upload(container);
     await waitFor(() => expect(container.textContent).toContain('3364'));
-    const zoneEl = zone(container);
-    expect(zoneEl.querySelector('img')).not.toBeNull();
-    // 隐藏后缩略图消失, 只留提示 (文件名) 与「显示图片」按钮
+    expect(zone(container)).not.toBeNull();
+    expect(container.querySelector('img')).not.toBeNull();
+    // 隐藏: 品牌色卡上方的区域 (上传区 + 两行说明) 全部收起, 只留一个小按钮
     const pickSpy = jest.spyOn(HTMLInputElement.prototype, 'click');
     fireEvent.click(screen.getByText('隐藏图片'));
-    expect(zoneEl.querySelector('img')).toBeNull();
-    expect(screen.getByText(/图片已隐藏/)).toBeInTheDocument();
-    expect(screen.getByText(/fake/)).toBeInTheDocument();
+    expect(zone(container)).toBeNull();
+    expect(container.querySelector('img')).toBeNull();
+    expect(screen.queryByText(/支持 png \/ jpg/)).toBeNull();
+    expect(screen.queryByText(/载入图片后自动生成拼豆图纸/)).toBeNull();
     // 点按钮不应冒泡到拖拽区 (不会再次弹出文件选择)
     expect(pickSpy).not.toHaveBeenCalled();
     pickSpy.mockRestore();
     // 图纸与统计不受影响
     expect(container.textContent).toContain('3364');
     expect(canvas(container)).toBeInTheDocument();
+    // 显示: 上传区恢复
     fireEvent.click(screen.getByText('显示图片'));
-    expect(zoneEl.querySelector('img')).not.toBeNull();
-    expect(screen.queryByText(/图片已隐藏/)).toBeNull();
+    expect(zone(container)).not.toBeNull();
+    expect(container.querySelector('img')).not.toBeNull();
+    expect(screen.getByText(/支持 png \/ jpg/)).toBeInTheDocument();
+    expect(screen.getByText('隐藏图片')).toBeInTheDocument();
   });
 
   test('非图片文件给出提示且不读取', async () => {

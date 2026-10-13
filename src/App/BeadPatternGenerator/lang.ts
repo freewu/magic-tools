@@ -65,7 +65,6 @@ const beadlangRows: Record<string, [string, string]> = {
   '增大图纸高': ['增大圖紙高', 'Increase height'],
   '隐藏图片': ['隱藏圖片', 'Hide image'],
   '显示图片': ['顯示圖片', 'Show image'],
-  '图片已隐藏': ['圖片已隱藏', 'Image hidden'],
   '载入图片后显示图纸预览': ['載入圖片後顯示圖紙預覽', 'Load an image to see the pattern preview'],
   '统计': ['統計', 'Stats'],
   '总豆数': ['總豆數', 'Total beads'],
