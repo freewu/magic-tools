@@ -1,0 +1,494 @@
+/* 假装开会: 三种会议软件的假界面 (腾讯会议 / Zoom / Microsoft Teams) */
+
+.fm-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .18);
+}
+
+.fm-stage.fm-immersive {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  aspect-ratio: auto;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.fm-stage.fm-immersive .fm-app { font-size: 19px; }
+
+.fm-app {
+  --bg: #1b1c1f;
+  --bar: #26272b;
+  --tile: #2b2d31;
+  --panel: #202126;
+  --text: #fff;
+  --sub: rgba(255, 255, 255, .62);
+  --line: rgba(255, 255, 255, .1);
+  --accent: #006eff;
+  --speaking: #00c169;
+  --danger: #ff6b6b;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text);
+  background: var(--bg);
+  font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  user-select: none;
+}
+
+/* 皮肤变量: 尽量贴近各产品深色主题的取色 */
+.fm-zoom {
+  --bg: #141414;
+  --bar: #242424;
+  --tile: #2d2d2d;
+  --panel: #1f1f1f;
+  --accent: #2d8cff;
+  --danger: #e8172b;
+  --speaking: #00c169;
+}
+
+.fm-teams {
+  --bg: #242338;
+  --bar: #2f2e45;
+  --tile: #3d3c55;
+  --panel: #2b2a40;
+  --accent: #5b5fc7;
+  --danger: #d74654;
+  --speaking: #7f85f5;
+}
+
+/* ---------------- 顶部栏 ---------------- */
+
+.fm-top {
+  display: flex;
+  align-items: center;
+  gap: .6em;
+  flex: none;
+  padding: .5em .9em;
+  background: var(--bar);
+  border-bottom: 1px solid var(--line);
+  font-size: .92em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.fm-zoom .fm-top { border-bottom-color: rgba(255, 255, 255, .08); }
+
+.fm-logo {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  min-width: 1.9em;
+  height: 1.9em;
+  padding: 0 .4em;
+  border-radius: .35em;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: .95em;
+  letter-spacing: .01em;
+}
+
+.fm-brand { font-weight: 600; flex: none; }
+
+.fm-topic {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 34%;
+  flex: 0 1 auto;
+}
+
+.fm-sub { color: var(--sub); font-size: .92em; overflow: hidden; text-overflow: ellipsis; }
+.fm-grow { flex: 1 1 auto; min-width: .2em; }
+
+.fm-rec {
+  color: #ff6b6b;
+  font-weight: 600;
+  font-size: .9em;
+  letter-spacing: .04em;
+}
+
+.fm-rec::before {
+  content: "";
+  display: inline-block;
+  width: .5em;
+  height: .5em;
+  margin-right: .35em;
+  border-radius: 50%;
+  background: #ff4d4f;
+  animation: fm-blink 1.6s infinite;
+}
+
+@keyframes fm-blink { 50% { opacity: .25; } }
+
+.fm-clock { font-variant-numeric: tabular-nums; color: var(--sub); }
+
+.fm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .25em;
+  padding: .05em .45em;
+  border-radius: .35em;
+  background: rgba(255, 255, 255, .08);
+  font-size: .88em;
+}
+
+.fm-chip.is-ok { color: #4cd07d; }
+
+.fm-top-icons { display: inline-flex; align-items: center; gap: .2em; }
+
+.fm-top-icons > .fm-icon {
+  display: grid;
+  place-items: center;
+  width: 1.9em;
+  height: 1.9em;
+  border-radius: .35em;
+  color: var(--sub);
+}
+
+/* ---------------- 主体 / 网格 ---------------- */
+
+.fm-body { flex: 1 1 auto; display: flex; min-height: 0; }
+.fm-main { position: relative; flex: 1 1 auto; min-width: 0; padding: .55em; display: flex; }
+
+.fm-grid {
+  flex: 1 1 auto;
+  display: grid;
+  gap: .55em;
+  grid-auto-rows: 1fr;
+  min-width: 0;
+}
+
+.fm-tile {
+  position: relative;
+  overflow: hidden;
+  border-radius: .55em;
+  background: var(--tile);
+  background-image: radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, .07), transparent 62%);
+  display: grid;
+  place-items: center;
+  container-type: size;
+  min-height: 0;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  transition: outline-color .25s;
+}
+
+.fm-tile.is-dim { background-color: #22242a; filter: brightness(.86); }
+.fm-zoom .fm-tile.is-dim { background-color: #232323; }
+.fm-teams .fm-tile.is-dim { background-color: #343350; }
+.fm-tile.is-speaking { outline-color: var(--speaking); }
+
+.fm-avatar {
+  width: 3.4em;
+  height: 3.4em;
+  width: min(4.4em, 34cqh, 26cqw);
+  height: min(4.4em, 34cqh, 26cqw);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #fff;
+}
+
+.fm-tile.is-video { background: #000; }
+.fm-tile.is-video .fm-avatar { visibility: hidden; }
+
+.fm-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+
+.fm-video.is-frame { transform: none; }
+
+.fm-tag {
+  position: absolute;
+  left: .45em;
+  bottom: .45em;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: .3em;
+  max-width: calc(100% - .9em);
+  padding: .1em .45em;
+  border-radius: .3em;
+  background: rgba(0, 0, 0, .58);
+  font-size: .8em;
+  color: #fff;
+}
+
+.fm-tag .fm-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fm-tag .fm-icon { display: inline-grid; place-items: center; font-size: 1.05em; }
+.fm-tag .fm-icon.is-off { color: #ff6b6b; }
+
+.fm-badge {
+  flex: none;
+  padding: 0 .35em;
+  border-radius: .25em;
+  background: rgba(255, 255, 255, .18);
+  font-size: .92em;
+}
+
+.fm-badge.is-host { background: rgba(255, 176, 32, .9); color: #1a1a1a; font-weight: 600; }
+
+.fm-hand {
+  position: absolute;
+  right: .45em;
+  bottom: .45em;
+  z-index: 1;
+  font-size: 1.1em;
+}
+
+.fm-selfpane {
+  position: absolute;
+  top: .9em;
+  right: .9em;
+  z-index: 2;
+  width: 15em;
+  aspect-ratio: 16 / 10;
+  border-radius: .5em;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .18);
+  background: var(--tile);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, .35);
+}
+
+.fm-selfpane .fm-tile {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+.fm-dot {
+  position: absolute;
+  top: .25em;
+  right: .6em;
+  width: .45em;
+  height: .45em;
+  border-radius: 50%;
+  background: #ff4d4f;
+}
+
+.fm-note {
+  position: absolute;
+  left: .8em;
+  top: .8em;
+  z-index: 2;
+  padding: .15em .5em;
+  border-radius: .3em;
+  background: rgba(0, 0, 0, .6);
+  font-size: .82em;
+  color: #fff;
+}
+
+/* ---------------- 共享屏幕 (假幻灯片) ---------------- */
+
+.fm-share {
+  flex: 1 1 auto;
+  min-width: 0;
+  border-radius: .5em;
+  overflow: hidden;
+  background: #f7f8fa;
+  color: #1f2430;
+  padding: 1.2em 1.5em;
+  display: flex;
+  flex-direction: column;
+  gap: .7em;
+}
+
+.fm-share h4 { margin: 0; font-size: 1.5em; color: #1f2430; }
+.fm-share ul { margin: 0; padding-left: 1.2em; font-size: .95em; color: #3c4459; }
+.fm-share .fm-bars { flex: 1 1 auto; display: flex; align-items: flex-end; gap: .8em; min-height: 4em; }
+.fm-share .fm-bar { flex: 1 1 0; border-radius: .25em .25em 0 0; background: linear-gradient(180deg, #4c7cf3, #7aa2ff); }
+
+/* ---------------- 右侧面板 (聊天 / 参会者) ---------------- */
+
+.fm-side {
+  flex: none;
+  width: 16em;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--panel);
+  border-left: 1px solid var(--line);
+  font-size: .92em;
+}
+
+.fm-side-h {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .4em;
+  padding: .55em .8em;
+  border-bottom: 1px solid var(--line);
+  font-weight: 600;
+}
+
+.fm-side-list { flex: 1 1 auto; overflow: auto; padding: .5em .8em; }
+.fm-side-input {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: .4em;
+  padding: .5em .6em;
+  border-top: 1px solid var(--line);
+}
+
+.fm-fake-input {
+  flex: 1 1 auto;
+  padding: .3em .5em;
+  border-radius: .35em;
+  background: rgba(255, 255, 255, .07);
+  color: var(--sub);
+  font-size: .9em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.fm-msg { margin-bottom: .7em; }
+.fm-msg-h { display: flex; gap: .4em; align-items: baseline; font-size: .85em; }
+.fm-msg-h b { font-weight: 600; }
+.fm-msg-h span { color: var(--sub); }
+.fm-msg p { margin: .1em 0 0; }
+
+.fm-prow { display: flex; align-items: center; gap: .5em; padding: .3em .1em; }
+.fm-prow .fm-pname { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fm-prow .fm-picons { display: inline-flex; gap: .3em; color: var(--sub); font-size: .95em; }
+.fm-prow .fm-picons .is-off { color: #ff6b6b; }
+
+.fm-pdot {
+  flex: none;
+  width: 1.8em;
+  height: 1.8em;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: .75em;
+  font-weight: 700;
+  color: #fff;
+}
+
+.fm-side-btn {
+  flex: none;
+  border: 0;
+  border-radius: .35em;
+  padding: .32em .7em;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-size: .88em;
+  cursor: pointer;
+}
+
+/* ---------------- 底部工具条 ---------------- */
+
+.fm-bottom { flex: none; display: flex; justify-content: center; align-items: center; padding: .45em .6em; }
+.fm-toolbar { display: flex; align-items: flex-start; gap: .1em; }
+
+.fm-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .18em;
+  min-width: 3.6em;
+  padding: .3em .5em;
+  border: 0;
+  border-radius: .4em;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: .82em;
+  cursor: pointer;
+}
+
+.fm-btn:hover { background: rgba(255, 255, 255, .1); }
+.fm-btn .fm-icon { font-size: 1.45em; line-height: 1; }
+.fm-btn.is-off, .fm-btn.is-off .fm-icon { color: #ff6b6b; }
+.fm-btn.is-active { color: var(--accent); }
+.fm-btn.is-danger, .fm-btn.is-danger .fm-icon { color: var(--danger); }
+.fm-btn-label { white-space: nowrap; }
+
+.fm-sep { flex: none; width: 1px; height: 2.4em; margin: .2em .45em 0; background: rgba(255, 255, 255, .16); }
+
+/* 腾讯会议: 底部深色圆角条 */
+.fm-tencent .fm-bottom { padding: .5em .8em; }
+.fm-tencent .fm-toolbar {
+  gap: .1em;
+  padding: .2em .3em;
+  border-radius: .7em;
+  background: #2a2b2f;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .35);
+}
+.fm-tencent .fm-btn { min-width: 3.9em; border-radius: .45em; font-size: .84em; }
+
+/* Zoom: 全宽深色条 + 分组分隔线 + 图标在上文字在下 */
+.fm-zoom .fm-bottom { background: #242424; border-top: 1px solid rgba(255, 255, 255, .08); padding: .5em .8em; }
+.fm-zoom .fm-btn { min-width: 4.6em; font-size: .84em; }
+.fm-zoom .fm-btn .fm-icon { font-size: 1.6em; }
+.fm-zoom .fm-btn.is-danger { color: #e8172b; }
+
+/* Teams: 紫色圆形按钮 + 红色离开胶囊 */
+.fm-teams .fm-bottom { background: #292838; border-top: 1px solid rgba(255, 255, 255, .08); padding: .7em .8em; }
+.fm-teams .fm-toolbar { gap: .7em; align-items: flex-start; }
+.fm-teams .fm-btn { min-width: 3.4em; font-size: .8em; padding: 0; }
+.fm-teams .fm-btn:hover { background: transparent; }
+.fm-teams .fm-btn .fm-icon {
+  display: grid;
+  place-items: center;
+  width: 2.7em;
+  height: 2.7em;
+  border-radius: 50%;
+  background: #3d3c55;
+  font-size: 1.15em;
+}
+.fm-teams .fm-btn:hover .fm-icon { background: #4b4a68; }
+.fm-teams .fm-btn.is-off .fm-icon { background: #4b4a68; }
+.fm-teams .fm-btn.is-danger .fm-icon {
+  width: auto;
+  min-width: 2.7em;
+  padding: 0 .8em;
+  border-radius: 1.4em;
+  background: var(--danger);
+  color: #fff;
+}
+.fm-teams .fm-btn.is-danger:hover .fm-icon { background: #c23a47; }
+.fm-teams .fm-btn.is-danger .fm-icon { gap: .3em; }
+
+/* ---------------- 沉浸模式辅助按钮 ---------------- */
+
+.fm-exit {
+  position: absolute;
+  right: 1em;
+  bottom: 1em;
+  z-index: 5;
+  border: 0;
+  border-radius: .4em;
+  padding: .35em .8em;
+  background: rgba(0, 0, 0, .55);
+  color: #fff;
+  font: inherit;
+  font-size: .85em;
+  cursor: pointer;
+  opacity: .3;
+  transition: opacity .2s;
+}
+
+.fm-exit:hover { opacity: 1; }

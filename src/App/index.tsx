@@ -31,6 +31,7 @@ const list = [
   'GitignoreGenerator',
   'Whiteboard',
   'BeadPatternGenerator',
+  'FakeMeeting',
   'AESCrypto',
   'RSACrypto',
   'SM2Crypto',

@@ -150,6 +150,7 @@ import NginxConfig from './NginxConfig/lang';
 import GitignoreGenerator from './GitignoreGenerator/lang';
 import Whiteboard from './Whiteboard/lang';
 import BeadPatternGenerator from './BeadPatternGenerator/lang';
+import FakeMeeting from './FakeMeeting/lang';
 
 export const langPacks = {
   Hash: Hash,
@@ -296,6 +297,7 @@ export const langPacks = {
   GitignoreGenerator,
   Whiteboard,
   BeadPatternGenerator,
+  FakeMeeting,
   BOMCheck,
   Metronome,
   ScreenRecorder,
