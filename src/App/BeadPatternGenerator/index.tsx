@@ -1,4 +1,4 @@
-import { Button, Checkbox, InputNumber, Segmented, Select, Slider, message } from "antd";
+import { Button, Checkbox, Segmented, Select, Slider, message } from "antd";
 import { CopyOutlined, DownloadOutlined, RedoOutlined, UndoOutlined } from '@ant-design/icons';
 import { useEffect, useMemo, useRef, useState } from "react";
 import { copyTextToClipboard } from "../../lib";
@@ -287,6 +287,8 @@ const BeadPatternGenerator: React.FC = () => {
   const row = { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 10 } as const;
   const labelStyle = { color: '#666', whiteSpace: 'nowrap' } as const;
   const sliderStyle = { width: 120, margin: '0 4px' } as const;
+  const wideSliderStyle = { width: 150, margin: '0 4px' } as const;
+  const valueStyle = { minWidth: 26, textAlign: 'right', fontFamily: 'monospace' } as const;
   const noteStyle = { color: '#888', fontSize: 12, lineHeight: '20px' } as const;
 
   return (
@@ -328,18 +330,18 @@ const BeadPatternGenerator: React.FC = () => {
           style={ { width: 200 } }
           options={ BEAD_BRANDS.map((b) => ({ value: b.key, label: `${b.name} · ${sizeLabel(b)}` })) }
         />
-        <span style={ labelStyle }>{t('图纸宽 (豆)')}:</span>
-        <InputNumber
-          min={ WIDTH_MIN } max={ WIDTH_MAX } value={ width }
-          onChange={ (v) => setWidth(Math.max(WIDTH_MIN, Math.min(WIDTH_MAX, Math.floor(Number(v) || WIDTH_MIN)))) }
-          style={ { width: 80 } }
+        <span style={ labelStyle }>{t('图纸宽 (颗粒数)')}:</span>
+        <Slider
+          min={ WIDTH_MIN } max={ WIDTH_MAX } value={ width } onChange={ setWidth }
+          style={ wideSliderStyle } tooltip={ { open: false } }
         />
-        <span style={ labelStyle }>{t('图纸高 (豆)')}:</span>
-        <InputNumber
-          min={ 1 } max={ WIDTH_MAX } value={ height } disabled={ keepRatio }
-          onChange={ (v) => setHeight(Math.max(1, Math.min(WIDTH_MAX, Math.floor(Number(v) || 1)))) }
-          style={ { width: 80 } }
+        <span style={ valueStyle }>{width}</span>
+        <span style={ labelStyle }>{t('图纸高 (颗粒数)')}:</span>
+        <Slider
+          min={ 1 } max={ WIDTH_MAX } value={ height } onChange={ setHeight } disabled={ keepRatio }
+          style={ wideSliderStyle } tooltip={ { open: false } }
         />
+        <span style={ valueStyle }>{height}</span>
         <Checkbox checked={ keepRatio } onChange={ (e) => setKeepRatio(e.target.checked) }>{t('按原图比例')}</Checkbox>
         <span style={ labelStyle }>{t('用色数')}:</span>
         <Slider min={ COLORS_MIN } max={ COLORS_MAX } value={ maxColors } onChange={ setMaxColors } style={ sliderStyle } />
@@ -432,7 +434,7 @@ const BeadPatternGenerator: React.FC = () => {
                   <span>{tt('成品 {w} × {h} cm', { w: stats.sizeCm.w, h: stats.sizeCm.h })}</span>
                   <span style={ labelStyle }>{t('拼豆板')}</span>
                   <span>{tt('29×29 拼豆板 {x}×{y} ({n} 块)', { x: stats.boards.x, y: stats.boards.y, n: stats.boards.total })}</span>
-                  <span style={ labelStyle }>{t('图纸宽 (豆)')}</span>
+                  <span style={ labelStyle }>{t('单颗尺寸')}</span>
                   <span>{tt('单颗 {mm}mm ({size})', { mm: brand.mm, size: sizeLabel(brand) })}</span>
                 </div>
                 <div style={ { ...noteStyle, marginTop: 8 } }>

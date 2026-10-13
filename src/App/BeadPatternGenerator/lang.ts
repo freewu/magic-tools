@@ -8,9 +8,9 @@ export default {
 // 界面文案词条 (zh 短语即 key; 缺 zh-CN 时回退原文)
 const beadlangRows: Record<string, [string, string]> = {
   '点击或拖拽图片到此处': ['點擊或拖曳圖片到此處', 'Click or drag an image here'],
-  '支持 png / jpg / webp / gif (首帧), 自动按图纸豆数缩放; 纯色/透明背景自动留空': [
-    '支援 png / jpg / webp / gif (首幀), 自動依圖紙豆數縮放; 純色/透明背景自動留空',
-    'Supports png / jpg / webp / gif (first frame); auto-scaled to the pattern size. Solid/transparent backgrounds are left empty',
+  '支持 png / jpg / webp / gif (首帧), 自动按颗粒数缩放; 纯色/透明背景自动留空': [
+    '支援 png / jpg / webp / gif (首幀), 自動依顆粒數縮放; 純色/透明背景自動留空',
+    'Supports png / jpg / webp / gif (first frame); auto-scaled to the bead grid. Solid/transparent backgrounds are left empty',
   ],
   '载入图片后自动生成拼豆图纸: 按真实色卡匹配色号, 可手工改色后导出打印': [
     '載入圖片後自動產生拼豆圖紙: 依真實色卡匹配色號, 可手工改色後匯出列印',
@@ -23,8 +23,9 @@ const beadlangRows: Record<string, [string, string]> = {
   '已载入 {name} ({w}×{h}px)': ['已載入 {name} ({w}×{h}px)', 'Loaded {name} ({w}×{h}px)'],
   '载入失败': ['載入失敗', 'Load failed'],
   '品牌色卡': ['品牌色卡', 'Brand chart'],
-  '图纸宽 (豆)': ['圖紙寬 (豆)', 'Width (beads)'],
-  '图纸高 (豆)': ['圖紙高 (豆)', 'Height (beads)'],
+  '图纸宽 (颗粒数)': ['圖紙寬 (顆粒數)', 'Width (beads)'],
+  '图纸高 (颗粒数)': ['圖紙高 (顆粒數)', 'Height (beads)'],
+  '单颗尺寸': ['單顆尺寸', 'Bead size'],
   '按原图比例': ['依原圖比例', 'Keep source ratio'],
   '用色数': ['用色數', 'Max colors'],
   '抖动': ['抖動', 'Dither'],

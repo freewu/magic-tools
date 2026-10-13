@@ -125,11 +125,15 @@ describe('拼豆图纸 初始界面', () => {
     expect(container.textContent).not.toContain('总豆数');
   });
 
-  test('默认参数: 宽 58 豆 / 16 色 / 去背景开启 / 自动格子', () => {
+  test('默认参数: 宽 58 颗粒 / 16 色 / 去背景开启 / 自动格子', () => {
     const { container } = render(<BeadPatternGenerator />);
-    const inputs = container.querySelectorAll('input.ant-input-number-input') as NodeListOf<HTMLInputElement>;
-    expect(inputs[0].value).toBe('58');
-    expect(inputs[1].value).toBe('58');
+    // 图纸宽/高改为滑块 (颗粒数)
+    expect(screen.getByText('图纸宽 (颗粒数):')).toBeInTheDocument();
+    expect(screen.getByText('图纸高 (颗粒数):')).toBeInTheDocument();
+    const sliders = container.querySelectorAll('[role="slider"]');
+    expect(sliders[0].getAttribute('aria-valuenow')).toBe('58');
+    expect(sliders[1].getAttribute('aria-valuenow')).toBe('58');
+    expect(container.querySelector('input.ant-input-number-input')).toBeNull();
     expect(screen.getByText('16')).toBeInTheDocument();
     expect(screen.getByText(/小豆/)).toBeInTheDocument();
     // 未载入图片前不出现导出入口 (没有可导出的内容)
@@ -209,13 +213,17 @@ describe('拼豆图纸 生成与编辑', () => {
     expect(canvas(container).width).toBe(before);
   });
 
-  test('改图纸宽后按原图比例联动高度', async () => {
+  test('滑块调整图纸宽后, 按原图比例联动高度', async () => {
     const { container } = render(<BeadPatternGenerator />);
     await upload(container);
     await waitFor(() => expect(container.textContent).toContain('3364'));
-    const inputs = container.querySelectorAll('input.ant-input-number-input');
-    fireEvent.change(inputs[0], { target: { value: '20' } });
-    await waitFor(() => expect(container.textContent).toContain('400'));
+    const sliders = container.querySelectorAll('[role="slider"]');
+    // HOME 键把宽度拉到最小 (8 颗粒), 4x4 原图 -> 高度同步为 8
+    fireEvent.keyDown(sliders[0], { keyCode: 36 });
+    await waitFor(() => expect(sliders[0].getAttribute('aria-valuenow')).toBe('8'));
+    await waitFor(() => expect(sliders[1].getAttribute('aria-valuenow')).toBe('8'));
+    // 8x8 = 64 颗粒
+    await waitFor(() => expect(container.textContent).toContain('64'));
     expect(container.textContent).not.toContain('3364');
   });
 
