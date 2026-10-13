@@ -132,12 +132,13 @@
   color: #d48806;
 }
 
-/* NEW 徽标: 骑在卡片上边框线上 (左端), 标记新版本新增的应用 (define.tsx 的 IsNew)
-   top 取负的半个行高, 使徽标垂直居中于 1px 上边框 (卡片本身无 overflow: hidden) */
+/* NEW 徽标: 骑在卡片左上角, 压住上边框与左边框 (define.tsx 的 IsNew)
+   top 取负的半个行高, 使徽标垂直居中于上边框; left 取负的卡片外边距 (5px),
+   使徽标左端正好压在左边框线上且不会被滚动容器裁掉 (卡片本身无 overflow: hidden) */
 .app-new-badge {
   position: absolute;
   top: -7px;
-  left: 8px;
+  left: -5px;
   padding: 0 5px;
   font-size: 10px;
   font-weight: 700;
