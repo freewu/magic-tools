@@ -1,5 +1,5 @@
-import { Alert, Button, Card, Input, Segmented, Space, Tag, Tree, Typography, message } from 'antd';
-import { ApartmentOutlined, CopyOutlined, DownloadOutlined, FileTextOutlined, FolderOpenOutlined } from '@ant-design/icons';
+import { Alert, Button, Card, Input, Segmented, Space, Tabs, Tag, Tree, Typography, message } from 'antd';
+import { ApartmentOutlined, CodeOutlined, CopyOutlined, DownloadOutlined, FileTextOutlined, FolderOpenOutlined } from '@ant-design/icons';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { XML_ACCEPT, formatXml, getXmlIndent, setXmlIndent, xmlFileNameOf, xmlTree } from './lib';
 import { useLocale } from '../../hook/locale-context';
@@ -41,6 +41,13 @@ const SAMPLE_XML = [
 const STAGE_CSS =
   '.xml-stage.xml-dragging::after { content: ""; position: absolute; inset: 6px; border-radius: 8px; pointer-events: none; border: 2px dashed var(--app-divider-text, #4c6cb3); }';
 
+/** 每个结果页签里的「状态 + 操作」小工具条 */
+const VIEW_BAR :React.CSSProperties = {
+  display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 8,
+};
+
+type ViewKey = 'result' | 'tree';
+
 const XmlFormatter: React.FC = () => {
   const { locale } = useLocale();
   const t = (zh: string) => u(locale, zh);
@@ -51,6 +58,8 @@ const XmlFormatter: React.FC = () => {
   // 打开过的本地文件名 (空表示没打开过): 保存时沿用它的名字与后缀
   const [fileName, setFileName] = useState('');
   const [dragging, setDragging] = useState(false);
+  // 「格式化结果」与「树状结构」分页展示, 默认显示主要输出
+  const [view, setView] = useState<ViewKey>('result');
   const stageRef = useRef<HTMLDivElement | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
 
@@ -175,56 +184,76 @@ const XmlFormatter: React.FC = () => {
 
       {error ? (
         <Alert type="error" showIcon message={t('XML 语法错误')} description={error} />
-      ) : (<>
-        <Card size="small" title={<Space><ApartmentOutlined /> {t('树状结构')}</Space>} extra={
-          <Space size={8}>
-            <Text type="secondary" style={{ fontSize: 12 }}>{tt('{n} 个节点', { n: treeNodeCount(tree.items).toLocaleString() })}</Text>
-            <Button size="small" disabled={!tree.items.length} onClick={() => setExpanded(allKeys)}>{t('展开全部')}</Button>
-            <Button size="small" disabled={!tree.items.length} onClick={() => setExpanded([])}>{t('折叠全部')}</Button>
-          </Space>
-        }>
-          {tree.items.length ? (
-            <Space direction="vertical" size={8} style={{ width: '100%' }}>
-              <Tree
-                treeData={tree.items}
-                expandedKeys={expanded}
-                onExpand={(keys) => setExpanded([...keys])}
-                selectable={false}
-                height={320}
-              />
-              {tree.truncated && (
-                <Text type="secondary" style={{ fontSize: 12 }}>{t('节点过多, 结构树只展示前面的节点。')}</Text>
-              )}
-            </Space>
-          ) : (
-            <Paragraph type="secondary" style={{ margin: 0 }}>{t('暂无结构 — 在上方粘贴 XML 后自动解析。')}</Paragraph>
-          )}
-        </Card>
-
-        <Card size="small" title={t('格式化结果')} extra={
-          <Space size={8}>
-            <Button size="small" icon={<CopyOutlined />} disabled={!result} onClick={copyOut}>{t('复制')}</Button>
-            <Button size="small" icon={<DownloadOutlined />} disabled={!result} onClick={downloadOut}>{t('下载 .xml')}</Button>
-          </Space>
-        }>
-          {result ? (
-            <Space direction="vertical" size={8} style={{ width: '100%' }}>
-              <Input.TextArea
-                value={result}
-                readOnly
-                autoSize={{ minRows: 8, maxRows: 18 }}
-                style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 12 }}
-              />
-              <Space size={8} wrap>
-                <Tag color="green">{tt('格式化后 {c} 字符', { c: result.length.toLocaleString() })}</Tag>
-                <Tag>{tt('{n} 行', { n: outLines })}</Tag>
-              </Space>
-            </Space>
-          ) : (
-            <Paragraph type="secondary" style={{ margin: 0 }}>{t('暂无结果 — 在上方粘贴 XML 后自动格式化。')}</Paragraph>
-          )}
-        </Card>
-      </>)}
+      ) : (
+        <Tabs
+          size="small"
+          activeKey={view}
+          onChange={(key) => setView(key as ViewKey)}
+          items={[
+            {
+              key: 'result',
+              label: <Space size={6}><CodeOutlined /> {t('格式化结果')}</Space>,
+              children: (
+                <div>
+                  <div style={{ ...VIEW_BAR, justifyContent: 'flex-end' }}>
+                    <Space size={8}>
+                      <Button size="small" icon={<CopyOutlined />} disabled={!result} onClick={copyOut}>{t('复制')}</Button>
+                      <Button size="small" icon={<DownloadOutlined />} disabled={!result} onClick={downloadOut}>{t('下载 .xml')}</Button>
+                    </Space>
+                  </div>
+                  {result ? (
+                    <Space direction="vertical" size={8} style={{ width: '100%' }}>
+                      <Input.TextArea
+                        value={result}
+                        readOnly
+                        autoSize={{ minRows: 8, maxRows: 18 }}
+                        style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 12 }}
+                      />
+                      <Space size={8} wrap>
+                        <Tag color="green">{tt('格式化后 {c} 字符', { c: result.length.toLocaleString() })}</Tag>
+                        <Tag>{tt('{n} 行', { n: outLines })}</Tag>
+                      </Space>
+                    </Space>
+                  ) : (
+                    <Paragraph type="secondary" style={{ margin: 0 }}>{t('暂无结果 — 在上方粘贴 XML 后自动格式化。')}</Paragraph>
+                  )}
+                </div>
+              ),
+            },
+            {
+              key: 'tree',
+              label: <Space size={6}><ApartmentOutlined /> {t('树状结构')}</Space>,
+              children: (
+                <div>
+                  <div style={VIEW_BAR}>
+                    <Text type="secondary" style={{ fontSize: 12 }}>{tt('{n} 个节点', { n: treeNodeCount(tree.items).toLocaleString() })}</Text>
+                    <Space size={8}>
+                      <Button size="small" disabled={!tree.items.length} onClick={() => setExpanded(allKeys)}>{t('展开全部')}</Button>
+                      <Button size="small" disabled={!tree.items.length} onClick={() => setExpanded([])}>{t('折叠全部')}</Button>
+                    </Space>
+                  </div>
+                  {tree.items.length ? (
+                    <Space direction="vertical" size={8} style={{ width: '100%' }}>
+                      <Tree
+                        treeData={tree.items}
+                        expandedKeys={expanded}
+                        onExpand={(keys) => setExpanded([...keys])}
+                        selectable={false}
+                        height={320}
+                      />
+                      {tree.truncated && (
+                        <Text type="secondary" style={{ fontSize: 12 }}>{t('节点过多, 结构树只展示前面的节点。')}</Text>
+                      )}
+                    </Space>
+                  ) : (
+                    <Paragraph type="secondary" style={{ margin: 0 }}>{t('暂无结构 — 在上方粘贴 XML 后自动解析。')}</Paragraph>
+                  )}
+                </div>
+              ),
+            },
+          ]}
+        />
+      )}
     </Space>
     </div>
   );
