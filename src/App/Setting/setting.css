@@ -1,5 +1,12 @@
-.ant-divider-inner-text {
+/* 设置中心各分组的分隔标题 (Divider orientation="left" plain)
+   颜色比原生的蓝色更柔和, 深色模式由主题变量切换为更亮的颜色 */
+.setting-body .ant-divider-inner-text {
     font-size: 12px;
-    opacity: 0.8;
-    color: blue;
+    color: var(--app-divider-text, #64748b);
+}
+
+/* 分隔线本身也淡一点, 避免抢过标题 */
+.setting-body .ant-divider-plain.ant-divider-with-text-left::before,
+.setting-body .ant-divider-plain.ant-divider-with-text-left::after {
+    border-block-start-color: var(--app-border, rgba(5, 5, 5, 0.12));
 }

@@ -155,6 +155,7 @@ const Setting = () => {
         </div>
         <div
           ref={ scrollRef }
+          className="setting-body"
           onScroll={ onScroll }
           style={ { flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', padding: '4px 16px 0', position: 'relative' } }
         >
