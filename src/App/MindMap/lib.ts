@@ -20,6 +20,7 @@ import {
   type ColorSchemeKey,
 } from './data';
 import type { SvgBox } from '../../lib/svg';
+import { mdFileNameOf as sharedMdFileNameOf } from '../../lib/file';
 
 /** 节点字号区间 (px): 越小越紧凑 */
 export const FONT_MIN = 10;
@@ -130,20 +131,13 @@ export const exportBaseName = (md: string, sampleId?: string): string => {
 /** 「打开文件」的可选类型 (大纲本身就是 Markdown, 因此 .md / .txt 都直接读入编辑器) */
 export const MD_ACCEPT = '.md,.markdown,.mdown,.mkd,.mdx,.txt,text/markdown,text/plain';
 
-/** 已是 Markdown 后缀时保留原文件名, 其它后缀 (含 .txt) 统一换成 .md */
-const MD_EXT = /\.(md|markdown|mdown|mkd|mdx)$/i;
-
 /**
  * 保存用文件名: 去掉路径, 保留已有的 .md / .markdown 后缀 (大小写不变),
- * 其它后缀 (如 outline.txt) 或无后缀时补 .md; 空名字回退默认名。
+ * 其它后缀 (如 outline.txt) 或无后缀时补 .md; 实现在 src/lib/file.ts, 各工具共用,
+ * 这里只把空名字的默认值定为本工具的 mindmap。
  */
-export const mdFileNameOf = (name: string, fallback = DEFAULT_FILE_BASE): string => {
-  const base = (name.split(/[\\/]/).pop() ?? '').trim();
-  if (!base) return `${fallback}.md`;
-  if (MD_EXT.test(base)) return base;
-  const stem = base.replace(/\.[^.]+$/, '').trim();
-  return `${stem || fallback}.md`;
-};
+export const mdFileNameOf = (name: string, fallback = DEFAULT_FILE_BASE): string =>
+  sharedMdFileNameOf(name, fallback);
 
 // ---------------- 指定层级 / 配色 ----------------
 

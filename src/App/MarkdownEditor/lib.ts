@@ -4,6 +4,8 @@
 // 表格/引用/分隔线/图片链接, 以及行内 $x$ 与块级 $$..$$ LaTeX 子集渲染。
 // 输入在解析前统一 HTML 转义 (含引号), 代码与公式块独立处理, 可安全用于 innerHTML。
 
+import { htmlFileNameOf, mdFileNameOf } from '../../lib/file';
+
 const escapeHtml = (s: string): string =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -297,15 +299,17 @@ export function wrapExportHtml(bodyHtml: string, title = 'Markdown 预览'): str
 /** 打开文件时允许的类型 (Markdown 及其常见变体, 允许直接读 .txt) */
 export const MD_ACCEPT = '.md,.markdown,.mdx,.mdown,.txt,text/markdown,text/plain';
 
-/** 读取本地文本文件 (打开 .md 时用); 失败时 reject, 由调用方提示 (实现见 src/lib/file.ts, 各工具共用) */
+/**
+ * 读取本地文本文件 (打开 .md 时用); 失败时 reject, 由调用方提示;
+ * 文件名辅助 (mdFileNameOf / htmlFileNameOf) 与其它工具共用, 见 src/lib/file.ts
+ */
 export { readTextFile } from '../../lib/file';
 
-/** 保存时的默认文件名: 去掉路径部分, 非 .md 扩展名统一补成 .md */
-export const mdFileName = (name: string): string => {
-  const base = (name || '').split(/[\\/]/).pop()?.trim() ?? '';
-  if (!base) return 'markdown.md';
-  return /\.(md|markdown|mdx|mdown)$/i.test(base) ? base : `${base.replace(/\.[^.]+$/, '') || base}.md`;
-};
+/**
+ * 保存时的默认文件名: 去掉路径部分, 非 .md 扩展名统一补成 .md (实现见 src/lib/file.ts, 各工具共用)
+ * @param name 打开过的文件名, 或自定义名字
+ */
+export const mdFileName = (name: string): string => mdFileNameOf(name, 'markdown');
 
 /** 导出 HTML 时的文件名: 跟随当前 .md 文件名 (my-note.md -> my-note.html) */
-export const htmlFileName = (name: string): string => `${mdFileName(name).replace(/\.[^.]+$/, '')}.html`;
+export const htmlFileName = (name: string): string => htmlFileNameOf(name, 'markdown');

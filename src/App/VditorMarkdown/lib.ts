@@ -313,6 +313,9 @@ export function exportFileName(title: string, ext: string): string {
   return `${safe === '' ? 'markdown' : safe}.${ext}`;
 }
 
+/** 「打开文件」允许的类型 (Markdown 及常见变体, 允许直接读 .txt) */
+export const MD_ACCEPT = '.md,.markdown,.mdown,.mkd,.mdx,.txt,text/markdown,text/plain';
+
 /** 文档标题: 首个一级标题, 没有则回退第一个标题 / 'Markdown' */
 export function docTitle(md: string): string {
   const items = headings(md);

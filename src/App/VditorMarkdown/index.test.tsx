@@ -274,6 +274,83 @@ describe('VditorMarkdown 页面交互', () => {
   });
 });
 
+describe('VditorMarkdown 打开 .md 文件', () => {
+  beforeEach(() => {
+    message.destroy();
+    created.length = 0;
+    md2htmlCalls.length = 0;
+    ctorError = '';
+    mockSave.mockClear().mockResolvedValue(true);
+  });
+
+  const fileInput = (): HTMLInputElement => document.querySelector('input[type="file"]') as HTMLInputElement;
+  /** 打开按钮在编辑器就绪后才可点 (就绪前写入会被后续初始化覆盖) */
+  const openFile = async (name: string, text: string) => {
+    await waitFor(() => expect(btn('打开文件')).toBeEnabled());
+    fireEvent.change(fileInput(), { target: { files: [ new File([ text ], name, { type: 'text/markdown' }) ] } });
+    // 读取文件是异步的: 等提示出现, 后续断言才不会跑到加载前面
+    await waitFor(() => expect(notice()).toContain(`已打开 ${name}`));
+  };
+
+  test('选择 .md 文件后内容进入编辑器, 并提示已打开', async () => {
+    render(<VditorMarkdown />);
+    const instance = await waitEditor();
+    // 编辑器就绪前不允许打开 (避免内容被初始化覆盖)
+    expect(fileInput().accept).toContain('.md');
+    expect(fileInput().accept).toContain('.txt');
+
+    await openFile('我的笔记.md', '# 笔记标题\n\n正文');
+    expect(instance.value).toBe('# 笔记标题\n\n正文');
+    expect(fileInput().value).toBe(''); // 同一个文件可以再次打开
+    expect(screen.getByText(/10 字符/)).toBeInTheDocument();
+    expect(screen.getByText('示例')).toBeInTheDocument();
+  });
+
+  test('打开后导出沿用原文件名 (.md / .html)', async () => {
+    render(<VditorMarkdown />);
+    await waitEditor();
+
+    await openFile('我的笔记.md', '# 笔记标题');
+    fireEvent.click(btn('导出 .md'));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+    expect(mockSave.mock.calls[0][0]).toBe('我的笔记.md');
+    expect(mockSave.mock.calls[0][1]).toBe('# 笔记标题');
+
+    fireEvent.click(btn('导出 .html'));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(2));
+    expect(mockSave.mock.calls[1][0]).toBe('我的笔记.html');
+  });
+
+  test('打开 .txt 导出为 .md; 没打开过文件时仍按文档标题命名', async () => {
+    render(<VditorMarkdown />);
+    await waitEditor();
+
+    await openFile('outline.txt', '# 大纲');
+    fireEvent.click(btn('导出 .md'));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+    expect(mockSave.mock.calls[0][0]).toBe('outline.md');
+  });
+
+  test('切换示例 / 清空会解除与本地文件的关联', async () => {
+    render(<VditorMarkdown />);
+    const instance = await waitEditor();
+
+    await openFile('我的笔记.md', '# 笔记标题');
+    expect(instance.value).toBe('# 笔记标题');
+    fireEvent.click(btn('清空'));
+    expect(instance.value).toBe('');
+    expect(btn('导出 .md')).toBeDisabled();
+
+    // 清空后再回到示例, 导出名前缀回到示例标题
+    await pickSample('数学公式');
+    fireEvent.click(btn('导出 .md'));
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
+    expect(String(mockSave.mock.calls[0][0]).endsWith('.md')).toBe(true);
+    expect(String(mockSave.mock.calls[0][0])).not.toContain('我的笔记');
+    expect(String(mockSave.mock.calls[0][0])).toContain('数学公式');
+  });
+});
+
 describe('VditorMarkdown 全屏', () => {
   beforeEach(() => {
     message.destroy();

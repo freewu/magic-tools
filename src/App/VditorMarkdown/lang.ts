@@ -20,6 +20,13 @@ export const vditorlangRows: Record<string, [string, string]> = {
   '分屏预览': ['分割預覽', 'Split view'],
   '所见即所得': ['所見即所得', 'WYSIWYG'],
   '示例': ['範例', 'Sample'],
+  '打开文件': ['開啟檔案', 'Open file'],
+  '打开 .md 文件编辑 (选择本地文件读入编辑器)': [
+    '開啟 .md 檔案編輯 (選擇本機檔案讀入編輯器)',
+    'Open a local .md file to edit (pick a file to load into the editor)',
+  ],
+  '已打开 {file}': ['已開啟 {file}', 'Opened {file}'],
+  '打开文件失败': ['開啟檔案失敗', 'Failed to open the file'],
   '复制 Markdown': ['複製 Markdown', 'Copy Markdown'],
   '复制 HTML': ['複製 HTML', 'Copy HTML'],
   '导出 .md': ['匯出 .md', 'Export .md'],
@@ -55,9 +62,9 @@ export const vditorlangRows: Record<string, [string, string]> = {
   ],
   '分屏预览: 左侧源码, 右侧实时预览': ['分割預覽: 左側原始碼, 右側即時預覽', 'Split view: source on the left, live preview on the right'],
   '所见即所得: 全部内容都是渲染结果': ['所見即所得: 全部內容都是渲染結果', 'WYSIWYG: everything is already rendered'],
-  '支持表格 / 任务列表 / 代码高亮 / KaTeX 公式 / 脚注 / 提示块; 粘贴或拖入的图片以 base64 内联 (2MB 以内)': [
-    '支援表格 / 任務清單 / 程式碼高亮 / KaTeX 公式 / 註腳 / 提示區塊; 貼上或拖入的圖片以 base64 內嵌 (2MB 以內)',
-    'Supports tables, task lists, code highlight, KaTeX math, footnotes and callouts; pasted or dropped images are inlined as base64 (up to 2MB)',
+  '支持表格 / 任务列表 / 代码高亮 / KaTeX 公式 / 脚注 / 提示块; 粘贴或拖入的图片以 base64 内联 (2MB 以内); 可打开本地 .md 文件继续编辑': [
+    '支援表格 / 任務清單 / 程式碼高亮 / KaTeX 公式 / 註腳 / 提示區塊; 貼上或拖入的圖片以 base64 內嵌 (2MB 以內); 可開啟本機 .md 檔案繼續編輯',
+    'Supports tables, task lists, code highlight, KaTeX math, footnotes and callouts; pasted or dropped images are inlined as base64 (up to 2MB); you can also open a local .md file to keep editing',
   ],
   '仅支持插入图片文件': ['僅支援插入圖片檔案', 'Only image files can be inserted'],
   '图片过大 (超过 2MB), 请先压缩再插入': ['圖片過大 (超過 2MB), 請先壓縮再插入', 'Image too large (over 2MB), please compress it first'],

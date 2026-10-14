@@ -4,6 +4,7 @@ import {
   DeleteOutlined,
   DownloadOutlined,
   FileTextOutlined,
+  FolderOpenOutlined,
   FullscreenExitOutlined,
   FullscreenOutlined,
   OrderedListOutlined,
@@ -13,11 +14,13 @@ import 'vditor/dist/index.css';
 import { useLocale } from '../../hook/locale-context';
 import { useTheme } from '../../hook/theme-context';
 import { copyTextToClipboard } from '../../lib';
+import { htmlFileNameOf, mdFileNameOf, readTextFile } from '../../lib/file';
 import { saveTextFile } from '../../lib/tauri';
 import { DEFAULT_SAMPLE_ID, MODE_OPTIONS, SAMPLES, findSample } from './data';
 import {
   EDITOR_HEIGHT,
   MARKDOWN_OPTIONS,
+  MD_ACCEPT,
   TOOLBAR,
   buildToc,
   contentTheme,
@@ -76,7 +79,7 @@ const MODE_HINTS: Record<EditorMode, string> = {
 const STATS_TEXT = '{c} 字符 · {w} 词 · {l} 行 · {h} 标题 · {cb} 代码块 · {lk} 链接 · {im} 图片';
 
 const HINT_TEXT =
-  '支持表格 / 任务列表 / 代码高亮 / KaTeX 公式 / 脚注 / 提示块; 粘贴或拖入的图片以 base64 内联 (2MB 以内)';
+  '支持表格 / 任务列表 / 代码高亮 / KaTeX 公式 / 脚注 / 提示块; 粘贴或拖入的图片以 base64 内联 (2MB 以内); 可打开本地 .md 文件继续编辑';
 
 /** 内联图片上限 (base64 会让文档迅速变大) */
 const MAX_INLINE_IMAGE = 2 * 1024 * 1024;
@@ -145,8 +148,11 @@ const VditorMarkdown: React.FC = () => {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState<'copyHtml' | 'saveMd' | 'saveHtml' | ''>('');
   const [full, setFull] = useState(false);
+  // 打开过的本地文件名 (空表示还没打开过文件): 保存时沿用它的名字
+  const [fileName, setFileName] = useState('');
 
   const hostRef = useRef<HTMLDivElement | null>(null);
+  const fileRef = useRef<HTMLInputElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const vditorRef = useRef<VditorInstance | null>(null);
   // 重建编辑器 / 导出时读取最新值, 避免把 markdown 放进 effect 依赖导致频繁重建
@@ -306,10 +312,38 @@ const VditorMarkdown: React.FC = () => {
     }
   }, []);
 
+  // ---- 打开本地 .md: 读入编辑器, 保存时沿用原文件名 (编辑器是命令式的, 需要 setValue 同步) ----
+  const loadFile = async (file?: File | null) => {
+    if (!file) return;
+    try {
+      const text = await readTextFile(file);
+      setFileName(file.name);
+      setSampleId('');
+      setMarkdown(text);
+      vditorRef.current?.setValue(text);
+      message.success(tt('已打开 {file}', { file: file.name }));
+    } catch {
+      message.error(t('打开文件失败'));
+    }
+  };
+
+  const onPickFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    void loadFile(e.target.files?.[0]);
+    // 清空 value: 同一个文件再选一次也能触发 change
+    e.target.value = '';
+  };
+
+  /** 保存时用的文件名: 打开过文件就用它的名字 (my-note.md / my-note.html), 否则按文档标题推导 */
+  const saveName = (ext: 'md' | 'html'): string =>
+    fileName === ''
+      ? exportFileName(docTitle(markdownRef.current), ext)
+      : (ext === 'md' ? mdFileNameOf(fileName, 'markdown') : htmlFileNameOf(fileName, 'markdown'));
+
   const applySample = (id: string) => {
     const sample = findSample(id);
     if (!sample) return;
     setSampleId(id);
+    setFileName('');
     setMarkdown(sample.md);
     vditorRef.current?.setValue(sample.md);
   };
@@ -326,6 +360,7 @@ const VditorMarkdown: React.FC = () => {
   const clearAll = () => {
     setMarkdown('');
     setSampleId('');
+    setFileName('');
     vditorRef.current?.setValue('');
   };
 
@@ -378,7 +413,7 @@ const VditorMarkdown: React.FC = () => {
     setBusy('saveMd');
     try {
       const ok = await saveTextFile(
-        exportFileName(docTitle(markdownRef.current), 'md'),
+        saveName('md'),
         markdownRef.current,
         t('导出 .md'),
         { filterName: 'Markdown', extensions: ['md'] },
@@ -394,7 +429,7 @@ const VditorMarkdown: React.FC = () => {
     try {
       const html = await buildHtml();
       const ok = await saveTextFile(
-        exportFileName(docTitle(markdownRef.current), 'html'),
+        saveName('html'),
         html,
         t('导出 .html'),
         { filterName: 'HTML', extensions: ['html'] },
@@ -421,6 +456,8 @@ const VditorMarkdown: React.FC = () => {
       size="small"
       title={t('即时渲染 Markdown')}
       extra={
+        <>
+        <input ref={fileRef} type="file" accept={MD_ACCEPT} style={{ display: 'none' }} onChange={onPickFile} />
         <Space size={8} wrap>
           <Segmented
             size="small"
@@ -438,6 +475,11 @@ const VditorMarkdown: React.FC = () => {
             onChange={applySample}
             options={SAMPLES.map((sample) => ({ value: sample.id, label: t(sample.label) }))}
           />
+          <Tooltip title={t('打开 .md 文件编辑 (选择本地文件读入编辑器)')}>
+            <Button size="small" icon={<FolderOpenOutlined />} disabled={!ready} onClick={() => fileRef.current?.click()}>
+              {t('打开文件')}
+            </Button>
+          </Tooltip>
           <Button size="small" icon={<CopyOutlined />} disabled={markdown === ''} onClick={() => copy(markdown, t('已复制 Markdown'))}>
             {t('复制 Markdown')}
           </Button>
@@ -489,6 +531,7 @@ const VditorMarkdown: React.FC = () => {
             {t('清空')}
           </Button>
         </Space>
+        </>
       }
     >
       {error !== '' && (

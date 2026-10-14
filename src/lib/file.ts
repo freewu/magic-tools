@@ -31,6 +31,25 @@ export const readTextFile = (file: File): Promise<string> =>
     reader.readAsText(file);
   });
 
+/** 已是 Markdown 后缀时保留原文件名, 其它后缀 (含 .txt) 统一换成 .md */
+const MD_EXT = /\.(md|markdown|mdx|mdown|mkd)$/i;
+
+/**
+ * 保存 .md 时用的文件名 (MarkdownEditor / MermaidEditor / MindMap / 即时渲染 Markdown 共用):
+ * 去掉路径, 保留已有的 Markdown 后缀 (大小写不变), 其它后缀 (note.txt) 或无后缀时补 .md,
+ * 空名字回退 fallback (不传则用 untitled)。
+ */
+export const mdFileNameOf = (name: string, fallback = 'untitled'): string => {
+  const base = (name.split(/[\\/]/).pop() ?? '').trim();
+  if (base === '') return `${fallback}.md`;
+  if (MD_EXT.test(base)) return base;
+  return `${base.replace(/\.[^.]+$/, '') || base}.md`;
+};
+
+/** 导出 HTML 时的文件名: 跟随 .md 文件名 (my-note.md -> my-note.html) */
+export const htmlFileNameOf = (name: string, fallback = 'untitled'): string =>
+  `${mdFileNameOf(name, fallback).replace(/\.[^.]+$/, '')}.html`;
+
 /**
  * 拼一个安全的导出文件名: 路径分隔符与非法字符换成 -, 空白折叠为 -;
  * 清理后为空时用 fallback (不传则用 untitled)。
