@@ -26,6 +26,7 @@
     "dev:renderer": "vite",
     "build": "just build",
     "build:renderer": "vite build",
+    "build:site": "npm run build:renderer && node scripts/build-site.mjs",
     "package": "vite build",
     "bundle": "just bundle",
     "publish": "just publish",

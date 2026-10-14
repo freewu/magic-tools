@@ -19,7 +19,7 @@
 
 ## Cloudflare Pages 构建 (Node 版本 + npm ci 同步规则)
 
-Cloudflare Pages 的构建环境和本地不同（本地 Node 24 / npm 11），需要留意两点：
+Cloudflare Pages 的构建环境和本地不同（本地 Node 24 / npm 11），需要留意三点：
 
 **① Node 版本 ≥ 20.19（Vite 8 的 engines 要求）**：CF Pages 默认镜像可能是 Node 18，会在 `vite build` 阶段报引擎不满足。请在 CF Pages 项目设置的**环境变量**里加 `NODE_VERSION=22`（仓库根目录 `.nvmrc` 亦写为 22，两者都保留更稳妥）；本地 Node 24 无需改动。
 
@@ -35,6 +35,15 @@ Cloudflare Pages 的构建环境和本地不同（本地 Node 24 / npm 11），�
 
 - 只改 `package.json` 版本号（不改依赖）时，lockfile 顶部 `version` 字段也需同步（可同上命令刷新）；
   设置 `NODE_VERSION=22` 让 CF 侧 npm 升到 10.x 后兼容性更好，但**不能代替**上述 npm9 同步步骤
+
+**③ 站点布局与构建命令（与 GitHub Pages 完全一致）**：CF Pages 同样按「根目录 = 三语官网 `docs/`，子路径 `/tools/` = 纯前端 Web 版」组装，由 `scripts/build-site.mjs`（`npm run build:site`）生成 `_site/`。CF Pages 项目设置里填：
+
+      Build command:            npm run build:site
+      Build output directory:   _site
+
+- 本地验证同一布局：`just site`（= `npm run build:site`）→ `npx serve _site`（根目录官网、`/tools/` Web 版）
+- `docs/` 三页里的 Web 版入口用**相对链接**（`tools/?lang=xx`），因此 CF 域名与 `freewu.github.io` 下都能正确跳转，**不要**改回绝对地址
+- `dist/` 与 `_site/` 均已 `.gitignore`，无需提交
 
 ## 持续集成 (CI)
 
@@ -77,7 +86,8 @@ Cloudflare Pages 的构建环境和本地不同（本地 Node 24 / npm 11），�
 
    （项目 justfile 中**没有** `just tag` 命令，手动执行上述 git 命令即可；tag 若推错可 `git tag -d vX.Y.Z && git push origin :refs/tags/vX.Y.Z` 删除后重推，不影响已触发失败的 Action）
 5. 推送 `v*` tag 触发 `.github/workflows/build-release.yml`：Windows 单体免安装 exe / macOS zip / Linux AppImage 三平台自动构建；workflow 会**自动截取 `update.md` 顶部第一个版本节**（第二个 `# MagicTools v` 标题之前）作为 GitHub Release 说明，产物自动上传。**确认 tag 已推送成功**（`git ls-remote --tags origin vX.Y.Z`）后，在回复中告知用户 CI 已触发，可在 GitHub Actions 页查看进度
-6. **同一个 `v*` tag 同时触发 `.github/workflows/deploy-pages.yml`**：构建纯前端 Web 版（`npm run build:renderer`，`base: './'` 适配仓库子路径）并部署到 **GitHub Pages**（线上演示版，无 Tauri 能力，保存类操作走浏览器下载回退）。前提：仓库 Settings → Pages → Source 选择 **GitHub Actions**（Build and deployment），并确认 Pages 已启用；回复中一并告知用户 Pages 部署状态
+6. **同一个 `v*` tag 同时触发 `.github/workflows/deploy-pages.yml`**：构建纯前端 Web 版（`npm run build:renderer`，`base: './'` 适配仓库子路径）并用 `scripts/build-site.mjs` 组装 `_site/`（根目录 = `docs/` 三语官网，`/tools/` = Web 版）部署到 **GitHub Pages**（线上演示版，无 Tauri 能力，保存类操作走浏览器下载回退）。前提：仓库 Settings → Pages → Source 选择 **GitHub Actions**（Build and deployment），并确认 Pages 已启用；回复中一并告知用户 Pages 部署状态。
+   **Cloudflare Pages** 侧走 Git 集成（推送 `master` 即自动按同一 `_site/` 布局构建，与 tag 无关），配置要求见上文「Cloudflare Pages 构建」③
 
 > **防漏检查（教训：v2.3.0 曾只升版本号未打 tag/未发 release）**：升版本前先 `git tag -l` 确认上一版本 tag 存在；commit 后立刻 `git tag vX.Y.Z` + push（用 `git ls-remote --tags origin vX.Y.Z` 复核）。若发现历史某版本号漏发（仅改了部分版本文件、无 tag），**不要**为历史版本补 tag，应把其变更并入下一实际发布的版本节，并在 update.md 该版本节开头注明“含此前未发布的 vX.Y.Z 变更”。
 

@@ -26,6 +26,9 @@ src-tauri/target
 frontendDist
 dist
 
+# 组装后的部署站点 (docs 官网 + /tools/ Web 版), 由 npm run build:site 生成
+_site
+
 .erb/dll
 
 .idea

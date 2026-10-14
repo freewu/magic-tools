@@ -55,6 +55,11 @@ dev-renderer:
 build-renderer:
     npm run build:renderer
 
+# 组装可部署站点 _site/ (根目录 = docs 官网, /tools/ = Web 版), 与 GitHub Pages / Cloudflare Pages 一致
+# 本地预览: npx serve _site (或 python3 -m http.server -d _site)
+site:
+    npm run build:site
+
 # Preview the built renderer locally (serve dist/ at http://localhost:4173)
 # 注意: 不要直接双击 dist/index.html (file:// 下浏览器禁 ES Module 分包, 会黑屏)
 preview:
