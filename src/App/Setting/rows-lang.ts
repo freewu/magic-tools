@@ -72,7 +72,9 @@ const ROWS: Record<string, Row> = {
   '默认开启批量取色': ['預設開啟批量取色', 'Batch color pick by default'],
   '默认最大批量取色个数': ['預設最大批量取色數量', 'Max batch color-pick count'],
   '默认展示配色板': ['預設顯示調色盤', 'Default color palette'],
+  '默认颜色类型': ['預設顏色類型', 'Default color type'],
   '默认 Opacity': ['預設 Opacity', 'Default opacity'],
+  '默认透明度': ['預設透明度', 'Default opacity'],
   '默认编辑器风格': ['預設編輯器風格', 'Default editor theme'],
   // ---- 名称式 Divider ----
   'GPS坐标转换': ['GPS 座標轉換', 'GPS Coordinate Convert'],

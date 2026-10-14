@@ -3,7 +3,8 @@ import { getDefaultColorPad, setDefaultColorPad } from "./lib";
 import { getDefaultBatchSwitch, setDefaultBatchSwitch } from "./lib";
 import { getDefaultOpacity, setDefaultOpacity } from "./lib";
 import { getDefaultPickMax, setDefaultPickMax } from "./lib";
-import { colorDataList } from "./data";
+import { getDefaultColorType, setDefaultColorType } from "./lib";
+import { colorDataList, colorTypeList } from "./data";
 import { useState } from "react";
 import { useLocale } from "../../hook/locale-context";
 import { tr } from "../../i18n/lang";
@@ -15,9 +16,15 @@ export const ColorSetting = () => {
   const st = (zh: string) => _r(locale, zh);
   const t = (key: string, fallback: string) => tr(colorLang, locale, key, fallback);
   const [ colorPad, setColorPad ] = useState(getDefaultColorPad()); // 默认展示的 颜色板
+  const [ colorType, setColorType ] = useState(getDefaultColorType()); // 默认颜色类型 (色块上展示的编码)
   const [ batchSwitch, setBatchSwitch ] = useState(getDefaultBatchSwitch()); // 默认是否开启批量取色
   const [ opacity, setOpacity ] = useState(getDefaultOpacity()); // 默认 opacity
   const [ pickMax, setPickMax ] = useState(getDefaultPickMax()); // 默认最大批量取色个数
+
+  // 颜色类型列表 (标签走语言包, 与工具页顶部一致)
+  const getColorTypeList = () => {
+    return colorTypeList.map((v) => ({ value: v.value, label: t('t_' + v.value, v.label) }));
+  };
 
   // 颜色板列表
   const getColorPadList = () => {
@@ -31,6 +38,14 @@ export const ColorSetting = () => {
   return (
     <>
       <Divider orientation="left" plain>{ st('CSS 配色') }</Divider>
+      <Form.Item label={ st('默认颜色类型') }>
+        <Select
+          value={ colorType }
+          style={{ width: 240 }}
+          onChange={ (value: string) => { setColorType(value); setDefaultColorType(value); } }
+          options={ getColorTypeList() }
+        />
+      </Form.Item>
       <Form.Item label={ st('默认展示配色板') }>
         <Select
           value={ colorPad }
@@ -39,7 +54,7 @@ export const ColorSetting = () => {
           options={ getColorPadList() }
         />
       </Form.Item>
-      <Form.Item label={ st('默认 Opacity') }>
+      <Form.Item label={ st('默认透明度') }>
         <Space style={{ width: "100%" }}>
           <div style={ {width: "100%", maxWidth: 520} }>
             <Slider

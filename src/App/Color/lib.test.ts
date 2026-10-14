@@ -1,4 +1,4 @@
-import { calcComplementaryColor, calcReadableTextColor, getDefaultColorPad, setDefaultColorPad, getDefaultBatchSwitch, setDefaultBatchSwitch, getDefaultOpacity, setDefaultOpacity, getDefaultPickMax, setDefaultPickMax } from './lib';
+import { calcComplementaryColor, calcReadableTextColor, isOpacityType, getDefaultColorPad, setDefaultColorPad, getDefaultBatchSwitch, setDefaultBatchSwitch, getDefaultOpacity, setDefaultOpacity, getDefaultPickMax, setDefaultPickMax, getDefaultColorType, setDefaultColorType } from './lib';
 
 describe('Color lib', () => {
   beforeEach(() => localStorage.clear());
@@ -40,5 +40,22 @@ describe('Color lib', () => {
     expect(getDefaultPickMax()).toBeGreaterThan(0);
     setDefaultPickMax(6);
     expect(getDefaultPickMax()).toBe(6);
+  });
+
+  test('默认颜色类型持久化, 脏数据回退 #HEX', () => {
+    // 未设置过 => 默认 #HEX
+    expect(getDefaultColorType()).toBe('HEX1');
+    setDefaultColorType('RGBA');
+    expect(getDefaultColorType()).toBe('RGBA');
+    // 已下线的类型 / 脏数据回退到 #HEX
+    localStorage.setItem('color:default-color-type', 'NOPE');
+    expect(getDefaultColorType()).toBe('HEX1');
+  });
+
+  test('isOpacityType: 只有 RGBA / HSLA 需要透明度选择器', () => {
+    expect(isOpacityType('RGBA')).toBe(true);
+    expect(isOpacityType('HSLA')).toBe(true);
+    expect(isOpacityType('HEX1')).toBe(false);
+    expect(isOpacityType('TEXT')).toBe(false);
   });
 });

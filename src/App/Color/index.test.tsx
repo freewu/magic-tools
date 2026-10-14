@@ -74,6 +74,35 @@ describe('Color 页面', () => {
     });
   });
 
+  test('色块编码跟随颜色类型切换, 选「颜色名称」时隐藏编码', async () => {
+    const { container } = render(<Color />);
+    const codeEl = () => container.querySelector('.color-card .color-card-code');
+    const code = () => codeEl()?.textContent ?? '';
+    const clickType = (label: string) => {
+      // 颜色类型是 antd Radio.Group (optionType="button") => label 元素而非 button
+      const el = Array.from(container.querySelectorAll('.ant-radio-button-wrapper')).find((b) => norm(b.textContent ?? '') === label);
+      expect(el).toBeTruthy();
+      fireEvent.click(el as Element);
+    };
+
+    // 默认 #HEX: 编码带 #
+    expect(code().startsWith('#')).toBe(true);
+
+    // HEX: 不带 #
+    clickType('HEX');
+    await waitFor(() => expect(code().startsWith('#')).toBe(false));
+    expect(code().length).toBeGreaterThan(0);
+
+    // RGBA: 展示 rgba(...) 且透明度 (默认 0.9) 进入编码
+    clickType('RGBA');
+    await waitFor(() => expect(code().startsWith('rgba(')).toBe(true));
+    expect(code()).toMatch(/rgba\(\d+, \d+, \d+, [\d.]+\)$/);
+
+    // 颜色名称: 不展示编码
+    clickType('颜色名称');
+    await waitFor(() => expect(codeEl()).toBeNull());
+  });
+
   test('输入内容后点击操作按钮不抛异常', () => {
     const { container } = render(<Color />);
     const editable = (container.querySelector('textarea') ?? container.querySelector('input')) as HTMLInputElement | HTMLTextAreaElement | null;

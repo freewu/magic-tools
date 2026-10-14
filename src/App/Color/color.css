@@ -14,8 +14,22 @@
   margin: 5px;
   /* 文字颜色由样式动态计算 (背景色的反色) */
   text-align: center;
-  padding-top:12px;
+  padding: 5px 4px 0;
+  line-height: 1.25;
   opacity: 0.9;
+}
+
+/* 颜色名称 / 编码 各占一行, 过长时省略 */
+.color-card-name,
+.color-card-code {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.color-card-code {
+  font-size: 12px;
 }
 
 .levitation-box {

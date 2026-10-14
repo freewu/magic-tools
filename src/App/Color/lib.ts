@@ -51,6 +51,9 @@ export const calcReadableTextColor = (color: string) :string => {
   return (contrastRatio(backgroundColor, [0,0,0]) >= contrastRatio(backgroundColor, [255,255,255]))? "#000000" : "#FFFFFF";
 }
 
+// 该颜色类型是否带不透明度 (RGBA / HSLA 才需要透明度选择器)
+export const isOpacityType = (colorType :string) :boolean => colorType === 'RGBA' || colorType === 'HSLA';
+
 // 获取要写入到粘贴板的数据
 const getColorString = (color :string,label :string,colorType :string, opacity :number) :string => {
   switch(colorType) {
@@ -90,11 +93,13 @@ const getColorString = (color :string,label :string,colorType :string, opacity :
 };
 
 // 选择颜色类型, 为了展示美观 小窗口不展示那么多颜色类型
-const pickColorTypeList = () => {
+// keepType: 当前选中的类型, 即使被过滤也保留 (设置里配置的默认类型在小窗口下仍可选中)
+const pickColorTypeList = (keepType?: string) => {
   //return colorTypeList;
   // 缩放卡顿，先注释
   if (window.innerWidth > 1200) return colorTypeList;
   const a = colorTypeList.filter((v) => {
+    if (v.value === keepType) return true;
     if(v.label == 'LAB' || v.label == 'LCH' || v.label == 'XYZ' || v.label == 'HSV') return false
     return true;
   });
@@ -145,6 +150,21 @@ export function getDefaultOpacity() :number {
 // 设置默认不透明度
 export function setDefaultOpacity(opacity :number) : void  {
   localStorage.setItem(DEFAULT_OPACITY_ITEM, opacity.toString());
+}
+
+const DEFAULT_COLORTYPE_ITEM = 'color:default-color-type';
+
+// 获取默认颜色类型 (默认 #HEX)
+export function getDefaultColorType() :string {
+  const type = localStorage.getItem(DEFAULT_COLORTYPE_ITEM);
+  // 未设置过 / 脏数据 (类型已下线) 时回退到 #HEX
+  if (type === null || !colorTypeList.some((item) => item.value === type)) return 'HEX1';
+  return type;
+}
+
+// 设置默认颜色类型
+export function setDefaultColorType(type :string) : void  {
+  localStorage.setItem(DEFAULT_COLORTYPE_ITEM, type);
 }
 
 const DEFAULT_PICK_MAX_ITEM = 'color:pick-max';

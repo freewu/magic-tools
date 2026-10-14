@@ -4,8 +4,8 @@ import { default as LevitationBox } from "./levitation-box"
 import { useState } from "react";
 import type { RadioChangeEvent } from 'antd';
 import { copyTextToClipboard, debounce } from "../../lib";
-import { getColorString, pickColorTypeList,} from "./lib";
-import { getDefaultColorPad, getDefaultBatchSwitch, getDefaultOpacity, getDefaultPickMax } from "./lib";
+import { getColorString, pickColorTypeList, isOpacityType } from "./lib";
+import { getDefaultColorPad, getDefaultBatchSwitch, getDefaultOpacity, getDefaultPickMax, getDefaultColorType } from "./lib";
 import "./color.css"
 import { colorDataList } from "./data"
 import type { PickColorEntity } from "./interface"
@@ -23,10 +23,10 @@ const Color = () => {
 
   const [ notice, contextHolder ] = message.useMessage(); // 消息提醒
   const [ height, setHeight ] = useState(genColorPadHeight()); // 颜色板高度
-  const [ colorType, setColorType ] = useState('HEX1'); // 选中择颜色类型
-  const [ opacityDisabled, setOpacityDisabled ] = useState(true); // 不透明度不可用 开启/关闭透明度选择器 
+  const [ colorType, setColorType ] = useState(getDefaultColorType()); // 选中择颜色类型 (默认取设置中心配置)
+  const [ opacityDisabled, setOpacityDisabled ] = useState(!isOpacityType(getDefaultColorType())); // 不透明度不可用 开启/关闭透明度选择器 
   const [ opacity, setOpacity ] = useState(getDefaultOpacity()); // // 不透明度
-  const [ typeList, setTypeList ] = useState(pickColorTypeList()); // 颜色类型列表
+  const [ typeList, setTypeList ] = useState(pickColorTypeList(getDefaultColorType())); // 颜色类型列表
   const [ batchPickFlag, setBatchPickFlag ] = useState(getDefaultBatchSwitch()); // 是否开启批量取色
   const [ pickColorList, setPickColorList ] = useState(Array<PickColorEntity>); // 批量取色列表
   const [ colorPad, setColorPad ] = useState(getDefaultColorPad()); // 默认显示的颜色板
@@ -39,7 +39,7 @@ const Color = () => {
       // 改变色板展示高度
       setHeight(genColorPadHeight()) 
       // 改变转换颜色类型 ( 为了美观 小窗口不展示那么多)
-      setTypeList(pickColorTypeList())
+      setTypeList(pickColorTypeList(colorType))
     },100)
   );
   
@@ -49,7 +49,7 @@ const Color = () => {
   };
 
   const onColorTypeChange = ({ target: { value } }: RadioChangeEvent) => {
-    setOpacityDisabled( !(value == "RGBA" || value == "HSLA" )); // 需要展示不透明度
+    setOpacityDisabled(!isOpacityType(value)); // 需要展示不透明度
     setColorType(value);
     // 如果开启了批量取色,需要粘贴板需要生成新的格式
     if (batchPickFlag) {
@@ -105,7 +105,7 @@ const Color = () => {
     return {
       key : item.key,
       label : t('c_' + item.key.replace(/-/g, '_'), item.label),
-      children: <ColorPad colorList={ item.data } height = { height } colorClickEvent={ cardClick } />,
+      children: <ColorPad colorList={ item.data } height = { height } colorType={ colorType } opacity={ opacity } colorClickEvent={ cardClick } />,
     }
   });
 
