@@ -1,5 +1,7 @@
 // HTML 格式化 纯逻辑层 (手写 pretty printer, 不依赖外部解析库)
 
+import { fileNameWithExt } from '../../lib/file';
+
 export interface FormatOptions {
   /** 每层缩进空格数 (默认 2) */
   indentSize?: number;
@@ -208,6 +210,17 @@ export function formatHtml(source: string, options?: FormatOptions): string {
 }
 
 // ---- 设置: 默认缩进 (2 / 4 空格) ----
+// ---- 打开 / 保存本地文件 ----
+
+/** 「打开文件」允许的类型 (HTML 及其变体; 一律按文本读入) */
+export const HTML_ACCEPT = '.html,.htm,.xhtml,.shtml,.txt,text/html,application/xhtml+xml,text/plain';
+
+/** 与 .html 等价的后缀: 打开这些文件时保存沿用原后缀, 不强行改成 .html */
+const HTML_ALIASES = ['htm', 'xhtml', 'shtml'];
+
+/** 保存时用的文件名: 打开过文件就沿用它的名字, 没有则用 formatted.html */
+export const htmlFileNameOf = (name: string): string => fileNameWithExt(name, 'html', 'formatted', HTML_ALIASES);
+
 const INDENT_KEY = 'html-format.indent-size';
 
 export function getHtmlIndent(): number {

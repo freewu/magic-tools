@@ -1,4 +1,4 @@
-import { formatXml, minifyXml, getXmlIndent, setXmlIndent } from './lib';
+import { XML_ACCEPT, formatXml, minifyXml, getXmlIndent, setXmlIndent, xmlFileNameOf } from './lib';
 
 const MINI = '<?xml version="1.0" encoding="UTF-8"?><config><app name="demo"><version>2.6.0</version><debug>false</debug><servers><server host="a.example.com" port="8080"/><server host="b.example.com" port="9090"/></servers></app></config>';
 
@@ -48,5 +48,28 @@ describe('XML 格式化', () => {
     expect(getXmlIndent()).toBe(4);
     localStorage.setItem('xml-format.indent-size', 'abc');
     expect(getXmlIndent()).toBe(2);
+  });
+});
+
+describe('XML 打开 / 保存文件名', () => {
+  test('打开过的文件沿用原名与后缀 (含 XML 方言)', () => {
+    expect(xmlFileNameOf('config.xml')).toBe('config.xml');
+    expect(xmlFileNameOf('布局.XML')).toBe('布局.XML');
+    expect(xmlFileNameOf('icon.svg')).toBe('icon.svg');
+    expect(xmlFileNameOf('Info.plist')).toBe('Info.plist');
+    expect(xmlFileNameOf('C:\\docs\\conf/config.xaml')).toBe('config.xaml');
+  });
+
+  test('其它后缀换成 .xml, 空名字回退 formatted.xml', () => {
+    expect(xmlFileNameOf('data.txt')).toBe('data.xml');
+    expect(xmlFileNameOf('no-ext')).toBe('no-ext.xml');
+    expect(xmlFileNameOf('')).toBe('formatted.xml');
+    expect(xmlFileNameOf('   ')).toBe('formatted.xml');
+    expect(xmlFileNameOf('a/b/')).toBe('formatted.xml');
+  });
+
+  test('XML_ACCEPT 覆盖常见方言与纯文本', () => {
+    for (const ext of [ '.xml', '.xaml', '.svg', '.plist', '.xsd', '.txt' ]) expect(XML_ACCEPT).toContain(ext);
+    expect(XML_ACCEPT).toContain('text/xml');
   });
 });

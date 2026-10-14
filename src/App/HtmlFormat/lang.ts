@@ -7,8 +7,17 @@ export default {
 // 界面文案词条 (zh 短语即 key; 缺 zh-CN 时回退原文)
 const uilangRows: Record<string, [string, string]> = {
   '载入示例': ['載入範例', 'Load sample'],
+  '打开文件': ['開啟檔案', 'Open file'],
+  '已打开 {file}': ['已開啟 {file}', 'Opened {file}'],
+  '打开文件失败': ['開啟檔案失敗', 'Failed to open the file'],
+  '保存 .html': ['儲存 .html', 'Save .html'],
+  '保存 HTML 文件': ['儲存 HTML 檔案', 'Save HTML file'],
+  '已保存 {file}': ['已儲存 {file}', 'Saved {file}'],
+  '保存失败': ['儲存失敗', 'Failed to save'],
+  'HTML 文件': ['HTML 檔案', 'HTML file'],
   '清空': ['清空', 'Clear'],
   '复制': ['複製', 'Copy'],
+  '已复制格式化结果': ['已複製格式化結果', 'Formatted result copied'],
   'HTML 格式化': ['HTML 格式化', 'HTML formatter'],
   '美化格式化 HTML 代码: 块级元素缩进换行、行内元素保留在一行、文本空白自动折叠。script / style / pre / textarea 内容原样保留。缩进空格数可在右侧或「设置 → 格式化」中切换 2 / 4 空格。': ['美化格式化 HTML 程式碼: 區塊元素縮排換行、行內元素保留在同一行、文字空白自動摺疊。script / style / pre / textarea 內容原樣保留。縮排空格數可在右側或「設定 → 格式化」中切換 2 / 4 空格。', 'Prettifies HTML: block-level elements are indented on new lines, inline elements stay on one line, and text whitespace collapses. Content inside script / style / pre / textarea is preserved as-is. The indentation can be switched between 2 / 4 spaces on the right or under Settings → Formatting.'],
   'HTML 源码': ['HTML 原始碼', 'HTML source'],

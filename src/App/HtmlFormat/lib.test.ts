@@ -1,4 +1,4 @@
-import { formatHtml } from './lib';
+import { HTML_ACCEPT, formatHtml, getHtmlIndent, htmlFileNameOf, setHtmlIndent } from './lib';
 
 describe('HTML 格式化 - 基础结构', () => {
   test('嵌套 div 缩进', () => {
@@ -71,5 +71,37 @@ describe('HTML 格式化 - 缩进与幂等', () => {
   test('空输入', () => {
     expect(formatHtml('')).toBe('');
     expect(formatHtml('   \n  ')).toBe('');
+  });
+});
+
+describe('HTML 打开 / 保存文件名', () => {
+  test('打开过的文件沿用原名与后缀 (.html / .htm)', () => {
+    expect(htmlFileNameOf('page.html')).toBe('page.html');
+    expect(htmlFileNameOf('页面.HTML')).toBe('页面.HTML');
+    expect(htmlFileNameOf('index.htm')).toBe('index.htm');
+    expect(htmlFileNameOf('doc.xhtml')).toBe('doc.xhtml');
+    expect(htmlFileNameOf('C:\\docs\\site/index.html')).toBe('index.html');
+  });
+
+  test('其它后缀换成 .html, 空名字回退 formatted.html', () => {
+    expect(htmlFileNameOf('note.txt')).toBe('note.html');
+    expect(htmlFileNameOf('no-ext')).toBe('no-ext.html');
+    expect(htmlFileNameOf('')).toBe('formatted.html');
+    expect(htmlFileNameOf('   ')).toBe('formatted.html');
+    expect(htmlFileNameOf('a/b/')).toBe('formatted.html');
+  });
+
+  test('HTML_ACCEPT 覆盖 .html / .htm / 纯文本', () => {
+    for (const ext of [ '.html', '.htm', '.xhtml', '.txt' ]) expect(HTML_ACCEPT).toContain(ext);
+    expect(HTML_ACCEPT).toContain('text/html');
+  });
+});
+
+describe('HTML 缩进设置', () => {
+  test('默认 2 空格, 可以改成 4 空格并持久化', () => {
+    localStorage.clear();
+    expect(getHtmlIndent()).toBe(2);
+    setHtmlIndent(4);
+    expect(getHtmlIndent()).toBe(4);
   });
 });

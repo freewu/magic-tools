@@ -3,6 +3,8 @@
 // 按元素嵌套缩进、行内化叶子文本, 保留注释/CDATA/DOCTYPE/PI 原样,
 // 并对标签配平做合法性检查 (未闭合 / 交叉嵌套 / 多余闭合会抛出带行号的错误)。
 
+import { fileNameWithExt } from '../../lib/file';
+
 export interface XmlFormatOptions {
   /** 每层缩进空格数 (1-8, 默认 2) */
   indentSize?: number;
@@ -210,6 +212,20 @@ export function minifyXml(source: string): string {
   walk(doc);
   return out.join('').replace(/\n[ \t]*/g, '');
 }
+
+// ---- 打开 / 保存本地文件 ----
+
+/** 「打开文件」允许的类型 (XML 及其常见方言; 一律按文本读入) */
+export const XML_ACCEPT = [
+  '.xml', '.xaml', '.svg', '.plist', '.xsd', '.xsl', '.xslt', '.rss', '.atom', '.config', '.txt',
+  'text/xml', 'application/xml', 'text/plain',
+].join(',');
+
+/** 与 .xml 等价的后缀: 打开这些文件时保存沿用原后缀, 不强行改成 .xml */
+const XML_ALIASES = ['xaml', 'svg', 'plist', 'xsd', 'xsl', 'xslt', 'rss', 'atom', 'config'];
+
+/** 保存时用的文件名: 打开过文件就沿用它的名字, 没有则用 formatted.xml */
+export const xmlFileNameOf = (name: string): string => fileNameWithExt(name, 'xml', 'formatted', XML_ALIASES);
 
 // ---- 设置: 默认缩进 (2 / 4 空格) ----
 const INDENT_KEY = 'xml-format.indent-size';
