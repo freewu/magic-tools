@@ -1,5 +1,5 @@
-import { Button, Card, Input, Radio, Space, Tree, Typography, message } from 'antd';
-import { ApartmentOutlined, CopyOutlined, DownloadOutlined, FolderOpenOutlined } from '@ant-design/icons';
+import { Button, Card, Input, Radio, Space, Tabs, Tree, Typography, message } from 'antd';
+import { ApartmentOutlined, CodeOutlined, CopyOutlined, DownloadOutlined, FolderOpenOutlined } from '@ant-design/icons';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { HTML_ACCEPT, formatHtml, getHtmlIndent, htmlFileNameOf, htmlTree } from './lib';
 import { useLocale } from '../../hook/locale-context';
@@ -21,6 +21,13 @@ const SAMPLE = `<!DOCTYPE html>
 const STAGE_CSS =
   '.html-stage.html-dragging::after { content: ""; position: absolute; inset: 6px; border-radius: 8px; pointer-events: none; border: 2px dashed var(--app-divider-text, #4c6cb3); }';
 
+/** 每个结果页签里的「状态 + 操作」小工具条 */
+const VIEW_BAR :React.CSSProperties = {
+  display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap', marginBottom: 8,
+};
+
+type ViewKey = 'result' | 'tree';
+
 const HtmlFormat: React.FC = () => {
   const { locale } = useLocale();
   const t = (zh: string) => u(locale, zh);
@@ -31,6 +38,8 @@ const HtmlFormat: React.FC = () => {
   // 打开过的本地文件名 (空表示没打开过): 保存时沿用它的名字与后缀
   const [fileName, setFileName] = useState('');
   const [dragging, setDragging] = useState(false);
+  // 「格式化结果」与「树状结构」分页签展示, 默认显示主要输出
+  const [view, setView] = useState<ViewKey>('result');
   const stageRef = useRef<HTMLDivElement | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
   const result = useMemo(() => {
@@ -136,48 +145,69 @@ const HtmlFormat: React.FC = () => {
           style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 13 }}
         />
       </Card>
-      <Card size="small" title={<Space><ApartmentOutlined /> {t('树状结构')}</Space>} extra={
-        <Space size={8}>
-          <Text type="secondary" style={{ fontSize: 12 }}>{tt('{n} 个节点', { n: treeNodeCount(tree.items).toLocaleString() })}</Text>
-          <Button size="small" disabled={!tree.items.length} onClick={() => setExpanded(allKeys)}>{t('展开全部')}</Button>
-          <Button size="small" disabled={!tree.items.length} onClick={() => setExpanded([])}>{t('折叠全部')}</Button>
-        </Space>
-      }>
-        {tree.items.length ? (
-          <Space direction="vertical" size={8} style={{ width: '100%' }}>
-            <Tree
-              treeData={tree.items}
-              expandedKeys={expanded}
-              onExpand={(keys) => setExpanded([...keys])}
-              selectable={false}
-              height={320}
-            />
-            {tree.truncated && (
-              <Text type="secondary" style={{ fontSize: 12 }}>{t('节点过多, 结构树只展示前面的节点。')}</Text>
-            )}
-          </Space>
-        ) : (
-          t('暂无结构 — 输入 HTML 后自动解析。')
-        )}
-      </Card>
-      <Card size="small" title={t('格式化结果')} extra={
-        <Space size={8}>
-          <Text type="secondary" style={{ fontSize: 12 }}>{tt('{n} 字符', { n: result.length })}</Text>
-          <Button size="small" icon={<CopyOutlined />} disabled={!result} onClick={copy}>{t('复制')}</Button>
-          <Button size="small" icon={<DownloadOutlined />} disabled={!result} onClick={saveResult}>{t('保存 .html')}</Button>
-        </Space>
-      }>
-        {result ? (
-          <Input.TextArea
-            value={result}
-            readOnly
-            autoSize={{ minRows: 8, maxRows: 20 }}
-            style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 13 }}
-          />
-        ) : (
-          t('暂无结果 — 输入 HTML 后自动格式化。')
-        )}
-      </Card>
+      <Tabs
+        size="small"
+        activeKey={view}
+        onChange={(key) => setView(key as ViewKey)}
+        items={[
+          {
+            key: 'result',
+            label: <Space size={6}><CodeOutlined /> {t('格式化结果')}</Space>,
+            children: (
+              <div>
+                <div style={VIEW_BAR}>
+                  <Text type="secondary" style={{ fontSize: 12 }}>{result ? tt('{n} 字符', { n: result.length }) : ''}</Text>
+                  <Space size={8}>
+                    <Button size="small" icon={<CopyOutlined />} disabled={!result} onClick={copy}>{t('复制')}</Button>
+                    <Button size="small" icon={<DownloadOutlined />} disabled={!result} onClick={saveResult}>{t('保存 .html')}</Button>
+                  </Space>
+                </div>
+                {result ? (
+                  <Input.TextArea
+                    value={result}
+                    readOnly
+                    autoSize={{ minRows: 8, maxRows: 20 }}
+                    style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 13 }}
+                  />
+                ) : (
+                  t('暂无结果 — 输入 HTML 后自动格式化。')
+                )}
+              </div>
+            ),
+          },
+          {
+            key: 'tree',
+            label: <Space size={6}><ApartmentOutlined /> {t('树状结构')}</Space>,
+            children: (
+              <div>
+                <div style={VIEW_BAR}>
+                  <Text type="secondary" style={{ fontSize: 12 }}>{tt('{n} 个节点', { n: treeNodeCount(tree.items).toLocaleString() })}</Text>
+                  <Space size={8}>
+                    <Button size="small" disabled={!tree.items.length} onClick={() => setExpanded(allKeys)}>{t('展开全部')}</Button>
+                    <Button size="small" disabled={!tree.items.length} onClick={() => setExpanded([])}>{t('折叠全部')}</Button>
+                  </Space>
+                </div>
+                {tree.items.length ? (
+                  <Space direction="vertical" size={8} style={{ width: '100%' }}>
+                    <Tree
+                      treeData={tree.items}
+                      expandedKeys={expanded}
+                      onExpand={(keys) => setExpanded([...keys])}
+                      selectable={false}
+                      height={320}
+                    />
+                    {tree.truncated && (
+                      <Text type="secondary" style={{ fontSize: 12 }}>{t('节点过多, 结构树只展示前面的节点。')}</Text>
+                    )}
+                  </Space>
+                ) : (
+                  t('暂无结构 — 输入 HTML 后自动解析。')
+                )}
+              </div>
+            ),
+          },
+        ]}
+      />
     </Space>
     </div>
   );

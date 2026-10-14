@@ -36,6 +36,16 @@ const switcherOf = (c: HTMLElement): HTMLElement =>
 const treeText = (c: HTMLElement): string[] =>
   treeNodes(c).map((n) => norm(n.querySelector('.ant-tree-title')?.textContent ?? ''));
 
+const tabsOf = (c: HTMLElement): string[] =>
+  Array.from(c.querySelectorAll('.ant-tabs-tab')).map((n) => norm(n.textContent ?? ''));
+/** 按页签文案切换视图 */
+const tab = (c: HTMLElement, name: string): HTMLElement => {
+  const el = Array.from(c.querySelectorAll('.ant-tabs-tab')).find((n) => norm(n.textContent ?? '').includes(norm(name)));
+  if (!el) throw new Error(`未找到页签: ${ name }`);
+  return el as HTMLElement;
+};
+const activeTab = (c: HTMLElement): string => norm(c.querySelector('.ant-tabs-tab-active')?.textContent ?? '');
+
 const WAIT = { timeout: 10000 };
 
 const HTML = '<div><p>你好</p></div>';
@@ -161,12 +171,41 @@ describe('HtmlFormat 保存格式化结果 (弹保存对话框)', () => {
   });
 });
 
+describe('HtmlFormat 格式化结果 / 树状结构 分页签', () => {
+  const A = '<div><p>你好</p><img src="a.png"></div>';
+
+  test('两个视图各占一个页签, 默认展示格式化结果', async () => {
+    const { container } = render(<HtmlFormat />);
+    fireEvent.change(rawArea(container), { target: { value: A } });
+
+    expect(tabsOf(container)).toEqual([ '格式化结果', '树状结构' ]);
+    expect(activeTab(container)).toContain('格式化结果');
+    // 默认页签只渲染结果: 有结果文本域, 没有结构树
+    expect(container.querySelectorAll('textarea').length).toBe(2);
+    expect(container.querySelector('.ant-tree')).toBeNull();
+  });
+
+  test('切到「树状结构」页签才渲染结构树, 切回结果页签仍在', async () => {
+    const { container } = render(<HtmlFormat />);
+    fireEvent.change(rawArea(container), { target: { value: A } });
+    fireEvent.click(tab(container, '树状结构'));
+
+    expect(activeTab(container)).toContain('树状结构');
+    expect(container.querySelector('.ant-tree')).not.toBeNull();
+    expect(norm(container.textContent ?? '')).toContain('4个节点');
+
+    fireEvent.click(tab(container, '格式化结果'));
+    expect(activeTab(container)).toContain('格式化结果');
+  });
+});
+
 describe('HtmlFormat 结构树 (树状折叠)', () => {
   const A = '<div><p>你好</p><img src="a.png"></div>';
 
   test('输入 HTML 后自动建树, 行内文本挂到最近元素下', async () => {
     const { container } = render(<HtmlFormat />);
     fireEvent.change(rawArea(container), { target: { value: A } });
+    fireEvent.click(tab(container, '树状结构'));
     await waitFor(() => expect(container.querySelector('.ant-tree')).not.toBeNull(), WAIT);
     expect(treeText(container)).toEqual([ '<div>', '<p>', '你好', norm('<img src="a.png">') ]);
     expect(norm(container.textContent ?? '')).toContain('4个节点');
@@ -175,6 +214,7 @@ describe('HtmlFormat 结构树 (树状折叠)', () => {
   test('「折叠全部」「展开全部」批量折叠; 点击箭头可折叠单个节点', async () => {
     const { container } = render(<HtmlFormat />);
     fireEvent.change(rawArea(container), { target: { value: A } });
+    fireEvent.click(tab(container, '树状结构'));
     await waitFor(() => expect(treeText(container)).toContain('你好'), WAIT);
 
     fireEvent.click(btn('折叠全部'));
@@ -195,6 +235,7 @@ describe('HtmlFormat 结构树 (树状折叠)', () => {
   test('清空后结构树为空并给出提示', async () => {
     const { container } = render(<HtmlFormat />);
     fireEvent.change(rawArea(container), { target: { value: A } });
+    fireEvent.click(tab(container, '树状结构'));
     await waitFor(() => expect(treeText(container)).toContain('<div>'), WAIT);
 
     fireEvent.click(btn('清空'));
