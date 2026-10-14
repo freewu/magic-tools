@@ -293,3 +293,19 @@ export function wrapExportHtml(bodyHtml: string, title = 'Markdown 预览'): str
     '</html>',
   ].join('\n');
 }
+
+/** 打开文件时允许的类型 (Markdown 及其常见变体, 允许直接读 .txt) */
+export const MD_ACCEPT = '.md,.markdown,.mdx,.mdown,.txt,text/markdown,text/plain';
+
+/** 读取本地文本文件 (打开 .md 时用); 失败时 reject, 由调用方提示 (实现见 src/lib/file.ts, 各工具共用) */
+export { readTextFile } from '../../lib/file';
+
+/** 保存时的默认文件名: 去掉路径部分, 非 .md 扩展名统一补成 .md */
+export const mdFileName = (name: string): string => {
+  const base = (name || '').split(/[\\/]/).pop()?.trim() ?? '';
+  if (!base) return 'markdown.md';
+  return /\.(md|markdown|mdx|mdown)$/i.test(base) ? base : `${base.replace(/\.[^.]+$/, '') || base}.md`;
+};
+
+/** 导出 HTML 时的文件名: 跟随当前 .md 文件名 (my-note.md -> my-note.html) */
+export const htmlFileName = (name: string): string => `${mdFileName(name).replace(/\.[^.]+$/, '')}.html`;

@@ -1,4 +1,4 @@
-import { renderMarkdown, texToHtml, wrapExportHtml, MD_EXPORT_CSS } from './lib';
+import { renderMarkdown, texToHtml, wrapExportHtml, readTextFile, mdFileName, htmlFileName, MD_ACCEPT, MD_EXPORT_CSS } from './lib';
 
 const has = (html: string, frag: string) => expect(html).toContain(frag);
 
@@ -97,5 +97,31 @@ describe('HTML 导出包装', () => {
     expect(MD_EXPORT_CSS.length).toBeGreaterThan(500);
     expect(MD_EXPORT_CSS).toContain('.md-preview table');
     expect(MD_EXPORT_CSS).toContain('.math-block');
+  });
+});
+
+describe('打开 / 保存文件辅助', () => {
+  test('mdFileName: 保留 Markdown 类扩展名, 其它补成 .md, 去路径, 空名回退', () => {
+    expect(mdFileName('readme.md')).toBe('readme.md');
+    expect(mdFileName('a.markdown')).toBe('a.markdown');
+    expect(mdFileName('note.txt')).toBe('note.md');
+    expect(mdFileName('说明.MD')).toBe('说明.MD');
+    expect(mdFileName('C:\\docs\\sub/报告')).toBe('报告.md');
+    expect(mdFileName('')).toBe('markdown.md');
+    expect(mdFileName('   ')).toBe('markdown.md');
+  });
+  test('htmlFileName: 跟随当前 .md 文件名', () => {
+    expect(htmlFileName('markdown.md')).toBe('markdown.html');
+    expect(htmlFileName('my-note.markdown')).toBe('my-note.html');
+    expect(htmlFileName('   ')).toBe('markdown.html');
+  });
+  test('readTextFile: 读取文本内容 (UTF-8)', async () => {
+    const file = new File([ '# 标题\n正文' ], 'a.md', { type: 'text/markdown' });
+    await expect(readTextFile(file)).resolves.toBe('# 标题\n正文');
+  });
+  test('MD_ACCEPT: 包含 .md / .markdown / .txt', () => {
+    expect(MD_ACCEPT).toContain('.md');
+    expect(MD_ACCEPT).toContain('.markdown');
+    expect(MD_ACCEPT).toContain('.txt');
   });
 });

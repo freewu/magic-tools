@@ -9,7 +9,7 @@ const zh = `<h2>这个工具做什么</h2>
 <li><p>在「Mermaid 源码」里编辑, 右侧预览会自动刷新 (输入停顿约 200ms 后渲染, 避免频繁重绘)</p></li>
 <li><p>语法有误时预览区上方会显示具体错误行与提示, 修正后自动恢复</p></li>
 <li><p>「缩放」(1x ~ 4x) 与「背景」同时作用于预览与位图导出: <code>1x</code> 自适应卡片宽度, <code>2x</code> ~ <code>4x</code> 按原图倍率放大 (超出时可滚动查看), 缩放大 = 高清大图 (适合打印 / 高分屏), 背景选「透明」时预览区显示棋盘格, 便于叠到深色文档上</p></li>
-<li><p>顶部的面板开关可单独收起左右两栏: 只看渲染结果时收起源码栏, 专注改代码时收起预览栏, 再次点击即可恢复</p></li>
+<li><p>顶部还可 <b>打开文件 / 保存为 .md / 全屏</b>: 「打开文件」读取本地 <code>.mmd</code> 源码或 <code>.md</code> 文档 (会把 <code>\`\`\`mermaid</code> 代码块取出来编辑, 也可直接把文件拖到编辑区), 「保存为 .md」时只替换代码块内部的代码, 周边的 Markdown 文字原样保留 (打开的是纯源码文件时自动补一层 <code>\`\`\`mermaid</code> 代码块); 「全屏」进入全屏专注模式 (Esc 退出), 此时说明区自动隐藏, 左右两栏铺满整屏</p></li>
 <li><p>点「导出 SVG / PNG / WebP」保存文件; 也可用「复制源码 / 复制 SVG」直接粘贴到别处</p></li>
 </ul>
 
@@ -49,7 +49,7 @@ const tw = `<h2>這個工具做什麼</h2>
 <li><p>在「Mermaid 原始碼」裡編輯, 右側預覽會自動更新 (輸入停頓約 200ms 後渲染, 避免頻繁重繪)</p></li>
 <li><p>語法有誤時預覽區上方會顯示具體錯誤行與提示, 修正後自動恢復</p></li>
 <li><p>「縮放」(1x ~ 4x) 與「背景」同時作用於預覽與點陣匯出: <code>1x</code> 自動適應卡片寬度, <code>2x</code> ~ <code>4x</code> 按原圖倍率放大 (超出時可捲動檢視), 縮放大 = 高解析大圖 (適合列印 / 高解析螢幕), 背景選「透明」時預覽區顯示棋盤格, 便於疊到深色文件上</p></li>
-<li><p>頂部的面板開關可單獨收合左右兩欄: 只看渲染結果時收起源碼欄, 專心改程式碼時收起預覽欄, 再次點擊即可還原</p></li>
+<li><p>頂部還可 <b>開啟檔案 / 儲存為 .md / 全螢幕</b>: 「開啟檔案」讀取本機 <code>.mmd</code> 原始碼或 <code>.md</code> 文件 (會把 <code>\`\`\`mermaid</code> 程式碼區塊取出來編輯, 也可直接將檔案拖曳到編輯區), 「儲存為 .md」只替換程式碼區塊內部的程式碼, 周邊的 Markdown 文字原樣保留 (開啟的是純原始碼檔案時自動補一層 <code>\`\`\`mermaid</code> 程式碼區塊); 「全螢幕」進入全螢幕專注模式 (Esc 離開), 此時說明區自動隱藏, 左右兩欄鋪滿整個畫面</p></li>
 <li><p>點「匯出 SVG / PNG / WebP」儲存檔案; 也可用「複製原始碼 / 複製 SVG」直接貼到別處</p></li>
 </ul>
 
@@ -89,6 +89,7 @@ const en = `<h2>What this tool does</h2>
 <li><p>Edit the code in “Mermaid source”; the preview refreshes automatically (about 200 ms after you stop typing, to avoid constant re-rendering)</p></li>
 <li><p>Syntax errors are shown above the preview with the offending line — fix the code and the preview recovers automatically</p></li>
 <li><p>“Scale” (1x – 4x) and “Background” apply to both the preview and the bitmap export: <code>1x</code> fits the card width, <code>2x</code> – <code>4x</code> magnify the original size (scroll when it overflows) and give a higher-resolution image, and “Transparent” shows a checkerboard in the preview area — handy for dark documents</p></li>
+<li><p>The same toolbar also offers <b>Open file / Save as .md / Fullscreen</b>: “Open file” reads a local <code>.mmd</code> source or a <code>.md</code> document (the <code>\`\`\`mermaid</code> block is extracted for editing, and you can drop a file onto the editor instead), “Save as .md” rewrites only the code inside that block and keeps the surrounding Markdown text intact (a plain source file gets a <code>\`\`\`mermaid</code> block added); “Fullscreen” gives you a distraction-free full-screen view (Esc to leave) that hides the docs section and lets both columns fill the screen</p></li>
 <li><p>The panel buttons at the top collapse either column on its own: put the source away to inspect the result, or hide the preview column to focus on the code — click again to bring it back</p></li>
 <li><p>Click “Export SVG / PNG / WebP” to save a file, or use “Copy source / Copy SVG” to paste the result elsewhere</p></li>
 </ul>

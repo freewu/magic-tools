@@ -422,3 +422,163 @@ describe('MermaidEditor 内置示例', () => {
     }
   });
 });
+
+describe('MermaidEditor 全屏', () => {
+  /** 页面根容器 */
+  const root = () => document.querySelector('.mmd-editor') as HTMLElement;
+
+  beforeEach(() => localStorage.clear());
+
+  test('窗口内全屏兜底: 输入/预览铺满, 说明区隐藏, Esc 退出', async () => {
+    render(<MermaidEditor />);
+    await waitRendered();
+
+    fireEvent.click(btn('全屏'));
+    expect(root().className).toContain('mmd-editor-full');
+    // 编辑框交给容器接管高度, 说明区在全屏下不占位置
+    expect(codeArea().style.minHeight).toBe('0');
+    expect(codeArea().style.height).toBe('100%');
+    expect(screen.queryByText('Mermaid 编辑器说明')).toBeNull();
+    expect(btn('退出全屏')).toBeInTheDocument();
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(root().className).not.toContain('mmd-editor-full');
+    expect(codeArea().style.minHeight).toBe('420px');
+    expect(screen.getByText('Mermaid 编辑器说明')).toBeInTheDocument();
+  });
+
+  test('原生 Fullscreen API 可用时走 requestFullscreen / exitFullscreen', async () => {
+    const request = jest.fn();
+    const exit = jest.fn();
+    Object.defineProperty(HTMLElement.prototype, 'requestFullscreen', { configurable: true, value: request });
+    Object.defineProperty(document, 'exitFullscreen', { configurable: true, value: exit });
+    // 只有当前确实处于原生全屏时才调 exitFullscreen
+    Object.defineProperty(document, 'fullscreenElement', { configurable: true, get: () => document.body });
+    try {
+      render(<MermaidEditor />);
+      await waitRendered();
+
+      fireEvent.click(btn('全屏'));
+      expect(request).toHaveBeenCalledTimes(1);
+      expect(root().className).toContain('mmd-editor-full');
+
+      fireEvent.click(btn('退出全屏'));
+      expect(exit).toHaveBeenCalledTimes(1);
+      expect(root().className).not.toContain('mmd-editor-full');
+    } finally {
+      delete (HTMLElement.prototype as unknown as Record<string, unknown>).requestFullscreen;
+      delete (document as unknown as Record<string, unknown>).exitFullscreen;
+      delete (document as unknown as Record<string, unknown>).fullscreenElement;
+    }
+  });
+
+  test('浏览器自身退出全屏时同步按钮状态', async () => {
+    Object.defineProperty(document, 'fullscreenElement', { configurable: true, get: () => null });
+    try {
+      render(<MermaidEditor />);
+      await waitRendered();
+      fireEvent.click(btn('全屏'));
+      expect(root().className).toContain('mmd-editor-full');
+
+      fireEvent(document, new Event('fullscreenchange'));
+      expect(root().className).not.toContain('mmd-editor-full');
+      expect(btn('全屏')).toBeInTheDocument();
+    } finally {
+      delete (document as unknown as Record<string, unknown>).fullscreenElement;
+    }
+  });
+
+  test('拖拽文件到编辑区即可打开', async () => {
+    const { container } = render(<MermaidEditor />);
+    await waitRendered();
+    const box = container.querySelector('.mmd-editor') as HTMLElement;
+
+    fireEvent.dragEnter(box);
+    expect(box.className).toContain('mmd-editor-dragging');
+    fireEvent.dragLeave(box);
+    expect(box.className).not.toContain('mmd-editor-dragging');
+
+    fireEvent.drop(box, { dataTransfer: { files: [ new File([ 'flowchart LR\n  A --> B' ], 'flow.mmd', { type: 'text/plain' }) ] } });
+    await waitFor(() => expect(codeArea().value).toBe('flowchart LR\n  A --> B'));
+    expect(box.className).not.toContain('mmd-editor-dragging');
+  });
+});
+
+describe('MermaidEditor 打开 / 保存 .md 文件', () => {
+  const DOC = [
+    '# 架构图',
+    '',
+    '下面这张图描述服务依赖:',
+    '',
+    '```mermaid',
+    'graph TD',
+    '  A --> B',
+    '```',
+    '',
+    '说明文字 (保存时应原样保留)。',
+    '',
+  ].join('\n');
+  const fileInput = (container: HTMLElement) => container.querySelector('input[type="file"]') as HTMLInputElement;
+  const open = async (container: HTMLElement, file: File, expectCode: string) => {
+    fireEvent.change(fileInput(container), { target: { files: [ file ] } });
+    await waitFor(() => expect(codeArea().value).toBe(expectCode));
+  };
+
+  test('打开 .md: 取 ```mermaid 代码块; 保存时只替换块内代码, 周边文字保留', async () => {
+    const { container } = render(<MermaidEditor />);
+    await waitRendered();
+    expect(fileInput(container).accept).toContain('.md');
+
+    await open(container, new File([ DOC ], '架构图.md', { type: 'text/markdown' }), 'graph TD\n  A --> B');
+    expect(fileInput(container).value).toBe(''); // 可重复打开同一文件
+    await waitFor(() => expect(rendered[rendered.length - 1]).toBe('graph TD\n  A --> B'));
+
+    // 编辑后保存为 .md
+    fireEvent.change(codeArea(), { target: { value: 'graph LR\n  A --> C' } });
+    fireEvent.click(btn('保存为.md'));
+
+    await waitFor(() => expect(saveTextFile).toHaveBeenCalledTimes(1));
+    const [ name, content, title, opts ] = (saveTextFile as jest.Mock).mock.calls[0];
+    expect(name).toBe('架构图.md');
+    expect(title).toBe('保存为 .md 文件');
+    expect(opts).toEqual({ filterName: 'Markdown 文件', extensions: [ 'md', 'markdown', 'mmd', 'txt' ] });
+    expect(content).toContain('# 架构图');
+    expect(content).toContain('说明文字 (保存时应原样保留)。');
+    expect(content).toContain('```mermaid\ngraph LR\n  A --> C\n```');
+    expect(content).not.toContain('A --> B');
+    await waitFor(() => expect(screen.getByText('已保存 架构图.md')).toBeInTheDocument());
+  });
+
+  test('打开 .mmd 源码: 保存为 .md 时自动补 ```mermaid 代码块', async () => {
+    const { container } = render(<MermaidEditor />);
+    await waitRendered();
+
+    await open(container, new File([ 'pie title 占比\n  "A" : 60' ], 'diagram.mmd', { type: 'text/plain' }), 'pie title 占比\n  "A" : 60');
+    fireEvent.click(btn('保存为.md'));
+
+    await waitFor(() => expect(saveTextFile).toHaveBeenCalledTimes(1));
+    const [ name, content ] = (saveTextFile as jest.Mock).mock.calls[0];
+    expect(name).toBe('diagram.md');
+    expect(content).toBe('```mermaid\npie title 占比\n  "A" : 60\n```\n');
+  });
+
+  test('图片导出文件名跟随已打开的文件', async () => {
+    const { container } = render(<MermaidEditor />);
+    await waitRendered();
+    await open(container, new File([ 'flowchart LR\n  A --> B' ], 'flow.mmd', { type: 'text/plain' }), 'flowchart LR\n  A --> B');
+
+    fireEvent.click(btn('导出 SVG'));
+    await waitFor(() => expect((saveTextFile as jest.Mock).mock.calls[0][0]).toBe('flow.svg'));
+  });
+
+  test('保存对话框取消时不提示成功', async () => {
+    (saveTextFile as jest.Mock).mockResolvedValue(false);
+    const { container } = render(<MermaidEditor />);
+    await waitRendered();
+    await open(container, new File([ 'graph TD\n  A --> B' ], 'a.mmd', { type: 'text/plain' }), 'graph TD\n  A --> B');
+
+    fireEvent.click(btn('保存为.md'));
+    await waitFor(() => expect(saveTextFile).toHaveBeenCalledTimes(1));
+    expect(screen.queryByText(/已保存/)).toBeNull();
+  });
+});

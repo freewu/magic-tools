@@ -13,6 +13,25 @@ const uilangRows: Record<string, [string, string]> = {
   '隐藏预览': ['隱藏預覽', 'Hide preview'],
   '显示预览': ['顯示預覽', 'Show preview'],
 
+  // 打开 / 保存本地文件 + 全屏
+  '打开文件': ['開啟檔案', 'Open file'],
+  '打开 .mmd / .md 文件编辑 (也可直接把文件拖到编辑区)': [
+    '開啟 .mmd / .md 檔案編輯 (也可直接將檔案拖曳到編輯區)',
+    'Open a .mmd / .md file (you can also drop a file onto the editor)',
+  ],
+  '保存为 .md': ['儲存為 .md', 'Save as .md'],
+  '保存为 .md 文件': ['儲存為 .md 檔案', 'Save as a .md file'],
+  '保存为 .md 文件 (Mermaid 代码写入 mermaid 代码块)': [
+    '儲存為 .md 檔案 (Mermaid 程式碼寫入 mermaid 程式碼區塊)',
+    'Save as a .md file (the Mermaid code is written into a mermaid code block)',
+  ],
+  'Markdown 文件': ['Markdown 檔案', 'Markdown file'],
+  '已打开 {file}': ['已開啟 {file}', 'Opened {file}'],
+  '打开文件失败': ['開啟檔案失敗', 'Failed to open the file'],
+  '保存失败': ['儲存失敗', 'Failed to save'],
+  '全屏': ['全螢幕', 'Fullscreen'],
+  '退出全屏': ['結束全螢幕', 'Exit fullscreen'],
+
   // 示例 (按图形家族分组, 覆盖 mermaid 内置的全部可预览图形)
   '示例': ['範例', 'Sample'],
   '基础图': ['基礎圖', 'Basic diagrams'],

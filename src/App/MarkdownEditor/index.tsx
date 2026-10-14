@@ -1,7 +1,8 @@
 import { Button, Card, Input, Segmented, Space, Tooltip, Typography, message } from 'antd';
-import { CopyOutlined, DownloadOutlined, EyeInvisibleOutlined, EyeOutlined, FullscreenExitOutlined, FullscreenOutlined } from '@ant-design/icons';
+import { CopyOutlined, DownloadOutlined, EyeInvisibleOutlined, EyeOutlined, FolderOpenOutlined, FullscreenExitOutlined, FullscreenOutlined, SaveOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { renderMarkdown, wrapExportHtml, MD_DARK_CSS, MD_EXPORT_CSS } from './lib';
+import { renderMarkdown, wrapExportHtml, htmlFileName, readTextFile, mdFileName, MD_ACCEPT, MD_DARK_CSS, MD_EXPORT_CSS } from './lib';
+import { saveTextFile } from '../../lib/tauri';
 import { useLocale } from '../../hook/locale-context';
 import { useTheme } from '../../hook/theme-context';
 import { u, uT } from './lang';
@@ -76,11 +77,14 @@ const TOOLS: Tool[] = [
   { label: '$$', title: '块级公式', type: 'block', block: '$$\n\\frac{}{}\n$$\n' },
 ];
 
-const markdown = (text: string) => new Blob([text], { type: 'text/plain;charset=utf-8' });
 
 // 全屏: 优先原生 Fullscreen API, 不可用 (内嵌 webview / 非用户手势) 时用窗口内全屏兜底 (与白板 / 思维导图同一套做法)
-const FULL_CSS = `
+const EDITOR_CSS = `
 .md-editor { position: relative; }
+.md-editor-dragging::after {
+  content: ''; position: absolute; inset: 6px; border-radius: 8px; pointer-events: none;
+  border: 2px dashed var(--app-divider-text, #4c6cb3);
+}
 .md-editor-full {
   position: fixed; inset: 0; z-index: 1000; box-sizing: border-box;
   display: flex; flex-direction: column;
@@ -132,20 +136,46 @@ const MarkdownEditor: React.FC = () => {
       message.error(t('复制失败, 请手动选择复制'));
     }
   };
-  const download = (text: string, filename: string) => {
-    const blob = markdown(text);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-    message.success(tt('已下载 {file}', { file: filename }));
+  /** 保存到文件: 桌面端弹系统保存对话框 (可选目录与文件名), 纯网页回退为浏览器下载 */
+  const saveAs = async (name: string, content: string, title: string, filterName: string, extensions: string[]) => {
+    try {
+      const ok = await saveTextFile(name, content, title, { filterName, extensions });
+      if (ok) message.success(tt('已保存 {file}', { file: name }));
+    } catch {
+      message.error(t('保存失败'));
+    }
   };
+  /** 保存 Markdown 源文件 (.md) */
+  const saveMd = () => void saveAs(fileName, md, t('保存 Markdown'), t('Markdown 文件'), [ 'md', 'markdown', 'txt' ]);
+  /** 导出带样式的独立 HTML 文档 (文件名跟随当前 .md 文件) */
+  const exportHtml = () => void saveAs(htmlFileName(fileName), wrapExportHtml(html, `Markdown ${t('预览')}`), t('导出 HTML'), t('HTML 文件'), [ 'html', 'htm' ]);
   const [md, setMd] = useState(SAMPLE);
   const [view, setView] = useState<'preview' | 'html'>('preview');
   const [showPreview, setShowPreview] = useState(true); // 是否显示右侧预览/HTML 面板
   const taRef = useRef<{ textArea: HTMLTextAreaElement }>(null);
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  // 当前编辑的文件名 (打开文件后作为保存的默认名)
+  const [fileName, setFileName] = useState('markdown.md');
+  const [dragging, setDragging] = useState(false); // 拖拽文件悬停中
+
+  /** 打开本地 .md 文件: 点击「打开文件」选择, 或直接把文件拖到编辑区 */
+  const loadFile = async (file: File | undefined) => {
+    if (!file) return;
+    try {
+      const text = await readTextFile(file);
+      setMd(text);
+      setFileName(mdFileName(file.name));
+      message.success(tt('已打开 {file}', { file: file.name }));
+    } catch {
+      message.error(t('打开文件失败'));
+    }
+  };
+
+  const onPickFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // 清空 value, 允许连续打开同一个文件
+    void loadFile(file);
+  };
 
   // ---- 全屏 ----
   const [full, setFull] = useState(false);
@@ -224,14 +254,27 @@ const MarkdownEditor: React.FC = () => {
   const statChars = md.length;
 
   return (
-    <div ref={rootRef} className={`md-editor${full ? ' md-editor-full' : ''}`}>
-      <style>{FULL_CSS}</style>
+    <div
+      ref={rootRef}
+      className={`md-editor${full ? ' md-editor-full' : ''}${dragging ? ' md-editor-dragging' : ''}`}
+      onDragOver={(e) => e.preventDefault()}
+      onDragEnter={(e) => { e.preventDefault(); setDragging(true); }}
+      onDragLeave={(e) => { if (!rootRef.current?.contains(e.relatedTarget as Node | null)) setDragging(false); }}
+      onDrop={(e) => { e.preventDefault(); setDragging(false); void loadFile(e.dataTransfer?.files?.[0]); }}
+    >
+      <style>{EDITOR_CSS}</style>
       <Space direction="vertical" size={16} style={{ width: '100%' }}>
         <Card
           size="small"
-          title={t('工具栏 (光标处插入)')}
           extra={
             <Space size={8}>
+              <input ref={fileRef} type="file" accept={MD_ACCEPT} style={{ display: 'none' }} onChange={onPickFile} />
+              <Tooltip title={t('打开 .md 文件编辑 (也可直接把文件拖到编辑区)')}>
+                <Button size="small" icon={<FolderOpenOutlined />} onClick={() => fileRef.current?.click()}>{t('打开文件')}</Button>
+              </Tooltip>
+              <Tooltip title={t('保存为 .md 文件')}>
+                <Button size="small" icon={<SaveOutlined />} disabled={!md} onClick={saveMd}>{t('保存')}</Button>
+              </Tooltip>
               <Button size="small" onClick={() => { setMd(SAMPLE); message.info(t('已载入示例')); }}>{t('载入示例')}</Button>
               <Button size="small" danger disabled={!md} onClick={() => setMd('')}>{t('清空')}</Button>
               <Tooltip title={t(full ? '退出全屏' : '全屏')}>
@@ -293,8 +336,7 @@ const MarkdownEditor: React.FC = () => {
                     options={[{ label: t('预览'), value: 'preview' }, { label: t('HTML 源码'), value: 'html' }]}
                   />
                   <Button size="small" icon={<CopyOutlined />} onClick={() => copy(view === 'preview' ? html : md, t('已复制预览 HTML'))}>{t('复制')}{view === 'preview' ? ' HTML' : ' ' + t('源文件')}</Button>
-                  <Button size="small" icon={<DownloadOutlined />} onClick={() => download(md, 'markdown.md')}>.md</Button>
-                  <Button size="small" type="primary" icon={<DownloadOutlined />} onClick={() => download(wrapExportHtml(html, `Markdown ${t('预览')}`), 'markdown.html')}>{t('导出 HTML')}</Button>
+                  <Button size="small" type="primary" icon={<DownloadOutlined />} onClick={exportHtml}>{t('导出 HTML')}</Button>
                 </Space>
               }
             >

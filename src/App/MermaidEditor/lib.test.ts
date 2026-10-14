@@ -1,15 +1,20 @@
 import {
+  CODE_ACCEPT,
   EXT_OF,
   MIME_OF,
   dataUrlToBytes,
+  extractCode,
   fileNameOf,
+  findFencedCode,
   isBlankCode,
+  markdownFileNameOf,
   mermaidConfig,
   parseSvgSize,
   prepareSvgForExport,
   scaleSize,
   svgToDataUrl,
   supportsWebp,
+  toMarkdown,
   utf8ToBase64,
 } from './lib';
 import { DEFAULT_FILE_BASE } from './data';
@@ -190,5 +195,62 @@ describe('MermaidEditor WebP 支持探测', () => {
     HTMLCanvasElement.prototype.toDataURL = (() => 'data:image/webp;base64,AAA') as never;
     expect(supportsWebp()).toBe(true);
     HTMLCanvasElement.prototype.toDataURL = original;
+  });
+});
+
+describe('MermaidEditor 打开 / 保存 .md', () => {
+  const DOC = [
+    '# 架构图',
+    '',
+    '下面这张图描述服务依赖:',
+    '',
+    '```mermaid',
+    'graph TD',
+    '  A --> B',
+    '```',
+    '',
+    '说明文字 (保存时应原样保留)。',
+    '',
+  ].join('\n');
+
+  it('markdownFileNameOf: 拼 .md 扩展名并清理非法字符', () => {
+    expect(markdownFileNameOf('mermaid-flowchart')).toBe('mermaid-flowchart.md');
+    expect(markdownFileNameOf('a b/c')).toBe('a-b-c.md');
+    expect(markdownFileNameOf('')).toBe(`${DEFAULT_FILE_BASE}.md`);
+  });
+
+  it('findFencedCode: 定位代码块 (返回代码在原文中的位置)', () => {
+    const found = findFencedCode(DOC)!;
+    expect(found.code).toBe('graph TD\n  A --> B');
+    expect(DOC.slice(found.start, found.end)).toBe(found.code);
+    // 语言标记与围栏长度都兼容
+    expect(findFencedCode('```mermaid\r\npie title x\r\n```')?.code).toBe('pie title x');
+    expect(findFencedCode('````mermaid\nblock-beta\n````')?.code).toBe('block-beta');
+    expect(findFencedCode('```js\nconst a = 1\n```')).toBeNull();
+    expect(findFencedCode('graph TD\n  A --> B')).toBeNull();
+  });
+
+  it('extractCode: .md 取代码块内容, 纯源码文件整体当代码', () => {
+    expect(extractCode(DOC)).toBe('graph TD\n  A --> B');
+    expect(extractCode('flowchart LR\n  X --> Y')).toBe('flowchart LR\n  X --> Y');
+  });
+
+  it('toMarkdown: 原有代码块只替换内部代码 (周边 Markdown 文字保留)', () => {
+    const out = toMarkdown('graph LR\n  A --> C', DOC);
+    expect(out).toContain('# 架构图');
+    expect(out).toContain('下面这张图描述服务依赖:');
+    expect(out).toContain('说明文字 (保存时应原样保留)。');
+    expect(out).toContain('```mermaid\ngraph LR\n  A --> C\n```');
+    expect(out).not.toContain('A --> B');
+  });
+
+  it('toMarkdown: 纯源码文件 (无代码块) 自动包一层 mermaid 代码块', () => {
+    expect(toMarkdown('pie title 占比\n  "A" : 1', 'pie title 占比\n  "A" : 1')).toBe('```mermaid\npie title 占比\n  "A" : 1\n```\n');
+    // 空 source (未打开过文件) 同样补代码块
+    expect(toMarkdown('graph TD', '')).toBe('```mermaid\ngraph TD\n```\n');
+  });
+
+  it('CODE_ACCEPT: 覆盖 .mmd / .md / .txt', () => {
+    for (const ext of [ '.mmd', '.mermaid', '.md', '.markdown', '.txt' ]) expect(CODE_ACCEPT).toContain(ext);
   });
 });
