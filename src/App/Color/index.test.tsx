@@ -103,7 +103,7 @@ describe('Color 页面', () => {
     await waitFor(() => expect(codeEl()).toBeNull());
   });
 
-  test('批量取色浮层展示当前颜色类型对应的编码', async () => {
+  test('批量取色浮层只展示当前颜色类型的值 (名称/编码)', async () => {
     const { container } = render(<Color />);
     // 开启批量取色
     const checkbox = container.querySelector('.levitation-box input[type="checkbox"]') as HTMLInputElement;
@@ -114,25 +114,27 @@ describe('Color 页面', () => {
     // 取一个色 => 浮层里出现一条记录 (背景色为色块颜色, 文字为可读色)
     fireEvent.click(container.querySelector('.color-card') as Element);
     await waitFor(() => expect(container.querySelectorAll('.levitation-box li').length).toBe(1));
-    const codeEl = () => container.querySelector('.levitation-box li .levitation-li-code');
-    const nameEl = () => container.querySelector('.levitation-box li .levitation-li-name');
-    expect(nameEl()?.textContent).toBeTruthy();
+    const name = container.querySelector('.color-card .color-card-name')?.textContent ?? '';
+    const textEl = () => container.querySelector('.levitation-box li .levitation-li-text');
+    const text = () => textEl()?.textContent ?? '';
+    expect(name).toBeTruthy();
 
-    // 默认 #HEX: 浮层编码带 # (与色块 / 粘贴板一致)
-    expect(codeEl()?.textContent?.startsWith('#')).toBe(true);
+    // 默认 #HEX: 只展示编码 (带 #), 不展示名称
+    expect(text().startsWith('#')).toBe(true);
+    expect(text()).not.toContain(name);
 
-    // 切到 RGB: 浮层编码同步变成 rgb(...)
+    // 切到 RGB: 浮层值同步变成 rgb(...)
     clickColorType(container, 'RGB');
-    await waitFor(() => expect(codeEl()?.textContent?.startsWith('rgb(')).toBe(true));
+    await waitFor(() => expect(text().startsWith('rgb(')).toBe(true));
+    expect(text()).not.toContain(name);
 
     // 切到 RGBA: 带上透明度
     clickColorType(container, 'RGBA');
-    await waitFor(() => expect(codeEl()?.textContent).toMatch(/rgba\(\d+, \d+, \d+, [\d.]+\)$/));
+    await waitFor(() => expect(text()).toMatch(/rgba\(\d+, \d+, \d+, [\d.]+\)$/));
 
-    // 颜色名称: 不展示编码 (与色块一致)
+    // 颜色名称: 只展示名称 (与粘贴板一致)
     clickColorType(container, '颜色名称');
-    await waitFor(() => expect(codeEl()).toBeNull());
-    expect(container.querySelectorAll('.levitation-box li').length).toBe(1);
+    await waitFor(() => expect(text()).toBe(name));
   });
 
   test('输入内容后点击操作按钮不抛异常', () => {

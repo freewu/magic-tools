@@ -65,26 +65,24 @@
   list-style: none;
   border-bottom: 1px #fff solid;
   width: 120px;
-  height: 34px;
+  height: 28px;
   margin: 1px 0 1px 0;
-  padding: 0 2px;
-  line-height: 1.15;
+  padding: 0 4px;
+  /* 单行值水平垂直居中 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
 }
 
-/* 颜色名称 / 编码 各占一行, 过长时省略 */
-.levitation-li-name,
-.levitation-li-code {
+/* 当前颜色类型对应的值 (名称 / 编码), 过长时省略 */
+.levitation-li-text {
   display: block;
+  max-width: 100%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 11px;
-}
-
-.levitation-li-code {
-  font-size: 10px;
-  opacity: 0.85;
 }
 
 .levitation-box li:last-child {
