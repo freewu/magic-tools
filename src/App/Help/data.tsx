@@ -83,6 +83,42 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-10-15 V2.23.1 Release", "2026-10-15 V2.23.1 Release", "2026-10-15 V2.23.1 Release"),
+    items: trio(
+      [
+        "敏感词检测新增「扩展词库」(数据来自开源项目 konsheng/Sensitive-lexicon, MIT): 按上游文件分为 17 个分类 (涉政 / 涉恐 / 暴恐 / 色情 / 广告法 / 网易 / 腾讯 / 网址 …) 共 74,212 条词条, 词表用异或 (XOR) + Base64 编码存放且按需加载 (1.4 MB 数据单独分包, 勾选后才拉取); 分类选择器位于「通用」页签顶部, 勾选后与内置词库融合检查: 命中明细合并为同一张表并多一列「分类」(扩展行显示所属分类, 内置行显示「内置」), 等级筛选计数、命中处数、页签与卡片统计同步叠加 (概览显示「含扩展词库 N 处」), 命中同样计入打码与检测报告; 扩展词库收录量大且含少量误报, 按需勾选并请结合语境核实",
+        "敏感词检测新增「打码预览」: 可直观看到打码后的全文, 被打码的位置高亮显示、悬停看原词与等级, 并统计「打码 N 处 / M 字」, 随打码字符与扩展词库勾选实时重算, 附「复制结果」按钮",
+        "XML 格式化 / HTML 格式化新增结构树视图: 以树状折叠方式查看标签层级 (默认全部展开, 支持展开全部 / 折叠全部), 树只保留标签 / 属性 / 文本结构, 长文档也能快速定位; Markdown 编辑器 / Mermaid 编辑器新增全屏模式 (优先原生 Fullscreen API, 内嵌 WebView 不可用时回退窗口内全屏, Esc 退出)",
+        "XML 格式化 / HTML 格式化的树状结构与格式化结果改为分页签展示 (格式化结果在前并默认选中), 每个页签各自带工具栏; 两个工具均支持打开本地文件 (含拖拽入框), 格式化结果统一走原生保存弹窗 (Web 版回退为浏览器下载)",
+        "Markdown 编辑器 / Mermaid 编辑器 / 思维导图 / Vditor Markdown 支持打开本地文件 (按钮选择, 前三个还可拖拽入框), 保存时沿用打开的文件名; Mermaid 编辑器导出的 .md 只替换 ```mermaid 代码块, 周边 Markdown 文字原样保留",
+        "敏感词检测打码字符改为组合框 (既可从下拉选择 * / ● / × / □ / ○, 也可自己填写任意单个字符, 保证打码后长度不变); CSS 配色色卡上的编码跟随颜色类型切换 (HEX / RGB / HSL …), 设置中心可设默认颜色类型, 批量取色浮层只展示当前颜色类型的值并支持拖动调整位置",
+        "设置中心分隔标题与分隔线样式调整 (标题颜色更柔和、深色模式更亮, 新增 --app-divider-line 主题变量, 最终改为蓝紫 #4c6cb3 加粗并通栏 100% 宽度); 收藏悬浮入口的数量角标移到圆形按钮左上角并更靠近按钮, 底色改为金色渐变、数字加粗; JSONL 转换去掉「清除」按钮后面多余的 JSONL 标签; 应用中心撤下 v2.23.0 新增的 6 个应用的 NEW 徽标 (拼豆图纸 / 假装开会 / Zip 压缩 / Zip 解压 / GIF 拆解 / GIF 生成)",
+        "工程: 新增 scripts/build-sensitive-lexicon.mjs (just lexicon) 一键生成词表数据 (XOR 密钥单一来源取自 lexicon.ts, 产出 lexicon.meta.json 与 lexicon.enc.json), 抽出 scripts/build-site.mjs 组装 _site (docs 官网 + /tools/ Web 版, GitHub Pages 与 Cloudflare Pages 共用, docs 三页 Web 版入口改为相对链接), 公共库新增 src/lib/file.ts 与 src/lib/tree.ts; 全量测试 3609 → 3753 条; 工具总数保持 151",
+      ],
+      [
+        "敏感詞檢測新增「擴充詞庫」(資料來自開源專案 konsheng/Sensitive-lexicon, MIT): 依上游檔案分為 17 個分類 (涉政 / 涉恐 / 暴恐 / 色情 / 廣告法 / 網易 / 騰訊 / 網址 …) 共 74,212 條詞條, 詞表以異或 (XOR) + Base64 編碼存放且按需載入 (1.4 MB 資料單獨分包, 勾選後才拉取); 分類選擇器位於「通用」頁籤頂部, 勾選後與內建詞庫融合檢查: 命中明細合併為同一張表並多一欄「分類」(擴充列顯示所屬分類, 內建列顯示「內建」), 等級篩選計數、命中處數、頁籤與卡片統計同步疊加 (概覽顯示「含擴充詞庫 N 處」), 命中同樣計入打碼與檢測報告; 擴充詞庫收錄量大且含少量誤報, 請按需勾選並結合語境核實",
+        "敏感詞檢測新增「打碼預覽」: 可直觀看到打碼後的全文, 被打碼的位置高亮顯示、懸停看原詞與等級, 並統計「打碼 N 處 / M 字」, 隨打碼字元與擴充詞庫勾選即時重算, 附「複製結果」按鈕",
+        "XML 格式化 / HTML 格式化新增結構樹檢視: 以樹狀折疊方式檢視標籤層級 (預設全部展開, 支援展開全部 / 折疊全部), 樹只保留標籤 / 屬性 / 文字結構, 長文件也能快速定位; Markdown 編輯器 / Mermaid 編輯器新增全螢幕模式 (優先原生 Fullscreen API, 內嵌 WebView 不可用時回退視窗內全螢幕, Esc 離開)",
+        "XML 格式化 / HTML 格式化的樹狀結構與格式化結果改為頁籤展示 (格式化結果在前並預設選中), 每個頁籤各自帶工具列; 兩個工具均支援開啟本機檔案 (含拖曳入框), 格式化結果統一走原生儲存對話框 (Web 版回退為瀏覽器下載)",
+        "Markdown 編輯器 / Mermaid 編輯器 / 心智圖 / Vditor Markdown 支援開啟本機檔案 (按鈕選擇, 前三個還可拖曳入框), 儲存時沿用開啟的檔案名稱; Mermaid 編輯器匯出的 .md 只替換 ```mermaid 程式碼區塊, 周邊 Markdown 文字原樣保留",
+        "敏感詞檢測打碼字元改為組合方塊 (可從下拉選擇 * / ● / × / □ / ○, 也可自行填寫任意單一字元, 保證打碼後長度不變); CSS 配色色卡上的編碼跟隨顏色類型切換 (HEX / RGB / HSL …), 設定中心可設預設顏色類型, 批次取色浮層只顯示目前顏色類型的值並支援拖曳調整位置",
+        "設定中心分隔標題與分隔線樣式調整 (標題顏色更柔和、深色模式更亮, 新增 --app-divider-line 主題變數, 最終改為藍紫 #4c6cb3 加粗並通欄 100% 寬度); 收藏懸浮入口的數量角標移到圓形按鈕左上角並更靠近按鈕, 底色改為金色漸層、數字加粗; JSONL 轉換移除「清除」按鈕後面多餘的 JSONL 標籤; 應用中心撤下 v2.23.0 新增的 6 個應用的 NEW 徽標 (拼豆圖紙 / 假裝開會 / Zip 壓縮 / Zip 解壓 / GIF 拆解 / GIF 生成)",
+        "工程: 新增 scripts/build-sensitive-lexicon.mjs (just lexicon) 一鍵生成詞表資料 (XOR 金鑰單一來源取自 lexicon.ts, 產出 lexicon.meta.json 與 lexicon.enc.json), 抽出 scripts/build-site.mjs 組裝 _site (docs 官網 + /tools/ Web 版, GitHub Pages 與 Cloudflare Pages 共用, docs 三頁 Web 版入口改為相對連結), 公共庫新增 src/lib/file.ts 與 src/lib/tree.ts; 全量測試 3609 → 3753 筆; 工具總數保持 151",
+      ],
+      [
+        "Sensitive word check gained an “extended lexicon” (data from the open-source konsheng/Sensitive-lexicon project, MIT): 17 categories taken from the upstream files (politics / terror / porn / advertising law / NetEase / Tencent / URLs …) with 74,212 entries, stored XOR + Base64 encoded and loaded on demand (a separate 1.4 MB chunk fetched only when you tick a category); the picker sits at the top of the General tab and the hits are fused with the built-in lexicon: one shared detail table with an extra Category column (extension rows show their category, built-in rows show Built-in), and the level filter counts, hit totals, tab labels and cards all add up (the summary shows “N hits incl. extended lexicon”); extension hits also count towards masking and the report; the extended lexicon is large and contains a few false positives, so tick categories as needed and verify in context",
+        "Sensitive word check gained a “masked preview”: see the whole masked text at a glance, with every masked spot highlighted and a hover tooltip showing the original word and level, a “N spots / M characters masked” readout that recomputes live with the mask character and the selected categories, and a Copy result button",
+        "XML formatter / HTML formatter gained a structural tree view: browse the tag hierarchy as a collapsible tree (expanded by default, with expand all / collapse all); the tree keeps tags, attributes and text so even long documents are easy to navigate; the Markdown editor and Mermaid editor gained a fullscreen mode (native Fullscreen API first, falling back to in-window fullscreen inside embedded webviews, Esc to exit)",
+        "XML formatter / HTML formatter now show the tree and the formatted output in tabs (formatted output first and selected by default), each tab with its own toolbar; both tools can open a local file (or take a dropped one) and save the formatted result through the native save dialog (browser download on the web fallback)",
+        "The Markdown editor / Mermaid editor / mind map / Vditor Markdown can open a local file (via a button, and the first three also accept a dropped file) and reuse the opened file name when saving; a Mermaid .md export only replaces the ```mermaid block and keeps the surrounding Markdown prose untouched",
+        "Sensitive word check: the mask character is now a combo box (pick * / ● / × / □ / ○ from the dropdown or type any single character, keeping the masked length unchanged); in the colour tool the code shown on each swatch follows the selected colour type (HEX / RGB / HSL …) with a default type in settings, and the batch-pick overlay shows only the current type and can be dragged around",
+        "Settings: divider headings and lines restyled (softer headings, brighter in dark mode, a new --app-divider-line theme variable, finally bold blue-purple #4c6cb3 at full width); the favourites count badge moved to the top-left of the round button and closer to it, now with a gold gradient and bold digits; the JSONL converter dropped the redundant JSONL label after the Clear button; the app centre removed the NEW badge from the six apps added in v2.23.0 (bead pattern, fake meeting, Zip compress, Zip extract, GIF split, GIF generator)",
+        "Engineering: added scripts/build-sensitive-lexicon.mjs (just lexicon) to regenerate the lexicon data (the XOR key is single-sourced from lexicon.ts, producing lexicon.meta.json and lexicon.enc.json), extracted scripts/build-site.mjs to assemble _site (docs site plus the /tools/ web app, shared by GitHub Pages and Cloudflare Pages, with relative web-app links in the three docs pages), and added the shared src/lib/file.ts and src/lib/tree.ts modules; the full suite went from 3609 to 3753 tests; the tool count stays at 151",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-10-14 V2.23.0 Release", "2026-10-14 V2.23.0 Release", "2026-10-14 V2.23.0 Release"),
     items: trio(
       [
