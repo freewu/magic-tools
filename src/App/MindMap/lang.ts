@@ -13,6 +13,21 @@ const uilangRows: Record<string, [string, string]> = {
   '隐藏预览': ['隱藏預覽', 'Hide preview'],
   '显示预览': ['顯示預覽', 'Show preview'],
 
+  // 打开 / 保存本地 .md 文件
+  '打开文件': ['開啟檔案', 'Open file'],
+  '打开 .md 文件编辑 (也可直接把文件拖到页面)': [
+    '開啟 .md 檔案編輯 (也可直接將檔案拖曳到頁面)',
+    'Open a .md file (you can also drop a file anywhere on the page)',
+  ],
+  '保存 .md': ['儲存 .md', 'Save .md'],
+  '保存当前大纲为 .md 文件': ['將目前大綱儲存為 .md 檔案', 'Save the current outline as a .md file'],
+  '保存为 .md 文件': ['儲存為 .md 檔案', 'Save as a .md file'],
+  'Markdown 文件': ['Markdown 檔案', 'Markdown file'],
+  '已打开 {file}': ['已開啟 {file}', 'Opened {file}'],
+  '打开文件失败': ['開啟檔案失敗', 'Failed to open the file'],
+  '已保存 {file}': ['已儲存 {file}', 'Saved {file}'],
+  '保存失败': ['儲存失敗', 'Failed to save'],
+
   // 输入面板
   'Markdown 大纲': ['Markdown 大綱', 'Markdown outline'],
   '在此输入 Markdown 大纲…': ['在此輸入 Markdown 大綱…', 'Type a Markdown outline here…'],

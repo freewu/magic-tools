@@ -10,7 +10,8 @@ const zh = `<h2>这个工具做什么</h2>
 <li><p>用「<b>配色</b>」换一套颜色 (多色 / 蓝 / 绿 / 灰 / 暖色 / 冷色), 「<b>展开层级</b>」(全部 / 一层 / 两层 / 三层 / 四层) 控制默认展开几层, 「<b>字号</b>」调节点文字大小 (12 - 22 px)</p></li>
 <li><p>预览区可以<b>滚轮缩放、拖拽平移</b>; 点节点旁的圆点即可折叠或展开该分支; 点「适应窗口」把整棵树重新摆正; 点「<b>全屏</b>」让<b>整个页面</b>铺满屏幕 (工具栏 / 大纲 / 预览一起放大, 下方说明区自动隐藏; 按 <code>Esc</code> 或点「退出全屏」返回, 全屏后会自动重新适应窗口)</p></li>
 <li><p>「背景」(白色 / 深色 / 透明) 与「缩放」(100% / 150% / 200% / 250% / 300% / 400%) 作用于<b>位图导出与预览</b>; 之后点「导出图片」选一种格式 (SVG / PNG / WebP) 保存, 或用「复制 SVG / 复制大纲」直接粘贴到别处</p></li>
-<li><p>左上角的开关可单独收起左右两栏: 只看结果时收起大纲栏, 专注写大纲时收起预览栏 (两者不会同时收起, 其中一个已收起时另一个会置灰); 「<b>全屏</b>」就在这两个开关旁边</p></li>
+<li><p>左上角还有「<b>打开文件</b>」与「<b>保存 .md</b>」: 大纲本身就是 Markdown, 「打开文件」直接读入本地 <code>.md</code> / <code>.txt</code> 文档 (也可把文件拖到页面上), 「保存 .md」把当前大纲存成 <code>.md</code> (桌面端弹系统保存对话框, 文件名沿用打开时的文件名, 没打开过文件时用「示例名 / 首个标题」推导)</p></li>
+<li><p>左上角的开关可单独收起左右两栏: 只看结果时收起大纲栏, 专注写大纲时收起预览栏 (两者不会同时收起, 其中一个已收起时另一个会置灰); 「<b>全屏</b>」就在这些按钮旁边</p></li>
 </ul>
 
 <h2>大纲怎么写 (markmap 规则)</h2>
@@ -50,7 +51,8 @@ const tw = `<h2>這個工具做什麼</h2>
 <li><p>用「<b>配色</b>」換一套顏色 (多色 / 藍 / 綠 / 灰 / 暖色 / 冷色), 「<b>展開層級</b>」(全部 / 一層 / 兩層 / 三層 / 四層) 控制預設展開幾層, 「<b>字號</b>」調整節點文字大小 (12 - 22 px)</p></li>
 <li><p>預覽區可以<b>滾輪縮放、拖曳平移</b>; 點節點旁的圓點即可折疊或展開該分支; 點「適應視窗」把整棵樹重新擺正; 點「<b>全螢幕</b>」讓<b>整個頁面</b>鋪滿螢幕 (工具列 / 大綱 / 預覽一起放大, 下方說明區自動隱藏; 按 <code>Esc</code> 或點「退出全螢幕」返回, 全螢幕後會自動重新適應視窗)</p></li>
 <li><p>「背景」(白色 / 深色 / 透明) 與「縮放」(100% / 150% / 200% / 250% / 300% / 400%) 作用於<b>點陣圖匯出與預覽</b>; 之後點「匯出圖片」選一種格式 (SVG / PNG / WebP) 儲存, 或用「複製 SVG / 複製大綱」直接貼到別處</p></li>
-<li><p>左上角的開關可單獨收起左右兩欄: 只看結果時收起大綱欄, 專心寫大綱時收起預覽欄 (兩者不會同時收起, 其中一個已收起時另一個會變灰); 「<b>全螢幕</b>」就在這兩個開關旁邊</p></li>
+<li><p>左上角還有「<b>開啟檔案</b>」與「<b>儲存 .md</b>」: 大綱本身就是 Markdown, 「開啟檔案」直接讀入本機 <code>.md</code> / <code>.txt</code> 文件 (也可把檔案拖到頁面上), 「儲存 .md」把目前大綱存成 <code>.md</code> (桌面端彈系統儲存對話框, 檔名沿用開啟時的檔名, 沒開過檔案時用「範例名 / 首個標題」推導)</p></li>
+<li><p>左上角的開關可單獨收起左右兩欄: 只看結果時收起大綱欄, 專心寫大綱時收起預覽欄 (兩者不會同時收起, 其中一個已收起時另一個會變灰); 「<b>全螢幕</b>」就在這些按鈕旁邊</p></li>
 </ul>
 
 <h2>大綱怎麼寫 (markmap 規則)</h2>
@@ -90,6 +92,7 @@ const en = `<h2>What this tool does</h2>
 <li><p>Use <b>Color</b> for the palette (multicolour / blue / green / gray / warm / cool), <b>Expand level</b> (all / 1 / 2 / 3 / 4 levels) for how many levels start expanded and <b>Font size</b> for the text size (12 – 22 px)</p></li>
 <li><p>The canvas supports <b>wheel zoom and drag panning</b>; click the circle next to a node to fold or unfold that branch; press “Fit” to re-centre the whole tree, or “<b>Fullscreen</b>” to blow the <b>whole page</b> up to the full screen (toolbar, outline and preview together; the notes below are hidden) — leave it with <code>Esc</code> or “Exit fullscreen”, and the map re-fits automatically</p></li>
 <li><p><b>Background</b> (white / dark / transparent) and <b>Scale</b> (100% / 150% / 200% / 250% / 300% / 400%) apply to the <b>preview and raster export</b>. Then use “Export image” to pick a format (SVG / PNG / WebP), or “Copy SVG / Copy outline” to paste elsewhere</p></li>
+<li><p>The top-left row also has <b>Open file</b> and <b>Save .md</b>: the outline <i>is</i> Markdown, so “Open file” loads a local <code>.md</code> / <code>.txt</code> document straight into the editor (you can also drop a file anywhere on the page), and “Save .md” writes the current outline to a <code>.md</code> file — the desktop app pops the system save dialog, reusing the opened file name, or deriving one from the sample / first heading</p></li>
 <li><p>The toggles in the top-left corner collapse the outline or the preview pane so you can focus on either side; they can never both be collapsed (whichever would hide everything is greyed out), and <b>Fullscreen</b> sits right next to them</p></li>
 </ul>
 

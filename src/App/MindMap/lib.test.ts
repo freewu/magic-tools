@@ -39,6 +39,8 @@ import {
   loadMarkmap,
   markdownStats,
   markmapStyle,
+  MD_ACCEPT,
+  mdFileNameOf,
   normalizeColorScheme,
   normalizeDepth,
   outlineInfo,
@@ -242,5 +244,27 @@ describe('MindMap 默认项持久化', () => {
     expect(getDefaultSample()).toBe('meeting');
     setDefaultSample('not-exist');
     expect(getDefaultSample()).toBe('');
+  });
+});
+
+describe('MindMap 打开 / 保存 .md 文件名', () => {
+  it('mdFileNameOf: 保留 Markdown 后缀, 其它后缀换成 .md', () => {
+    expect(mdFileNameOf('我的大纲.md')).toBe('我的大纲.md');
+    expect(mdFileNameOf('note.markdown')).toBe('note.markdown');
+    expect(mdFileNameOf('说明.MD')).toBe('说明.MD');
+    expect(mdFileNameOf('outline.txt')).toBe('outline.md');
+    expect(mdFileNameOf('no-ext')).toBe('no-ext.md');
+    expect(mdFileNameOf('report.final.txt')).toBe('report.final.md');
+  });
+
+  it('mdFileNameOf: 去掉路径, 空名字回退默认名', () => {
+    expect(mdFileNameOf('C:\\docs\\sub/我的大纲.md')).toBe('我的大纲.md');
+    expect(mdFileNameOf('')).toBe(`${DEFAULT_FILE_BASE}.md`);
+    expect(mdFileNameOf('   ')).toBe(`${DEFAULT_FILE_BASE}.md`);
+    expect(mdFileNameOf('a/b/', 'fallback')).toBe('fallback.md');
+  });
+
+  it('MD_ACCEPT 覆盖 .md / .markdown / .txt', () => {
+    for (const ext of [ '.md', '.markdown', '.mdown', '.mkd', '.mdx', '.txt' ]) expect(MD_ACCEPT).toContain(ext);
   });
 });

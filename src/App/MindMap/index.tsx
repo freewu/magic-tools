@@ -1,11 +1,11 @@
 import { Alert, Button, Card, Divider, Dropdown, Input, Select, Space, Tooltip, message } from 'antd';
 import type { MenuProps } from 'antd';
-import { CopyOutlined, DownloadOutlined, DownOutlined, ExpandOutlined, EyeInvisibleOutlined, EyeOutlined, FullscreenExitOutlined, FullscreenOutlined } from '@ant-design/icons';
+import { CopyOutlined, DownloadOutlined, DownOutlined, ExpandOutlined, EyeInvisibleOutlined, EyeOutlined, FolderOpenOutlined, FullscreenExitOutlined, FullscreenOutlined, SaveOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocale } from '../../hook/locale-context';
 import { useTheme } from '../../hook/theme-context';
 import { copyTextToClipboard } from '../../lib';
-import { fileNameOf } from '../../lib/file';
+import { fileNameOf, readTextFile } from '../../lib/file';
 import { saveBytesFile, savePngFile, saveTextFile } from '../../lib/tauri';
 import { dataUrlToBytes, exportSvgFromCanvas, rasterizeSvg, supportsWebp, type SvgBox } from '../../lib/svg';
 import {
@@ -36,6 +36,8 @@ import {
   isBlankMarkdown,
   loadMarkmap,
   markdownStats,
+  MD_ACCEPT,
+  mdFileNameOf,
   outlineInfo,
   viewOptions,
   type MindMapInstance,
@@ -80,6 +82,11 @@ const STAGE_CSS = [
   '.mindmap-stage.mindmap-full .mindmap-pane > .ant-card { border-radius: 0; }',
   // 画布吃掉预览卡剩余高度, 其余 (标题 / 参数 / 提示条) 保持自然高度
   '.mindmap-stage.mindmap-full .mindmap-canvas { flex: 1 1 auto; min-height: 0; }',
+  // 把 .md 文件拖到页面上时的高亮边框
+  '.mindmap-stage.mindmap-dragging::after {',
+  "  content: ''; position: absolute; inset: 6px; border-radius: 8px; pointer-events: none;",
+  '  border: 2px dashed var(--app-divider-text, #4c6cb3);',
+  '}',
 ].join('\n');
 
 /** 透明背景用棋盘格表示 (与位图导出的透明通道对应) */
@@ -122,9 +129,12 @@ const MindMap: React.FC = () => {
   const [info, setInfo] = useState<OutlineInfo>(EMPTY_INFO);
   const [webpOk] = useState(() => supportsWebp());
   const [full, setFull] = useState(false);
+  const [fileName, setFileName] = useState(''); // 已打开的 .md 文件名 (作为保存时的默认名)
+  const [dragging, setDragging] = useState(false);
 
   const svgRef = useRef<SVGSVGElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
+  const fileRef = useRef<HTMLInputElement | null>(null);
   const instRef = useRef<{ el: SVGSVGElement; mm: MindMapInstance } | null>(null);
   // 缩放值只影响视图, 不该重建整棵树: 供渲染 / 全屏等 effect 读取最新值
   const scaleRef = useRef(scale);
@@ -368,6 +378,41 @@ const MindMap: React.FC = () => {
     }
   };
 
+  /** 打开本地 .md / .txt 文件 (markmap 大纲本身就是 Markdown, 直接读入编辑器) */
+  const loadFile = async (file: File | undefined) => {
+    if (!file) return;
+    try {
+      const raw = await readTextFile(file);
+      setFileName(file.name);
+      setSampleId(''); // 内容来自文件, 不再跟随示例
+      setCode(raw);
+      message.success(tt('已打开 {file}', { file: file.name }));
+    } catch {
+      message.error(t('打开文件失败'));
+    }
+  };
+
+  const onPickFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // 清空 value, 允许连续打开同一个文件
+    void loadFile(file);
+  };
+
+  /** 保存当前大纲为 .md: 弹系统保存对话框 (纯网页回退为浏览器下载) */
+  const saveMarkdown = async () => {
+    // 打开过文件就沿用原名, 否则用「示例 id / 首个标题」推导
+    const name = fileName ? mdFileNameOf(fileName) : fileNameOf(exportBaseName(code, sampleId), 'md', DEFAULT_FILE_BASE);
+    try {
+      const ok = await saveTextFile(name, code, t('保存为 .md 文件'), {
+        filterName: t('Markdown 文件'),
+        extensions: [ 'md', 'markdown', 'txt' ],
+      });
+      if (ok) message.success(tt('已保存 {file}', { file: name }));
+    } catch {
+      message.error(t('保存失败'));
+    }
+  };
+
   const fitView = async () => {
     const inst = instRef.current?.mm;
     if (!inst) return;
@@ -434,8 +479,13 @@ const MindMap: React.FC = () => {
   return (
     <div
       ref={stageRef}
-      className={full ? 'mindmap-stage mindmap-full' : 'mindmap-stage'}
+      className={`mindmap-stage${full ? ' mindmap-full' : ''}${dragging ? ' mindmap-dragging' : ''}`}
+      onDragOver={(e) => e.preventDefault()}
+      onDragEnter={(e) => { e.preventDefault(); setDragging(true); }}
+      onDragLeave={(e) => { if (!stageRef.current?.contains(e.relatedTarget as Node | null)) setDragging(false); }}
+      onDrop={(e) => { e.preventDefault(); setDragging(false); void loadFile(e.dataTransfer?.files?.[0]); }}
       style={{
+        position: 'relative',
         display: 'flex',
         flexDirection: 'column',
         gap: 16,
@@ -446,6 +496,13 @@ const MindMap: React.FC = () => {
     >
       <style>{STAGE_CSS}</style>
       <Space size={8} wrap>
+        <input ref={fileRef} type="file" accept={MD_ACCEPT} style={{ display: 'none' }} onChange={onPickFile} />
+        <Tooltip title={t('打开 .md 文件编辑 (也可直接把文件拖到页面)')}>
+          <Button size="small" icon={<FolderOpenOutlined />} onClick={() => fileRef.current?.click()}>{t('打开文件')}</Button>
+        </Tooltip>
+        <Tooltip title={t('保存当前大纲为 .md 文件')}>
+          <Button size="small" icon={<SaveOutlined />} disabled={!code} onClick={() => { void saveMarkdown(); }}>{t('保存 .md')}</Button>
+        </Tooltip>
         <Button
           size="small"
           icon={showEditor ? <EyeInvisibleOutlined /> : <EyeOutlined />}

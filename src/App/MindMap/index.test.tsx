@@ -686,6 +686,82 @@ describe('MindMap 导出', () => {
   });
 });
 
+describe('MindMap 打开 / 保存 .md', () => {
+  const fileInput = (c: HTMLElement) => c.querySelector('input[type="file"]') as HTMLInputElement;
+  const open = async (c: HTMLElement, file: File, expectCode: string) => {
+    fireEvent.change(fileInput(c), { target: { files: [ file ] } });
+    await waitFor(() => expect(codeArea().value).toBe(expectCode));
+  };
+  const MD = '# 我的大纲\n\n- 第一条\n- 第二条';
+
+  test('打开 .md: 内容直接进编辑器, 保存时沿用原文件名', async () => {
+    const { container } = render(<MindMap />);
+    await waitRendered();
+    // 大纲本身就是 Markdown, .md 与 .txt 都接受
+    expect(fileInput(container).accept).toContain('.md');
+    expect(fileInput(container).accept).toContain('.txt');
+
+    await open(container, new File([ MD ], '我的大纲.md', { type: 'text/markdown' }), MD);
+    expect(fileInput(container).value).toBe(''); // 可重复打开同一个文件
+    await waitFor(() => expect(screen.getByText('已打开 我的大纲.md')).toBeInTheDocument());
+    // 内容来自文件, 示例下拉回到占位状态
+    expect(selectAt(0).textContent).toBe('示例');
+
+    fireEvent.click(btn('保存.md'));
+    await waitFor(() => expect(saveTextFile).toHaveBeenCalledTimes(1));
+    const [ name, content, title, opts ] = (saveTextFile as jest.Mock).mock.calls[0];
+    expect(name).toBe('我的大纲.md');
+    expect(content).toBe(MD);
+    expect(title).toBe('保存为 .md 文件');
+    expect(opts).toEqual({ filterName: 'Markdown 文件', extensions: [ 'md', 'markdown', 'txt' ] });
+    await waitFor(() => expect(screen.getByText('已保存 我的大纲.md')).toBeInTheDocument());
+  });
+
+  test('未打开过文件时用「示例名」推导保存名, 保存的文本带 frontmatter 说明', async () => {
+    render(<MindMap />);
+    await waitRendered();
+
+    fireEvent.click(btn('保存.md'));
+    await waitFor(() => expect(saveTextFile).toHaveBeenCalledTimes(1));
+    const [ name, content ] = (saveTextFile as jest.Mock).mock.calls[0];
+    expect(name).toBe('mindmap-project.md');
+    expect(content).toBe(SAMPLES[0].code);
+  });
+
+  test('打开 .txt 保存为 .md; 用首个标题推导 (未选示例时)', async () => {
+    const { container } = render(<MindMap />);
+    await waitRendered();
+
+    await open(container, new File([ '# 读书笔记\n- a' ], 'outline.txt', { type: 'text/plain' }), '# 读书笔记\n- a');
+    fireEvent.click(btn('保存.md'));
+    await waitFor(() => expect((saveTextFile as jest.Mock).mock.calls[0][0]).toBe('outline.md'));
+  });
+
+  test('取消保存对话框时不提示成功', async () => {
+    (saveTextFile as jest.Mock).mockResolvedValue(false);
+    render(<MindMap />);
+    await waitRendered();
+    fireEvent.click(btn('保存.md'));
+    await waitFor(() => expect(saveTextFile).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(screen.queryByText(/已保存/)).toBeNull());
+  });
+
+  test('把 .md 文件拖到页面上即可打开 (拖入时高亮)', async () => {
+    const { container } = render(<MindMap />);
+    await waitRendered();
+    const stage = stageOf(container);
+
+    fireEvent.dragEnter(stage);
+    expect(stage.className).toContain('mindmap-dragging');
+    fireEvent.dragLeave(stage);
+    expect(stage.className).not.toContain('mindmap-dragging');
+
+    fireEvent.drop(stage, { dataTransfer: { files: [ new File([ '# 拖进来的大纲' ], 'drag.md', { type: 'text/markdown' }) ] } });
+    await waitFor(() => expect(codeArea().value).toBe('# 拖进来的大纲'));
+    await waitFor(() => expect(screen.getByText('已打开 drag.md')).toBeInTheDocument());
+  });
+});
+
 describe('MindMap 说明区', () => {
   test('渲染说明标题与要点 (含 markmap 写法与混用提示)', () => {
     const { container } = render(<MindMap />);
