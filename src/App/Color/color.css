@@ -46,7 +46,7 @@
 .levitation-box-content {
   padding: 5px;
   text-align:center;
-  width: 100px;
+  width: 130px;
   border: 1px slategray solid;
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
@@ -64,9 +64,27 @@
   cursor: pointer;
   list-style: none;
   border-bottom: 1px #fff solid;
-  width: 90px;
-  height: 32px;
+  width: 120px;
+  height: 34px;
   margin: 1px 0 1px 0;
+  padding: 0 2px;
+  line-height: 1.15;
+  overflow: hidden;
+}
+
+/* 颜色名称 / 编码 各占一行, 过长时省略 */
+.levitation-li-name,
+.levitation-li-code {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 11px;
+}
+
+.levitation-li-code {
+  font-size: 10px;
+  opacity: 0.85;
 }
 
 .levitation-box li:last-child {

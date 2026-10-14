@@ -1,11 +1,12 @@
 import { Checkbox, Tooltip, Badge } from "antd";
 import type { BatchPickColorProps } from "./interface"
+import { calcReadableTextColor, getColorString } from "./lib";
 import colorLang from "./lang";
 import { useLocale } from "../../hook/locale-context";
 import { tr } from "../../i18n/lang";
 
 // 悬浮框
-const LevitationBox = ({ colorList, flag, flagChangeEvent, colorListChange } :BatchPickColorProps ) => {
+const LevitationBox = ({ colorList, flag, colorType, opacity, flagChangeEvent, colorListChange } :BatchPickColorProps ) => {
   const { locale } = useLocale();
   const t = (key: string, fallback: string) => tr(colorLang, locale, key, fallback);
 
@@ -34,14 +35,18 @@ const LevitationBox = ({ colorList, flag, flagChangeEvent, colorListChange } :Ba
         <ul>
           {
             colorList.map((item) => {
+              // 与色块保持一致: 展示当前颜色类型对应的编码, 颜色名称类型不展示编码
+              const showCode = colorType !== 'TEXT';
+              const code = getColorString(item.color, item.label, colorType, opacity);
               return (
               <li 
                 key={ item.color }
                 onDoubleClick={ () => { removeColor(item.color) } }
-                style={ { backgroundColor: item.color } } 
-                title = { item.label }  
+                style={ { backgroundColor: item.color, color: calcReadableTextColor(item.color) } } 
+                title = { showCode? `${item.label} ( ${code} )` : item.label }  
               >
-                {/* { item.label } */}
+                <span className="levitation-li-name">{ item.label }</span>
+                { showCode && <span className="levitation-li-code">{ code }</span> }
               </li>)
             })
           }

@@ -59,6 +59,10 @@ const Color = () => {
 
   const onOpacityChange = (value :number) => {
     setOpacity(value);
+    // 开启了批量取色时, 粘贴板里的透明度也要跟着变
+    if (batchPickFlag) {
+      updateClipboard(pickColorList, colorType, value);
+    }
   }
 
   const cardClick = (color :string , label :string) => {
@@ -82,12 +86,12 @@ const Color = () => {
     updatePickColorList([...pickColorList,{color,label}]);
   }
 
-  // 更新粘贴板的数据const UICard = (color: string, label: string, colorType: string, opa: number) => {  // 创建一个 
-  const updateClipboard = (list: Array<PickColorEntity>,colorType :string) => {
+  // 更新粘贴板的数据
+  const updateClipboard = (list: Array<PickColorEntity>, colorType :string, opacityValue :number = opacity) => {
     // 更新粘贴板
     const arr :Array<string> = [];
     list.forEach((item: PickColorEntity) => {
-      arr.push(getColorString(item.color, item.label, colorType, opacity));
+      arr.push(getColorString(item.color, item.label, colorType, opacityValue));
     });
     copyTextToClipboard(arr.toString());
   }
@@ -135,7 +139,7 @@ const Color = () => {
     </Space>
     <Tabs activeKey={ colorPad } items={ items } onChange={ onTabChange } />
     {/* 悬浮框 */}
-    <LevitationBox colorList={ pickColorList } flag={ batchPickFlag } flagChangeEvent={ setBatchPickFlag } colorListChange={ updatePickColorList } />
+    <LevitationBox colorList={ pickColorList } flag={ batchPickFlag } colorType={ colorType } opacity={ opacity } flagChangeEvent={ setBatchPickFlag } colorListChange={ updatePickColorList } />
     </>
   );
 }

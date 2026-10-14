@@ -16,6 +16,12 @@ const toHex = (color: string) => {
   return '#' + [1, 2, 3].map((i) => Number(match[i]).toString(16).padStart(2, '0')).join('').toUpperCase();
 };
 const buttons = (c: HTMLElement) => Array.from(c.querySelectorAll('button')).map((b) => norm(b.textContent ?? ''));
+/** 颜色类型是 antd Radio.Group (optionType="button") => label 元素而非 button */
+const clickColorType = (container: HTMLElement, label: string) => {
+  const el = Array.from(container.querySelectorAll('.ant-radio-button-wrapper')).find((b) => norm(b.textContent ?? '') === label);
+  expect(el).toBeTruthy();
+  fireEvent.click(el as Element);
+};
 
 describe('Color 页面', () => {
   test('渲染参数控件与操作区 (按钮 + 输入/选择)', () => {
@@ -78,13 +84,7 @@ describe('Color 页面', () => {
     const { container } = render(<Color />);
     const codeEl = () => container.querySelector('.color-card .color-card-code');
     const code = () => codeEl()?.textContent ?? '';
-    const clickType = (label: string) => {
-      // 颜色类型是 antd Radio.Group (optionType="button") => label 元素而非 button
-      const el = Array.from(container.querySelectorAll('.ant-radio-button-wrapper')).find((b) => norm(b.textContent ?? '') === label);
-      expect(el).toBeTruthy();
-      fireEvent.click(el as Element);
-    };
-
+    const clickType = (label: string) => clickColorType(container, label);
     // 默认 #HEX: 编码带 #
     expect(code().startsWith('#')).toBe(true);
 
@@ -101,6 +101,38 @@ describe('Color 页面', () => {
     // 颜色名称: 不展示编码
     clickType('颜色名称');
     await waitFor(() => expect(codeEl()).toBeNull());
+  });
+
+  test('批量取色浮层展示当前颜色类型对应的编码', async () => {
+    const { container } = render(<Color />);
+    // 开启批量取色
+    const checkbox = container.querySelector('.levitation-box input[type="checkbox"]') as HTMLInputElement;
+    expect(checkbox).toBeTruthy();
+    fireEvent.click(checkbox);
+    await waitFor(() => expect((container.querySelector('.levitation-box input[type="checkbox"]') as HTMLInputElement).checked).toBe(true));
+
+    // 取一个色 => 浮层里出现一条记录 (背景色为色块颜色, 文字为可读色)
+    fireEvent.click(container.querySelector('.color-card') as Element);
+    await waitFor(() => expect(container.querySelectorAll('.levitation-box li').length).toBe(1));
+    const codeEl = () => container.querySelector('.levitation-box li .levitation-li-code');
+    const nameEl = () => container.querySelector('.levitation-box li .levitation-li-name');
+    expect(nameEl()?.textContent).toBeTruthy();
+
+    // 默认 #HEX: 浮层编码带 # (与色块 / 粘贴板一致)
+    expect(codeEl()?.textContent?.startsWith('#')).toBe(true);
+
+    // 切到 RGB: 浮层编码同步变成 rgb(...)
+    clickColorType(container, 'RGB');
+    await waitFor(() => expect(codeEl()?.textContent?.startsWith('rgb(')).toBe(true));
+
+    // 切到 RGBA: 带上透明度
+    clickColorType(container, 'RGBA');
+    await waitFor(() => expect(codeEl()?.textContent).toMatch(/rgba\(\d+, \d+, \d+, [\d.]+\)$/));
+
+    // 颜色名称: 不展示编码 (与色块一致)
+    clickColorType(container, '颜色名称');
+    await waitFor(() => expect(codeEl()).toBeNull());
+    expect(container.querySelectorAll('.levitation-box li').length).toBe(1);
   });
 
   test('输入内容后点击操作按钮不抛异常', () => {

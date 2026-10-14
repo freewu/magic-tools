@@ -28,6 +28,8 @@ export interface ColorCardProps {
 export interface BatchPickColorProps {
   colorList: Array<PickColorEntity> // 颜色列表 [{label:"黑",code:"#000000"}]
   flag: boolean, // 是否选中
+  colorType: string, // 当前选中的颜色类型 (决定浮层里展示的编码)
+  opacity: number, // 不透明度 (RGBA / HSLA 编码会用到)
   flagChangeEvent: Function, // 批量取色事件
   colorListChange: Function, // 批量颜色变更调用
 }
