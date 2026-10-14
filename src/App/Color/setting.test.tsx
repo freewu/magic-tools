@@ -41,6 +41,21 @@ describe('ColorSetting 默认设置', () => {
     expect(flat(document.querySelector('.ant-select-selection-item'))).toContain('CMYK');
   });
 
+  test('滑块容器用 flex 擑开 (避免被 Space 挤得很短)', () => {
+    render(<ColorSetting />);
+    // 默认透明度 / 默认最大批量取色个数 两行的外层容器
+    const rows = Array.from(document.querySelectorAll('.ant-form-item-control-input-content > div'))
+      .filter((el) => (el as HTMLElement).style.display === 'flex' && (el as HTMLElement).style.maxWidth === '520px') as HTMLElement[];
+    expect(rows.length).toBe(2);
+    for (const row of rows) {
+      const slider = row.querySelector('.ant-slider') as HTMLElement;
+      expect(slider).toBeTruthy();
+      // Slider 占满剩余宽度 (flex: 1 + minWidth: 0)
+      expect(slider.style.flexGrow).toBe('1');
+      expect(slider.style.minWidth).toBe('0');
+    }
+  });
+
   test('英文环境下展示英文行级文案 (取自 Setting/rows-lang)', () => {
     localStorage.setItem('app-locale', 'en');
     render(<LocaleProvider><ColorSetting /></LocaleProvider>);

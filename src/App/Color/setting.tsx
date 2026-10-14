@@ -1,4 +1,4 @@
-import { Select, Form, Divider, Switch, Space, Slider } from "antd";
+import { Select, Form, Divider, Switch, Slider } from "antd";
 import { getDefaultColorPad, setDefaultColorPad } from "./lib";
 import { getDefaultBatchSwitch, setDefaultBatchSwitch } from "./lib";
 import { getDefaultOpacity, setDefaultOpacity } from "./lib";
@@ -55,18 +55,17 @@ export const ColorSetting = () => {
         />
       </Form.Item>
       <Form.Item label={ st('默认透明度') }>
-        <Space style={{ width: "100%" }}>
-          <div style={ {width: "100%", maxWidth: 520} }>
-            <Slider
-              tooltip={{ formatter: (value? :number) => { return (value)? (value / 10) : null; } }} 
-              value={ opacity }
-              min = { 0 }
-              max = { 10 }
-              onChange={ (value) => { setOpacity(value); setDefaultOpacity(value); }}
-            />
-          </div>
-          { opacity / 10 }
-        </Space>
+        <div style={ { display: 'flex', alignItems: 'center', gap: 12, maxWidth: 520 } }>
+          <Slider
+            style={ { flex: 1, minWidth: 0 } }
+            tooltip={{ formatter: (value? :number) => { return (value)? (value / 10) : null; } }} 
+            value={ opacity }
+            min = { 0 }
+            max = { 10 }
+            onChange={ (value) => { setOpacity(value); setDefaultOpacity(value); }}
+          />
+          <span>{ opacity / 10 }</span>
+        </div>
       </Form.Item>
       <Form.Item label={ st('默认开启批量取色') }>
         <Switch 
@@ -75,18 +74,18 @@ export const ColorSetting = () => {
           checked={ batchSwitch } />
       </Form.Item>
       <Form.Item label={ st('默认最大批量取色个数') }>
-        <Space style={{ width: "100%" }}>
-          <div style={ {width: "100%", maxWidth: 520} }>
-            <Slider
-              tooltip={{ formatter: (value? :number) => { return (value)? (value) : null; } }} 
-              value={ pickMax }
-              min = { 5 }
-              max = { 20 }
-              onChange={ (value) => { setPickMax(value); setDefaultPickMax(value); }}
-            />
-          </div>
-          { pickMax }
-        </Space>
+        <div style={ { display: 'flex', alignItems: 'center', gap: 12, maxWidth: 520 } }>
+          <Slider
+            style={ { flex: 1, minWidth: 0 } }
+            tooltip={{ formatter: (value? :number) => { return (value)? (value) : null; } }} 
+            value={ pickMax }
+            min = { 5 }
+            max = { 20 }
+            step = { 1 }
+            onChange={ (value) => { setPickMax(value); setDefaultPickMax(value); }}
+          />
+          <span>{ pickMax }</span>
+        </div>
       </Form.Item>
     </>
   );
