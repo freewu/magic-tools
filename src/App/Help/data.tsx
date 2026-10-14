@@ -83,6 +83,39 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-10-14 V2.23.0 Release", "2026-10-14 V2.23.0 Release", "2026-10-14 V2.23.0 Release"),
+    items: trio(
+      [
+        "新增「拼豆图纸」: 上传图片一键转成真实色卡拼豆图纸, 内置 6 种品牌色卡 (MARD 221 / COCO 291 / Artkal 176 / Artkal Mini 221 / Perler 117 / Hama 89), 图纸宽高用颗粒数滑块调整 (另配 -/+ 微调按钮), 支持 CIEDE2000 感知匹配、用色数限制、抖动、自动去背景、亮度/对比度/饱和度, 画笔/橡皮/换色/魔棒与撤销重做, 熨烫用的镜像预览, 总豆数/成品尺寸/拼豆板统计, 导出可打印 PNG 与色号/用量 CSV; 预览可放大缩小与归位, 可隐藏已载入的原图",
+        "新增「假装开会」: 腾讯会议 / Zoom / Microsoft Teams 三套界面 + 假参会者头像与名牌、随机高亮的发言者、走动的计时器、逐条到来的聊天消息、参会者列表、假共享屏幕幻灯片、沉浸模式 (接入浏览器全屏 API, Esc 退出)、自己的画面可用摄像头或上传照片代替、可合成背景人声; 参会者名字可点击改名 (Enter 提交 / Esc 取消, 改过的名字按 id 保留)",
+        "新增「Zip 压缩」/「Zip 解压」(基于 JSZip): 拖拽文件或文件夹并保留目录层级、压缩级别 0~9、自定义包名、重名自动加序号、显示压缩前后体积; 解压条目列表按大小/时间展示、全选/反选、文本与图片在线预览、按包内层级解压到指定目录 (桌面版选目录写入, Web 版逐个下载)、单个条目直接下载, 中文文件名编码 auto/UTF-8/GBK/Big5, 路径归一化防 zip-slip",
+        "新增「GIF 拆解」/「GIF 生成」(基于 gifuct-js 与 modern-gif): 拆解可逐帧查看 (播放/暂停/倍速)、全选/反选、导出选中帧为逐帧 PNG、拼成精灵图 (行列数与间隔可调); 生成可把多张图片按添加顺序合成动画帧 (上移/下移/反转调整顺序)、画布宽高尺寸模式、帧延时可一键应用到全部帧、循环次数 (0 为无限循环)、最大颜色数、抖动、背景透明, 全程在本地编码 (图片不上传), 生成后先预览确认再保存",
+        "应用中心新增 NEW 徽标: 应用在自己的 define.tsx 里导出 IsNew = true 即展示, 用于标记本版本新增的应用 (本版本新增的 6 个应用都带 NEW); 徽标位于卡片左上角并压住左边框线, 「仅桌面版 / 仅 Web」标识移到卡片右下角",
+        "Shield Badge 生成: SVG 源码支持格式化查看 (逐层缩进多行), 可切换单行原始并显示「共 N 行 · M 字符」, 一键复制当前显示的内容; Zip 压缩 / Zip 解压窗口宽度改为 100% (铺满内容区)",
+        "工程: 新增依赖 jszip / gifuct-js / modern-gif 与公共库 src/lib/zip.ts、src/lib/gif.ts (lib/tauri.ts 增加 saveBytesBatch, Tauri 侧追加 fs:allow-mkdir 权限); 三语 README 与 docs 同步工具数 147 → 151 (图片 17 → 19、其它 16 → 18); 全量测试 3300 → 3609 条; 工具总数 145 → 151",
+      ],
+      [
+        "新增「拼豆圖紙」: 上傳圖片一鍵轉成真實色卡拼豆圖紙, 內建 6 種品牌色卡 (MARD 221 / COCO 291 / Artkal 176 / Artkal Mini 221 / Perler 117 / Hama 89), 圖紙寬高用顆粒數滑桿調整 (另配 -/+ 微調按鈕), 支援 CIEDE2000 感知匹配、用色數限制、抖動、自動去背景、亮度/對比度/飽和度, 畫筆/橡皮/換色/魔棒與復原重做, 熨燙用的鏡像預覽, 總豆數/成品尺寸/拼豆板統計, 匯出可列印 PNG 與色號/用量 CSV; 預覽可放大縮小與歸位, 可隱藏已載入的原圖",
+        "新增「假裝開會」: 騰訊會議 / Zoom / Microsoft Teams 三套介面 + 假參與者頭像與名牌、隨機高亮的發言者、走動的計時器、逐條到來的聊天訊息、參與者清單、假分享螢幕投影片、沉浸模式 (接入瀏覽器全螢幕 API, Esc 離開)、自己的畫面可用攝影機或上傳照片代替、可合成背景人聲; 參與者名字可點擊改名 (Enter 提交 / Esc 取消, 改過的名字依 id 保留)",
+        "新增「Zip 壓縮」/「Zip 解壓」(基於 JSZip): 拖曳檔案或資料夾並保留目錄層級、壓縮等級 0~9、自訂壓縮檔名、重名自動加序號、顯示壓縮前後體積; 解壓項目清單依大小/時間顯示、全選/反選、文字與圖片線上預覽、依壓縮檔內層級解壓到指定目錄 (桌面版選目錄寫入, Web 版逐個下載)、單一項目直接下載, 中文檔名編碼 auto/UTF-8/GBK/Big5, 路徑正規化防 zip-slip",
+        "新增「GIF 拆解」/「GIF 生成」(基於 gifuct-js 與 modern-gif): 拆解可逐格檢視 (播放/暫停/倍速)、全選/反選、匯出選中格為逐格 PNG、拼成精靈圖 (行列數與間隔可調); 生成可把多張圖片依加入順序合成動畫影格 (上移/下移/反轉調整順序)、畫布寬高尺寸模式、影格延時可一鍵套用到全部影格、循環次數 (0 為無限循環)、最大顏色數、抖動、背景透明, 全程在本機編碼 (圖片不會上傳), 產生後先預覽確認再儲存",
+        "應用中心新增 NEW 徽標: 應用在自己的 define.tsx 裡匯出 IsNew = true 即顯示, 用於標記本版本新增的應用 (本版本新增的 6 個應用都帶 NEW); 徽標位於卡片左上角並壓住左邊框線, 「僅桌面版 / 僅 Web」標識移到卡片右下角",
+        "Shield Badge 生成: SVG 原始碼支援格式化檢視 (逐層縮排多行), 可切換單行原始並顯示「共 N 行 · M 字元」, 一鍵複製目前顯示的內容; Zip 壓縮 / Zip 解壓視窗寬度改為 100% (鋪滿內容區)",
+        "工程: 新增依賴 jszip / gifuct-js / modern-gif 與公共庫 src/lib/zip.ts、src/lib/gif.ts (lib/tauri.ts 增加 saveBytesBatch, Tauri 側追加 fs:allow-mkdir 權限); 三語 README 與 docs 同步工具數 147 → 151 (圖片 17 → 19、其他 16 → 18); 全量測試 3300 → 3609 筆; 工具總數 145 → 151",
+      ],
+      [
+        "New “Bead pattern” tool: turn an uploaded image into a real bead-colour chart with six brand palettes (MARD 221 / COCO 291 / Artkal 176 / Artkal Mini 221 / Perler 117 / Hama 89); width and height are set with bead-count sliders (plus -/+ nudge buttons), with CIEDE2000 perceptual matching, a colour-count limit, dithering, automatic background removal and brightness / contrast / saturation; brush, eraser, recolour and magic wand with undo / redo, a mirror preview for ironing, bead count / finished size / pegboard stats, and export as a printable PNG or code / usage CSV; the preview zooms and recentres, and the loaded original can be hidden",
+        "New “Fake meeting” tool: three meeting-app skins (Tencent Meeting / Zoom / Microsoft Teams) with fake participants, avatars and name tags, a randomly highlighted speaker, a ticking clock, chat messages arriving over time, a participant list, a fake screen-share slide, an immersive mode (real browser fullscreen API, Esc to exit), your own tile from the camera or an uploaded photo, and a synthesised background murmur; participant names can be renamed by clicking (Enter to submit, Esc to cancel, edits kept per participant)",
+        "New “Zip compress” / “Zip extract” tools (based on JSZip): compress by dragging in files or folders while keeping the folder structure, compression level 0–9, a custom archive name, automatic renumbering on duplicates and before / after size; extract lists entries with size and time, offers select-all / invert, inline previews of text and images, extraction into a folder keeping the archive hierarchy (desktop picks a folder, the web build downloads each file), single-entry download, Chinese filename encodings (auto / UTF-8 / GBK / Big5) and zip-slip-safe path normalisation",
+        "New “GIF split” / “GIF generator” tools (based on gifuct-js and modern-gif): split loads a .gif for frame-by-frame inspection (play / pause / speed), a frame list with select-all and invert, exporting the selected frames as one PNG each or stitching them into a sprite sheet (rows, columns and gap adjustable); the generator turns several images into animation frames in the order added (move up / move down / reverse), with canvas sizing, per-frame delay applied to all, loop count (0 = forever), max colours, dithering and a transparent background — everything is encoded locally (nothing is uploaded) with a preview before saving",
+        "App Center gained a NEW badge: an app shows it by exporting IsNew = true from its define.tsx, marking the apps added in this release (all six new apps carry it); the badge sits at the top-left corner of the card over the border, and the desktop-only / web-only tags moved to the bottom-right",
+        "Shield badge: the SVG source can be viewed formatted (indented across lines) or switched back to the raw single line, with a “N lines · M characters” readout and a button to copy what is shown; the Zip compress / Zip extract windows are now 100% wide (filling the content area)",
+        "Engineering: added the jszip / gifuct-js / modern-gif dependencies and the shared src/lib/zip.ts and src/lib/gif.ts modules (lib/tauri.ts gained saveBytesBatch, and the Tauri side now allows fs:allow-mkdir); the trilingual READMEs and the docs site report 151 tools instead of 147 (image 17 → 19, utilities 16 → 18); the full suite went from 3300 to 3609 tests; the tool count went from 145 to 151",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-10-11 V2.22.2 Release", "2026-10-11 V2.22.2 Release", "2026-10-11 V2.22.2 Release"),
     items: trio(
       [

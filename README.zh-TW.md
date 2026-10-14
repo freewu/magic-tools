@@ -2,11 +2,11 @@
 
 # 🧰 Magic Tools
 
-**全能開發工具箱 —— 9 大分類、147 個實用工具，桌面 + Web 雙端。**
+**全能開發工具箱 —— 9 大分類、151 個實用工具，桌面 + Web 雙端。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
-![version](https://img.shields.io/badge/magic--tools-v2.22.2-007EC6?style=flat-square&labelColor=24292F) ![ci](https://img.shields.io/github/actions/workflow/status/freewu/magic-tools/ci.yml?style=flat-square&label=CI&labelColor=24292F&logo=githubactions&logoColor=fff) ![Tauri](https://img.shields.io/badge/Tauri-2-0E7490?style=flat-square&labelColor=24292F&logo=tauri&logoColor=fff) ![React](https://img.shields.io/badge/React-18-087EA4?style=flat-square&labelColor=24292F&logo=react&logoColor=fff) ![Ant Design](https://img.shields.io/badge/Ant_Design-5-0170FE?style=flat-square&labelColor=24292F&logo=antdesign&logoColor=fff) ![MIT License](https://img.shields.io/badge/license-MIT-4F46E5?style=flat-square&labelColor=24292F)
+![version](https://img.shields.io/badge/magic--tools-v2.23.0-007EC6?style=flat-square&labelColor=24292F) ![ci](https://img.shields.io/github/actions/workflow/status/freewu/magic-tools/ci.yml?style=flat-square&label=CI&labelColor=24292F&logo=githubactions&logoColor=fff) ![Tauri](https://img.shields.io/badge/Tauri-2-0E7490?style=flat-square&labelColor=24292F&logo=tauri&logoColor=fff) ![React](https://img.shields.io/badge/React-18-087EA4?style=flat-square&labelColor=24292F&logo=react&logoColor=fff) ![Ant Design](https://img.shields.io/badge/Ant_Design-5-0170FE?style=flat-square&labelColor=24292F&logo=antdesign&logoColor=fff) ![MIT License](https://img.shields.io/badge/license-MIT-4F46E5?style=flat-square&labelColor=24292F)
 
 [下載桌面版](#-下載) · [線上體驗](https://freewu.github.io/magic-tools/) · [提交 Issue](https://github.com/freewu/magic-tools/issues/new)
 
@@ -42,8 +42,8 @@ Base64 編解碼 · URL 編解碼 · Unicode 編解碼 · Punycode 編解碼 · 
 ### 🛠️ 格式化 *(12)*
 Markdown 編輯器 · 即時渲染 Markdown 編輯器(Vditor: 即時渲染/分割/所見即所得三種模式, KaTeX 公式, 匯出 .md 與自帶樣式的 .html) · Mermaid 編輯器(即時預覽, 內建 30+ 圖形類型範例, 匯出 SVG/PNG/WebP) · 心智圖(Markdown 大綱轉 markmap 互動式心智圖, 折疊層級/縮放平移, 配色與字號, 匯出 SVG/PNG/WebP) · JSON 格式化 · JSON5 格式化 · JavaScript 格式化(美化/壓縮/混淆加密/解密還原) · SQL 格式化 · XML 格式化 · HTML 格式化 · SVG 格式化 · 中英文自動排版
 
-### 🖼️ 圖片 *(17)*
-Base64 圖片 · ASCII 圖片 · 程式碼截圖 · ICO 生成 · App Icon 生成 · 圖片主題色(合併相近色 + 佔比) · 圖片分割(2/3/4/6/9 份) · 圖片調整(依比例/依像素縮放 + 旋轉 90°·180°·270°, PNG·JPEG·WebP) · 圖片浮水印(文字/logo, 九宮格·平鋪 + 旋轉·透明度) · 佔位圖片 · Shield Badge 生成 · 圖片負片(可調強度反相) · 圖片黑白化(灰階/二值, 支援大津法自動閾值) · 圖片銳化(USM 半徑/強度/閾值) · 圖片取色(放大鏡 + HEX/RGB/HSL, 歷史色) · 圖片轉 SVG(點陣圖描線成向量, VTracer 彩色分層/黑白二值, 13 項參數 + 7 組預設) · 像素圖(圖片轉像素風: 快捷設定「人像照片 / 遊戲素材 / 抽象創作」, 像素塊平均 + 灰階 + 調色板量化 + 4×4 Bayer 抖動; 自適應 16~256 色與經典主機色板 NES·PICO-8·Game Boy·C64·CGA·ZX·SMS·MD·SFC)
+### 🖼️ 圖片 *(19)*
+Base64 圖片 · ASCII 圖片 · 程式碼截圖 · ICO 生成 · App Icon 生成 · 圖片主題色(合併相近色 + 佔比) · 圖片分割(2/3/4/6/9 份) · 圖片調整(依比例/依像素縮放 + 旋轉 90°·180°·270°, PNG·JPEG·WebP) · 圖片浮水印(文字/logo, 九宮格·平鋪 + 旋轉·透明度) · 佔位圖片 · Shield Badge 生成 · 圖片負片(可調強度反相) · 圖片黑白化(灰階/二值, 支援大津法自動閾值) · 圖片銳化(USM 半徑/強度/閾值) · 圖片取色(放大鏡 + HEX/RGB/HSL, 歷史色) · 圖片轉 SVG(點陣圖描線成向量, VTracer 彩色分層/黑白二值, 13 項參數 + 7 組預設) · 像素圖(圖片轉像素風: 快捷設定「人像照片 / 遊戲素材 / 抽象創作」, 像素塊平均 + 灰階 + 調色板量化 + 4×4 Bayer 抖動; 自適應 16~256 色與經典主機色板 NES·PICO-8·Game Boy·C64·CGA·ZX·SMS·MD·SFC) · GIF 拆解(載入 .gif 後逐格檢視: 動畫預覽支援播放/暫停與倍速, 影格清單可全選/反選, 匯出選中格為逐格 PNG (桌面版依「GIF 檔名/影格序號」寫入資料夾), 也可拼成精靈圖 (行列數與間隔可調)) · GIF 生成(把多張圖片依加入順序合成動畫影格, 可上移/下移/反轉調整順序; 畫布寬高尺寸模式, 影格延時可一鍵套用到全部影格, 循環次數 (0 為無限循環), 最大顏色數, 抖動, 背景透明; 用 modern-gif 在本機編碼, 產生後先預覽確認再儲存, 圖片不會上傳)
 
 ### 🎲 產生器 *(15)*
 二維碼生成(批次, logo/標籤) · 條碼生成(CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · 密碼生成(強度分析) · OTP 密碼產生器(TOTP/HOTP, 二維碼匯出) · htpasswd 生成 · 資料產生(JSON/CSV/SQL) · 點陣字產生器 · 數獨產生器(4/6/9 宮格, 唯一解, A4 列印) · 字帖產生器(米字格/田字格/回宮格/作文格, A4 列印) · Cron 規則產生(解析 + 下次執行時間) · .gitignore 產生(60+ 現成範本: 語言/框架與工具/編輯器/作業系統, 技術棧一鍵組合, 自訂追加, 跨範本自動去重) · 白板(Excalidraw 無限畫布: 圖形/箭頭/文字/手繪, 本機自動儲存, 匯出 PNG/SVG/畫布檔案 —— 不連網、無協作) · 聊天產生器(9 種平台風格: 微信/QQ/Slack/Telegram/Discord/WhatsApp/LINE/釘釘/飛書, 手機或桌面視窗預覽, 文字/圖片/語音/時間分隔四類訊息, 微信另支援紅包/轉帳卡片, 可設定聊天標題、暱稱、頭像、勿擾與手機狀態列, 匯出 PNG) · 拼豆圖紙 (上傳圖片產生拼豆圖紙: 6 種品牌色卡 (MARD / COCO / Artkal / Artkal Mini / Perler / Hama)、圖紙豆數、用色數限制、CIEDE2000 感知匹配、抖動、自動去背景、亮度/對比度/飽和度、畫筆/橡皮/換色/魔棒與復原重做、熨燙用的鏡像預覽、總豆數/成品尺寸/拼豆板統計, 匯出可列印 PNG 與色號/用量 CSV) · 假裝開會 (三套會議軟體介面 —— 騰訊會議 / Zoom / Microsoft Teams：假參與者頭像與名牌、隨機高亮的發言者、走動的計時器、會逐條到來的聊天訊息、參與者清單、假分享螢幕投影片、沉浸全螢幕 (Esc 離開)、自己的畫面可用攝影機或上傳照片代替、可合成背景人聲營造「辦公室很忙」氛圍)
@@ -51,8 +51,8 @@ Base64 圖片 · ASCII 圖片 · 程式碼截圖 · ICO 生成 · App Icon 生�
 ### 🌐 站長工具 *(16)*
 HTML 標籤去除 · 瀏覽器指紋 · CSR 申請文件(本機產生 RSA 私鑰 + PKCS#10 請求, 支援 SAN) · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 檢查 · 關鍵詞密度 · 網頁TDK 資訊檢測 · DNS 查詢(僅桌面版) · Whois 查詢(僅桌面版) · MTR 查詢(僅桌面版: traceroute + ping, 逐跳丟包/RTT/抖動) · robots.txt 生成 · iptables 規則(日常情境一鍵產生: 開放連接埠 / 封鎖 IP / 封鎖網段 / 連接埠轉發; 也可解析現有規則或依表單產生指令, 支援 iptables-save) · tc 規則(HTB / TBF / netem 限速與弱網模擬, 入口限速走 ifb) · nginx 設定(靜態站點 / SPA / PHP / 反向代理, 含 TLS、gzip、靜態快取、限流、防盜連, 直接產生 vhost 設定檔)
 
-### 🧩 其他 *(16)*
-CSS 配色 · 行數統計 · 正則表達式 · 檔案比較 · 鍵盤按鍵資訊 · Chmod 權限 · ASCII 文字 · CIDR 計算器 · WebSocket 偵錯 · 提詞器(調速/淡入淡出/逐行高亮/閱讀基準線可開關、自訂顏色並上下調整位置/全螢幕, 開始前可先倒計時, 空格 開始·暫停·取消倒計時, 預設值可在設定裡改/頁面一鍵儲存) · BOM 檢查(偵測 / 移除 / 新增 UTF-8·UTF-16·UTF-32 BOM, 編碼推測與文字預覽) · 節拍器(20~300 BPM, 拍號與拍內細分, 3 種音色 + 音量, 開始前預排拍倒計時, 全螢幕閃爍圓點, 連擊測速) · 螢幕錄製(瀏覽器專享: 擷取螢幕/視窗/分頁, 可選系統聲音與麥克風, 影格率·位元率·解析度可選, 一鍵儲存 WebM/MP4) · 二維碼解析(上傳/拖曳/貼上二維碼圖片, 用 jsQR 讀出內容: 網址·WiFi 配網·名片·郵件·電話·簡訊·座標·動態密碼, 結構化欄位顯示, 預覽圖上框出二維碼位置, 反色策略可調, 本機歷史記錄) · 敏感詞檢測(Aho–Corasick 掃描, 通用/小紅書/微信公眾號三套詞庫: 危險等級、命中位置與替換建議, 一鍵打碼與報告匯出, 寬鬆匹配可揪出「微 信」這類繞過寫法) · 番茄鐘(專注/短休/長休循環, 5 種內建合成提示音或指定自己的音訊檔, 提示音可設重複次數, 彈窗通知桌面端用系統彈窗, 時鐘背景與專注/休息數字配色可調, 背景可換成自己的圖片, 全螢幕支援空格/Enter 開始·暫停)
+### 🧩 其他 *(18)*
+CSS 配色 · 行數統計 · 正則表達式 · 檔案比較 · 鍵盤按鍵資訊 · Chmod 權限 · ASCII 文字 · CIDR 計算器 · WebSocket 偵錯 · 提詞器(調速/淡入淡出/逐行高亮/閱讀基準線可開關、自訂顏色並上下調整位置/全螢幕, 開始前可先倒計時, 空格 開始·暫停·取消倒計時, 預設值可在設定裡改/頁面一鍵儲存) · BOM 檢查(偵測 / 移除 / 新增 UTF-8·UTF-16·UTF-32 BOM, 編碼推測與文字預覽) · 節拍器(20~300 BPM, 拍號與拍內細分, 3 種音色 + 音量, 開始前預排拍倒計時, 全螢幕閃爍圓點, 連擊測速) · 螢幕錄製(瀏覽器專享: 擷取螢幕/視窗/分頁, 可選系統聲音與麥克風, 影格率·位元率·解析度可選, 一鍵儲存 WebM/MP4) · 二維碼解析(上傳/拖曳/貼上二維碼圖片, 用 jsQR 讀出內容: 網址·WiFi 配網·名片·郵件·電話·簡訊·座標·動態密碼, 結構化欄位顯示, 預覽圖上框出二維碼位置, 反色策略可調, 本機歷史記錄) · 敏感詞檢測(Aho–Corasick 掃描, 通用/小紅書/微信公眾號三套詞庫: 危險等級、命中位置與替換建議, 一鍵打碼與報告匯出, 寬鬆匹配可揪出「微 信」這類繞過寫法) · 番茄鐘(專注/短休/長休循環, 5 種內建合成提示音或指定自己的音訊檔, 提示音可設重複次數, 彈窗通知桌面端用系統彈窗, 時鐘背景與專注/休息數字配色可調, 背景可換成自己的圖片, 全螢幕支援空格/Enter 開始·暫停) · Zip 壓縮(拖曳檔案或資料夾並保留目錄層級, 壓縮等級 0~9, 自訂壓縮檔名, 重名自動加序號, 顯示壓縮前後體積) · Zip 解壓(項目清單依大小/時間顯示, 全選/反選, 文字與圖片線上預覽, 依壓縮檔內層級解壓到指定目錄, 單一項目也可直接下載, 中文檔名編碼 auto/UTF-8/GBK/Big5)
 
 > 另有內建頁面：**應用中心**(支援按應用名稱 / 分類名稱搜尋 + 分類篩選)、**我的收藏**(常用工具集中收藏, 懸浮入口可拖到任意位置)、**說明與更新日誌**、**設定**。
 
@@ -92,15 +92,15 @@ magic-tools
 │   │   ├── app-modules.ts    # 建置期用 import.meta.glob 靜態收集 (取代 webpack context 動態匯入)
 │   │   ├── app-i18n.ts       # 應用註冊表: appNameOf() 等取各工具/固定頁三語名稱
 │   │   ├── lang-packs.ts     # 彙總各工具 lang.ts 的預設語言包 (default 匯出)
-│   │   └── <工具>/           # 每工具一個目錄 (目前 147 個, 清單見下) — 兩步註冊
+│   │   └── <工具>/           # 每工具一個目錄 (目前 151 個, 清單見下) — 兩步註冊
 │   │       ├── define.tsx    # 註冊中繼資料: AppName(zh-CN 預設名) / Icon / Type(分組)
 │   │       ├── index.tsx     # 工具頁面元件 (預設匯出, 懶載入)
 │   │       ├── lang.ts       # 預設語言包 + 三語詞條 (zh 短語即 key, 值=[zh-TW, en]) + 本地取詞函式
 │   │       ├── lib.ts        # 純函式邏輯, 頁面與單測共用 (絕大多數工具)
-│   │       ├── lib.test.ts   # jest 單測 (138 個工具; 開發時用 `npm test -- src/App/<工具>` 只跑該工具)
-│   │       ├── data.ts       # 選項/常數表與型別 (75 個工具)
-│   │       ├── setting.tsx   # 設定中心內本工具的設定面板 (72 個工具)
-│   │       └── intro.tsx     # About/說明 三語內容 (57 個工具)
+│   │       ├── lib.test.ts   # jest 單測 (147 個工具; 開發時用 `npm test -- src/App/<工具>` 只跑該工具)
+│   │       ├── data.ts       # 選項/常數表與型別 (79 個工具)
+│   │       ├── setting.tsx   # 設定中心內本工具的設定面板 (77 個工具)
+│   │       └── intro.tsx     # About/說明 三語內容 (59 個工具)
 │   ├── layout/           # 主框架: 側邊欄/內容區
 │   ├── hook/             # 全域狀態: 主題/應用上下文
 │   └── lib/              # 共用工具庫
@@ -111,7 +111,7 @@ magic-tools
 
 ### `src/App/` 現有工具清單
 
-[`src/App/`](src/App/) 下現有 **147** 個工具目錄, 每個目錄 = 一個工具, 由其中 `define.tsx` 宣告。**新增工具需兩步登記**：(1) 把目錄名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 陣列 (該陣列決定側邊欄/應用中心選單順序與路由; `import.meta.glob` 只負責發現頁面元件, 不決定選單); (2) 把其 `lang.ts` 預設匯出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名稱與介面文案才能隨語言切換。按下表 `Type` 分組列出 (與側邊欄/上方功能總覽一致), 括號內為目錄數。除下列公共檔案外, 個別工具另有私有檔案 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
+[`src/App/`](src/App/) 下現有 **151** 個工具目錄, 每個目錄 = 一個工具, 由其中 `define.tsx` 宣告。**新增工具需兩步登記**：(1) 把目錄名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 陣列 (該陣列決定側邊欄/應用中心選單順序與路由; `import.meta.glob` 只負責發現頁面元件, 不決定選單); (2) 把其 `lang.ts` 預設匯出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名稱與介面文案才能隨語言切換。按下表 `Type` 分組列出 (與側邊欄/上方功能總覽一致), 括號內為目錄數。除下列公共檔案外, 個別工具另有私有檔案 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
 
 **🔐 加解密 *(23)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `SM9Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto` · `ZucCrypto`
 
@@ -123,13 +123,13 @@ magic-tools
 
 **🛠️ 格式化 *(12)*** — `CnEnSpacing` · `HtmlFormat` · `JSON5Formatter` · `JsFormatter` · `JsonFormatter` · `MarkdownEditor` · `MermaidEditor` · `MindMap` · `SQLFormatter` · `SvgFormat` · `VditorMarkdown` · `XmlFormatter`
 
-**🖼️ 圖片 *(17)*** — `AppIconGenerator` · `AsciiImageGenerator` · `Base64Image` · `CodeShot` · `IcoGenerator` · `ImageColor` · `ImageColorPicker` · `ImageGrayscale` · `ImageNegative` · `ImageResize` · `ImageSharpen` · `ImageSplit` · `ImageToSvg` · `ImageWatermark` · `PixelArt` · `PlaceholderImage` · `ShieldBadgeGenerator`
+**🖼️ 圖片 *(19)*** — `AppIconGenerator` · `AsciiImageGenerator` · `Base64Image` · `CodeShot` · `GifGenerator` · `GifSplit` · `IcoGenerator` · `ImageColor` · `ImageColorPicker` · `ImageGrayscale` · `ImageNegative` · `ImageResize` · `ImageSharpen` · `ImageSplit` · `ImageToSvg` · `ImageWatermark` · `PixelArt` · `PlaceholderImage` · `ShieldBadgeGenerator`
 
 **🎲 產生器 *(15)*** — `BarcodeGenerator` · `BeadPatternGenerator` · `ChatGenerator` · `CopybookGenerator` · `CronRules` · `DotMatrixFont` · `FakeMeeting` · `GitignoreGenerator` · `HtpasswdGenerator` · `MockData` · `OTPGenerator` · `PasswordGenerator` · `QRCodeGenerator` · `SudokuGenerator` · `Whiteboard`
 
 **🌐 站長工具 *(16)*** — `BrowserFingerprint` · `CSRGenerator` · `CookieAnalyzer` · `DnsQuery` · `HtmlStripText` · `IptablesRules` · `KeywordDensity` · `MtrQuery` · `NginxConfig` · `RobotsTxtGenerator` · `SitemapCheck` · `TcRules` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck` · `WhoisQuery`
 
-**🧩 其他 *(16)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `Metronome` · `Pomodoro` · `QrDecode` · `RegexTester` · `ScreenRecorder` · `SensitiveWord` · `Teleprompter` · `WebSocketDebug`
+**🧩 其他 *(18)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `Metronome` · `Pomodoro` · `QrDecode` · `RegexTester` · `ScreenRecorder` · `SensitiveWord` · `Teleprompter` · `WebSocketDebug` · `ZipCompress` · `ZipExtract`
 
 > 內建頁面 `AppStore`(應用中心) / `Favorites`(我的收藏) / `Help` / `Setting` 也位於 `src/App/` 下 (註冊 `Type = 'misc'`), 但屬固定頁面而非工具。
 
