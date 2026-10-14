@@ -1,6 +1,6 @@
 import { Button, Card, Input, Segmented, Space, Tooltip, Typography, message } from 'antd';
-import { CopyOutlined, DownloadOutlined, EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
-import { useMemo, useRef, useState } from 'react';
+import { CopyOutlined, DownloadOutlined, EyeInvisibleOutlined, EyeOutlined, FullscreenExitOutlined, FullscreenOutlined } from '@ant-design/icons';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { renderMarkdown, wrapExportHtml, MD_DARK_CSS, MD_EXPORT_CSS } from './lib';
 import { useLocale } from '../../hook/locale-context';
 import { useTheme } from '../../hook/theme-context';
@@ -78,6 +78,47 @@ const TOOLS: Tool[] = [
 
 const markdown = (text: string) => new Blob([text], { type: 'text/plain;charset=utf-8' });
 
+// 全屏: 优先原生 Fullscreen API, 不可用 (内嵌 webview / 非用户手势) 时用窗口内全屏兜底 (与白板 / 思维导图同一套做法)
+const FULL_CSS = `
+.md-editor { position: relative; }
+.md-editor-full {
+  position: fixed; inset: 0; z-index: 1000; box-sizing: border-box;
+  display: flex; flex-direction: column;
+  padding: 12px; overflow: auto;
+  background: var(--app-bg, #f0f2f5);
+}
+/* 全屏时: 工具栏保持原高, 源码 / 预览两栏平分并占满剩余高度 (各自内部滚动) */
+.md-editor-full > .ant-space { flex: 1 1 auto; min-height: 0; }
+.md-editor-full > .ant-space > .ant-space-item:last-child { flex: 1 1 auto; min-height: 0; display: flex; }
+.md-editor-full .md-editor-main { flex: 1 1 auto; min-width: 0; min-height: 0; }
+.md-editor-full .md-editor-main > .ant-card { display: flex; flex-direction: column; min-height: 0; }
+.md-editor-full .md-editor-main > .ant-card > .ant-card-body {
+  flex: 1 1 auto; min-height: 0; display: flex; overflow: hidden;
+}
+.md-editor-full .md-editor-main > .ant-card > .ant-card-body > * {
+  flex: 1 1 auto; min-width: 0; min-height: 0;
+}
+`;
+
+/** 全屏 API 在内嵌 webview / 老浏览器上可能不存在, 统一按可选处理 */
+type FullscreenElement = HTMLDivElement & { webkitRequestFullscreen?: () => Promise<void> | void };
+type FullscreenDocument = Document & {
+  webkitFullscreenElement?: Element | null;
+  webkitExitFullscreen?: () => Promise<void> | void;
+};
+
+/** 退出原生全屏 (无原生全屏时什么也不做) */
+const exitNativeFullscreen = () => {
+  const doc = document as FullscreenDocument;
+  if (!(doc.fullscreenElement ?? doc.webkitFullscreenElement)) return;
+  try {
+    const exit = doc.exitFullscreen?.bind(doc) ?? doc.webkitExitFullscreen?.bind(doc);
+    void Promise.resolve(exit?.()).catch(() => undefined);
+  } catch {
+    /* 忽略 */
+  }
+};
+
 const MarkdownEditor: React.FC = () => {
   const { locale } = useLocale();
   const { isDark } = useTheme();
@@ -105,6 +146,49 @@ const MarkdownEditor: React.FC = () => {
   const [view, setView] = useState<'preview' | 'html'>('preview');
   const [showPreview, setShowPreview] = useState(true); // 是否显示右侧预览/HTML 面板
   const taRef = useRef<{ textArea: HTMLTextAreaElement }>(null);
+
+  // ---- 全屏 ----
+  const [full, setFull] = useState(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const enterFull = useCallback(() => {
+    setFull(true);
+    const el = rootRef.current as FullscreenElement | null;
+    const request = el?.requestFullscreen?.bind(el) ?? el?.webkitRequestFullscreen?.bind(el);
+    if (!request) return;
+    try {
+      void Promise.resolve(request()).catch(() => undefined);
+    } catch {
+      /* 忽略: 已有 CSS 全屏兜底 */
+    }
+  }, []);
+  const exitFull = useCallback(() => {
+    setFull(false);
+    exitNativeFullscreen();
+  }, []);
+  // 浏览器 (含 Esc / F11) 退出原生全屏时同步状态, 避免按钮卡在「退出全屏」
+  useEffect(() => {
+    const onChange = () => {
+      const doc = document as FullscreenDocument;
+      if (!doc.fullscreenElement && !doc.webkitFullscreenElement) setFull(false);
+    };
+    document.addEventListener('fullscreenchange', onChange);
+    document.addEventListener('webkitfullscreenchange', onChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', onChange);
+      document.removeEventListener('webkitfullscreenchange', onChange);
+    };
+  }, []);
+  // 窗口内全屏 (兜底) 时按 Esc 退出 (原生全屏由浏览器自己处理)
+  useEffect(() => {
+    if (!full) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !document.fullscreenElement) exitFull();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [ full, exitFull ]);
+  // 卸载时退出原生全屏, 避免切到别的工具后还停在全屏层
+  useEffect(() => () => exitNativeFullscreen(), []);
 
   const html = useMemo(() => renderMarkdown(md), [md]);
 
@@ -140,89 +224,99 @@ const MarkdownEditor: React.FC = () => {
   const statChars = md.length;
 
   return (
-    <Space direction="vertical" size={16} style={{ width: '100%' }}>
-      <Card
-        size="small"
-        title={t('工具栏 (光标处插入)')}
-        extra={
-          <Space size={8}>
-            <Button size="small" onClick={() => { setMd(SAMPLE); message.info(t('已载入示例')); }}>{t('载入示例')}</Button>
-            <Button size="small" danger disabled={!md} onClick={() => setMd('')}>{t('清空')}</Button>
-          </Space>
-        }
-      >
-        <Space size={4} wrap>
-          {TOOLS.map((tool) => (
-            <Tooltip key={tool.label + tool.title} title={t(tool.title)}>
-              <Button size="small" type="text" style={{ fontSize: 13 }} onClick={() => applyTool(tool)}>{tool.label}</Button>
-            </Tooltip>
-          ))}
-        </Space>
-      </Card>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+    <div ref={rootRef} className={`md-editor${full ? ' md-editor-full' : ''}`}>
+      <style>{FULL_CSS}</style>
+      <Space direction="vertical" size={16} style={{ width: '100%' }}>
         <Card
           size="small"
-          title={t('Markdown 源码')}
-          style={{ flex: '1 1 360px', minWidth: 300 }}
+          title={t('工具栏 (光标处插入)')}
           extra={
             <Space size={8}>
-              <Tooltip title={t(showPreview ? '收起右侧预览, 专注编辑' : '恢复右侧预览面板')}>
+              <Button size="small" onClick={() => { setMd(SAMPLE); message.info(t('已载入示例')); }}>{t('载入示例')}</Button>
+              <Button size="small" danger disabled={!md} onClick={() => setMd('')}>{t('清空')}</Button>
+              <Tooltip title={t(full ? '退出全屏' : '全屏')}>
                 <Button
                   size="small"
-                  icon={showPreview ? <EyeInvisibleOutlined /> : <EyeOutlined />}
-                  onClick={() => setShowPreview(!showPreview)}
-                >{t(showPreview ? '隐藏预览' : '显示预览')}</Button>
+                  icon={full ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+                  onClick={full ? exitFull : enterFull}
+                >{t(full ? '退出全屏' : '全屏')}</Button>
               </Tooltip>
-              <Text type="secondary" style={{ fontSize: 12 }}>{tt('{l} 行 / {c} 字符', { l: statLines, c: statChars })}</Text>
             </Space>
           }
         >
-          <Input.TextArea
-            ref={taRef as never}
-            value={md}
-            onChange={(e) => setMd(e.target.value)}
-            autoSize={false}
-            style={{ minHeight: 460, fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 13, lineHeight: 1.7, resize: 'vertical' }}
-            placeholder={t('在此输入 Markdown…')}
-          />
+          <Space size={4} wrap>
+            {TOOLS.map((tool) => (
+              <Tooltip key={tool.label + tool.title} title={t(tool.title)}>
+                <Button size="small" type="text" style={{ fontSize: 13 }} onClick={() => applyTool(tool)}>{tool.label}</Button>
+              </Tooltip>
+            ))}
+          </Space>
         </Card>
-        {showPreview && (
+        <div className="md-editor-main" style={{ display: 'flex', flexWrap: full ? 'nowrap' : 'wrap', gap: 12 }}>
           <Card
             size="small"
-            title={t('预览')}
-            style={{ flex: '1 1 380px', minWidth: 300 }}
+            title={t('Markdown 源码')}
+            style={{ flex: '1 1 360px', minWidth: 300 }}
             extra={
               <Space size={8}>
-                <Segmented
-                  size="small"
-                  value={view}
-                  onChange={(v) => setView(v as typeof view)}
-                  options={[{ label: t('预览'), value: 'preview' }, { label: t('HTML 源码'), value: 'html' }]}
-                />
-                <Button size="small" icon={<CopyOutlined />} onClick={() => copy(view === 'preview' ? html : md, t('已复制预览 HTML'))}>{t('复制')}{view === 'preview' ? ' HTML' : ' ' + t('源文件')}</Button>
-                <Button size="small" icon={<DownloadOutlined />} onClick={() => download(md, 'markdown.md')}>.md</Button>
-                <Button size="small" type="primary" icon={<DownloadOutlined />} onClick={() => download(wrapExportHtml(html, `Markdown ${t('预览')}`), 'markdown.html')}>{t('导出 HTML')}</Button>
+                <Tooltip title={t(showPreview ? '收起右侧预览, 专注编辑' : '恢复右侧预览面板')}>
+                  <Button
+                    size="small"
+                    icon={showPreview ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                    onClick={() => setShowPreview(!showPreview)}
+                  >{t(showPreview ? '隐藏预览' : '显示预览')}</Button>
+                </Tooltip>
+                <Text type="secondary" style={{ fontSize: 12 }}>{tt('{l} 行 / {c} 字符', { l: statLines, c: statChars })}</Text>
               </Space>
             }
           >
-            {view === 'preview' ? (
-              <div style={{ maxHeight: 520, overflow: 'auto' }}>
-                <style>{MD_EXPORT_CSS}</style>
-                {isDark ? <style>{MD_DARK_CSS}</style> : null}
-                <div className="md-preview" dangerouslySetInnerHTML={{ __html: html || `<p style="color:#999">${t('(空内容)')}</p>` }} />
-              </div>
-            ) : (
-              <Input.TextArea
-                value={html}
-                readOnly
-                autoSize={false}
-                style={{ minHeight: 460, fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 12, lineHeight: 1.6, resize: 'vertical' }}
-              />
-            )}
+            <Input.TextArea
+              ref={taRef as never}
+              value={md}
+              onChange={(e) => setMd(e.target.value)}
+              autoSize={false}
+              style={{ minHeight: full ? 0 : 460, height: full ? '100%' : undefined, fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 13, lineHeight: 1.7, resize: full ? 'none' : 'vertical' }}
+              placeholder={t('在此输入 Markdown…')}
+            />
           </Card>
-        )}
-      </div>
-    </Space>
+          {showPreview && (
+            <Card
+              size="small"
+              title={t('预览')}
+              style={{ flex: '1 1 380px', minWidth: 300 }}
+              extra={
+                <Space size={8}>
+                  <Segmented
+                    size="small"
+                    value={view}
+                    onChange={(v) => setView(v as typeof view)}
+                    options={[{ label: t('预览'), value: 'preview' }, { label: t('HTML 源码'), value: 'html' }]}
+                  />
+                  <Button size="small" icon={<CopyOutlined />} onClick={() => copy(view === 'preview' ? html : md, t('已复制预览 HTML'))}>{t('复制')}{view === 'preview' ? ' HTML' : ' ' + t('源文件')}</Button>
+                  <Button size="small" icon={<DownloadOutlined />} onClick={() => download(md, 'markdown.md')}>.md</Button>
+                  <Button size="small" type="primary" icon={<DownloadOutlined />} onClick={() => download(wrapExportHtml(html, `Markdown ${t('预览')}`), 'markdown.html')}>{t('导出 HTML')}</Button>
+                </Space>
+              }
+            >
+              {view === 'preview' ? (
+                <div style={{ maxHeight: full ? undefined : 520, overflow: 'auto' }}>
+                  <style>{MD_EXPORT_CSS}</style>
+                  {isDark ? <style>{MD_DARK_CSS}</style> : null}
+                  <div className="md-preview" dangerouslySetInnerHTML={{ __html: html || `<p style="color:#999">${t('(空内容)')}</p>` }} />
+                </div>
+              ) : (
+                <Input.TextArea
+                  value={html}
+                  readOnly
+                  autoSize={false}
+                  style={{ minHeight: full ? 0 : 460, height: full ? '100%' : undefined, fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 12, lineHeight: 1.6, resize: full ? 'none' : 'vertical' }}
+                />
+              )}
+            </Card>
+          )}
+        </div>
+      </Space>
+    </div>
   );
 };
 

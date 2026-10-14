@@ -57,6 +57,8 @@ const uilangRows: Record<string, [string, string]> = {
   '恢复右侧预览面板': ['恢復右側預覽面板', 'Restore the right preview panel'],
   '隐藏预览': ['隱藏預覽', 'Hide preview'],
   '显示预览': ['顯示預覽', 'Show preview'],
+  '全屏': ['全螢幕', 'Fullscreen'],
+  '退出全屏': ['結束全螢幕', 'Exit fullscreen'],
   '{l} 行 / {c} 字符': ['{l} 行 / {c} 字元', '{l} lines / {c} chars'],
   '在此输入 Markdown…': ['在此輸入 Markdown…', 'Type Markdown here…'],
   '预览': ['預覽', 'Preview'],
