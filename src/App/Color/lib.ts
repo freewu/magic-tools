@@ -167,6 +167,26 @@ export function setDefaultColorType(type :string) : void  {
   localStorage.setItem(DEFAULT_COLORTYPE_ITEM, type);
 }
 
+const LEVITATION_POS_ITEM = 'color:levitation-box-pos';
+
+// 获取批量取色浮层的位置 (未拖过返回 null, 使用默认位置)
+export function getLevitationPos() :{ x: number, y: number } | null {
+  const raw = localStorage.getItem(LEVITATION_POS_ITEM);
+  if (raw === null) return null;
+  try {
+    const pos = JSON.parse(raw);
+    if (typeof pos?.x === 'number' && typeof pos?.y === 'number') return { x: pos.x, y: pos.y };
+  } catch {
+    // 脏数据忽略, 回退默认位置
+  }
+  return null;
+}
+
+// 记住批量取色浮层的位置
+export function setLevitationPos(pos :{ x: number, y: number }) : void  {
+  localStorage.setItem(LEVITATION_POS_ITEM, JSON.stringify(pos));
+}
+
 const DEFAULT_PICK_MAX_ITEM = 'color:pick-max';
 
 // 获取默认最大取色个数

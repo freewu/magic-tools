@@ -41,6 +41,20 @@
   top: 70px;
   padding-top:12px;
   padding-right:12px;
+  /* 按住浮层可拖动调整位置 */
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.levitation-box-dragging {
+  cursor: grabbing;
+  opacity: 0.85;
+}
+
+/* 拖动过之后: 改用 left/top 定位, 覆盖默认的 right (避免同时设置冲突) */
+.levitation-box-moved {
+  right: auto;
 }
 
 .levitation-box-content {

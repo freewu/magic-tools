@@ -1,4 +1,4 @@
-import { calcComplementaryColor, calcReadableTextColor, isOpacityType, getDefaultColorPad, setDefaultColorPad, getDefaultBatchSwitch, setDefaultBatchSwitch, getDefaultOpacity, setDefaultOpacity, getDefaultPickMax, setDefaultPickMax, getDefaultColorType, setDefaultColorType } from './lib';
+import { calcComplementaryColor, calcReadableTextColor, isOpacityType, getDefaultColorPad, setDefaultColorPad, getDefaultBatchSwitch, setDefaultBatchSwitch, getDefaultOpacity, setDefaultOpacity, getDefaultPickMax, setDefaultPickMax, getDefaultColorType, setDefaultColorType, getLevitationPos, setLevitationPos } from './lib';
 
 describe('Color lib', () => {
   beforeEach(() => localStorage.clear());
@@ -57,5 +57,17 @@ describe('Color lib', () => {
     expect(isOpacityType('HSLA')).toBe(true);
     expect(isOpacityType('HEX1')).toBe(false);
     expect(isOpacityType('TEXT')).toBe(false);
+  });
+
+  test('批量取色浮层位置持久化, 脏数据回退默认位置', () => {
+    // 未拖过 => null (使用默认位置)
+    expect(getLevitationPos()).toBeNull();
+    setLevitationPos({ x: 120, y: 240 });
+    expect(getLevitationPos()).toEqual({ x: 120, y: 240 });
+    // 非 JSON / 缺字段 / 类型不对都回退默认位置
+    for (const bad of ['not-json', '{}', '{"x":"a","y":1}', 'null']) {
+      localStorage.setItem('color:levitation-box-pos', bad);
+      expect(getLevitationPos()).toBeNull();
+    }
   });
 });

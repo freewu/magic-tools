@@ -10,6 +10,7 @@ export default {
     copyOk: '复制到粘贴板成功！！！',
     clickTip: '单击色块复制到粘贴板的内容',
     removeTip: '双击剔除不需要的颜色',
+    dragTip: '按住浮层拖动可调整位置',
     batchPick: '批量取色',
   },
   'zh-TW': {
@@ -22,6 +23,7 @@ export default {
     copyOk: '複製到剪貼簿成功！！！',
     clickTip: '按一下色塊即可複製內容到剪貼簿',
     removeTip: '雙擊剔除不需要的顏色',
+    dragTip: '按住浮層拖動可調整位置',
     batchPick: '批量取色',
   },
   en: {
@@ -34,6 +36,7 @@ export default {
     copyOk: 'Copied to clipboard!!!',
     clickTip: 'Click a color block to copy it',
     removeTip: 'Double-click to remove colors',
+    dragTip: 'Drag the panel to move it',
     batchPick: 'Batch pick',
   },
 } as const;

@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
-import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import Color from './index';
-import { calcReadableTextColor } from './lib';
+import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
+import { calcReadableTextColor, getLevitationPos } from './lib';
 jest.mock('../../lib', () => ({
   ...jest.requireActual('../../lib'),
   copyTextToClipboard: jest.fn().mockResolvedValue(undefined),
@@ -135,6 +135,43 @@ describe('Color 页面', () => {
     // 颜色名称: 只展示名称 (与粘贴板一致)
     clickColorType(container, '颜色名称');
     await waitFor(() => expect(text()).toBe(name));
+  });
+
+  test('批量取色浮层可拖动调整位置并记住位置', async () => {
+    const { container } = render(<Color />);
+    const box = container.querySelector('.levitation-box') as HTMLElement;
+    expect(box).toBeTruthy();
+    // 默认位置由 CSS 控制 (right/top), 没有内联 left
+    expect(box.style.left).toBe('');
+
+    // 在浮层空白处按下 (100,100) 拖到 (200,150) => 偏移 (100,50)
+    fireEvent.mouseDown(box, { button: 0, clientX: 100, clientY: 100 });
+    expect(box.className).toContain('levitation-box-dragging');
+    fireEvent.mouseMove(window, { clientX: 200, clientY: 150 });
+    await waitFor(() => expect(box.style.left).toBe('100px'));
+    expect(box.style.top).toBe('50px');
+    // 拖动后用 left/top 定位 (覆盖默认的 right: 20px)
+    expect(box.className).toContain('levitation-box-moved');
+
+    // 松开鼠标: 退出拖动状态并写入 localStorage
+    fireEvent.mouseUp(window);
+    await waitFor(() => expect(box.className).not.toContain('levitation-box-dragging'));
+    expect(getLevitationPos()).toEqual({ x: 100, y: 50 });
+
+    // 重新渲染后位置依旧生效 (从 localStorage 恢复)
+    cleanup();
+    const second = render(<Color />);
+    const box2 = second.container.querySelector('.levitation-box') as HTMLElement;
+    await waitFor(() => expect(box2.style.left).toBe('100px'));
+    expect(box2.style.top).toBe('50px');
+  });
+
+  test('批量取色复选框区域不参与拖动 (仍可开关)', async () => {
+    const { container } = render(<Color />);
+    const box = container.querySelector('.levitation-box') as HTMLElement;
+    const checkbox = box.querySelector('.ant-checkbox-wrapper') as HTMLElement;
+    fireEvent.mouseDown(checkbox, { button: 0, clientX: 100, clientY: 100 });
+    expect(box.className).not.toContain('levitation-box-dragging');
   });
 
   test('输入内容后点击操作按钮不抛异常', () => {
