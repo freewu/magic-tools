@@ -1,4 +1,6 @@
 import '@testing-library/jest-dom';
+import fs from 'fs';
+import path from 'path';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import FavoritesFab from './favorites-fab';
@@ -67,6 +69,23 @@ describe('收藏悬浮入口', () => {
     setFavorites([ 'AES', 'SM4' ]);
     renderFab();
     expect(screen.getByText('2')).toBeInTheDocument();
+  });
+
+  test('角标不带内联 offset, 位置交给 CSS (否则会盖住左上角规则)', () => {
+    setFavorites([ 'AES', 'SM4' ]);
+    renderFab();
+    const count = screen.getByText('2');
+    expect(count.style.right).toBe('');
+    expect(count.style.left).toBe('');
+    expect(count.style.marginTop).toBe('');
+  });
+
+  test('角标位置规则: 相对悬浮按钮定位并落在左上角', () => {
+    const css = fs.readFileSync(path.join(__dirname, 'favorites-fab.css'), 'utf8');
+    // .ant-badge 改为 static, 让角标相对整个按钮(圆形悬浮层)定位
+    expect(css).toMatch(/\.favorites-fab\s+\.ant-badge\s*\{[^}]*position:\s*static/);
+    // 覆盖 antd 的 inset-inline-end: 0 (右上角) -> 100% (右上角左移一个按钮宽度 = 左上角)
+    expect(css).toMatch(/\.favorites-fab\s+\.ant-badge-count\s*\{[^}]*inset-inline-end:\s*100%/);
   });
 
   test('按比例坐标渲染默认位置 (右下)', () => {

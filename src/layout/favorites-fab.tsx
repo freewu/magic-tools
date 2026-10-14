@@ -115,7 +115,8 @@ const FavoritesFab :React.FC = () => {
         onContextMenu={ onContextMenu }
         aria-label={ title }
       >
-        <Badge count={ count } size="small" offset={ [ 2, -2 ] }>
+        {/* 数量角标由 favorites-fab.css 放到悬浮入口的左上角 (不传 offset, 避免内联样式覆盖 CSS) */}
+        <Badge count={ count } size="small">
           { count > 0 ? <StarFilled /> : <StarOutlined /> }
         </Badge>
       </button>
