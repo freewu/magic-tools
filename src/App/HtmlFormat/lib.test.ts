@@ -1,4 +1,4 @@
-import { HTML_ACCEPT, formatHtml, getHtmlIndent, htmlFileNameOf, setHtmlIndent } from './lib';
+import { HTML_ACCEPT, formatHtml, getHtmlIndent, htmlFileNameOf, htmlTree, setHtmlIndent } from './lib';
 
 describe('HTML 格式化 - 基础结构', () => {
   test('嵌套 div 缩进', () => {
@@ -103,5 +103,47 @@ describe('HTML 缩进设置', () => {
     expect(getHtmlIndent()).toBe(2);
     setHtmlIndent(4);
     expect(getHtmlIndent()).toBe(4);
+  });
+});
+
+describe('HTML 结构树 (树状折叠)', () => {
+  test('行内文本挂到最近的元素下, 标签之间的纯空白不建节点', () => {
+    const { items, truncated } = htmlTree('<div>\n  <p>你好</p>\n  <img src="a.png">\n</div>');
+    expect(truncated).toBe(false);
+    expect(items).toHaveLength(1);
+    expect(items[0].title).toBe('<div>');
+    expect(items[0].kind).toBe('element');
+
+    const kids = items[0].children ?? [];
+    expect(kids.map((k) => [ k.kind, k.title ])).toEqual([
+      [ 'element', '<p>' ],
+      [ 'element', '<img src="a.png">' ],
+    ]);
+    expect(kids[0].children).toEqual([{ key: 'n3', kind: 'text', title: '你好' }]);
+    // 空元素不挂 children
+    expect('children' in kids[1]).toBe(false);
+    expect(kids[1].selfClose).toBe(true);
+  });
+
+  test('script / style 内容作为文本子节点, 注释作为原样节点', () => {
+    const { items } = htmlTree('<body><!-- 注释 --><script>const a = 1;\nconst b = 2;</script></body>');
+    const kids = items[0].children ?? [];
+    expect(kids.map((k) => k.kind)).toEqual([ 'raw', 'element' ]);
+    expect(kids[0].title).toBe('<!-- 注释 -->');
+    const script = kids[1];
+    expect(script.title).toBe('<script>');
+    expect((script.children ?? []).length).toBe(1);
+    expect((script.children ?? [])[0].kind).toBe('text');
+    expect((script.children ?? [])[0].title).toContain('const a = 1;');
+  });
+
+  test('残缺 HTML 也能建树 (与格式化一致的宽容策略), 节点渐进编号', () => {
+    const { items } = htmlTree('<ul><li>一<li>二</ul>');
+    expect(items[0].title).toBe('<ul>');
+    const keys: string[] = [];
+    const walk = (list: typeof items) => list.forEach((i) => { keys.push(i.key); walk(i.children ?? []); });
+    walk(items);
+    expect(keys).toEqual([ 'n1', 'n2', 'n3', 'n4', 'n5' ]);
+    expect(new Set(keys).size).toBe(keys.length);
   });
 });

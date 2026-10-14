@@ -1,10 +1,11 @@
-import { Alert, Button, Card, Input, Segmented, Space, Tag, Typography, message } from 'antd';
-import { CopyOutlined, DownloadOutlined, FileTextOutlined, FolderOpenOutlined } from '@ant-design/icons';
-import { useMemo, useRef, useState } from 'react';
-import { XML_ACCEPT, formatXml, getXmlIndent, setXmlIndent, xmlFileNameOf } from './lib';
+import { Alert, Button, Card, Input, Segmented, Space, Tag, Tree, Typography, message } from 'antd';
+import { ApartmentOutlined, CopyOutlined, DownloadOutlined, FileTextOutlined, FolderOpenOutlined } from '@ant-design/icons';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { XML_ACCEPT, formatXml, getXmlIndent, setXmlIndent, xmlFileNameOf, xmlTree } from './lib';
 import { useLocale } from '../../hook/locale-context';
 import { readTextFile } from '../../lib/file';
 import { saveTextFile } from '../../lib/tauri';
+import { treeKeys, treeNodeCount } from '../../lib/tree';
 import { u, uT } from './lang';
 
 const { Text, Paragraph } = Typography;
@@ -107,6 +108,19 @@ const XmlFormatter: React.FC = () => {
     }
   };
 
+  // 结构树: XML 非法时 xmlTree 会抛错, 此时交给上面的错误提示
+  const tree = useMemo(() => {
+    try {
+      return xmlTree(raw);
+    } catch {
+      return { items: [], truncated: false };
+    }
+  }, [raw]);
+  const allKeys = useMemo(() => treeKeys(tree.items), [tree]);
+  const [expanded, setExpanded] = useState<React.Key[]>(allKeys);
+  // 内容变化后默认全部展开
+  useEffect(() => { setExpanded(allKeys); }, [allKeys]);
+
   const rawLines = raw ? raw.split('\n').length : 0;
   const outLines = result ? result.split('\n').length : 0;
 
@@ -161,7 +175,32 @@ const XmlFormatter: React.FC = () => {
 
       {error ? (
         <Alert type="error" showIcon message={t('XML 语法错误')} description={error} />
-      ) : (
+      ) : (<>
+        <Card size="small" title={<Space><ApartmentOutlined /> {t('树状结构')}</Space>} extra={
+          <Space size={8}>
+            <Text type="secondary" style={{ fontSize: 12 }}>{tt('{n} 个节点', { n: treeNodeCount(tree.items).toLocaleString() })}</Text>
+            <Button size="small" disabled={!tree.items.length} onClick={() => setExpanded(allKeys)}>{t('展开全部')}</Button>
+            <Button size="small" disabled={!tree.items.length} onClick={() => setExpanded([])}>{t('折叠全部')}</Button>
+          </Space>
+        }>
+          {tree.items.length ? (
+            <Space direction="vertical" size={8} style={{ width: '100%' }}>
+              <Tree
+                treeData={tree.items}
+                expandedKeys={expanded}
+                onExpand={(keys) => setExpanded([...keys])}
+                selectable={false}
+                height={320}
+              />
+              {tree.truncated && (
+                <Text type="secondary" style={{ fontSize: 12 }}>{t('节点过多, 结构树只展示前面的节点。')}</Text>
+              )}
+            </Space>
+          ) : (
+            <Paragraph type="secondary" style={{ margin: 0 }}>{t('暂无结构 — 在上方粘贴 XML 后自动解析。')}</Paragraph>
+          )}
+        </Card>
+
         <Card size="small" title={t('格式化结果')} extra={
           <Space size={8}>
             <Button size="small" icon={<CopyOutlined />} disabled={!result} onClick={copyOut}>{t('复制')}</Button>
@@ -185,7 +224,7 @@ const XmlFormatter: React.FC = () => {
             <Paragraph type="secondary" style={{ margin: 0 }}>{t('暂无结果 — 在上方粘贴 XML 后自动格式化。')}</Paragraph>
           )}
         </Card>
-      )}
+      </>)}
     </Space>
     </div>
   );

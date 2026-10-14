@@ -1,10 +1,11 @@
-import { Button, Card, Input, Radio, Space, Typography, message } from 'antd';
-import { CopyOutlined, DownloadOutlined, FolderOpenOutlined } from '@ant-design/icons';
-import { useMemo, useRef, useState } from 'react';
-import { HTML_ACCEPT, formatHtml, getHtmlIndent, htmlFileNameOf } from './lib';
+import { Button, Card, Input, Radio, Space, Tree, Typography, message } from 'antd';
+import { ApartmentOutlined, CopyOutlined, DownloadOutlined, FolderOpenOutlined } from '@ant-design/icons';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { HTML_ACCEPT, formatHtml, getHtmlIndent, htmlFileNameOf, htmlTree } from './lib';
 import { useLocale } from '../../hook/locale-context';
 import { readTextFile } from '../../lib/file';
 import { saveTextFile } from '../../lib/tauri';
+import { treeKeys, treeNodeCount } from '../../lib/tree';
 import { u, uT } from './lang';
 
 const { Text } = Typography;
@@ -39,6 +40,18 @@ const HtmlFormat: React.FC = () => {
       return '';
     }
   }, [raw, indent]);
+  // 结构树 (树状折叠视图)
+  const tree = useMemo(() => {
+    try {
+      return htmlTree(raw);
+    } catch {
+      return { items: [], truncated: false };
+    }
+  }, [raw]);
+  const allKeys = useMemo(() => treeKeys(tree.items), [tree]);
+  const [expanded, setExpanded] = useState<React.Key[]>(allKeys);
+  // 内容变化后默认全部展开
+  useEffect(() => { setExpanded(allKeys); }, [allKeys]);
 
   const copy = async () => {
     try {
@@ -122,6 +135,30 @@ const HtmlFormat: React.FC = () => {
           autoSize={{ minRows: 8, maxRows: 16 }}
           style={{ fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', fontSize: 13 }}
         />
+      </Card>
+      <Card size="small" title={<Space><ApartmentOutlined /> {t('树状结构')}</Space>} extra={
+        <Space size={8}>
+          <Text type="secondary" style={{ fontSize: 12 }}>{tt('{n} 个节点', { n: treeNodeCount(tree.items).toLocaleString() })}</Text>
+          <Button size="small" disabled={!tree.items.length} onClick={() => setExpanded(allKeys)}>{t('展开全部')}</Button>
+          <Button size="small" disabled={!tree.items.length} onClick={() => setExpanded([])}>{t('折叠全部')}</Button>
+        </Space>
+      }>
+        {tree.items.length ? (
+          <Space direction="vertical" size={8} style={{ width: '100%' }}>
+            <Tree
+              treeData={tree.items}
+              expandedKeys={expanded}
+              onExpand={(keys) => setExpanded([...keys])}
+              selectable={false}
+              height={320}
+            />
+            {tree.truncated && (
+              <Text type="secondary" style={{ fontSize: 12 }}>{t('节点过多, 结构树只展示前面的节点。')}</Text>
+            )}
+          </Space>
+        ) : (
+          t('暂无结构 — 输入 HTML 后自动解析。')
+        )}
       </Card>
       <Card size="small" title={t('格式化结果')} extra={
         <Space size={8}>

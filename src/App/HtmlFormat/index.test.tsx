@@ -28,6 +28,14 @@ const rawArea = (c: HTMLElement): HTMLTextAreaElement => c.querySelectorAll('tex
 const fileInput = (c: HTMLElement): HTMLInputElement => c.querySelector('input[type="file"]') as HTMLInputElement;
 const stage = (c: HTMLElement): HTMLElement => c.querySelector('.html-stage') as HTMLElement;
 
+// antd Tree 开了虚拟滚动, 会额外渲染一行 aria-hidden 的测量节点, 断言时排除
+const treeNodes = (c: HTMLElement): HTMLElement[] =>
+  Array.from(c.querySelectorAll('.ant-tree-treenode:not([aria-hidden="true"])'));
+const switcherOf = (c: HTMLElement): HTMLElement =>
+  treeNodes(c)[0].querySelector('.ant-tree-switcher') as HTMLElement;
+const treeText = (c: HTMLElement): string[] =>
+  treeNodes(c).map((n) => norm(n.querySelector('.ant-tree-title')?.textContent ?? ''));
+
 const WAIT = { timeout: 10000 };
 
 const HTML = '<div><p>你好</p></div>';
@@ -150,5 +158,48 @@ describe('HtmlFormat 保存格式化结果 (弹保存对话框)', () => {
     mockSave.mockRejectedValue(new Error('disk full'));
     fireEvent.click(btn('保存 .html'));
     await waitFor(() => expect(notice()).toContain('保存失败'));
+  });
+});
+
+describe('HtmlFormat 结构树 (树状折叠)', () => {
+  const A = '<div><p>你好</p><img src="a.png"></div>';
+
+  test('输入 HTML 后自动建树, 行内文本挂到最近元素下', async () => {
+    const { container } = render(<HtmlFormat />);
+    fireEvent.change(rawArea(container), { target: { value: A } });
+    await waitFor(() => expect(container.querySelector('.ant-tree')).not.toBeNull(), WAIT);
+    expect(treeText(container)).toEqual([ '<div>', '<p>', '你好', norm('<img src="a.png">') ]);
+    expect(norm(container.textContent ?? '')).toContain('4个节点');
+  });
+
+  test('「折叠全部」「展开全部」批量折叠; 点击箭头可折叠单个节点', async () => {
+    const { container } = render(<HtmlFormat />);
+    fireEvent.change(rawArea(container), { target: { value: A } });
+    await waitFor(() => expect(treeText(container)).toContain('你好'), WAIT);
+
+    fireEvent.click(btn('折叠全部'));
+    expect(treeText(container)).toEqual([ '<div>' ]);
+
+    fireEvent.click(btn('展开全部'));
+    expect(treeText(container)).toEqual([ '<div>', '<p>', '你好', norm('<img src="a.png">') ]);
+
+    // 点击箭头折叠单个节点.
+    // 注: jsdom 里 rc-tree 的折叠动画不会结束 (listChanging 一直为 true, 后续箭头点击被忽略),
+    // 因此折叠后再用「展开全部」按钮恢复
+    fireEvent.click(switcherOf(container));
+    await waitFor(() => expect(treeText(container)).toEqual([ '<div>' ]), WAIT);
+    fireEvent.click(btn('展开全部'));
+    await waitFor(() => expect(treeText(container)).toEqual([ '<div>', '<p>', '你好', norm('<img src="a.png">') ]), WAIT);
+  });
+
+  test('清空后结构树为空并给出提示', async () => {
+    const { container } = render(<HtmlFormat />);
+    fireEvent.change(rawArea(container), { target: { value: A } });
+    await waitFor(() => expect(treeText(container)).toContain('<div>'), WAIT);
+
+    fireEvent.click(btn('清空'));
+    expect(container.querySelector('.ant-tree')).toBeNull();
+    expect(norm(container.textContent ?? '')).toContain('0个节点');
+    expect(norm(container.textContent ?? '')).toContain('暂无结构');
   });
 });

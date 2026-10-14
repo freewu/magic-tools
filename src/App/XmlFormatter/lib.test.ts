@@ -1,4 +1,4 @@
-import { XML_ACCEPT, formatXml, minifyXml, getXmlIndent, setXmlIndent, xmlFileNameOf } from './lib';
+import { XML_ACCEPT, formatXml, minifyXml, getXmlIndent, setXmlIndent, xmlFileNameOf, xmlTree } from './lib';
 
 const MINI = '<?xml version="1.0" encoding="UTF-8"?><config><app name="demo"><version>2.6.0</version><debug>false</debug><servers><server host="a.example.com" port="8080"/><server host="b.example.com" port="9090"/></servers></app></config>';
 
@@ -71,5 +71,53 @@ describe('XML 打开 / 保存文件名', () => {
   test('XML_ACCEPT 覆盖常见方言与纯文本', () => {
     for (const ext of [ '.xml', '.xaml', '.svg', '.plist', '.xsd', '.txt' ]) expect(XML_ACCEPT).toContain(ext);
     expect(XML_ACCEPT).toContain('text/xml');
+  });
+});
+
+describe('XML 结构树 (树状折叠)', () => {
+  test('元素 / 文本 / 注释分层, 元素标题保留开标签, 空白文本不建节点', () => {
+    const { items, truncated } = xmlTree('<a x="1">\n  <b>文字</b>\n  <!-- 注释 -->\n  <c/>\n</a>');
+    expect(truncated).toBe(false);
+    expect(items).toHaveLength(1);
+    expect(items[0].title).toBe('<a x="1">');
+    expect(items[0].kind).toBe('element');
+    expect(items[0].selfClose).toBeUndefined();
+
+    const kids = items[0].children ?? [];
+    expect(kids.map((k) => [ k.kind, k.title ])).toEqual([
+      [ 'element', '<b>' ],
+      [ 'raw', '<!-- 注释 -->' ],
+      [ 'element', '<c/>' ],
+    ]);
+    expect(kids[0].children).toEqual([{ key: 'n3', kind: 'text', title: '文字' }]);
+    // 自闭合元素不挂 children
+    expect('children' in kids[2]).toBe(false);
+    expect(kids[2].selfClose).toBe(true);
+  });
+
+  test('多行文本折叠成单行, 过长的标题裁剪', () => {
+    const { items } = xmlTree(`<a>\n  第一行\n  第二行\n  ${'x'.repeat(100)}\n</a>`);
+    const text = (items[0].children ?? [])[0];
+    expect(text.kind).toBe('text');
+    expect(text.title).not.toContain('\n');
+    expect(text.title.endsWith('…')).toBe(true);
+  });
+
+  test('声明 / DOCTYPE / CDATA 作为原样节点; 非法 XML 抛出错误', () => {
+    const { items } = xmlTree('<?xml version="1.0"?><!DOCTYPE a><a><![CDATA[<b>原样</b>]]></a>');
+    expect(items.map((i) => i.kind)).toEqual([ 'raw', 'raw', 'element' ]);
+    expect(items[0].title).toBe('<?xml version="1.0"?>');
+    expect((items[2].children ?? [])[0].title).toContain('CDATA');
+
+    expect(() => xmlTree('<a><b></a>')).toThrow();
+  });
+
+  test('节点顺序渐进编号, 每个节点都有唯一 key', () => {
+    const { items } = xmlTree('<a><b/><c><d/></c></a>');
+    const flat: string[] = [];
+    const walk = (list: typeof items) => list.forEach((i) => { flat.push(i.key); walk(i.children ?? []); });
+    walk(items);
+    expect(flat).toEqual([ 'n1', 'n2', 'n3', 'n4' ]);
+    expect(new Set(flat).size).toBe(flat.length);
   });
 });

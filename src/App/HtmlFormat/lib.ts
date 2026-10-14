@@ -1,6 +1,7 @@
 // HTML 格式化 纯逻辑层 (手写 pretty printer, 不依赖外部解析库)
 
 import { fileNameWithExt } from '../../lib/file';
+import { TreeBuilder, treeTitle, withChildren, type TreeItem } from '../../lib/tree';
 
 export interface FormatOptions {
   /** 每层缩进空格数 (默认 2) */
@@ -210,6 +211,57 @@ export function formatHtml(source: string, options?: FormatOptions): string {
 }
 
 // ---- 设置: 默认缩进 (2 / 4 空格) ----
+// ---- 结构树 (树状折叠视图) ----
+
+/** 结构树构建结果: items 为根节点列表, truncated 表示节点过多被截断 */
+export interface HtmlTreeResult {
+  items: TreeItem[];
+  truncated: boolean;
+}
+
+/** 把 HTML 解析成结构树: 元素节点标题取开标签原文, 文本节点做单行预览 */
+export function htmlTree(source: string): HtmlTreeResult {
+  const doc = tokenize(String(source ?? ''));
+  const builder = new TreeBuilder();
+  const walk = (nodes: DocNode[]): TreeItem[] => {
+    const out: TreeItem[] = [];
+    for (const node of nodes) {
+      if (node.type === 'text') {
+        const text = treeTitle(node.raw);
+        // 标签之间的纯空白文本不建节点
+        if (!text) continue;
+        const item = builder.create('text', text);
+        if (!item) break;
+        out.push(item);
+        continue;
+      }
+      if (node.type === 'raw') {
+        const title = treeTitle(node.raw);
+        if (!title) continue;
+        const item = builder.create('raw', title);
+        if (!item) break;
+        out.push(item);
+        continue;
+      }
+      const item = builder.create('element', treeTitle(node.open), node.close === null);
+      if (!item) break;
+      let kids: TreeItem[];
+      if (node.rawText) {
+        // script / style / pre / textarea: 内容原样保留, 树里只放一个文本子节点
+        const body = treeTitle(node.rawBody);
+        const child = body ? builder.create('text', body) : null;
+        kids = child ? [ child ] : [];
+      } else {
+        kids = walk(node.children);
+      }
+      out.push(withChildren(item, kids));
+    }
+    return out;
+  };
+  const items = walk(doc);
+  return { items, truncated: builder.truncated };
+}
+
 // ---- 打开 / 保存本地文件 ----
 
 /** 「打开文件」允许的类型 (HTML 及其变体; 一律按文本读入) */

@@ -7,6 +7,12 @@ export default {
 // 界面文案词条 (zh 短语即 key; 缺 zh-CN 时回退原文)
 const uilangRows: Record<string, [string, string]> = {
   '载入示例': ['載入範例', 'Load sample'],
+  '树状结构': ['樹狀結構', 'Tree view'],
+  '展开全部': ['展開全部', 'Expand all'],
+  '折叠全部': ['摺疊全部', 'Collapse all'],
+  '{n} 个节点': ['{n} 個節點', '{n} nodes'],
+  '暂无结构 — 输入 HTML 后自动解析。': ['尚無結構 — 輸入 HTML 後自動解析。', 'No structure yet — pasting HTML parses it automatically.'],
+  '节点过多, 结构树只展示前面的节点。': ['節點過多, 結構樹只顯示前面的節點。', 'Too many nodes: the tree only shows the first part.'],
   '打开文件': ['開啟檔案', 'Open file'],
   '已打开 {file}': ['已開啟 {file}', 'Opened {file}'],
   '打开文件失败': ['開啟檔案失敗', 'Failed to open the file'],
@@ -19,7 +25,7 @@ const uilangRows: Record<string, [string, string]> = {
   '复制': ['複製', 'Copy'],
   '已复制格式化结果': ['已複製格式化結果', 'Formatted result copied'],
   'HTML 格式化': ['HTML 格式化', 'HTML formatter'],
-  '美化格式化 HTML 代码: 块级元素缩进换行、行内元素保留在一行、文本空白自动折叠。script / style / pre / textarea 内容原样保留。缩进空格数可在右侧或「设置 → 格式化」中切换 2 / 4 空格。': ['美化格式化 HTML 程式碼: 區塊元素縮排換行、行內元素保留在同一行、文字空白自動摺疊。script / style / pre / textarea 內容原樣保留。縮排空格數可在右側或「設定 → 格式化」中切換 2 / 4 空格。', 'Prettifies HTML: block-level elements are indented on new lines, inline elements stay on one line, and text whitespace collapses. Content inside script / style / pre / textarea is preserved as-is. The indentation can be switched between 2 / 4 spaces on the right or under Settings → Formatting.'],
+  '美化格式化 HTML 代码: 块级元素缩进换行、行内元素保留在一行、文本空白自动折叠。script / style / pre / textarea 内容原样保留。缩进空格数可在右侧或「设置 → 格式化」中切换 2 / 4 空格。可打开本地 .html / .htm 文件、按树状结构折叠查看，并把格式化结果保存到指定位置。': ['美化格式化 HTML 程式碼: 區塊元素縮排換行、行內元素保留在同一行、文字空白自動摺疊。script / style / pre / textarea 內容原樣保留。縮排空格數可在右側或「設定 → 格式化」中切換 2 / 4 空格。可開啟本機 .html / .htm 檔案、以樹狀結構摺疊檢視，並把格式化結果儲存到指定位置。', 'Prettifies HTML: block-level elements are indented on new lines, inline elements stay on one line, and text whitespace collapses. Content inside script / style / pre / textarea is preserved as-is. The indentation can be switched between 2 / 4 spaces on the right or under Settings → Formatting. Local .html / .htm files can be opened, the structure can be browsed as a collapsible tree, and the formatted result can be saved anywhere.'],
   'HTML 源码': ['HTML 原始碼', 'HTML source'],
   '格式化结果': ['格式化結果', 'Formatted result'],
   '2 空格': ['2 空格', '2 spaces'],

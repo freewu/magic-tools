@@ -4,6 +4,7 @@
 // 并对标签配平做合法性检查 (未闭合 / 交叉嵌套 / 多余闭合会抛出带行号的错误)。
 
 import { fileNameWithExt } from '../../lib/file';
+import { TreeBuilder, treeTitle, withChildren, type TreeItem } from '../../lib/tree';
 
 export interface XmlFormatOptions {
   /** 每层缩进空格数 (1-8, 默认 2) */
@@ -211,6 +212,48 @@ export function minifyXml(source: string): string {
   };
   walk(doc);
   return out.join('').replace(/\n[ \t]*/g, '');
+}
+
+// ---- 结构树 (树状折叠视图) ----
+
+/** 结构树构建结果: items 为根节点列表, truncated 表示节点过多被截断 */
+export interface XmlTreeResult {
+  items: TreeItem[];
+  truncated: boolean;
+}
+
+/** 把 XML 解析成结构树: 元素节点标题取开标签原文, 文本 / 注释做单行预览 */
+export function xmlTree(source: string): XmlTreeResult {
+  const doc = tokenize(String(source ?? ''));
+  const builder = new TreeBuilder();
+  const walk = (nodes: XmlNode[]): TreeItem[] => {
+    const out: TreeItem[] = [];
+    for (const node of nodes) {
+      if (node.type === 'text') {
+        const text = collapse(node.raw);
+        // 元素之间的纯空白文本不建节点
+        if (!text) continue;
+        const item = builder.create('text', treeTitle(text));
+        if (!item) break;
+        out.push(item);
+        continue;
+      }
+      if (node.type === 'raw') {
+        const title = treeTitle(node.raw);
+        if (!title) continue;
+        const item = builder.create('raw', title);
+        if (!item) break;
+        out.push(item);
+        continue;
+      }
+      const item = builder.create('element', treeTitle(node.open), node.selfClose);
+      if (!item) break;
+      out.push(withChildren(item, walk(node.children)));
+    }
+    return out;
+  };
+  const items = walk(doc);
+  return { items, truncated: builder.truncated };
 }
 
 // ---- 打开 / 保存本地文件 ----
