@@ -1,0 +1,127 @@
+{
+  "v": 1,
+  "source": "https://github.com/konsheng/Sensitive-lexicon",
+  "license": "MIT License, Copyright (c) 2024~2099 Konsheng",
+  "builtAt": "2026-10-14",
+  "categories": [
+    {
+      "key": "politics",
+      "label": "涉政",
+      "file": "政治类型.txt",
+      "level": "high",
+      "count": 303
+    },
+    {
+      "key": "rebel",
+      "label": "反动",
+      "file": "反动词库.txt",
+      "level": "high",
+      "count": 551
+    },
+    {
+      "key": "terror",
+      "label": "涉恐",
+      "file": "暴恐词库.txt",
+      "level": "high",
+      "count": 178
+    },
+    {
+      "key": "weapon",
+      "label": "涉枪涉爆",
+      "file": "涉枪涉爆.txt",
+      "level": "high",
+      "count": 431
+    },
+    {
+      "key": "porn",
+      "label": "涉黄",
+      "file": "色情词库.txt",
+      "level": "high",
+      "count": 550
+    },
+    {
+      "key": "pornType",
+      "label": "涉黄类型",
+      "file": "色情类型.txt",
+      "level": "high",
+      "count": 304
+    },
+    {
+      "key": "corrupt",
+      "label": "贪腐",
+      "file": "贪腐词库.txt",
+      "level": "mid",
+      "count": 240
+    },
+    {
+      "key": "livelihood",
+      "label": "民生",
+      "file": "民生词库.txt",
+      "level": "mid",
+      "count": 508
+    },
+    {
+      "key": "covid",
+      "label": "涉疫",
+      "file": "COVID-19词库.txt",
+      "level": "mid",
+      "count": 72
+    },
+    {
+      "key": "thought",
+      "label": "思想启蒙",
+      "file": "新思想启蒙.txt",
+      "level": "mid",
+      "count": 16
+    },
+    {
+      "key": "gfw",
+      "label": "网络审查",
+      "file": "GFW补充词库.txt",
+      "level": "mid",
+      "count": 6139
+    },
+    {
+      "key": "netease",
+      "label": "网易过滤词",
+      "file": "网易前端过滤敏感词库.txt",
+      "level": "low",
+      "count": 7703
+    },
+    {
+      "key": "tencent",
+      "label": "腾讯过滤词",
+      "file": "零时-Tencent.txt",
+      "level": "low",
+      "count": 41293
+    },
+    {
+      "key": "ad",
+      "label": "广告法",
+      "file": "广告类型.txt",
+      "level": "low",
+      "count": 120
+    },
+    {
+      "key": "other",
+      "label": "其他",
+      "file": "其他词库.txt",
+      "level": "low",
+      "count": 157
+    },
+    {
+      "key": "extra",
+      "label": "补充",
+      "file": "补充词库.txt",
+      "level": "low",
+      "count": 1063
+    },
+    {
+      "key": "url",
+      "label": "非法网址",
+      "file": "非法网址.txt",
+      "level": "low",
+      "count": 14584
+    }
+  ]
+}

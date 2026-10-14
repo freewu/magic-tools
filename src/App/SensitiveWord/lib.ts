@@ -37,9 +37,9 @@ export interface WordStat {
   positions: number[];
 }
 
-/** 单个词库的检测结果 */
+/** 单个词库的检测结果 (key 为内置词库编号或扩展词库分类键) */
 export interface BankScan {
-  key: BankKey;
+  key: string;
   /** 全部命中 (同一位置重复命中已去重) */
   hits: Hit[];
   /** 按敏感词汇总 (按等级 -> 次数排序) */
@@ -54,7 +54,7 @@ export interface BankScan {
 export interface ScanOptions {
   /** 宽松匹配: 忽略间隔符 / 零宽字符, 全角折半角 (用于发现「微 信」这类绕过写法) */
   loose: boolean;
-  /** 拉丁词边界: 纯字母数字词要求左右不是字母, 避免「v」命中 version */
+  /** 拉丁词边界: 纯字母词要求左右不是字母, 避免「v」命中 version */
   latinBoundary: boolean;
 }
 
@@ -123,6 +123,8 @@ interface AcNode {
   fail: AcNode | null;
   /** 该节点结尾的词 (仅终端节点非空) */
   word: WordMeta | null;
+  /** 该节点结尾词的归一化匹配串 (宽松模式下与词面不同, 边界判定用) */
+  key: string | null;
   /** 从根到该节点的字符数 */
   depth: number;
 }
@@ -133,14 +135,18 @@ export interface Automaton {
   size: number;
 }
 
-const newNode = (depth: number): AcNode => ({ next: new Map(), fail: null, word: null, depth });
+const newNode = (depth: number): AcNode => ({ next: new Map(), fail: null, word: null, key: null, depth });
 
-/** 构建 Aho-Corasick 自动机: 小写化 trie + 失配指针 */
-export const buildAutomaton = (bank: WordMeta[]): Automaton => {
+/**
+ * 构建 Aho-Corasick 自动机: 小写化 trie + 失配指针
+ * @param loose 宽松模式: 词条也按同一套规则归一化 (否则「000.bbexe.cn」这类含分隔符的词
+ *              永远匹配不到已去掉分隔符的文本), 命中时仍展示词面原写法
+ */
+export const buildAutomaton = (bank: WordMeta[], loose = false): Automaton => {
   const root = newNode(0);
   let size = 1;
   bank.forEach((meta) => {
-    const key = meta.word.toLowerCase();
+    const key = loose ? normalizeText(meta.word, true).text : meta.word.toLowerCase();
     if (key === '') return;
     let cur = root;
     for (const ch of key) {
@@ -152,7 +158,10 @@ export const buildAutomaton = (bank: WordMeta[]): Automaton => {
       }
       cur = next;
     }
-    if (!cur.word) cur.word = meta; // 同词重复时保留第一条
+    if (!cur.word) { // 同词重复时保留第一条
+      cur.word = meta;
+      cur.key = key;
+    }
   });
 
   // BFS 建失配指针
@@ -174,34 +183,45 @@ export const buildAutomaton = (bank: WordMeta[]): Automaton => {
   return { root, size };
 };
 
-const automatonCache = new Map<BankKey, Automaton>();
+const automatonCache = new Map<string, Automaton>();
 
-/** 取某个词库的自动机 (构建一次后缓存; 词库是模块常量, 无需失效) */
-export const automatonOf = (key: BankKey): Automaton => {
-  const cached = automatonCache.get(key);
+/**
+ * 取任意词表的自动机: 按「id + 匹配模式」缓存 (同一 id 的词表需保持稳定)
+ * 扩展词库 (Sensitive-lexicon) 分类解码后也走这里, 同一分类同一模式只构建一次
+ */
+export const automatonOfWords = (id: string, bank: WordMeta[], loose = false): Automaton => {
+  const cacheKey = `${id}::${loose ? 'loose' : 'exact'}`;
+  const cached = automatonCache.get(cacheKey);
   if (cached) return cached;
-  const built = buildAutomaton(SENSITIVE_BANKS[key]);
-  automatonCache.set(key, built);
+  const built = buildAutomaton(bank, loose);
+  automatonCache.set(cacheKey, built);
   return built;
 };
 
+/** 取内置词库的自动机 (构建一次后缓存; 词库是模块常量, 无需失效) */
+export const automatonOf = (key: BankKey, loose = false): Automaton => automatonOfWords(key, SENSITIVE_BANKS[key], loose);
+
 // ---------------- 扫描 ----------------
 
-/** 纯字母数字的模式 (v / vx / qq / yyds / 100% 除外) 需要词边界 */
-const PURE_LATIN = /^[a-z0-9]+$/;
+/**
+ * 纯字母模式 (v / vx / qq / yyds) 需要词边界
+ * 不含数字与符号 (域名、手机号、英文缩写等) 的模式不加边界: 它们本身足够特别,
+ * 而加了边界反而会漏掉「http://000.bbexe.cn」这类被字母数字包住的命中
+ */
+const PURE_LATIN = /^[a-z]+$/;
 
 /** 字母 (归一化后已小写) */
 const LATIN = /[a-z]/;
 
 /**
- * 扫描一个词库: 返回全部命中 (含位置) 与按词汇总的结果。
+ * 扫描任意词表: 返回全部命中 (含位置) 与按词汇总的结果。
  * 同一位置重叠命中时全部保留 (例如「最后一天」与「最」), 打码 / 高亮再由 maskSpans 合并。
  */
-export const scanBank = (raw: string, key: BankKey, opts?: Partial<ScanOptions>): BankScan => {
+export const scanWords = (raw: string, id: string, bank: WordMeta[], opts?: Partial<ScanOptions>): BankScan => {
   const loose = opts?.loose !== false;
   const latinBoundary = opts?.latinBoundary !== false;
   const { text, map } = normalizeText(raw, loose);
-  const root = automatonOf(key).root;
+  const root = automatonOfWords(id, bank, loose).root;
 
   const hits: Hit[] = [];
   const seen = new Set<string>();
@@ -216,12 +236,13 @@ export const scanBank = (raw: string, key: BankKey, opts?: Partial<ScanOptions>)
       const meta = node.word;
       if (meta) {
         const nStart = i - node.depth + 1;
-        const blocked = latinBoundary && PURE_LATIN.test(meta.word.toLowerCase())
+        const wordKey = node.key ?? '';
+        const blocked = latinBoundary && PURE_LATIN.test(wordKey)
           && (LATIN.test(text[nStart - 1] ?? '') || LATIN.test(text[i + 1] ?? ''));
         if (!blocked) {
           const start = map[nStart];
           const end = map[i] + 1;
-          const id = `${meta.word.toLowerCase()}|${start}|${end}`;
+          const id = `${wordKey}|${start}|${end}`;
           if (!seen.has(id)) {
             seen.add(id);
             hits.push({
@@ -253,8 +274,12 @@ export const scanBank = (raw: string, key: BankKey, opts?: Partial<ScanOptions>)
   });
   words.sort((a, b) => rank(a.level) - rank(b.level) || b.count - a.count || a.word.localeCompare(b.word));
 
-  return { key, hits, words, counts, total: hits.length };
+  return { key: id, hits, words, counts, total: hits.length };
 };
+
+/** 扫描一个内置词库 */
+export const scanBank = (raw: string, key: BankKey, opts?: Partial<ScanOptions>): BankScan =>
+  scanWords(raw, key, SENSITIVE_BANKS[key], opts);
 
 /** 扫描全部词库 (通用 / 小红书 / 微信公众号) */
 export const scanText = (raw: string, opts?: Partial<ScanOptions>): Record<BankKey, BankScan> => {
@@ -342,39 +367,60 @@ export const maskedFileName = (date: Date = new Date()): string => `sensitive-wo
 /** 检测报告导出文件名 */
 export const reportFileName = (date: Date = new Date()): string => `sensitive-word-report-${fileStamp(date)}.txt`;
 
+/** 报告里的附加词库分组 (扩展词库按分类传入) */
+export interface ReportGroup {
+  /** 分类名 (如「涉政」) */
+  label: string;
+  scan: BankScan;
+}
+
+/** 单段词库明细 (内置词库与扩展词库分类共用) */
+const sectionOf = (raw: string, title: string, scan: BankScan): string[] => {
+  const lines: string[] = [];
+  const levels = LEVEL_ORDER
+    .filter((level) => scan.counts[level] > 0)
+    .map((level) => `${LEVEL_LABELS[level]} ${scan.counts[level]}`)
+    .join(' / ');
+  lines.push(`【${title}】命中 ${scan.total} 处 / ${scan.words.length} 个词${levels ? ` (${levels})` : ''}`);
+  if (scan.words.length === 0) {
+    lines.push('  - 无命中');
+  } else {
+    scan.words.forEach((stat) => {
+      const list = stat.positions.slice(0, POS_LIMIT).map((pos) => positionLabel(raw, pos)).join(', ');
+      const more = stat.positions.length > POS_LIMIT ? ` 等 ${stat.positions.length} 处` : '';
+      lines.push(`  - ${stat.word} [${LEVEL_LABELS[stat.level]}] ×${stat.count} 位置: ${list}${more}`);
+      lines.push(`    建议: ${stat.tip}`);
+    });
+  }
+  return lines;
+};
+
 /** 生成纯文本检测报告 (中文, 便于留档或交给运营同学) */
 export const reportText = (
   raw: string,
   scans: Record<BankKey, BankScan>,
   opts: ScanOptions,
-  date: Date = new Date()
+  date: Date = new Date(),
+  groups: ReportGroup[] = []
 ): string => {
   const lines: string[] = [];
-  const hitTotal = BANK_KEYS.reduce((n, key) => n + scans[key].total, 0);
-  const wordTotal = BANK_KEYS.reduce((n, key) => n + scans[key].words.length, 0);
+  const parts = [
+    ...BANK_KEYS.map((key) => ({ title: `${BANK_LABELS[key]}词库`, scan: scans[key] })),
+    ...groups.map((g) => ({ title: `扩展词库 · ${g.label}`, scan: g.scan })),
+  ];
+  const hitTotal = parts.reduce((n, p) => n + p.scan.total, 0);
+  const wordTotal = parts.reduce((n, p) => n + p.scan.words.length, 0);
   lines.push('敏感词检测报告');
   lines.push(`生成时间: ${readTime(date)}`);
   lines.push(`文本字数: ${textLength(raw)}`);
   lines.push(`匹配规则: ${opts.loose ? '宽松匹配 (忽略间隔符 / 零宽字符)' : '精确匹配'} · 拉丁词边界${opts.latinBoundary ? '开' : '关'}`);
+  if (groups.length > 0) {
+    lines.push(`词库范围: ${BANK_KEYS.map((key) => `${BANK_LABELS[key]}词库`).join(' / ')} + 扩展词库 (${groups.map((g) => g.label).join('、')})`);
+  }
   lines.push(`命中合计: ${hitTotal} 处 / ${wordTotal} 个词`);
   lines.push('');
-  BANK_KEYS.forEach((key) => {
-    const scan = scans[key];
-    const levels = LEVEL_ORDER
-      .filter((level) => scan.counts[level] > 0)
-      .map((level) => `${LEVEL_LABELS[level]} ${scan.counts[level]}`)
-      .join(' / ');
-    lines.push(`【${BANK_LABELS[key]}词库】命中 ${scan.total} 处 / ${scan.words.length} 个词${levels ? ` (${levels})` : ''}`);
-    if (scan.words.length === 0) {
-      lines.push('  - 无命中');
-    } else {
-      scan.words.forEach((stat) => {
-        const list = stat.positions.slice(0, POS_LIMIT).map((pos) => positionLabel(raw, pos)).join(', ');
-        const more = stat.positions.length > POS_LIMIT ? ` 等 ${stat.positions.length} 处` : '';
-        lines.push(`  - ${stat.word} [${LEVEL_LABELS[stat.level]}] ×${stat.count} 位置: ${list}${more}`);
-        lines.push(`    建议: ${stat.tip}`);
-      });
-    }
+  parts.forEach((part) => {
+    lines.push(...sectionOf(raw, part.title, part.scan));
     lines.push('');
   });
   lines.push('说明: 词库为常见平台违规词的经验汇总, 平台规则会持续更新, 结果仅供发布前自检参考, 不构成法律意见。');

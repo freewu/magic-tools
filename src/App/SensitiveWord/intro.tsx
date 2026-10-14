@@ -19,6 +19,14 @@ const zh = `<h2>这个工具做什么</h2>
 <li><p><b>微信公众号</b>: 除广告法极限词与医疗功效外, 还有公众号特有的<b>诱导分享 / 导流</b> (集赞、转发领、分享到朋友圈、扫码加微信、点击领取) 与<b>涉赌</b>词 (赌博、博彩)</p></li>
 </ul>
 
+<h2>扩展词库 (Sensitive-lexicon)</h2>
+<ul>
+<li><p>除内置的三个词库外, 还可在下方卡片里勾选<b>外部社区词库</b> (开源项目 konsheng/Sensitive-lexicon, MIT): 几万个词条<b>按上游文件分类</b> —— 涉政、反动、涉恐、涉枪涉爆、涉黄、涉黄类型、贪腐、民生、涉疫、思想启蒙、网络审查、网易过滤词、腾讯过滤词、广告法、其他、补充、非法网址</p></li>
+<li><p>分类<b>按需勾选</b>: 勾选后才在本地解码对应词表 (词表以异或 + Base64 编码存放, 不勾选就不会加载, 因此不拖慢页面); 首次勾选稍等「正在解码词表…」即可, 之后瞬时命中</p></li>
+<li><p>命中结果额外带一列<b>分类</b> (悬停可看上游文件名), 并按分类统计命中数; 命中的词同时计入<b>打码</b>与<b>检测报告</b> (报告里会列出「词库范围」)</p></li>
+<li><p>外部词库收录量大、<b>误报相对较多</b> (例如「兼职」「招聘」这类正常词也在其中), 建议当作<b>二次筛查</b>: 命中后结合语境判断, 不必全部改写</p></li>
+</ul>
+
 <h2>等级怎么用</h2>
 <ul>
 <li><p><b>高危</b>: 平台通常直接限流 / 删除 / 封号 (广告法极限词、医疗功效、站外导流、涉赌), 发布前务必改写</p></li>
@@ -63,6 +71,14 @@ const tw = `<h2>這個工具做什麼</h2>
 <li><p><b>微信公眾號</b>: 除廣告法極限詞與醫療功效外, 還有公眾號特有的<b>誘導分享 / 導流</b> (集讚、轉發領、分享到朋友圈、掃碼加微信、點擊領取) 與<b>涉賭</b>詞 (賭博、博彩)</p></li>
 </ul>
 
+<h2>擴展詞庫 (Sensitive-lexicon)</h2>
+<ul>
+<li><p>除內建的三個詞庫外, 還可在下方卡片裡勾選<b>外部社區詞庫</b> (開源專案 konsheng/Sensitive-lexicon, MIT): 幾萬個詞條<b>按上游檔案分類</b> —— 涉政、反動、涉恐、涉槍涉爆、涉黃、涉黃類型、貪腐、民生、涉疫、思想啟蒙、網絡審查、網易過濾詞、騰訊過濾詞、廣告法、其他、補充、非法網址</p></li>
+<li><p>分類<b>按需勾選</b>: 勾選後才在本機解碼對應詞表 (詞表以異或 + Base64 編碼存放, 不勾選就不會載入, 因此不拖慢頁面); 首次勾選稍等「正在解碼詞表…」即可, 之後瞬時命中</p></li>
+<li><p>命中結果額外帶一欄<b>分類</b> (懸停可看上游檔名), 並按分類統計命中數; 命中的詞同時計入<b>打碼</b>與<b>檢測報告</b> (報告裡會列出「詞庫範圍」)</p></li>
+<li><p>外部詞庫收錄量大、<b>誤報相對較多</b> (例如「兼職」「招聘」這類正常詞也在其中), 建議當作<b>二次篩查</b>: 命中後結合語境判斷, 不必全部改寫</p></li>
+</ul>
+
 <h2>等級怎麼用</h2>
 <ul>
 <li><p><b>高危</b>: 平台通常直接限流 / 刪除 / 封號 (廣告法極限詞、醫療功效、站外導流、涉賭), 發布前務必改寫</p></li>
@@ -105,6 +121,14 @@ const en = `<h2>What this tool does</h2>
 <li><p><b>General</b>: the union of both platform lists — run this first for a full self-check</p></li>
 <li><p><b>Xiaohongshu</b>: heavy on <b>medical / efficacy</b> claims (祛斑, 美白, 祛痘, 医用…), <b>off-platform diversion</b> (微信, vx, 加v, 二维码, 扫码, 私我领福利, 移步淘宝) and <b>exaggerated slang</b> (yyds, 绝绝子, 闭眼买)</p></li>
 <li><p><b>WeChat Official Account</b>: adds the platform-specific <b>inducement / diversion</b> words (集赞, 转发领, 分享到朋友圈, 扫码加微信, 点击领取) and <b>gambling</b> terms (赌博, 博彩) on top of the advertising-law and medical words</p></li>
+</ul>
+
+<h2>Extended lists (Sensitive-lexicon)</h2>
+<ul>
+<li><p>Beyond the three built-in lists you can tick <b>community lists</b> in the card below (open-source konsheng/Sensitive-lexicon, MIT): tens of thousands of entries <b>grouped by upstream file</b> — politics, subversion, terrorism, guns &amp; explosives, pornography, porn by type, corruption, livelihood, epidemic, ideology, internet censorship, NetEase filter list, Tencent filter list, advertising law, others, supplement and illegal URLs</p></li>
+<li><p>Categories are <b>opt-in</b>: a list is decoded locally only once you tick it (the data is stored XOR + Base64 encoded, so unticked lists are never loaded and the page stays fast). The first tick shows “Decoding word list…”, afterwards matching is instant</p></li>
+<li><p>Hits get an extra <b>category</b> column (hover for the upstream file name) and are counted per category; they also feed <b>masking</b> and the <b>report</b> (which lists the word-list scope)</p></li>
+<li><p>These lists are large and produce <b>more false positives</b> (ordinary words such as 「兼职」 or 「招聘」 are included), so treat them as a <b>second pass</b>: check the context instead of rewriting everything</p></li>
 </ul>
 
 <h2>Reading the risk levels</h2>

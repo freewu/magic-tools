@@ -1,9 +1,10 @@
 import '@testing-library/jest-dom';
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { message } from 'antd';
 import SensitiveWord from './index';
 import { DEFAULTS_STORAGE_KEY, GZH_BANK, MASK_CHAR_DEFAULT, SAMPLE_TEXT, XHS_BANK } from './data';
 import { maskText, scanText } from './lib';
+import { LEXICON_CATEGORIES, LEXICON_MAP, LEXICON_TOTAL } from './lexicon';
 
 // ---- tauri 桩: 保存文件 ----
 const mockSaveTextFile = jest.fn().mockResolvedValue(true);
@@ -33,6 +34,8 @@ const uiTexts = (c: HTMLElement, text: string) =>
 const hasUiText = (c: HTMLElement, text: string) => {
   expect(uiTexts(c, text).length).toBeGreaterThan(0);
 };
+const tableRows = (table: HTMLElement) => Array.from(table.querySelectorAll('tbody tr'))
+  .filter((tr) => !tr.classList.contains('ant-table-measure-row') && !tr.classList.contains('ant-table-placeholder')) as HTMLTableRowElement[];
 const rows = (c: HTMLElement) => Array.from(c.querySelectorAll('.sw-table tbody tr'))
   .filter((tr) => !tr.classList.contains('ant-table-measure-row') && !tr.classList.contains('ant-table-placeholder')) as HTMLTableRowElement[];
 const rowWords = (c: HTMLElement) => rows(c).map((tr) => (tr.querySelector('td')?.textContent ?? '').trim());
@@ -41,6 +44,26 @@ const switches = (c: HTMLElement) => Array.from(c.querySelectorAll('button.ant-s
 const radios = (c: HTMLElement) => Array.from(c.querySelectorAll('input[type="radio"]')) as HTMLInputElement[];
 const activeTab = (c: HTMLElement) => (c.querySelector('.ant-tabs-tab-active')?.textContent ?? '');
 const cards = (c: HTMLElement) => Array.from(c.querySelectorAll('.sw-card')) as HTMLElement[];
+/** 扩展词库卡片 / 命中明细表 */
+const lexCard = (c: HTMLElement) => c.querySelector('.sw-lexicon') as HTMLElement;
+const lexRows = (c: HTMLElement) => {
+  const table = c.querySelector('.sw-lexicon-table') as HTMLElement | null;
+  return table ? tableRows(table) : [];
+};
+const lexRowWords = (c: HTMLElement) => lexRows(c).map((tr) => (tr.querySelector('td')?.textContent ?? '').trim());
+const lexRowCategories = (c: HTMLElement) => lexRows(c).map((tr) => (tr.querySelectorAll('td')[1]?.textContent ?? '').trim());
+/** 勾选一个扩展词库分类 (多选下拉只能用搜索框过滤到目标选项, 虚拟列表只渲染可视区) */
+const pickLexCategory = async (c: HTMLElement, key: keyof typeof LEXICON_MAP) => {
+  const category = LEXICON_MAP[key];
+  const select = lexCard(c).querySelector('.sw-lexicon-select') as HTMLElement;
+  await act(async () => { fireEvent.mouseDown(select.querySelector('.ant-select-selector') as HTMLElement); });
+  await act(async () => {
+    fireEvent.change(select.querySelector('input.ant-select-selection-search-input') as HTMLInputElement, {
+      target: { value: category.label },
+    });
+  });
+  await clickOption(`${category.label} (${category.count})`);
+};
 const bankTags = (c: HTMLElement) => Array.from(c.querySelectorAll('.sw-bank-list .ant-tag')) as HTMLElement[];
 const scanCommon = (text: string) => scanText(text, { loose: true, latinBoundary: true }).common;
 /** 切换页签 (antd Tabs 用 role=tab) */
@@ -354,5 +377,55 @@ describe('敏感词检测 复制与保存', () => {
     setText(container, '微信');
     expect(rowWords(container)).toEqual([ '微信' ]);
     expect(btn('复制打码文本')).toBeEnabled();
+  });
+});
+
+describe('敏感词检测 扩展词库 (Sensitive-lexicon)', () => {
+  test('默认不加载词表: 只展示分类数与勾选提示', () => {
+    const { container } = render(<SensitiveWord />);
+    hasUiText(container, '扩展词库');
+    hasUiText(container, `${LEXICON_CATEGORIES.length} 个分类 / 共 ${LEXICON_TOTAL} 条词条`);
+    hasUiText(container, '勾选分类后, 命中的词条会按分类列在下方');
+    // 没勾选时不出明细表, 打码仍只按通用词库
+    expect(container.querySelector('.sw-lexicon-table')).not.toBeInTheDocument();
+    expect(btn('清空选择')).toBeDisabled();
+    expect(btn('全选')).toBeEnabled();
+  });
+
+  test('勾选分类后按分类给出命中, 明细表多一列分类', async () => {
+    const { container } = render(<SensitiveWord />);
+    setText(container, '招聘 兼职');
+    await pickLexCategory(container, 'ad');
+    await waitFor(() => expect(lexRows(container).length).toBe(2), { timeout: 5000 });
+    expect(lexRowWords(container)).toEqual(expect.arrayContaining([ '招聘', '兼职' ]));
+    expect(lexRowCategories(container)).toEqual([ '广告法', '广告法' ]);
+    // 分类统计标签 + 表头
+    hasUiText(container, '广告法 2');
+    expect(lexCard(container).querySelectorAll('thead th')[1]).toHaveTextContent('分类');
+    expect(lexCard(container).textContent).toContain('低危');
+  });
+
+  test('命中的扩展词库词条计入打码文本与检测报告', async () => {
+    const { container } = render(<SensitiveWord />);
+    setText(container, '招聘兼职');
+    await pickLexCategory(container, 'ad');
+    await waitFor(() => expect(lexRows(container).length).toBeGreaterThan(0), { timeout: 5000 });
+    await clickCopy('复制打码文本');
+    expect(mockWriteText).toHaveBeenCalledWith('****');
+    await clickCopy('复制检测报告');
+    const report = mockWriteText.mock.calls[1][0] as string;
+    expect(report).toContain('词库范围: 通用词库 / 小红书词库 / 微信公众号词库 + 扩展词库 (广告法)');
+    expect(report).toContain('【扩展词库 · 广告法】命中 2 处 / 2 个词');
+  });
+
+  test('取消勾选后回到未选择状态', async () => {
+    const { container } = render(<SensitiveWord />);
+    setText(container, '招聘');
+    await pickLexCategory(container, 'ad');
+    await waitFor(() => expect(lexRows(container).length).toBe(1), { timeout: 5000 });
+    await act(async () => { fireEvent.click(btn('清空选择')); });
+    expect(container.querySelector('.sw-lexicon-table')).not.toBeInTheDocument();
+    hasUiText(container, '勾选分类后, 命中的词条会按分类列在下方');
+    expect(btn('清空选择')).toBeDisabled();
   });
 });

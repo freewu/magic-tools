@@ -157,6 +157,13 @@ tag v:
     git push
     git push origin {{ if replace(v, "v", "") == v { "v" + v } else { v } }}
 
+# 重建「敏感词检测」的扩展词库 (Sensitive-lexicon): 生成 lexicon.meta.json + lexicon.enc.json
+# 依赖: 先把上游词库克隆到同级目录
+#   git clone --depth 1 https://github.com/konsheng/Sensitive-lexicon.git ../Sensitive-lexicon
+# 用法: just lexicon (默认读 ../Sensitive-lexicon/Vocabulary) 或 just lexicon /path/to/Vocabulary
+lexicon src="":
+    node scripts/build-sensitive-lexicon.mjs {{ if src != "" { "--src " + src } else { "" } }}
+
 # Use this when the dev server exited abnormally and the port is still occupied
 # Kill leftover dev server process on port 1212 (Windows)
 kill-dev:
