@@ -264,7 +264,6 @@ const JSONLConvert: React.FC = () => {
         >{ t('清除') }</Button>
       </Space>
 
-      <Text strong style={ { fontSize: 12 } }>JSONL</Text>
       <TextArea
         style={ { margin: '5px 0 5px 0' } }
         onDoubleClick={ textareaDoubleClick }
