@@ -17,7 +17,7 @@ describe('ThemeProvider 主题变量', () => {
     await waitFor(() => expect(cssVar('--app-bg')).toBe('#f0f2f5'));
     expect(cssVar('--app-text')).toBe('rgba(0, 0, 0, 0.88)');
     expect(cssVar('--app-input-bg')).toBe('#ffffff');
-    expect(cssVar('--app-divider-text')).toBe('#64748b');
+    expect(cssVar('--app-divider-text')).toBe('#4c6cb3');
     expect(cssVar('--app-divider-line')).toBe('rgba(5, 5, 5, 0.25)');
   });
 
@@ -27,7 +27,7 @@ describe('ThemeProvider 主题变量', () => {
     await waitFor(() => expect(cssVar('--app-bg')).toBe('#000000'));
     expect(cssVar('--app-text')).toBe('rgba(255, 255, 255, 0.85)');
     expect(cssVar('--app-input-bg')).toBe('#1f1f1f');
-    expect(cssVar('--app-divider-text')).toBe('#cbd5e1');
+    expect(cssVar('--app-divider-text')).toBe('#97abd8');
     expect(cssVar('--app-divider-line')).toBe('rgba(255, 255, 255, 0.4)');
   });
 

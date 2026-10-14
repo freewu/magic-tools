@@ -172,7 +172,7 @@ const Setting = () => {
                 <span style={ { fontSize: 15, display: 'inline-flex' } }>{ CATEGORY_ICONS[item.key] ?? null }</span>
                 { itemName(item.key, item.label) }
               </div>
-              <div style={ { background: token.colorBgContainer, border: `1px solid ${token.colorBorderSecondary}`, borderRadius: 8, padding: '6px 16px 16px' } }>
+              <div className="setting-panel" style={ { background: token.colorBgContainer, border: `1px solid ${token.colorBorderSecondary}`, borderRadius: 8, padding: '6px 16px 16px' } }>
                 { item.children }
               </div>
             </div>
