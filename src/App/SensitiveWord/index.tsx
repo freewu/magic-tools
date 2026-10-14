@@ -1,5 +1,5 @@
 // 敏感词检测: 粘贴文案即自动检测, 内置「通用 / 小红书 / 微信公众号」三个词库与替换建议
-import { Button, Card, Collapse, Divider, Empty, Input, Radio, Select, Space, Switch, Table, Tabs, Tag, Tooltip, Typography, message, theme } from 'antd';
+import { AutoComplete, Button, Card, Collapse, Divider, Empty, Input, Radio, Select, Space, Switch, Table, Tabs, Tag, Tooltip, Typography, message, theme } from 'antd';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { ClearOutlined, CopyOutlined, DownloadOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useLocale } from '../../hook/locale-context';
@@ -10,8 +10,8 @@ import {
   type BankKey, type Level,
 } from './data';
 import {
-  getSettings, highlightParts, lineCol, maskedFileName, maskText, reportFileName, reportText,
-  scanText, textLength, type BankScan,
+  getSettings, highlightParts, lineCol, maskCharInput, maskedFileName, maskText, normalizeMaskChar,
+  reportFileName, reportText, scanText, textLength, type BankScan,
 } from './lib';
 import { saveTextFile } from '../../lib/tauri';
 import SensitiveWordIntro from './intro';
@@ -283,16 +283,20 @@ const SensitiveWord = () => {
               <Switch size="small" checked={ latinBoundary } onChange={ setLatinBoundary } />
             </Space>
           </Tooltip>
-          <Space size={ 4 }>
-            <Text type="secondary" style={ { fontSize: 12 } }>{ t('打码字符') }</Text>
-            <Select
-              size="small"
-              style={ { width: 72 } }
-              value={ maskChar }
-              onChange={ setMaskChar }
-              options={ MASK_CHAR_OPTIONS.map((c) => ({ value: c, label: c })) }
-            />
-          </Space>
+          <Tooltip title={ t('可下拉选择, 也可自己填写 (只取第一个字符)') }>
+            <Space size={ 4 }>
+              <Text type="secondary" style={ { fontSize: 12 } }>{ t('打码字符') }</Text>
+              <AutoComplete
+                size="small"
+                className="sw-mask-char"
+                style={ { width: 84 } }
+                value={ maskChar }
+                onChange={ (v) => setMaskChar(maskCharInput(v)) }
+                onBlur={ () => setMaskChar((c) => normalizeMaskChar(c)) }
+                options={ MASK_CHAR_OPTIONS.map((c) => ({ value: c, label: c })) }
+              />
+            </Space>
+          </Tooltip>
         </Space>
         <Text type="secondary" style={ { fontSize: 12 } }>
           { `${tT('共 {n} 字', { n: textLength(text) })} · ${tT('命中 {n} 处', { n: scans.common.total })}` }

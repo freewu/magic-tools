@@ -5,7 +5,7 @@ import {
 } from './data';
 import {
   DEFAULT_SETTINGS, POS_LIMIT, automatonOf, buildAutomaton, fileStamp, getSettings,
-  highlightParts, lineCol, maskSpans, maskText, maskedFileName, normalizeBank,
+  highlightParts, lineCol, maskCharInput, maskSpans, maskText, maskedFileName, normalizeBank,
   normalizeMaskChar, normalizeSettings, normalizeText, patchSettings, positionLabel,
   readTime, reportFileName, reportText, scanBank, scanText, setSettings, textLength,
 } from './lib';
@@ -260,9 +260,18 @@ describe('maskSpans / maskText', () => {
     expect(maskText(raw, hits, '●')).toBe('a●●b');
   });
 
-  test('打码字符非法时回退默认字符', () => {
+  test('打码字符可自定义 (只取第一个字符), 空值回退默认字符', () => {
     const raw = '祛斑';
-    expect(maskText(raw, scanBank(raw, 'xhs').hits, 'Z')).toBe('**');
+    const hits = scanBank(raw, 'xhs').hits;
+    expect(maskText(raw, hits, 'Z')).toBe('ZZ');
+    expect(maskText(raw, hits, '＃')).toBe('＃＃');
+    // 多字符只取第一个 (保持打码后长度与原文一致)
+    expect(maskText(raw, hits, '●×')).toBe('●●');
+    // emoji 等代理对按 1 个字符处理
+    expect(maskText(raw, hits, '🙈')).toBe('🙈🙈');
+    // 空 / 空白回退默认
+    expect(maskText(raw, hits, '')).toBe('**');
+    expect(maskText(raw, hits, '   ')).toBe('**');
   });
 
   test('宽松命中时打码覆盖整段 (含间隔符), 但保留换行', () => {
@@ -387,6 +396,24 @@ describe('reportText', () => {
 // ---------------- 默认设置 ----------------
 
 describe('默认设置', () => {
+  test('maskCharInput 最多保留 1 个字符 (兼容 emoji 代理对)', () => {
+    expect(maskCharInput('')).toBe('');
+    expect(maskCharInput('*')).toBe('*');
+    expect(maskCharInput('●×')).toBe('●');
+    expect(maskCharInput('🙈🙈')).toBe('🙈');
+    expect(maskCharInput('  #  ')).toBe('#');
+  });
+
+  test('normalizeMaskChar 保留自定义单字符, 非法值回退默认', () => {
+    expect(normalizeMaskChar('●')).toBe('●');
+    expect(normalizeMaskChar('  @  ')).toBe('@');
+    expect(normalizeMaskChar('😀abc')).toBe('😀');
+    expect(normalizeMaskChar('')).toBe(MASK_CHAR_DEFAULT);
+    expect(normalizeMaskChar(' ')).toBe(MASK_CHAR_DEFAULT);
+    expect(normalizeMaskChar(null)).toBe(MASK_CHAR_DEFAULT);
+    expect(normalizeMaskChar(42)).toBe(MASK_CHAR_DEFAULT);
+  });
+
   test('DEFAULT_SETTINGS 与文档一致', () => {
     expect(DEFAULT_SETTINGS).toEqual({ bank: 'common', loose: true, latinBoundary: true, maskChar: '*' });
   });
@@ -394,7 +421,11 @@ describe('默认设置', () => {
   test('normalizeSettings 回退非法值', () => {
     expect(normalizeSettings()).toEqual(DEFAULT_SETTINGS);
     expect(normalizeSettings({ bank: 'nope' as never })).toEqual(DEFAULT_SETTINGS);
-    expect(normalizeSettings({ maskChar: '@' }).maskChar).toBe('*');
+    // 自定义打码字符保留, 但只取第一个字符; 非字符串 / 空值回退默认
+    expect(normalizeSettings({ maskChar: '@' }).maskChar).toBe('@');
+    expect(normalizeSettings({ maskChar: '##' }).maskChar).toBe('#');
+    expect(normalizeSettings({ maskChar: '  ' }).maskChar).toBe('*');
+    expect(normalizeSettings({ maskChar: 1 as never }).maskChar).toBe('*');
     expect(normalizeSettings({ bank: 'xhs', maskChar: '●', loose: false })).toEqual({
       bank: 'xhs', loose: false, latinBoundary: true, maskChar: '●',
     });

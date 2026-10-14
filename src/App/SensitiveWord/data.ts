@@ -57,7 +57,7 @@ export const BANK_KEYS: readonly BankKey[] = [ 'common', 'xhs', 'gzh' ];
 /** 默认设置的本地存储键 (设置中心与工具页共用) */
 export const DEFAULTS_STORAGE_KEY = 'sensitive-word:defaults';
 
-/** 打码字符候选 */
+/** 打码字符候选 (下拉可选, 也可在输入框自己填写任意单字符) */
 export const MASK_CHAR_OPTIONS = [ '*', '●', '×', '□', '○' ];
 
 export const MASK_CHAR_DEFAULT = '*';

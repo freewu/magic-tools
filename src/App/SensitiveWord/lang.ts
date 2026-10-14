@@ -46,6 +46,10 @@ const uilangRows: Record<string, [ string, string ]> = {
   '宽松匹配 (忽略间隔符)': [ '寬鬆匹配 (忽略間隔符)', 'Loose matching (ignore separators)' ],
   '拉丁词边界': [ '拉丁詞邊界', 'Latin word boundary' ],
   '打码字符': [ '打碼字元', 'Mask character' ],
+  '可下拉选择, 也可自己填写 (只取第一个字符)': [
+    '可下拉選擇, 也可自己填寫 (只取第一個字元)',
+    'Pick from the list or type your own (first character only)',
+  ],
   '开启后「微 信」「ｖｘ」这类插入间隔符 / 全角的绕过写法也会被检出': [
     '開啟後「微 信」「ｖｘ」這類插入間隔符 / 全角的繞過寫法也會被檢出',
     'Catches bypass tricks such as “微 信” or full-width “ｖｘ”',

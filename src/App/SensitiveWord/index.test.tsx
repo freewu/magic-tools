@@ -50,6 +50,16 @@ const toTab = (name: RegExp) => {
 const clickCopy = async (name: string) => {
   await act(async () => { fireEvent.click(btn(name)); });
 };
+/** 打码字符组合框 (AutoComplete: 下拉可选, 也可自己填写) */
+const maskInput = (c: HTMLElement) => c.querySelector('.sw-mask-char input') as HTMLInputElement;
+const maskValue = (c: HTMLElement) => maskInput(c)?.value ?? '';
+/** 在组合框里自己填写打码字符 */
+const typeMaskChar = (c: HTMLElement, value: string) => {
+  act(() => { fireEvent.change(maskInput(c), { target: { value } }); });
+};
+const blurMaskChar = (c: HTMLElement) => {
+  act(() => { fireEvent.blur(maskInput(c)); });
+};
 const openMaskSelect = async () => {
   const selector = document.querySelector('.ant-select-selector') as HTMLElement;
   await act(async () => { fireEvent.mouseDown(selector); });
@@ -93,7 +103,7 @@ describe('敏感词检测 初始界面', () => {
     expect(switches(container)).toHaveLength(2);
     expect(switches(container)[0]).toHaveClass('ant-switch-checked');
     expect(switches(container)[1]).toHaveClass('ant-switch-checked');
-    expect(container.querySelector('.ant-select-selection-item')).toHaveTextContent(MASK_CHAR_DEFAULT);
+    expect(maskValue(container)).toBe(MASK_CHAR_DEFAULT);
     // 说明区
     expect(within(container).getByText('这个工具做什么')).toBeInTheDocument();
   });
@@ -105,7 +115,7 @@ describe('敏感词检测 初始界面', () => {
     const { container } = render(<SensitiveWord />);
     expect(switches(container)[0]).not.toHaveClass('ant-switch-checked');
     expect(switches(container)[1]).not.toHaveClass('ant-switch-checked');
-    expect(container.querySelector('.ant-select-selection-item')).toHaveTextContent('●');
+    expect(maskValue(container)).toBe('●');
     setText(container, '集赞');
     expect(activeTab(container)).toContain('微信公众号');
   });
@@ -256,13 +266,38 @@ describe('敏感词检测 匹配选项', () => {
     expect(rowWords(container)).toEqual([ 'v' ]);
   });
 
-  test('切换打码字符后复制的打码文本随之变化', async () => {
+  test('下拉选择打码字符后复制的打码文本随之变化', async () => {
     const { container } = render(<SensitiveWord />);
     setText(container, '祛斑');
     await openMaskSelect();
     await clickOption('●');
+    expect(maskValue(container)).toBe('●');
     await clickCopy('复制打码文本');
     expect(mockWriteText).toHaveBeenCalledWith('●●');
+  });
+
+  test('打码字符也可自己填写 (自定义单字符)', async () => {
+    const { container } = render(<SensitiveWord />);
+    setText(container, '祛斑');
+    typeMaskChar(container, '＃');
+    expect(maskValue(container)).toBe('＃');
+    await clickCopy('复制打码文本');
+    expect(mockWriteText).toHaveBeenCalledWith('＃＃');
+
+    // 自己填写 emoji 等字符同样生效
+    typeMaskChar(container, '🙈');
+    await clickCopy('复制打码文本');
+    expect(mockWriteText).toHaveBeenLastCalledWith('🙈🙈');
+  });
+
+  test('组合框只保留 1 个字符, 清空后失焦回退默认字符', () => {
+    const { container } = render(<SensitiveWord />);
+    typeMaskChar(container, '●×');
+    expect(maskValue(container)).toBe('●');
+    typeMaskChar(container, '');
+    expect(maskValue(container)).toBe('');
+    blurMaskChar(container);
+    expect(maskValue(container)).toBe(MASK_CHAR_DEFAULT);
   });
 });
 

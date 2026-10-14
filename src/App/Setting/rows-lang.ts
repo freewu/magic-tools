@@ -538,7 +538,7 @@ const ROWS: Record<string, Row> = {
   '拉丁词边界': ['拉丁詞邊界', 'Latin word boundary'],
   '纯字母数字词要求左右不是字母, 避免「v」命中 version / VIP 这类英文单词': ['純英數字詞要求左右不是字母, 避免「v」命中 version / VIP 這類英文單詞', 'Pure alphanumeric words must not be surrounded by letters, so “v” no longer matches inside version or VIP'],
   '默认打码字符': ['預設打碼字元', 'Default mask character'],
-  '「复制打码文本 / 保存打码文本」使用的字符': ['「複製打碼文字 / 儲存打碼文字」使用的字元', 'Character used by Copy / Save masked text'],
+  '「复制打码文本 / 保存打码文本」使用的字符, 可下拉选择也可自己填写': ['「複製打碼文字 / 儲存打碼文字」使用的字元, 可下拉選擇也可自己填寫', 'Character used by Copy / Save masked text — pick from the list or type your own'],
 
   // ---- 聊天生成器 (Chat Generator) ----
   '聊天生成器': ['聊天產生器', 'Chat Generator'],

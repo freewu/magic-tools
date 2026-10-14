@@ -1,7 +1,7 @@
-import { Divider, Form, Select, Switch } from 'antd';
+import { AutoComplete, Divider, Form, Select, Switch } from 'antd';
 import { useState } from 'react';
-import { BANK_KEYS, BANK_LABELS, MASK_CHAR_OPTIONS } from './data';
-import { getSettings, patchSettings } from './lib';
+import { BANK_KEYS, BANK_LABELS, MASK_CHAR_DEFAULT, MASK_CHAR_OPTIONS } from './data';
+import { getSettings, maskCharInput, patchSettings } from './lib';
 import { u } from './lang';
 import { useLocale } from '../../hook/locale-context';
 import { row as _r } from '../Setting/rows-lang';
@@ -43,12 +43,12 @@ export const SensitiveWordSetting = () => {
       </Form.Item>
       <Form.Item
         label={ st('默认打码字符') }
-        extra={ st('「复制打码文本 / 保存打码文本」使用的字符') }
+        extra={ st('「复制打码文本 / 保存打码文本」使用的字符, 可下拉选择也可自己填写') }
       >
-        <Select
+        <AutoComplete
           style={ { width: 120 } }
           value={ opts.maskChar }
-          onChange={ (v) => patch({ maskChar: v }) }
+          onChange={ (v) => patch({ maskChar: maskCharInput(v) || MASK_CHAR_DEFAULT }) }
           options={ MASK_CHAR_OPTIONS.map((c) => ({ value: c, label: c })) }
         />
       </Form.Item>

@@ -6,7 +6,7 @@
 // 得到「敏感词 + 等级 + 建议 + 精确位置」。
 import {
   BANK_KEYS, BANK_LABELS, DEFAULTS_STORAGE_KEY, LEVEL_LABELS, LEVEL_ORDER,
-  MASK_CHAR_DEFAULT, MASK_CHAR_OPTIONS, SENSITIVE_BANKS,
+  MASK_CHAR_DEFAULT, SENSITIVE_BANKS,
   type BankKey, type Level, type WordMeta,
 } from './data';
 
@@ -277,9 +277,9 @@ export const maskSpans = (hits: Hit[]): Hit[] => {
   return out;
 };
 
-/** 打码: 命中片段每个字符换成打码字符 (换行保留, 不改变段落结构) */
+/** 打码: 命中片段每个字符换成打码字符 (可自定义单字符; 换行保留, 不改变段落结构) */
 export const maskText = (raw: string, hits: Hit[], maskChar: string = MASK_CHAR_DEFAULT): string => {
-  const ch = MASK_CHAR_OPTIONS.includes(maskChar) ? maskChar : MASK_CHAR_DEFAULT;
+  const ch = normalizeMaskChar(maskChar);
   const chars = raw.split('');
   maskSpans(hits).forEach((hit) => {
     for (let i = hit.start; i < hit.end && i < chars.length; i += 1) {
@@ -387,7 +387,16 @@ const isBankKey = (v: unknown): v is BankKey => BANK_KEYS.includes(v as BankKey)
 
 export const normalizeBank = (v: unknown): BankKey => (isBankKey(v) ? v : DEFAULT_SETTINGS.bank);
 
-export const normalizeMaskChar = (v: unknown): string => (typeof v === 'string' && MASK_CHAR_OPTIONS.includes(v) ? v : MASK_CHAR_DEFAULT);
+/**
+ * 打码字符输入值: 最多保留 1 个字符 (允许暂时为空, 方便清空重填)
+ * - 用 Array.from 取首个字符, 兼容 emoji 等代理对
+ */
+export const maskCharInput = (v: string): string => Array.from(v.trim()).slice(0, 1).join('');
+
+/** 打码字符归一化: 自定义字符保留 (只取第一个字符), 空 / 非法值回退默认「*」 */
+export const normalizeMaskChar = (v: unknown): string => (
+  (typeof v === 'string' ? maskCharInput(v) : '') || MASK_CHAR_DEFAULT
+);
 
 /** 归一化设置 (非法值一律回退默认) */
 export const normalizeSettings = (raw?: Partial<SensitiveDefaults> | null): SensitiveDefaults => ({
