@@ -84,10 +84,19 @@ describe('收藏悬浮入口', () => {
     const css = fs.readFileSync(path.join(__dirname, 'favorites-fab.css'), 'utf8');
     // .ant-badge 改为 static, 让角标相对整个按钮(圆形悬浮层)定位
     expect(css).toMatch(/\.favorites-fab\s+\.ant-badge\s*\{[^}]*position:\s*static/);
-    // 覆盖 antd 的 inset-inline-end: 0 (右上角): 左移一个按钮宽度再回 8px = 左上角并向右靠近
-    expect(css).toMatch(/\.favorites-fab\s+\.ant-badge-count\s*\{[^}]*inset-inline-end:\s*calc\(100%\s*-\s*8px\)/);
+    // 覆盖 antd 的 inset-inline-end: 0 (右上角): 左移一个按钮宽度再回 6px = 左上角并向右靠近
+    expect(css).toMatch(/\.favorites-fab\s+\.ant-badge-count\s*\{[^}]*inset-inline-end:\s*calc\(100%\s*-\s*6px\)/);
     // 同时向下靠近 (antd 默认 top: 0)
-    expect(css).toMatch(/\.favorites-fab\s+\.ant-badge-count\s*\{[^}]*top:\s*8px/);
+    expect(css).toMatch(/\.favorites-fab\s+\.ant-badge-count\s*\{[^}]*top:\s*6px/);
+  });
+
+  test('角标背景为金色 (替换 antd 默认的红色)', () => {
+    const css = fs.readFileSync(path.join(__dirname, 'favorites-fab.css'), 'utf8');
+    const rule = /\.favorites-fab\s+\.ant-badge-count\s*\{([^}]*)\}/.exec(css);
+    expect(rule).not.toBeNull();
+    const body = rule ? rule[1] : '';
+    expect(body).toMatch(/background:\s*linear-gradient\([^)]*#faad14/);
+    expect(body).toMatch(/color:\s*#fff/i);
   });
 
   test('按比例坐标渲染默认位置 (右下)', () => {
