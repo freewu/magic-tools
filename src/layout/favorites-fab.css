@@ -40,12 +40,14 @@
 
 /* 收藏数量角标: 放到悬浮入口(整个圆形按钮)的左上角, 与 antd 默认的右上角镜像
    - .ant-badge 改为 static: 让角标相对按钮定位 (而不是相对图标盒子)
-   - inset-inline-end: 100% + antd 自带的 translate(50%, -50%): 角标中心正好落在按钮左上角 */
+   - antd 自带 transform: translate(50%, -50%) (角标中心对其锚点),
+     所以 inset-inline-end / top 各留 8px 即可让角标向右向下靠近圆形边缘 */
 .favorites-fab .ant-badge {
   position: static;
 }
 
 .favorites-fab .ant-badge-count {
-  inset-inline-end: 100%;
+  inset-inline-end: calc(100% - 8px);
+  top: 8px;
   box-shadow: 0 0 0 1px var(--app-raised, #ffffff);
 }

@@ -84,8 +84,10 @@ describe('收藏悬浮入口', () => {
     const css = fs.readFileSync(path.join(__dirname, 'favorites-fab.css'), 'utf8');
     // .ant-badge 改为 static, 让角标相对整个按钮(圆形悬浮层)定位
     expect(css).toMatch(/\.favorites-fab\s+\.ant-badge\s*\{[^}]*position:\s*static/);
-    // 覆盖 antd 的 inset-inline-end: 0 (右上角) -> 100% (右上角左移一个按钮宽度 = 左上角)
-    expect(css).toMatch(/\.favorites-fab\s+\.ant-badge-count\s*\{[^}]*inset-inline-end:\s*100%/);
+    // 覆盖 antd 的 inset-inline-end: 0 (右上角): 左移一个按钮宽度再回 8px = 左上角并向右靠近
+    expect(css).toMatch(/\.favorites-fab\s+\.ant-badge-count\s*\{[^}]*inset-inline-end:\s*calc\(100%\s*-\s*8px\)/);
+    // 同时向下靠近 (antd 默认 top: 0)
+    expect(css).toMatch(/\.favorites-fab\s+\.ant-badge-count\s*\{[^}]*top:\s*8px/);
   });
 
   test('按比例坐标渲染默认位置 (右下)', () => {
