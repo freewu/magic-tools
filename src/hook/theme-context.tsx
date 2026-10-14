@@ -75,6 +75,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     root.style.setProperty('--app-border', isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(5, 5, 5, 0.12)');
     // 设置中心分隔标题文字: 浅色用柔和的灰蓝, 深色用更亮的颜色 (避免深色下看不清)
     root.style.setProperty('--app-divider-text', isDark ? '#cbd5e1' : '#64748b');
+    // 设置中心分隔线: 比 antd 默认 (透明度 0.06) 更明显一些
+    root.style.setProperty('--app-divider-line', isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(5, 5, 5, 0.25)');
   }, [isDark]);
 
   return (

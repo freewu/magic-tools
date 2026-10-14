@@ -5,8 +5,12 @@
     color: var(--app-divider-text, #64748b);
 }
 
-/* 分隔线本身也淡一点, 避免抢过标题 */
-.setting-body .ant-divider-plain.ant-divider-with-text-left::before,
-.setting-body .ant-divider-plain.ant-divider-with-text-left::after {
-    border-block-start-color: var(--app-border, rgba(5, 5, 5, 0.12));
+/* 分隔线: 比 antd 默认 (rgba(5,5,5,0.06)) 明显一些, 深色模式自动切换 */
+.setting-body .ant-divider {
+    border-block-start-color: var(--app-divider-line, rgba(5, 5, 5, 0.25));
+}
+
+.setting-body .ant-divider::before,
+.setting-body .ant-divider::after {
+    border-block-start-color: var(--app-divider-line, rgba(5, 5, 5, 0.25));
 }

@@ -18,6 +18,7 @@ describe('ThemeProvider 主题变量', () => {
     expect(cssVar('--app-text')).toBe('rgba(0, 0, 0, 0.88)');
     expect(cssVar('--app-input-bg')).toBe('#ffffff');
     expect(cssVar('--app-divider-text')).toBe('#64748b');
+    expect(cssVar('--app-divider-line')).toBe('rgba(5, 5, 5, 0.25)');
   });
 
   test('深色模式: 写入深色变量, 分隔标题换成更亮的颜色', async () => {
@@ -27,6 +28,7 @@ describe('ThemeProvider 主题变量', () => {
     expect(cssVar('--app-text')).toBe('rgba(255, 255, 255, 0.85)');
     expect(cssVar('--app-input-bg')).toBe('#1f1f1f');
     expect(cssVar('--app-divider-text')).toBe('#cbd5e1');
+    expect(cssVar('--app-divider-line')).toBe('rgba(255, 255, 255, 0.4)');
   });
 
   test('显示模式持久化到 localStorage', async () => {
