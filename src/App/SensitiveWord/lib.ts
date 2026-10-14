@@ -333,6 +333,35 @@ export const highlightParts = (raw: string, hits: Hit[]): TextPart[] => {
   return parts;
 };
 
+/**
+ * 打码分段: 被打码的片段 (已换成打码字符) 与普通片段交替 (供「打码预览」渲染)
+ * 拼接结果与 maskText 完全一致, 方便界面上把打码位置标出来
+ */
+export const maskedParts = (raw: string, hits: Hit[], maskChar: string = MASK_CHAR_DEFAULT): TextPart[] => {
+  const ch = normalizeMaskChar(maskChar);
+  const parts: TextPart[] = [];
+  let at = 0;
+  maskSpans(hits).forEach((hit) => {
+    if (hit.start > at) parts.push({ text: raw.slice(at, hit.start), hit: null });
+    const masked = raw.slice(hit.start, hit.end)
+      .split('')
+      .map((c) => (c === '\n' || c === '\r' ? c : ch))
+      .join('');
+    parts.push({ text: masked, hit });
+    at = hit.end;
+  });
+  if (at < raw.length) parts.push({ text: raw.slice(at), hit: null });
+  return parts;
+};
+
+/** 打码统计: 打码处数与被替换的字符数 (不含换行) */
+export const maskStats = (parts: TextPart[]): { spots: number; chars: number } => parts.reduce(
+  (acc, part) => (part.hit
+    ? { spots: acc.spots + 1, chars: acc.chars + part.text.replace(/[\n\r]/g, '').length }
+    : acc),
+  { spots: 0, chars: 0 }
+);
+
 // ---------------- 位置 / 报告 ----------------
 
 /** 字面位置: 第几行第几字 (1 起) */
@@ -369,10 +398,57 @@ export const reportFileName = (date: Date = new Date()): string => `sensitive-wo
 
 /** 报告里的附加词库分组 (扩展词库按分类传入) */
 export interface ReportGroup {
+  /** 分类键 (扩展词库分类, 便于明细表标注来源) */
+  key?: string;
   /** 分类名 (如「涉政」) */
   label: string;
   scan: BankScan;
 }
+
+/** 命中明细行 (扩展词库的行额外带分类键, 内置词库的行不填) */
+export interface ScanRow extends WordStat {
+  categoryKey?: string;
+}
+
+/** 融合结果: 内置词库扫描 + 扩展词库分类 (供「通用」自检一次性看全) */
+export interface FusedScan {
+  hits: Hit[];
+  words: ScanRow[];
+  counts: Record<Level, number>;
+  total: number;
+  /** 其中来自扩展词库的命中处数 / 词数 */
+  extraHits: number;
+  extraWords: number;
+}
+
+/**
+ * 把扩展词库分类的命中并进内置词库扫描结果:
+ * 命中明细按「内置在前、扩展在后」拼接 (扩展行带 categoryKey, 界面上多一列来源),
+ * 等级计数与命中处数同步叠加, 没选分类时原样返回 base
+ */
+export const fuseScans = (base: BankScan, extras: ReportGroup[] = []): FusedScan => {
+  if (extras.length === 0) {
+    return { hits: base.hits, words: base.words, counts: base.counts, total: base.total, extraHits: 0, extraWords: 0 };
+  }
+  const counts: Record<Level, number> = { ...base.counts };
+  const hits: Hit[] = [ ...base.hits ];
+  const words: ScanRow[] = [ ...base.words ];
+  let extraHits = 0;
+  extras.forEach(({ key, scan }) => {
+    extraHits += scan.total;
+    scan.hits.forEach((hit) => hits.push(hit));
+    scan.words.forEach((stat) => words.push({ ...stat, categoryKey: key }));
+    LEVEL_ORDER.forEach((level) => { counts[level] += scan.counts[level]; });
+  });
+  return {
+    hits,
+    words,
+    counts,
+    total: base.total + extraHits,
+    extraHits,
+    extraWords: words.length - base.words.length,
+  };
+};
 
 /** 单段词库明细 (内置词库与扩展词库分类共用) */
 const sectionOf = (raw: string, title: string, scan: BankScan): string[] => {

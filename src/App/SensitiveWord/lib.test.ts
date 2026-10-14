@@ -5,9 +5,9 @@ import {
 } from './data';
 import {
   DEFAULT_SETTINGS, POS_LIMIT, automatonOf, buildAutomaton, fileStamp, getSettings,
-  highlightParts, lineCol, maskCharInput, maskSpans, maskText, maskedFileName, normalizeBank,
+  fuseScans, highlightParts, lineCol, maskCharInput, maskSpans, maskText, maskStats, maskedFileName, maskedParts, normalizeBank,
   normalizeMaskChar, normalizeSettings, normalizeText, patchSettings, positionLabel,
-  readTime, reportFileName, reportText, scanBank, scanText, setSettings, textLength,
+  readTime, reportFileName, reportText, scanBank, scanText, scanWords, setSettings, textLength,
 } from './lib';
 
 const wordsOf = (bank: { word: string }[]) => bank.map((e) => e.word.toLowerCase());
@@ -309,6 +309,50 @@ describe('highlightParts', () => {
   });
 });
 
+describe('maskedParts / maskStats (打码预览)', () => {
+  test('拼接结果与 maskText 完全一致', () => {
+    const raw = 'a祛斑b微信c';
+    const hits = scanBank(raw, 'common').hits;
+    expect(maskedParts(raw, hits).map((p) => p.text).join('')).toBe(maskText(raw, hits));
+    expect(maskedParts(raw, hits, '●').map((p) => p.text).join('')).toBe(maskText(raw, hits, '●'));
+  });
+
+  test('打码片段已换成打码字符, 并带上原词信息', () => {
+    const raw = 'a祛斑b';
+    const hits = scanBank(raw, 'common').hits;
+    const parts = maskedParts(raw, hits);
+    expect(parts.map((p) => p.text)).toEqual([ 'a', '**', 'b' ]);
+    const hit = parts.find((p) => p.hit)!;
+    expect(hit.hit!.word).toBe('祛斑');
+    expect(hit.hit!.level).toBe('high');
+  });
+
+  test('换行保留, 打码字符不从换行处替换', () => {
+    const raw = '微信\n微信';
+    const hits = scanBank(raw, 'common').hits;
+    expect(maskedParts(raw, hits, '●').map((p) => p.text).join('')).toBe('●●\n●●');
+  });
+
+  test('没有命中时只有一段普通文本, 统计为 0', () => {
+    const parts = maskedParts('今天天气不错', []);
+    expect(parts).toEqual([ { text: '今天天气不错', hit: null } ]);
+    expect(maskStats(parts)).toEqual({ spots: 0, chars: 0 });
+  });
+
+  test('maskStats 统计打码处数与字符数 (不含换行)', () => {
+    const raw = '微信\n祛斑';
+    const stat = maskStats(maskedParts(raw, scanBank(raw, 'common').hits));
+    expect(stat).toEqual({ spots: 2, chars: 4 });
+  });
+
+  test('重叠命中按最长合并后只算一处', () => {
+    const raw = '最后一天';
+    const stat = maskStats(maskedParts(raw, scanBank(raw, 'gzh').hits));
+    expect(stat.spots).toBe(1);
+    expect(stat.chars).toBe(4);
+  });
+});
+
 // ---------------- 位置 / 文件名 / 报告 ----------------
 
 describe('位置与字数', () => {
@@ -344,6 +388,50 @@ describe('文件名与时间', () => {
   test('导出文件名带时间戳与 .txt 后缀', () => {
     expect(maskedFileName(date)).toBe('sensitive-word-masked-20260928-213045.txt');
     expect(reportFileName(date)).toBe('sensitive-word-report-20260928-213045.txt');
+  });
+});
+
+describe('fuseScans (融合检查)', () => {
+  const opt = { loose: true, latinBoundary: true };
+
+  test('没有扩展词库分类时原样返回内置结果', () => {
+    const base = scanBank('祛斑', 'common');
+    const fused = fuseScans(base);
+    expect(fused.hits).toBe(base.hits);
+    expect(fused.words).toBe(base.words);
+    expect(fused.total).toBe(base.total);
+    expect(fused.counts).toBe(base.counts);
+    expect(fused).toMatchObject({ extraHits: 0, extraWords: 0 });
+  });
+
+  test('扩展词库命中并入明细 (带 categoryKey), 处数与原词数同步叠加', () => {
+    const raw = '祛斑 招聘';
+    const base = scanBank(raw, 'common');
+    const extra = scanWords(raw, 'ad', [ { word: '招聘', level: 'low', tip: '广告法提示' } ], opt);
+    const fused = fuseScans(base, [ { key: 'ad', label: '广告法', scan: extra } ]);
+    expect(fused.total).toBe(base.total + extra.total);
+    expect(fused.extraHits).toBe(1);
+    expect(fused.extraWords).toBe(1);
+    // 内置在前, 扩展在后
+    expect(fused.words.map((w) => w.word)).toEqual([ ...base.words.map((w) => w.word), '招聘' ]);
+    expect(fused.words[fused.words.length - 1].categoryKey).toBe('ad');
+    expect(fused.words[0].categoryKey).toBeUndefined();
+    // 等级计数叠加
+    expect(fused.counts.low).toBe(base.counts.low + extra.counts.low);
+    expect(fused.hits.map((h) => h.word)).toEqual([ ...base.hits.map((h) => h.word), '招聘' ]);
+  });
+
+  test('多个分类的命中都并入', () => {
+    const raw = '招聘 兼职';
+    const base = scanBank(raw, 'common');
+    const ad = scanWords(raw, 'ad', [ { word: '招聘', level: 'low', tip: 't' } ], opt);
+    const other = scanWords(raw, 'other', [ { word: '兼职', level: 'low', tip: 't' } ], opt);
+    const fused = fuseScans(base, [
+      { key: 'ad', label: '广告法', scan: ad },
+      { key: 'other', label: '其他', scan: other },
+    ]);
+    expect(fused.extraHits).toBe(2);
+    expect(fused.words.slice(-2).map((w) => w.categoryKey)).toEqual([ 'ad', 'other' ]);
   });
 });
 

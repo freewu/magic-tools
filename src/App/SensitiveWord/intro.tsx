@@ -9,6 +9,7 @@ const zh = `<h2>这个工具做什么</h2>
 <li><p>输入框下方三张卡片显示三个词库各自的命中数量, 点卡片或页签即切换; 每个页签里是<b>命中高亮预览 + 命中明细表</b></p></li>
 <li><p>明细表按<b>敏感词</b>汇总: 等级、次数、出现位置 (第几行第几字) 与<b>建议替换</b>; 点词后的复制按钮可单独取词, 便于批量替换</p></li>
 <li><p>「<b>复制打码文本</b>」按<b>通用词库</b>把命中词替换成打码字符 (默认 <code>*</code>), 适合先跑一遍自动化再人工改写; 「<b>复制 / 保存检测报告</b>」导出一份中文报告留档</p></li>
+<li><p>结果区下方还有「<b>打码预览</b>」卡片: 直接看到打码后的全文 (被打码的位置高亮标出, 悬停可看原词与等级), 打码处数 / 字数一并给出; 换打码字符或勾选扩展词库分类会<b>实时重算</b>, 确认无误再复制 / 保存</p></li>
 <li><p>匹配选项 (宽松匹配 / 拉丁词边界 / 打码字符) 可在工具页临时调整; 打码字符可下拉选择, 也可自己填写任意单字符 (emoji 亦可); 默认值在「设置中心 → 其它 → 敏感词检测」里改</p></li>
 </ul>
 
@@ -21,9 +22,9 @@ const zh = `<h2>这个工具做什么</h2>
 
 <h2>扩展词库 (Sensitive-lexicon)</h2>
 <ul>
-<li><p>除内置的三个词库外, 还可在下方卡片里勾选<b>外部社区词库</b> (开源项目 konsheng/Sensitive-lexicon, MIT): 几万个词条<b>按上游文件分类</b> —— 涉政、反动、涉恐、涉枪涉爆、涉黄、涉黄类型、贪腐、民生、涉疫、思想启蒙、网络审查、网易过滤词、腾讯过滤词、广告法、其他、补充、非法网址</p></li>
+<li><p>除内置的三个词库外, 「<b>通用</b>」页签顶部还能勾选<b>外部社区词库</b> (开源项目 konsheng/Sensitive-lexicon, MIT): 几万个词条<b>按上游文件分类</b> —— 涉政、反动、涉恐、涉枪涉爆、涉黄、涉黄类型、贪腐、民生、涉疫、思想启蒙、网络审查、网易过滤词、腾讯过滤词、广告法、其他、补充、非法网址</p></li>
 <li><p>分类<b>按需勾选</b>: 勾选后才在本地解码对应词表 (词表以异或 + Base64 编码存放, 不勾选就不会加载, 因此不拖慢页面); 首次勾选稍等「正在解码词表…」即可, 之后瞬时命中</p></li>
-<li><p>命中结果额外带一列<b>分类</b> (悬停可看上游文件名), 并按分类统计命中数; 命中的词同时计入<b>打码</b>与<b>检测报告</b> (报告里会列出「词库范围」)</p></li>
+<li><p>勾选后与「通用」词库<b>融合检查</b>: 命中明细合并成同一张表 (扩展词条多一列<b>分类</b>, 悬停可看上游文件名; 内置词条标为「内置」), 等级筛选与「命中 N 处」也同步叠加; 命中的词同时计入<b>打码</b>与<b>检测报告</b> (报告里会列出「词库范围」)</p></li>
 <li><p>外部词库收录量大、<b>误报相对较多</b> (例如「兼职」「招聘」这类正常词也在其中), 建议当作<b>二次筛查</b>: 命中后结合语境判断, 不必全部改写</p></li>
 </ul>
 
@@ -61,6 +62,7 @@ const tw = `<h2>這個工具做什麼</h2>
 <li><p>輸入框下方三張卡片顯示三個詞庫各自的命中數量, 點卡片或頁籤即切換; 每個頁籤裡是<b>命中高亮預覽 + 命中明細表</b></p></li>
 <li><p>明細表按<b>敏感詞</b>彙總: 等級、次數、出現位置 (第幾行第幾字) 與<b>建議替換</b>; 點詞後的複製按鈕可單獨取詞, 便於批次替換</p></li>
 <li><p>「<b>複製打碼文字</b>」按<b>通用詞庫</b>把命中詞換成打碼字元 (預設 <code>*</code>), 適合先跑一遍再人工改寫; 「<b>複製 / 儲存檢測報告</b>」匯出一份中文報告留檔</p></li>
+<li><p>結果區下方還有「<b>打碼預覽</b>」卡片: 直接看到打碼後的全文 (被打碼的位置高亮標出, 懸停可看原詞與等級), 打碼處數 / 字數一併給出; 換打碼字元或勾選擴展詞庫分類會<b>即時重算</b>, 確認無誤再複製 / 儲存</p></li>
 <li><p>匹配選項 (寬鬆匹配 / 拉丁詞邊界 / 打碼字元) 可在工具頁臨時調整; 預設值在「設定中心 → 其他 → 敏感詞檢測」裡改</p></li>
 </ul>
 
@@ -73,9 +75,9 @@ const tw = `<h2>這個工具做什麼</h2>
 
 <h2>擴展詞庫 (Sensitive-lexicon)</h2>
 <ul>
-<li><p>除內建的三個詞庫外, 還可在下方卡片裡勾選<b>外部社區詞庫</b> (開源專案 konsheng/Sensitive-lexicon, MIT): 幾萬個詞條<b>按上游檔案分類</b> —— 涉政、反動、涉恐、涉槍涉爆、涉黃、涉黃類型、貪腐、民生、涉疫、思想啟蒙、網絡審查、網易過濾詞、騰訊過濾詞、廣告法、其他、補充、非法網址</p></li>
+<li><p>除內建的三個詞庫外, 「<b>通用</b>」頁籤頂部還能勾選<b>外部社區詞庫</b> (開源專案 konsheng/Sensitive-lexicon, MIT): 幾萬個詞條<b>按上游檔案分類</b> —— 涉政、反動、涉恐、涉槍涉爆、涉黃、涉黃類型、貪腐、民生、涉疫、思想啟蒙、網絡審查、網易過濾詞、騰訊過濾詞、廣告法、其他、補充、非法網址</p></li>
 <li><p>分類<b>按需勾選</b>: 勾選後才在本機解碼對應詞表 (詞表以異或 + Base64 編碼存放, 不勾選就不會載入, 因此不拖慢頁面); 首次勾選稍等「正在解碼詞表…」即可, 之後瞬時命中</p></li>
-<li><p>命中結果額外帶一欄<b>分類</b> (懸停可看上游檔名), 並按分類統計命中數; 命中的詞同時計入<b>打碼</b>與<b>檢測報告</b> (報告裡會列出「詞庫範圍」)</p></li>
+<li><p>勾選後與「通用」詞庫<b>融合檢查</b>: 命中明細合併成同一張表 (擴展詞條多一欄<b>分類</b>, 懸停可看上游檔名; 內建詞條標為「內置」), 等級篩選與「命中 N 處」也同步疊加; 命中的詞同時計入<b>打碼</b>與<b>檢測報告</b> (報告裡會列出「詞庫範圍」)</p></li>
 <li><p>外部詞庫收錄量大、<b>誤報相對較多</b> (例如「兼職」「招聘」這類正常詞也在其中), 建議當作<b>二次篩查</b>: 命中後結合語境判斷, 不必全部改寫</p></li>
 </ul>
 
@@ -113,6 +115,7 @@ const en = `<h2>What this tool does</h2>
 <li><p>Three cards below the box show how many hits each word list found; click a card or a tab to switch. Each tab has a <b>highlighted preview</b> plus a <b>result table</b></p></li>
 <li><p>The table groups hits by <b>word</b>: risk level, count, position (line and column) and the <b>suggested rewrite</b>; the copy button next to a word grabs it for a bulk replace</p></li>
 <li><p><b>Copy masked text</b> replaces every hit from the <b>General</b> list with the mask character (default <code>*</code>) — handy before a manual rewrite. <b>Copy / Save report</b> exports a Chinese report for your records</p></li>
+<li><p>A <b>Masked text</b> card below the results shows the whole text after masking (masked spots are highlighted — hover for the original word and its level) together with the number of spots and characters. Changing the mask character or ticking an extended category recomputes it <b>live</b>, so you can confirm before copying or saving</p></li>
 <li><p>Matching options (loose matching, Latin word boundary, mask character) can be tweaked per session; defaults live in <i>Settings → Misc → Sensitive word check</i></p></li>
 </ul>
 
@@ -125,9 +128,9 @@ const en = `<h2>What this tool does</h2>
 
 <h2>Extended lists (Sensitive-lexicon)</h2>
 <ul>
-<li><p>Beyond the three built-in lists you can tick <b>community lists</b> in the card below (open-source konsheng/Sensitive-lexicon, MIT): tens of thousands of entries <b>grouped by upstream file</b> — politics, subversion, terrorism, guns &amp; explosives, pornography, porn by type, corruption, livelihood, epidemic, ideology, internet censorship, NetEase filter list, Tencent filter list, advertising law, others, supplement and illegal URLs</p></li>
+<li><p>Beyond the three built-in lists you can tick <b>community lists</b> at the top of the <b>General</b> tab (open-source konsheng/Sensitive-lexicon, MIT): tens of thousands of entries <b>grouped by upstream file</b> — politics, subversion, terrorism, guns &amp; explosives, pornography, porn by type, corruption, livelihood, epidemic, ideology, internet censorship, NetEase filter list, Tencent filter list, advertising law, others, supplement and illegal URLs</p></li>
 <li><p>Categories are <b>opt-in</b>: a list is decoded locally only once you tick it (the data is stored XOR + Base64 encoded, so unticked lists are never loaded and the page stays fast). The first tick shows “Decoding word list…”, afterwards matching is instant</p></li>
-<li><p>Hits get an extra <b>category</b> column (hover for the upstream file name) and are counted per category; they also feed <b>masking</b> and the <b>report</b> (which lists the word-list scope)</p></li>
+<li><p>Ticked lists are <b>checked together with the General list</b>: matches end up in the same table (extended rows get a <b>Category</b> column — hover for the upstream file name; built-in rows are marked as built-in) and the level filter and “N matches” counter add up accordingly. Hits also feed <b>masking</b> and the <b>report</b> (which lists the word-list scope)</p></li>
 <li><p>These lists are large and produce <b>more false positives</b> (ordinary words such as 「兼职」 or 「招聘」 are included), so treat them as a <b>second pass</b>: check the context instead of rewriting everything</p></li>
 </ul>
 

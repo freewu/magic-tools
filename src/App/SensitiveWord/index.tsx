@@ -1,8 +1,8 @@
 // 敏感词检测: 粘贴文案即自动检测, 内置「通用 / 小红书 / 微信公众号」三个词库与替换建议,
-// 另可按分类勾选外部扩展词库 (Sensitive-lexicon, 涉政 / 涉恐 / 涉黄 ...)
+// 另可按分类勾选外部扩展词库 (Sensitive-lexicon, 涉政 / 涉恐 / 涉黄 ...), 与「通用」词库融合检查
 import { Alert, AutoComplete, Button, Card, Collapse, Divider, Empty, Input, Radio, Select, Space, Spin, Switch, Table, Tabs, Tag, Tooltip, Typography, message, theme } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { ClearOutlined, CopyOutlined, DownloadOutlined, LinkOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useLocale } from '../../hook/locale-context';
 import { u, uT } from './lang';
@@ -12,8 +12,9 @@ import {
   type BankKey, type Level, type WordMeta,
 } from './data';
 import {
-  getSettings, highlightParts, lineCol, maskCharInput, maskedFileName, maskText, normalizeMaskChar,
-  reportFileName, reportText, scanText, scanWords, textLength, type BankScan, type Hit, type WordStat,
+  fuseScans, getSettings, highlightParts, lineCol, maskCharInput, maskedFileName, maskStats, maskedParts,
+  maskText, normalizeMaskChar, reportFileName, reportText, scanText, scanWords, textLength,
+  type BankScan, type Hit, type ReportGroup, type ScanRow,
 } from './lib';
 import {
   LEXICON_BUILT_AT, LEXICON_CATEGORIES, LEXICON_MAP, LEXICON_SOURCE, LEXICON_TOTAL,
@@ -29,8 +30,8 @@ const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 /** 等级筛选值 */
 type LevelFilter = 'all' | Level;
 
-/** 命中明细行 (扩展词库的表多一列分类) */
-type HitRow = WordStat & { categoryKey?: LexKey };
+/** 命中明细行 (融合扩展词库时, 扩展行多一列分类) */
+type HitRow = ScanRow;
 
 /** 命中高亮底色 (深浅色主题下都清晰) */
 const MARK_BG: Record<Level, string> = {
@@ -99,6 +100,24 @@ const SensitiveWord = () => {
   const lexHitTotal = lexGroups.reduce((n, { scan }) => n + scan.total, 0);
   const lexWordTotal = lexGroups.reduce((n, { scan }) => n + scan.words.length, 0);
 
+  /** 已勾选扩展词库分类的扫描结果 (检测报告 / 融合检查共用) */
+  const extraGroups = useMemo<ReportGroup[]>(
+    () => lexGroups.map(({ key, scan }) => ({ key, label: LEXICON_MAP[key].label, scan })),
+    [ lexGroups ]
+  );
+
+  /**
+   * 融合检查: 「通用」页签把已勾选的扩展词库分类一起算进来
+   * (命中明细合并、扩展行标注分类, 等级计数与命中处数同步叠加)
+   */
+  const commonView = useMemo(() => fuseScans(scans.common, extraGroups), [ scans, extraGroups ]);
+
+  /** 命中所属的扩展词库分类名 (高亮预览的悬停提示用) */
+  const categoryLabel = (hit: Hit): string | undefined => {
+    const key = lexHitCategory.get(hit);
+    return key ? t(LEXICON_MAP[key].label) : undefined;
+  };
+
   /**
    * 勾选扩展词库分类: 首次勾选某分类时才动态 import 词库文件并解码
    * (词表经 XOR + Base64 编码存放, 不勾选就不加载, 避免拖慢工具页)
@@ -131,10 +150,7 @@ const SensitiveWord = () => {
   }, [ locale ]);
 
   /** 检测报告正文 (含已勾选的扩展词库分类) */
-  const reportContent = () => reportText(
-    text, scans, { loose, latinBoundary }, new Date(),
-    lexGroups.map(({ key, scan }) => ({ label: LEXICON_MAP[key].label, scan }))
-  );
+  const reportContent = () => reportText(text, scans, { loose, latinBoundary }, new Date(), extraGroups);
 
   const onSave = async (kind: 'masked' | 'report') => {
     const masked = kind === 'masked';
@@ -151,32 +167,32 @@ const SensitiveWord = () => {
   };
 
   /** 等额命中的等级统计标签 */
-  const levelTags = (scan: BankScan) => LEVEL_ORDER
-    .filter((lv) => scan.counts[lv] > 0)
+  const levelTags = (counts: Record<Level, number>) => LEVEL_ORDER
+    .filter((lv) => counts[lv] > 0)
     .map((lv) => (
       <Tag key={ lv } color={ LEVEL_COLOR[lv] } style={ { marginInlineEnd: 0 } }>
-        { `${t(LEVEL_LABELS[lv])} ${scan.counts[lv]}` }
+        { `${t(LEVEL_LABELS[lv])} ${counts[lv]}` }
       </Tag>
     ));
 
+  /** 预览区外框 (高亮预览 / 打码预览共用) */
+  const PREVIEW_BOX: CSSProperties = {
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word',
+    fontFamily: MONO,
+    fontSize: 13,
+    lineHeight: 1.7,
+    maxHeight: 200,
+    overflow: 'auto',
+    padding: '8px 10px',
+    border: `1px solid ${token.colorBorderSecondary}`,
+    borderRadius: token.borderRadius,
+    background: token.colorFillQuaternary,
+  };
+
   /** 命中高亮预览 (扩展词库的预览会在悬停提示里带上分类) */
   const previewNode = (hits: Hit[], categoryOf?: (hit: Hit) => string | undefined) => (
-    <div
-      className="sw-preview"
-      style={ {
-        whiteSpace: 'pre-wrap',
-        wordBreak: 'break-word',
-        fontFamily: MONO,
-        fontSize: 13,
-        lineHeight: 1.7,
-        maxHeight: 200,
-        overflow: 'auto',
-        padding: '8px 10px',
-        border: `1px solid ${token.colorBorderSecondary}`,
-        borderRadius: token.borderRadius,
-        background: token.colorFillQuaternary,
-      } }
-    >
+    <div className="sw-preview" style={ PREVIEW_BOX }>
       { highlightParts(text, hits).map((part, i) => (part.hit
         ? (
           <mark
@@ -192,7 +208,35 @@ const SensitiveWord = () => {
     </div>
   );
 
-  /** 命中明细表列 (扩展词库的表额外带一列「分类」) */
+  /** 打码效果预览: 被打码的片段标成高亮块, 悬停可看原词 */
+  const maskPreviewNode = () => {
+    const parts = maskedParts(text, maskHits, maskChar);
+    const stat = maskStats(parts);
+    if (stat.spots === 0) {
+      return <Text type="secondary" style={ { fontSize: 12 } }>{ t('文案里没有命中词库的敏感词, 打码后与原文一致') }</Text>;
+    }
+    return (
+      <>
+        <Text>{ tT('打码 {n} 处 / {m} 字', { n: stat.spots, m: stat.chars }) }</Text>
+        <div className="sw-preview sw-mask-preview" style={ PREVIEW_BOX }>
+          { parts.map((part, i) => (part.hit
+            ? (
+              <span
+                key={ i }
+                className={ `sw-mask-fill sw-mask-fill-${part.hit.level}` }
+                title={ `${part.hit.word} · ${t(LEVEL_LABELS[part.hit.level])} · ${part.hit.tip}` }
+                style={ { background: MARK_BG[part.hit.level], color: 'inherit', borderRadius: 2 } }
+              >
+                { part.text }
+              </span>
+            )
+            : <span key={ i }>{ part.text }</span>)) }
+        </div>
+      </>
+    );
+  };
+
+  /** 命中明细表列 (融合扩展词库时额外带一列「分类」, 内置词条标为内置) */
   const wordColumns = (withCategory = false): ColumnsType<HitRow> => {
     const cols: ColumnsType<HitRow> = [
       {
@@ -248,8 +292,11 @@ const SensitiveWord = () => {
         title: t('分类'),
         dataIndex: 'categoryKey',
         width: 120,
-        render: (key: LexKey) => {
-          const category = LEXICON_MAP[key];
+        render: (key?: string) => {
+          if (!key) {
+            return <Tag style={ { marginInlineEnd: 0 } }>{ t('内置') }</Tag>;
+          }
+          const category = LEXICON_MAP[key as LexKey];
           return (
             <Tooltip title={ tT('来源: 上游文件 {file}', { file: category?.file ?? '' }) }>
               <Tag style={ { marginInlineEnd: 0 } }>{ t(category?.label ?? key) }</Tag>
@@ -261,11 +308,81 @@ const SensitiveWord = () => {
     ];
   };
 
-  /** 词库页签内容: 高亮预览 + 等级筛选 + 命中明细 + 词库预览 */
+  /** 融合检查: 「通用」页签内的扩展词库选择 (勾选后才动态加载解码) */
+  const lexiconPicker = () => (
+    <Space direction="vertical" size={ 6 } style={ { width: '100%' } }>
+      <Space wrap size={ 8 }>
+        <Select
+          className="sw-lexicon-select"
+          mode="multiple"
+          allowClear
+          size="small"
+          style={ { minWidth: 340, maxWidth: '100%' } }
+          placeholder={ t('选择扩展词库分类 (可多选)') }
+          value={ lexKeys }
+          onChange={ (v: LexKey[]) => onLexKeysChange(v) }
+          maxTagCount="responsive"
+          optionFilterProp="label"
+          options={ LEVEL_ORDER.map((lv) => ({
+            label: `${t(LEVEL_LABELS[lv])} ${lexCountOf(lv)}`,
+            options: LEXICON_CATEGORIES.filter((c) => c.level === lv).map((c) => ({
+              value: c.key,
+              label: `${t(c.label)} (${c.count})`,
+            })),
+          })) }
+        />
+        <Button className="sw-lexicon-all" size="small" onClick={ () => onLexKeysChange(LEXICON_CATEGORIES.map((c) => c.key)) }>{ t('全选') }</Button>
+        <Button className="sw-lexicon-reset" size="small" onClick={ () => onLexKeysChange([]) } disabled={ lexKeys.length === 0 }>{ t('清空选择') }</Button>
+        { lexLoading
+          ? <Space size={ 6 }><Spin size="small" /><Text type="secondary" style={ { fontSize: 12 } }>{ t('正在解码词表…') }</Text></Space>
+          : null }
+        <Tooltip title={ t('词库来自开源项目 konsheng/Sensitive-lexicon (MIT), 已按上游文件分类整理, 词表编码存放') }>
+          <Button
+            className="sw-lexicon-source"
+            type="link"
+            size="small"
+            icon={ <LinkOutlined /> }
+            onClick={ () => { void openUrl(LEXICON_SOURCE); } }
+          >
+            { t('词库来源') }
+          </Button>
+        </Tooltip>
+      </Space>
+
+      <Text type="secondary" style={ { fontSize: 12 } }>
+        { tT('扩展词库 (社区词库, 按上游文件分类): {n} 个分类 / 共 {m} 条词条; 勾选后与「通用」词库一起自检, 命中明细多一列「分类」并计入打码与报告; 收录量大且含少量误报, 按需勾选', {
+          n: LEXICON_CATEGORIES.length,
+          m: LEXICON_TOTAL,
+        }) }
+      </Text>
+
+      { lexError ? <Alert className="sw-lexicon-error" type="error" showIcon message={ lexError } /> : null }
+
+      { lexKeys.length > 0 ? (
+        <Space wrap size={ 8 }>
+          <Text>
+            { lexHitTotal === 0
+              ? t('未命中已选分类')
+              : tT('扩展词库命中 {hits} 处 / {words} 个词', { hits: lexHitTotal, words: lexWordTotal }) }
+          </Text>
+          { lexGroups.filter(({ scan }) => scan.total > 0).map(({ key, scan }) => (
+            <Tag key={ key } color={ LEVEL_COLOR[LEXICON_MAP[key].level] } style={ { marginInlineEnd: 0 } }>
+              { `${t(LEXICON_MAP[key].label)} ${scan.total}` }
+            </Tag>
+          )) }
+        </Space>
+      ) : null }
+    </Space>
+  );
+
+  /** 词库页签内容: (通用: 扩展词库选择) + 高亮预览 + 等级筛选 + 命中明细 + 词库预览 */
   const bankPanel = (key: BankKey) => {
     const scan = scans[key];
-    const hits = level === 'all' ? scan.hits : scan.hits.filter((h) => h.level === level);
-    const rows = level === 'all' ? scan.words : scan.words.filter((w) => w.level === level);
+    // 「通用」页签融合已勾选的扩展词库分类, 扩展行在明细表里带分类
+    const fused = key === 'common' && extraGroups.length > 0;
+    const view = key === 'common' ? commonView : scan;
+    const hits = level === 'all' ? view.hits : view.hits.filter((h) => h.level === level);
+    const rows = (level === 'all' ? view.words : view.words.filter((w) => w.level === level)) as HitRow[];
     const bankWords: typeof scan.words = [];
     const matched = new Map(scan.words.map((w) => [ w.word.toLowerCase(), w ]));
     SENSITIVE_BANKS[key].forEach((meta) => {
@@ -280,39 +397,43 @@ const SensitiveWord = () => {
 
     return (
       <Space direction="vertical" size={ 12 } style={ { width: '100%' } }>
-        { previewNode(hits) }
+        { key === 'common' ? lexiconPicker() : null }
+
+        { previewNode(hits, key === 'common' ? categoryLabel : undefined) }
 
         <Radio.Group
           size="small"
           value={ level }
           onChange={ (e) => setLevel(e.target.value as LevelFilter) }
           options={ [
-            { value: 'all', label: `${t('全部')} (${scan.total})` },
-            ...LEVEL_ORDER.map((lv) => ({ value: lv, label: `${t(LEVEL_LABELS[lv])} (${scan.counts[lv]})` })),
+            { value: 'all', label: `${t('全部')} (${view.total})` },
+            ...LEVEL_ORDER.map((lv) => ({ value: lv, label: `${t(LEVEL_LABELS[lv])} (${view.counts[lv]})` })),
           ] }
         />
 
         <Table
           className="sw-table"
           size="small"
-          rowKey="word"
+          rowKey={ fused ? (row: HitRow) => (row.categoryKey ? `${row.categoryKey}-${row.word}` : `builtin-${row.word}`) : 'word' }
           dataSource={ rows }
           pagination={ false }
-          scroll={ { x: 760 } }
+          scroll={ { x: fused ? 880 : 760 } }
           locale={ {
             emptyText: (
               <Empty
                 image={ Empty.PRESENTED_IMAGE_SIMPLE }
                 description={ (
                   <Space direction="vertical" size={ 2 }>
-                    <Text>{ t('未命中该词库的敏感词') }</Text>
-                    <Text type="secondary" style={ { fontSize: 12 } }>{ t('换个词库试试, 或检查文案是否需要放宽松') }</Text>
+                    <Text>{ t(fused ? '未命中已选分类的敏感词' : '未命中该词库的敏感词') }</Text>
+                    <Text type="secondary" style={ { fontSize: 12 } }>
+                      { t(fused ? '外部词库误报较多, 命中后请结合语境核实' : '换个词库试试, 或检查文案是否需要放宽松') }
+                    </Text>
                   </Space>
                 ) }
               />
             ),
           } }
-          columns={ wordColumns() }
+          columns={ wordColumns(fused) }
         />
 
         <Collapse
@@ -395,7 +516,8 @@ const SensitiveWord = () => {
           </Tooltip>
         </Space>
         <Text type="secondary" style={ { fontSize: 12 } }>
-          { `${tT('共 {n} 字', { n: textLength(text) })} · ${tT('命中 {n} 处', { n: scans.common.total })}` }
+          { `${tT('共 {n} 字', { n: textLength(text) })} · ${tT('命中 {n} 处', { n: commonView.total })}`
+            + (commonView.extraHits > 0 ? ` (${tT('含扩展词库 {n} 处', { n: commonView.extraHits })})` : '') }
         </Text>
       </div>
 
@@ -415,28 +537,37 @@ const SensitiveWord = () => {
         />
       ) : (
         <>
-          {/* 词库概览: 点击卡片即切到对应页签 */}
+          {/* 词库概览: 点击卡片即切到对应页签; 「通用」融合已勾选的扩展词库 */}
           <div style={ { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 } }>
-            { BANK_KEYS.map((key) => (
-              <Card
-                key={ key }
-                className="sw-card"
-                size="small"
-                hoverable
-                onClick={ () => setBank(key) }
-                style={ { borderColor: bank === key ? token.colorPrimary : undefined } }
-              >
-                <Space direction="vertical" size={ 4 }>
-                  <Text strong>{ t(BANK_LABELS[key]) }</Text>
-                  <Text type="secondary" style={ { fontSize: 12 } }>
-                    { scans[key].total === 0
-                      ? t('未命中')
-                      : tT('命中 {hits} 处 / {words} 个词', { hits: scans[key].total, words: scans[key].words.length }) }
-                  </Text>
-                  <Space size={ 4 } wrap>{ levelTags(scans[key]) }</Space>
-                </Space>
-              </Card>
-            )) }
+            { BANK_KEYS.map((key) => {
+              const view = key === 'common' ? commonView : scans[key];
+              return (
+                <Card
+                  key={ key }
+                  className="sw-card"
+                  size="small"
+                  hoverable
+                  onClick={ () => setBank(key) }
+                  style={ { borderColor: bank === key ? token.colorPrimary : undefined } }
+                >
+                  <Space direction="vertical" size={ 4 }>
+                    <Space size={ 4 } wrap>
+                      <Text strong>{ t(BANK_LABELS[key]) }</Text>
+                      { key === 'common' && lexKeys.length > 0
+                        ? <Tag color={ token.colorPrimary } style={ { marginInlineEnd: 0 } }>{ tT('已融合扩展词库 {n} 个分类', { n: lexKeys.length }) }</Tag>
+                        : null }
+                    </Space>
+                    <Text type="secondary" style={ { fontSize: 12 } }>
+                      { view.total === 0
+                        ? t('未命中')
+                        : tT('命中 {hits} 处 / {words} 个词', { hits: view.total, words: view.words.length }) }
+                      { key === 'common' && commonView.extraHits > 0 ? ` · ${tT('含扩展词库 {n} 处', { n: commonView.extraHits })}` : '' }
+                    </Text>
+                    <Space size={ 4 } wrap>{ levelTags(view.counts) }</Space>
+                  </Space>
+                </Card>
+              );
+            }) }
           </div>
 
           {/* 各平台词库明细 */}
@@ -447,124 +578,48 @@ const SensitiveWord = () => {
             onChange={ (key) => setBank(key as BankKey) }
             items={ BANK_KEYS.map((key) => ({
               key,
-              label: `${t(BANK_LABELS[key])} (${scans[key].total})`,
+              label: `${t(BANK_LABELS[key])} (${key === 'common' ? commonView.total : scans[key].total})`,
               children: key === bank ? bankPanel(key) : null,
             })) }
           />
+
+          {/* 打码效果预览: 按通用词库 + 已勾选扩展词库分类打码 */}
+          <Card
+            className="sw-mask-card"
+            size="small"
+            style={ { marginTop: 12 } }
+            title={ (
+              <Space size={ 8 } wrap>
+                <Text strong>{ t('打码预览') }</Text>
+                <Text type="secondary" style={ { fontSize: 12 } }>
+                  { lexKeys.length > 0
+                    ? tT('按通用词库 + 已勾选扩展词库分类打码, 打码字符: {ch}', { ch: normalizeMaskChar(maskChar) })
+                    : tT('按通用词库打码, 打码字符: {ch}', { ch: normalizeMaskChar(maskChar) }) }
+                </Text>
+              </Space>
+            ) }
+            extra={ (
+              <Tooltip title={ t('复制打码文本') }>
+                <Button
+                  className="sw-mask-copy"
+                  size="small"
+                  icon={ <CopyOutlined /> }
+                  onClick={ () => { void copy(maskText(text, maskHits, maskChar), t('已复制打码文本')); } }
+                >
+                  { t('复制结果') }
+                </Button>
+              </Tooltip>
+            ) }
+          >
+            <Space direction="vertical" size={ 8 } style={ { width: '100%' } }>
+              <Text type="secondary" style={ { fontSize: 12 } }>
+                { tT('原文共 {n} 字', { n: textLength(text) }) }
+              </Text>
+              { maskPreviewNode() }
+            </Space>
+          </Card>
         </>
       ) }
-
-      {/* 扩展词库 (Sensitive-lexicon): 按上游文件分类, 勾选后动态加载解码 */}
-      <Card
-        className="sw-lexicon"
-        size="small"
-        style={ { marginTop: 12 } }
-        title={ (
-          <Space size={ 8 } wrap>
-            <Text strong>{ t('扩展词库') }</Text>
-            <Text type="secondary" style={ { fontSize: 12 } }>
-              { tT('{n} 个分类 / 共 {m} 条词条', { n: LEXICON_CATEGORIES.length, m: LEXICON_TOTAL }) }
-            </Text>
-          </Space>
-        ) }
-        extra={ (
-          <Tooltip title={ t('词库来自开源项目 konsheng/Sensitive-lexicon (MIT), 已按上游文件分类整理, 词表编码存放') }>
-            <Button
-              className="sw-lexicon-source"
-              type="link"
-              size="small"
-              icon={ <LinkOutlined /> }
-              onClick={ () => { void openUrl(LEXICON_SOURCE); } }
-            >
-              { t('词库来源') }
-            </Button>
-          </Tooltip>
-        ) }
-      >
-        <Space direction="vertical" size={ 10 } style={ { width: '100%' } }>
-          <Text type="secondary" style={ { fontSize: 12 } }>
-            { t('社区词库按上游文件分类 (涉政 / 涉恐 / 涉黄 ...), 收录量大且含少量误报, 按需勾选; 命中会标注分类, 并计入打码与检测报告') }
-          </Text>
-
-          <Space wrap size={ 8 }>
-            <Select
-              className="sw-lexicon-select"
-              mode="multiple"
-              allowClear
-              size="small"
-              style={ { minWidth: 340, maxWidth: '100%' } }
-              placeholder={ t('选择分类 (可多选)') }
-              value={ lexKeys }
-              onChange={ (v: LexKey[]) => onLexKeysChange(v) }
-              maxTagCount="responsive"
-              optionFilterProp="label"
-              options={ LEVEL_ORDER.map((lv) => ({
-                label: `${t(LEVEL_LABELS[lv])} ${lexCountOf(lv)}`,
-                options: LEXICON_CATEGORIES.filter((c) => c.level === lv).map((c) => ({
-                  value: c.key,
-                  label: `${t(c.label)} (${c.count})`,
-                })),
-              })) }
-            />
-            <Button className="sw-lexicon-all" size="small" onClick={ () => onLexKeysChange(LEXICON_CATEGORIES.map((c) => c.key)) }>{ t('全选') }</Button>
-            <Button className="sw-lexicon-reset" size="small" onClick={ () => onLexKeysChange([]) } disabled={ lexKeys.length === 0 }>{ t('清空选择') }</Button>
-            { lexLoading
-              ? <Space size={ 6 }><Spin size="small" /><Text type="secondary" style={ { fontSize: 12 } }>{ t('正在解码词表…') }</Text></Space>
-              : null }
-          </Space>
-
-          { lexError ? <Alert className="sw-lexicon-error" type="error" showIcon message={ lexError } /> : null }
-
-          { lexKeys.length === 0 ? (
-            <Text type="secondary" style={ { fontSize: 12 } }>{ t('勾选分类后, 命中的词条会按分类列在下方') }</Text>
-          ) : (
-            <>
-              <Space wrap size={ 8 }>
-                <Text>
-                  { lexHitTotal === 0
-                    ? t('未命中已选分类')
-                    : tT('命中 {hits} 处 / {words} 个词', { hits: lexHitTotal, words: lexWordTotal }) }
-                </Text>
-                { lexGroups.filter(({ scan }) => scan.total > 0).map(({ key, scan }) => (
-                  <Tag key={ key } color={ LEVEL_COLOR[LEXICON_MAP[key].level] } style={ { marginInlineEnd: 0 } }>
-                    { `${t(LEXICON_MAP[key].label)} ${scan.total}` }
-                  </Tag>
-                )) }
-              </Space>
-
-              { lexHitTotal > 0
-                ? previewNode(lexHits, (hit) => {
-                  const key = lexHitCategory.get(hit);
-                  return key ? t(LEXICON_MAP[key].label) : undefined;
-                })
-                : null }
-
-              <Table
-                className="sw-lexicon-table"
-                size="small"
-                rowKey={ (row: HitRow) => `${row.categoryKey}-${row.word}` }
-                dataSource={ lexGroups.flatMap(({ key, scan }) => scan.words.map((w) => ({ ...w, categoryKey: key }))) }
-                pagination={ false }
-                scroll={ { x: 880 } }
-                locale={ {
-                  emptyText: (
-                    <Empty
-                      image={ Empty.PRESENTED_IMAGE_SIMPLE }
-                      description={ (
-                        <Space direction="vertical" size={ 2 }>
-                          <Text>{ t('未命中已选分类的敏感词') }</Text>
-                          <Text type="secondary" style={ { fontSize: 12 } }>{ t('外部词库误报较多, 命中后请结合语境核实') }</Text>
-                        </Space>
-                      ) }
-                    />
-                  ),
-                } }
-                columns={ wordColumns(true) }
-              />
-            </>
-          ) }
-        </Space>
-      </Card>
 
       <Divider>{ t(' 敏感词检测说明 ') }</Divider>
       <SensitiveWordIntro />

@@ -90,6 +90,21 @@ const uilangRows: Record<string, [ string, string ]> = {
   ],
   '命中高亮': [ '命中高亮', 'Highlighted text' ],
   '打码预览': [ '打碼預覽', 'Masked text' ],
+  '复制结果': [ '複製結果', 'Copy result' ],
+  '按通用词库打码, 打码字符: {ch}': [
+    '按通用詞庫打碼, 打碼字元: {ch}',
+    'Masked with the General list — mask character: {ch}',
+  ],
+  '按通用词库 + 已勾选扩展词库分类打码, 打码字符: {ch}': [
+    '按通用詞庫 + 已勾選擴展詞庫分類打碼, 打碼字元: {ch}',
+    'Masked with the General list plus the extended categories you ticked — mask character: {ch}',
+  ],
+  '原文共 {n} 字': [ '原文共 {n} 字', 'Original: {n} characters' ],
+  '打码 {n} 处 / {m} 字': [ '打碼 {n} 處 / {m} 字', '{n} spots masked / {m} characters' ],
+  '文案里没有命中词库的敏感词, 打码后与原文一致': [
+    '文案裡沒有命中詞庫的敏感詞, 打碼後與原文一致',
+    'No word from the selected lists was found — the masked text equals the original',
+  ],
   '词库预览': [ '詞庫預覽', 'Word list' ],
   '共 {n} 条词条, 命中的词条排在最前': [
     '共 {n} 條詞條, 命中的詞條排在最前',
@@ -110,25 +125,26 @@ const uilangRows: Record<string, [ string, string ]> = {
   ],
 
   // 扩展词库 (Sensitive-lexicon)
-  '扩展词库': [ '擴展詞庫', 'Extended lists' ],
-  '{n} 个分类 / 共 {m} 条词条': [ '{n} 個分類 / 共 {m} 條詞條', '{n} categories / {m} entries' ],
+  '扩展词库 (社区词库, 按上游文件分类): {n} 个分类 / 共 {m} 条词条; 勾选后与「通用」词库一起自检, 命中明细多一列「分类」并计入打码与报告; 收录量大且含少量误报, 按需勾选': [
+    '擴展詞庫 (社區詞庫, 按上游檔案分類): {n} 個分類 / 共 {m} 條詞條; 勾選後與「通用」詞庫一起自檢, 命中明細多一列「分類」並計入打碼與報告; 收錄量大且含少量誤報, 按需勾選',
+    'Extended lists (community, grouped by upstream file): {n} categories / {m} entries. Tick any to include them in the General check — match details gain a Category column and hits count towards masking and the report. Large with some false positives, tick as needed',
+  ],
+  '选择扩展词库分类 (可多选)': [ '選擇擴展詞庫分類 (可多選)', 'Pick extended categories (multi)' ],
+  '扩展词库命中 {hits} 处 / {words} 个词': [
+    '擴展詞庫命中 {hits} 處 / {words} 個詞',
+    'Extended lists: {hits} matches / {words} words',
+  ],
+  '已融合扩展词库 {n} 个分类': [ '已融合擴展詞庫 {n} 個分類', 'merged with {n} extended categories' ],
+  '含扩展词库 {n} 处': [ '含擴展詞庫 {n} 處', 'incl. {n} from the extended lists' ],
+  '内置': [ '內置', 'Built-in' ],
   '词库来源': [ '詞庫來源', 'Source' ],
   '词库来自开源项目 konsheng/Sensitive-lexicon (MIT), 已按上游文件分类整理, 词表编码存放': [
     '詞庫來自開源專案 konsheng/Sensitive-lexicon (MIT), 已按上游檔案分類整理, 詞表編碼存放',
     'From the open-source konsheng/Sensitive-lexicon (MIT); grouped by upstream file, stored encoded',
   ],
-  '社区词库按上游文件分类 (涉政 / 涉恐 / 涉黄 ...), 收录量大且含少量误报, 按需勾选; 命中会标注分类, 并计入打码与检测报告': [
-    '社區詞庫按上游檔案分類 (涉政 / 涉恐 / 涉黃 ...), 收錄量大且含少量誤報, 按需勾選; 命中會標註分類, 並計入打碼與檢測報告',
-    'A community list grouped by upstream file (politics / terrorism / porn ...). Large with some false positives — tick what you need; hits are labelled with their category and counted in masking and the report',
-  ],
-  '选择分类 (可多选)': [ '選擇分類 (可多選)', 'Pick categories (multi)' ],
+  '正在解码词表…': [ '正在解碼詞表…', 'Decoding word list…' ],
   '全选': [ '全選', 'Select all' ],
   '清空选择': [ '清空選擇', 'Clear selection' ],
-  '正在解码词表…': [ '正在解碼詞表…', 'Decoding word list…' ],
-  '勾选分类后, 命中的词条会按分类列在下方': [
-    '勾選分類後, 命中的詞條會按分類列在下方',
-    'Tick some categories — matches will be listed below by category',
-  ],
   '未命中已选分类': [ '未命中已選分類', 'No match in the selected categories' ],
   '未命中已选分类的敏感词': [ '未命中已選分類的敏感詞', 'No word from the selected categories was found' ],
   '外部词库误报较多, 命中后请结合语境核实': [
