@@ -1,3 +1,31 @@
+# MagicTools v2.23.2
+
+## 更新内容
+
+### 🛠 体验优化
+
+- 「**Mermaid 编辑器**」渲染引擎由 **mermaid** 换成 **pele**（[pele.run](https://pele.run/)，零依赖的单文件绘图引擎，语法对齐 Mermaid 12.1.0）：内置示例仍是 **32 种图形**（流程图 / 时序图 / 类图 / 状态图 / ER 图 / 思维导图 / 用户旅程图 / C4 图 / 架构图 / 块图 / 需求图 / 饼图 / 象限图 / XY 图 / 桑基图 / 雷达图 / 矩形树图 / 韦恩图 / 数据包图 / 甘特图 / Git 分支图 / 时间线 / 看板 / 鱼骨图 / Cynefin 框架 / Wardley 地图 / 事件建模 / 目录树 / 铁路语法图），渲染改为同步调用，且不再直接依赖 mermaid（首屏也随之少下载一个引擎）
+- 「**Mermaid 编辑器**」**图表配色跟随「背景」**：选「白色」用浅色配色、选「深色」用深色配色、选「透明」跟随应用的浅色 / 深色模式；配色以 CSS 变量写进 SVG 根节点，**切换背景不再重新渲染**，导出的 SVG 在别处打开也是同一套颜色
+- 「**Mermaid 编辑器**」**错误提示按类型分类**：语法错误 / 图表内容有误 / 图形过大或嵌套过深 / 无法识别图形类型 / 渲染失败（引擎加载失败），并给出「**第 N 行, 第 M 列**」定位，修正后自动恢复预览
+- 「**Mermaid 编辑器**」**安全与隐私**：图表里的 HTML 标签一律按纯文本渲染（不会执行脚本），图表内的**链接与外部图片默认不生效**（点击不跳转、不发起网络请求），渲染全程在本机完成；需求图 `text` 字段中文需加引号、桑基图节点标签只能 ASCII 等语法限制已在说明里注明
+- 「**Mermaid 编辑器**」说明与示例文案同步到新引擎（pele 自身还支持用例图、泳道图、Agentflow、信息图等，本工具未收录示例；ZenUML 等外挂插件图形与 `flowchart-elk` 的 ELK 布局不受支持）
+- 帮助页「使用组件」把 **Mermaid 11.17.2** 换为 **Pele 1.6.0**（「白板」的 Mermaid 转 Excalidraw 仍使用 mermaid，只是不再由本工具直接依赖）
+
+### 🐛 修复
+
+- 修复首屏**白预载 3.6MB mermaid chunk**（gzip 979KB）：Vite 8（rolldown）会把 `manualChunks` 迁移成单个分组，Vite 注入的 `__vitePreload` 助手（`\0vite/preload-helper.js`）会被并入 `vendor-mermaid`，使入口静态依赖该 chunk，于是每次打开都要先下载一个整页用不到的 mermaid。改用 rolldown 原生 `codeSplitting.groups` + `priority`（语义等价于原 `manualChunks` 的「先 return 先生效」，但归组结果确定）：助手固定到已预载的小 chunk `vendor-react`，`vendor-mermaid` 回归纯按需 chunk（仅「白板」的 Mermaid 转 Excalidraw 使用）
+
+### 🛠 工程 / CI
+
+- 新增 `vendor-pele` 分包（仅在打开「Mermaid 编辑器」时按需拉取）；删除手写的 `src/types/mermaid.d.ts`（pele 自带类型声明）
+- 分包兜底组 `vendor-misc` 显式排除 excalidraw / shiki 语言包 / svgo.browser / vtracer-wasm，保住它们原有的自动拆分与懒加载行为（否则 misc 会从 1.2MB 膨胀到 5.9MB 并被入口静态引用）
+- 首屏 `modulepreload` 预载 gzip 总量 **1523KB → 585KB**；chunk 数量（820 → 821）与产物总体积不变
+- 全量单元测试 **3753 → 3760** 条（360 个测试文件全绿）
+
+### 📊 页面总数
+
+- 工具总数保持 **151**，系统级页面保持 4
+
 # MagicTools v2.23.1
 
 ## 更新内容

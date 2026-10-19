@@ -83,6 +83,39 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-10-19 V2.23.2 Release", "2026-10-19 V2.23.2 Release", "2026-10-19 V2.23.2 Release"),
+    items: trio(
+      [
+        "「Mermaid 编辑器」渲染引擎由 mermaid 换成 pele (pele.run, 零依赖的单文件绘图引擎, 语法对齐 Mermaid 12.1.0): 内置示例仍是 32 种图形 (流程图 / 时序图 / 类图 / 状态图 / ER 图 / 思维导图 / 用户旅程图 / C4 图 / 架构图 / 块图 / 需求图 / 饼图 / 象限图 / XY 图 / 桑基图 / 雷达图 / 矩形树图 / 韦恩图 / 数据包图 / 甘特图 / Git 分支图 / 时间线 / 看板 / 鱼骨图 / Cynefin 框架 / Wardley 地图 / 事件建模 / 目录树 / 铁路语法图), 渲染改为同步调用, 且不再直接依赖 mermaid (首屏也随之少下载一个引擎)",
+        "「Mermaid 编辑器」图表配色跟随「背景」: 选「白色」用浅色配色、选「深色」用深色配色、选「透明」跟随应用的浅色 / 深色模式; 配色以 CSS 变量写进 SVG 根节点, 切换背景不再重新渲染, 导出的 SVG 在别处打开也是同一套颜色",
+        "「Mermaid 编辑器」错误提示按类型分类 (语法错误 / 图表内容有误 / 图形过大或嵌套过深 / 无法识别图形类型 / 渲染失败即引擎加载失败), 并给出「第 N 行, 第 M 列」定位, 修正后自动恢复预览; 安全与隐私: 图表里的 HTML 标签一律按纯文本渲染 (不执行脚本), 图表内的链接与外部图片默认不生效 (点击不跳转、不发起网络请求), 渲染全程在本机完成",
+        "「Mermaid 编辑器」说明与示例文案同步到新引擎 (pele 自身还支持用例图、泳道图、Agentflow、信息图等, 本工具未收录示例; ZenUML 等外挂插件图形与 flowchart-elk 的 ELK 布局不受支持); 需求图 text 字段中文需加引号、桑基图节点标签只能 ASCII 等语法限制已在说明里注明",
+        "帮助页「使用组件」把 Mermaid 11.17.2 换为 Pele 1.6.0 (「白板」的 Mermaid 转 Excalidraw 仍使用 mermaid, 只是不再由本工具直接依赖)",
+        "修复首屏白预载 3.6MB mermaid chunk (gzip 979KB): Vite 8 (rolldown) 会把 manualChunks 迁移成单个分组, Vite 注入的 __vitePreload 助手 (\\0vite/preload-helper.js) 会被并入 vendor-mermaid, 使入口静态依赖该 chunk; 改用 rolldown 原生 codeSplitting.groups + priority (语义等价于原 manualChunks) 后助手固定到已预载的小 chunk vendor-react, vendor-mermaid 回归纯按需 chunk (仅白板的 Mermaid 转 Excalidraw 使用); 首屏 modulepreload 预载 gzip 总量 1523KB → 585KB",
+        "工程: 新增 vendor-pele 分包 (仅在打开「Mermaid 编辑器」时按需拉取), 删除手写的 src/types/mermaid.d.ts (pele 自带类型声明), 分包兜底组 vendor-misc 显式排除 excalidraw / shiki 语言包 / svgo.browser / vtracer-wasm 以保住原有懒加载 (否则 misc 会从 1.2MB 膨胀到 5.9MB 并被入口静态引用); 全量测试 3753 → 3760 条; 工具总数保持 151",
+      ],
+      [
+        "「Mermaid 編輯器」渲染引擎由 mermaid 換成 pele (pele.run, 零相依的單檔繪圖引擎, 語法對齊 Mermaid 12.1.0): 內建範例仍是 32 種圖形 (流程圖 / 時序圖 / 類別圖 / 狀態圖 / ER 圖 / 思維導圖 / 使用者旅程圖 / C4 圖 / 架構圖 / 區塊圖 / 需求圖 / 圓餅圖 / 象限圖 / XY 圖 / 桑基圖 / 雷達圖 / 矩形樹狀圖 / 韋恩圖 / 封包圖 / 甘特圖 / Git 分支圖 / 時間軸 / 看板 / 魚骨圖 / Cynefin 框架 / Wardley 地圖 / 事件建模 / 目錄樹 / 鐵路語法圖), 渲染改為同步呼叫, 且不再直接相依 mermaid (首屏也隨之少下載一個引擎)",
+        "「Mermaid 編輯器」圖表配色跟隨「背景」: 選「白色」用淺色配色、選「深色」用深色配色、選「透明」跟隨應用程式的淺色 / 深色模式; 配色以 CSS 變數寫進 SVG 根節點, 切換背景不再重新渲染, 匯出的 SVG 在別處開啟也是同一套顏色",
+        "「Mermaid 編輯器」錯誤提示依類型分類 (語法錯誤 / 圖表內容有誤 / 圖形過大或巢狀過深 / 無法識別圖形類型 / 渲染失敗即引擎載入失敗), 並給出「第 N 行, 第 M 列」定位, 修正後自動恢復預覽; 安全與隱私: 圖表中的 HTML 標籤一律按純文字渲染 (不執行腳本), 圖表內的連結與外部圖片預設不生效 (點擊不跳轉、不發起網路請求), 渲染全程在本機完成",
+        "「Mermaid 編輯器」說明與範例文案同步到新引擎 (pele 本身還支援用例圖、泳道圖、Agentflow、資訊圖等, 本工具未收錄範例; ZenUML 等外掛圖形與 flowchart-elk 的 ELK 佈局不受支援); 需求圖 text 欄位中文需加引號、桑基圖節點標籤只能 ASCII 等語法限制已在說明裡註明",
+        "說明頁「使用元件」把 Mermaid 11.17.2 換為 Pele 1.6.0 (「白板」的 Mermaid 轉 Excalidraw 仍使用 mermaid, 只是不再由本工具直接相依)",
+        "修正首屏白預載 3.6MB mermaid chunk (gzip 979KB): Vite 8 (rolldown) 會把 manualChunks 遷移成單一分組, Vite 注入的 __vitePreload 助手 (\\0vite/preload-helper.js) 會被併入 vendor-mermaid, 使入口靜態相依該 chunk; 改用 rolldown 原生 codeSplitting.groups + priority (語意等於原 manualChunks) 後助手固定到已預載的小 chunk vendor-react, vendor-mermaid 回歸純按需 chunk (僅白板的 Mermaid 轉 Excalidraw 使用); 首屏 modulepreload 預載 gzip 總量 1523KB → 585KB",
+        "工程: 新增 vendor-pele 分包 (僅在開啟「Mermaid 編輯器」時按需載入), 刪除手寫的 src/types/mermaid.d.ts (pele 自帶型別宣告), 分包兜底組 vendor-misc 明確排除 excalidraw / shiki 語言包 / svgo.browser / vtracer-wasm 以保住原有延遲載入 (否則 misc 會從 1.2MB 膨脹到 5.9MB 並被入口靜態引用); 全量測試 3753 → 3760 筆; 工具總數保持 151",
+      ],
+      [
+        "The Mermaid editor now renders with pele (pele.run, a dependency-free single-file diagram engine whose syntax tracks Mermaid 12.1.0) instead of mermaid: the 32 built-in samples are unchanged (flowchart / sequence / class / state / ER / mind map / user journey / C4 / architecture / block / requirement / pie / quadrant / XY / sankey / radar / treemap / Venn / packet / Gantt / Git graph / timeline / kanban / fishbone / Cynefin / Wardley map / event modelling / tree view / railroad), rendering is now synchronous, and mermaid is no longer a direct dependency (so the first screen no longer downloads an engine it never uses)",
+        "Mermaid editor: the diagram palette now follows “Background” — White uses the light palette, Dark uses the dark one and Transparent follows the app's light/dark mode; the palette is written into the SVG root as CSS variables, so switching the background no longer re-renders, and an exported SVG keeps exactly the colours you saw",
+        "Mermaid editor: error messages are now classified (syntax error / invalid diagram content / diagram too large or too deeply nested / diagram type not recognized / render failed, i.e. the engine failed to load) and carry a “Line N, column M” position, with the preview recovering automatically once fixed; safety and privacy: HTML inside diagrams is rendered as plain text (never executed) and links plus external images in diagrams are inert (no navigation, no network request) — everything is rendered locally",
+        "Mermaid editor: the help text and samples were rewritten for the new engine (pele itself also supports use case, swimlane, Agentflow and infographic diagrams, none of which ship as samples here; ZenUML-style plugin diagrams and the flowchart-elk ELK layout are not supported), and syntax limits such as quoting Chinese text in a requirementDiagram text field or ASCII-only sankey node labels are now documented",
+        "Help page: the component list now shows Pele 1.6.0 instead of Mermaid 11.17.2 (the Whiteboard's Mermaid-to-Excalidraw still uses mermaid — it is just no longer a direct dependency of this tool)",
+        "Fixed the 3.6 MB (979 KB gzipped) mermaid chunk that was preloaded on the first screen: Vite 8 (rolldown) migrates manualChunks into a single group, which swallowed Vite's __vitePreload helper (\\0vite/preload-helper.js) into vendor-mermaid, making the entry statically depend on it. Using rolldown's native codeSplitting.groups with priority (equivalent to the old manualChunks, but deterministic) pins the helper to the already-preloaded vendor-react and turns vendor-mermaid back into a pure on-demand chunk (used only by the Whiteboard's Mermaid-to-Excalidraw); the first-screen modulepreload dropped from 1523 KB to 585 KB gzipped",
+        "Engineering: added a vendor-pele chunk (fetched only when the Mermaid editor opens), deleted the hand-written src/types/mermaid.d.ts (pele ships its own types), and excluded excalidraw / Shiki language packs / svgo.browser / vtracer-wasm from the vendor-misc catch-all to keep their lazy loading intact (without it vendor-misc would grow from 1.2 MB to 5.9 MB and become an entry dependency); the full suite went from 3753 to 3760 tests and the tool count stays at 151",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-10-15 V2.23.1 Release", "2026-10-15 V2.23.1 Release", "2026-10-15 V2.23.1 Release"),
     items: trio(
       [
