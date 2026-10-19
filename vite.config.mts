@@ -174,92 +174,66 @@ export default defineConfig({
         defaultHandler(warning);
       },
       output: {
-        // 手动分包: 主入口 (layout/App 注册表) 只留业务骨架,
-        // 框架/UI/工具依赖拆成独立 vendor chunk, 供懒加载页面按需复用
-        manualChunks(id) {
-          // Vite 注入的 __vitePreload 助手 (\0vite/preload-helper.js) 被入口与所有按需 chunk 共享:
-          // 必须固定到入口已预载的小 chunk, 否则打包器会把它并入某个大按需 chunk
-          // (Rollup 实测并入 vendor-mermaid), 使该 chunk 变成入口静态依赖 → 首屏被全量预载
-          // (Vite 8 / Rolldown 同样会下发该模块, 规则继续生效)
-          if (id.includes('vite/preload-helper')) {
-            return 'vendor-react';
-          }
-          // 各工具的 lang.ts 被入口注册表 (lang-packs) 静态引用, 同时也是对应工具页的依赖:
-          // Rolldown (Vite 8) 会为每个这类共享模块单独出包, 使入口 modulepreload 从十几个
-          // 涨到 150+, 首屏变成上百个并发小请求 (碎片化); 固定成一个 chunk 后仅多一次请求,
-          // 与 Vite 5/Rollup 把 lang 并入入口的行为等价
-          if (/[\\/]src[\\/]App[\\/][^\\/]+[\\/]lang\.ts$/.test(id)) {
-            return 'app-lang';
-          }
-          if (!id.includes('node_modules')) return undefined;
-          if (/node_modules\/(?:react|react-dom|react-router|react-router-dom|scheduler|use-sync-external-store|@remix-run|object-assign|loose-envify|prop-types)\//.test(id)) {
-            return 'vendor-react';
-          }
-          // @ant-design/icons 与 antd 同 chunk: icons 依赖 rc-util (antd 组) 而 antd 主又 import icons,
-          // 分两 chunk 会产生 vendor-antd-icons -> vendor-antd 双向循环
-          if (/node_modules\/(?:antd|rc-[^/]+|@rc-component|dayjs|classnames|@ant-design)\//.test(id)) {
-            return 'vendor-antd';
-          }
-          if (/node_modules\/(?:sql-formatter|nearley|moo|discontinuous-range|ret|railroad-diagrams)\//.test(id)) {
-            return 'vendor-sql';
-          }
-          if (/node_modules\/highlight\.js\//.test(id)) {
-            return 'vendor-highlight';
-          }
-          if (/node_modules\/yaml\//.test(id)) {
-            return 'vendor-yaml';
-          }
-          if (/node_modules\/(?:crypto-js|bcryptjs)\//.test(id)) {
-            return 'vendor-crypto';
-          }
-          if (/node_modules\/jsbarcode\//.test(id)) {
-            return 'vendor-barcode';
-          }
-          if (/node_modules\/pinyin-pro\//.test(id)) {
-            return 'vendor-pinyin';
-          }
-          // Excalidraw (白板画布, ~2.5MB): 保持独立的动态 chunk, 只在打开「白板」页时拉取。
-          // 不能命名成固定 vendor chunk: 入口与 excalidraw 会共享个别小模块, 命名后共享模块
-          // 被并入该 chunk → 入口静态依赖 → 整包被 modulepreload 预载, 懒加载失去意义
-          // (实测首屏预载 1.4MB gzip)。return undefined 交给打包器自动拆分: 共享小模块抽到
-          // 独立 chunk, excalidraw 主体留在按需 chunk。roughjs 等与 mermaid 共享的依赖仍由
-          // 下方 mermaid 规则收纳 (vendor-mermaid 本就随入口预载, 无额外下载)
-          if (/node_modules\/(?:@excalidraw|@radix-ui|jotai|jotai-scope|fractional-indexing|image-blob-reduce|open-color|perfect-freehand|pako|browser-fs-access|es6-promise-pool|fuzzy|canvas-roundrect-polyfill|i18next|@babel\/runtime|points-on-curve|tunnel-rat|png-chunk-text|png-chunks-encode|png-chunks-extract|use-isomorphic-layout-effect|react-is)\//.test(id)) {
-            return undefined;
-          }
-          // pele (https://pele.run, 单文件 ~600KB 的图形渲染引擎, 零依赖): 独立 chunk 按需加载,
-          // 只在打开「Mermaid 编辑器」页时拉取; 与入口无共享模块, 命名成固定 chunk 不会被预载
-          if (/node_modules\/pele\//.test(id)) {
-            return 'vendor-pele';
-          }
-          // mermaid 与其图形依赖 (d3 / cytoscape / katex 等, 合计约 2MB): 「Mermaid 编辑器」已改用 pele,
-          // 但「白板」的 Mermaid 转 Excalidraw 仍经 @excalidraw/mermaid-to-excalidraw 用到 mermaid,
-          // 保持独立 chunk 避免拖大 vendor-misc (其依赖与 excalidraw 共享, 不适合塞进白板那个匿名 chunk)
-          // (注意此规则必须在 vendor-antd 之后: stylis 同时被 @ant-design/cssinjs 使用)
-          if (/node_modules\/(?:mermaid|@mermaid-js|@braintree|@iconify|@upsetjs|cytoscape|cytoscape-[^/]+|d3|d3-[^/]+|dagre-d3-es|dompurify|es-toolkit|fastdom|katex|khroma|marked|roughjs|ts-dedent|uuid)\//.test(id)) {
-            return 'vendor-mermaid';
-          }
-          // Vditor (即时渲染 Markdown 的编辑器, 约 700KB): 必须独立成 chunk, 混入 vendor-misc
-          // 会被入口静态引用, 首屏直接多下 700KB, 失去懒加载意义
-          if (/node_modules\/(?:vditor|diff-match-patch)\//.test(id)) {
-            return 'vendor-vditor';
-          }
-          // Shiki 语言语法包: 保持独立 dynamic chunk (import.meta.glob 按需加载),
-          // 不并入 vendor-misc, 否则代码截图首次打开会拉取全部语言 (gzip ~1.7MB)
-          if (id.includes('node_modules/@shikijs/langs')) {
-            return undefined;
-          }
-          // svgo/browser (~780kB, 仅 SVG 格式化页使用): 独立 chunk 按需加载,
-          // 避免拖大 vendor-misc (混入后 misc 超 1.1MB 且其它杂项页无谓预载)
-          if (id.includes('node_modules/svgo/dist/svgo.browser.js')) {
-            return undefined;
-          }
-          // vtracer-wasm (图片转 SVG 的 WASM 包装, 仅该页动态 import): 同样独立按需加载,
-          // 混入 vendor-misc 会被入口静态预载
-          if (id.includes('node_modules/vtracer-wasm/')) {
-            return undefined;
-          }
-          return 'vendor-misc';
+        // 分包: 主入口 (layout/App 注册表) 只留业务骨架, 框架/UI/工具依赖拆成独立 vendor chunk,
+        // 供懒加载页面按需复用。用 Rolldown 原生 codeSplitting.groups 而非 manualChunks:
+        // 每组的 test 命中的模块归入同名 chunk, 多组命中时 priority 大者优先
+        // (等价于 manualChunks 的 "先 return 先生效" 顺序, 但归组结果确定可预期)
+        codeSplitting: {
+          groups: [
+            // Vite 注入的 __vitePreload 助手 (\0vite/preload-helper.js) 被入口与所有按需 chunk 共享:
+            // 必须固定到入口已预载的小 chunk, 否则打包器会把它并入某个大按需 chunk → 该 chunk 变成
+            // 入口静态依赖, 首屏被全量预载。注意此规则在 manualChunks 下无效 (Vite 8 / Rolldown
+            // 把 manualChunks 迁移成单个 group, 助手的归组不受返回值控制, 实测总被并入 vendor-mermaid,
+            // 首屏白预载 3.6MB), 改用 codeSplitting.groups 后按组名生效
+            { name: 'vendor-react', priority: 100, test: /vite\/preload-helper|node_modules\/(?:react|react-dom|react-router|react-router-dom|scheduler|use-sync-external-store|@remix-run|object-assign|loose-envify|prop-types)\// },
+            // 各工具的 lang.ts 被入口注册表 (lang-packs) 静态引用, 同时也是对应工具页的依赖:
+            // Rolldown (Vite 8) 会为每个这类共享模块单独出包, 使入口 modulepreload 从十几个
+            // 涨到 150+, 首屏变成上百个并发小请求 (碎片化); 固定成一个 chunk 后仅多一次请求,
+            // 与 Vite 5/Rollup 把 lang 并入入口的行为等价
+            { name: 'app-lang', priority: 95, test: /[\\/]src[\\/]App[\\/][^\\/]+[\\/]lang\.ts$/ },
+            // @ant-design/icons 与 antd 同 chunk: icons 依赖 rc-util (antd 组) 而 antd 主又 import icons,
+            // 分两 chunk 会产生 vendor-antd-icons -> vendor-antd 双向循环
+            { name: 'vendor-antd', priority: 90, test: /node_modules\/(?:antd|rc-[^/]+|@rc-component|dayjs|classnames|@ant-design)\// },
+            { name: 'vendor-sql', priority: 85, test: /node_modules\/(?:sql-formatter|nearley|moo|discontinuous-range|ret|railroad-diagrams)\// },
+            { name: 'vendor-highlight', priority: 84, test: /node_modules\/highlight\.js\// },
+            { name: 'vendor-yaml', priority: 83, test: /node_modules\/yaml\// },
+            { name: 'vendor-crypto', priority: 82, test: /node_modules\/(?:crypto-js|bcryptjs)\// },
+            { name: 'vendor-barcode', priority: 81, test: /node_modules\/jsbarcode\// },
+            { name: 'vendor-pinyin', priority: 80, test: /node_modules\/pinyin-pro\// },
+            // pele (https://pele.run, 单文件 ~600KB 的图形渲染引擎, 零依赖): 独立 chunk 按需加载,
+            // 只在打开「Mermaid 编辑器」页时拉取; 与入口无共享模块, 命名成固定 chunk 不会被预载
+            { name: 'vendor-pele', priority: 70, test: /node_modules\/pele\// },
+            // mermaid 与其图形依赖 (d3 / cytoscape / katex 等, 合计约 3.6MB): 「Mermaid 编辑器」已改用 pele,
+            // 但「白板」的 Mermaid 转 Excalidraw 仍经 @excalidraw/mermaid-to-excalidraw 用到 mermaid,
+            // 保持独立 chunk 避免拖大 vendor-misc (其依赖与 excalidraw 共享, 不适合塞进白板那个匿名 chunk)
+            // (注意此规则必须在 vendor-antd 之后: stylis 同时被 @ant-design/cssinjs 使用)
+            { name: 'vendor-mermaid', priority: 60, test: /node_modules\/(?:mermaid|@mermaid-js|@braintree|@iconify|@upsetjs|cytoscape|cytoscape-[^/]+|d3|d3-[^/]+|dagre-d3-es|dompurify|es-toolkit|fastdom|katex|khroma|marked|roughjs|ts-dedent|uuid)\// },
+            // Vditor (即时渲染 Markdown 的编辑器, 约 700KB): 必须独立成 chunk, 混入 vendor-misc
+            // 会被入口静态引用, 首屏直接多下 700KB, 失去懒加载意义
+            { name: 'vendor-vditor', priority: 50, test: /node_modules\/(?:vditor|diff-match-patch)\// },
+            // 兜底: 其余 node_modules 归 vendor-misc, 但下面的包必须留在自动拆分里 (test 里排除):
+            // - Excalidraw (白板画布, ~2.5MB): 保持独立的动态 chunk, 只在打开「白板」页时拉取。
+            //   不能命名成固定 vendor chunk: 入口与 excalidraw 会共享个别小模块, 命名后共享模块
+            //   被并入该 chunk → 入口静态依赖 → 整包被 modulepreload 预载, 懒加载失去意义
+            //   (实测首屏预载 1.4MB gzip); 交给打包器自动拆分后, 共享小模块抽到独立 chunk,
+            //   excalidraw 主体留在按需 chunk
+            // - Shiki 语言语法包: 保持独立 dynamic chunk (import.meta.glob 按需加载),
+            //   不并入 vendor-misc, 否则代码截图首次打开会拉取全部语言 (gzip ~1.7MB)
+            // - svgo/browser (~780kB, 仅 SVG 格式化页使用): 独立 chunk 按需加载,
+            //   避免拖大 vendor-misc (混入后 misc 超 1.1MB 且其它杂项页无谓预载)
+            // - vtracer-wasm (图片转 SVG 的 WASM 包装, 仅该页动态 import): 同样独立按需加载,
+            //   混入 vendor-misc 会被入口静态预载
+            {
+              name: 'vendor-misc',
+              priority: 10,
+              test: (id) =>
+                id.includes('node_modules') &&
+                !/node_modules\/(?:@excalidraw|@radix-ui|jotai|jotai-scope|fractional-indexing|image-blob-reduce|open-color|perfect-freehand|pako|browser-fs-access|es6-promise-pool|fuzzy|canvas-roundrect-polyfill|i18next|@babel\/runtime|points-on-curve|tunnel-rat|png-chunk-text|png-chunks-encode|png-chunks-extract|use-isomorphic-layout-effect|react-is)\//.test(id) &&
+                !id.includes('node_modules/@shikijs/langs') &&
+                !id.includes('node_modules/svgo/dist/svgo.browser.js') &&
+                !id.includes('node_modules/vtracer-wasm/'),
+            },
+          ],
         },
       },
     },
