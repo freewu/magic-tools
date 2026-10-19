@@ -1,7 +1,6 @@
 import { Alert, Button, Card, Divider, Input, Segmented, Select, Space, Tooltip, Typography, message } from 'antd';
 import { CopyOutlined, DownloadOutlined, EyeInvisibleOutlined, EyeOutlined, FolderOpenOutlined, FullscreenExitOutlined, FullscreenOutlined, SaveOutlined } from '@ant-design/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { MermaidAPI } from 'mermaid';
 import { useLocale } from '../../hook/locale-context';
 import { useTheme } from '../../hook/theme-context';
 import { copyTextToClipboard } from '../../lib';
@@ -20,20 +19,25 @@ import {
 } from './data';
 import {
   CODE_ACCEPT,
+  ENGINE_ERROR,
   MIME_OF,
+  RENDER_ERROR_TITLE,
+  applyPeleTheme,
   dataUrlToBytes,
   extractCode,
   fileNameOf,
   isBlankCode,
   markdownFileNameOf,
-  mermaidConfig,
+  parseRenderError,
   parseSvgSize,
+  peleOptions,
   prepareSvgForExport,
   rasterizeSvg,
   scaleSize,
   supportsWebp,
   toMarkdown,
   type MermaidFormat,
+  type RenderErrorInfo,
 } from './lib';
 import { u, uT } from './lang';
 import MermaidIntro from './intro';
@@ -81,18 +85,18 @@ const exitNativeFullscreen = () => {
   }
 };
 
-// mermaid 体积较大 (~1MB+), 动态加载并缓存: 只在打开本页时才拉取对应 chunk
-let mermaidPromise: Promise<MermaidAPI> | null = null;
-const loadMermaid = (): Promise<MermaidAPI> => {
-  if (!mermaidPromise) {
-    mermaidPromise = import('mermaid')
-      .then((m) => m.default)
-      .catch((err) => {
-        mermaidPromise = null; // 加载失败允许重试
-        throw err;
-      });
+// pele (单文件 ~600KB, 仅 ESM): 动态加载并缓存 chunk, 只在打开本页时才拉取
+// 类型从 package.json 的导出映射取 (typeof import 不会产生运行时 import)
+type PeleModule = typeof import('pele');
+let peleModule: Promise<PeleModule> | null = null;
+const loadPele = (): Promise<PeleModule> => {
+  if (!peleModule) {
+    peleModule = import('pele').catch((err) => {
+      peleModule = null; // 加载失败允许重试 (例如刚好断网)
+      throw err;
+    });
   }
-  return mermaidPromise;
+  return peleModule;
 };
 
 const MermaidEditor: React.FC = () => {
@@ -104,7 +108,7 @@ const MermaidEditor: React.FC = () => {
   const [sampleId, setSampleId] = useState(SAMPLES[0].id);
   const [code, setCode] = useState(SAMPLES[0].code);
   const [svg, setSvg] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState<RenderErrorInfo | null>(null);
   const [rendering, setRendering] = useState(false);
   const [scale, setScale] = useState(DEFAULT_SCALE);
   const [bg, setBg] = useState<RasterBackground>('white');
@@ -165,12 +169,18 @@ const MermaidEditor: React.FC = () => {
   // 切走本页 (卸载) 时退出原生全屏, 避免残留全屏层
   useEffect(() => () => exitNativeFullscreen(), []);
 
+  // 图表配色跟随「背景」: 深色背景配深色配色, 白色背景配浅色配色,
+  // 透明背景则跟随应用的明暗模式 — 无论怎么选, 图与底色都是对比关系
+  const darkSvg = bg === 'dark' || (bg === 'transparent' && isDark);
+
   // 代码变化后延迟渲染 (输入停顿 200ms 再渲染, 避免每敲一个字符都重绘)
+  // pele 的 render() 是同步的, 但解析失败会抛 PeleError, 仍需 try/catch
+  // 只依赖 code: 配色变化不重新渲染, 只是把变量重新套到已有 SVG 上 (见 themedSvg)
   useEffect(() => {
     if (isBlankCode(code)) {
       seqRef.current += 1;
       setSvg('');
-      setError('');
+      setError(null);
       setRendering(false);
       return;
     }
@@ -179,18 +189,26 @@ const MermaidEditor: React.FC = () => {
     setRendering(true);
     const timer = window.setTimeout(() => {
       void (async () => {
+        let pele: PeleModule;
         try {
-          const mermaid = await loadMermaid();
-          mermaid.initialize(mermaidConfig(isDark));
-          const { svg: out } = await mermaid.render(`mmd-${seq}-${Date.now()}`, code);
+          pele = await loadPele();
+        } catch {
           if (cancelled || seq !== seqRef.current) return;
-          setSvg(out);
-          setError('');
+          setSvg('');
+          setError(ENGINE_ERROR);
+          setRendering(false);
+          return;
+        }
+        try {
+          const out = pele.render(code, peleOptions({ idPrefix: `mmd-${seq}` }));
+          if (cancelled || seq !== seqRef.current) return;
+          setSvg(out.svg);
+          setError(null);
           setRendering(false);
         } catch (err) {
           if (cancelled || seq !== seqRef.current) return;
           setSvg('');
-          setError(err instanceof Error ? err.message : String(err));
+          setError(parseRenderError(err));
           setRendering(false);
         }
       })();
@@ -199,9 +217,21 @@ const MermaidEditor: React.FC = () => {
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [code, isDark]);
+  }, [code]);
 
-  const size = useMemo(() => parseSvgSize(svg), [svg]);
+  // 错误展示: 标题按 pele 的错误类型分类, 正文带行列位置 (message 里已含出错片段)
+  const errorView = useMemo(() => {
+    if (!error) return null;
+    if (error.code === 'engine') return { title: t('渲染失败'), text: t('渲染引擎加载失败, 请刷新页面重试') };
+    const title = t(RENDER_ERROR_TITLE[error.code ?? ''] ?? '渲染失败');
+    const pos = error.line > 0 ? tt('第 {l} 行, 第 {c} 列', { l: error.line, c: error.column }) : '';
+    return { title, text: [ pos, error.message ].filter(Boolean).join('\n') };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ error, locale ]);
+
+  // 配色套在 SVG 上 (pele 用 CSS 变量取色, 换色只需换变量, 不必重新渲染); 预览 / 导出 / 复制都用它
+  const themedSvg = useMemo(() => applyPeleTheme(svg, darkSvg), [ svg, darkSvg ]);
+  const size = useMemo(() => parseSvgSize(themedSvg), [ themedSvg ]);
   // 「背景」同时作用于预览与位图导出 (SVG 始终透明); 「缩放」同时作用于预览与位图导出
   const bgColor = useMemo(() => BACKGROUND_OPTIONS.find((o) => o.value === bg)?.color ?? null, [bg]);
   const previewCss = useMemo(() => {
@@ -226,7 +256,7 @@ const MermaidEditor: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [ locale ],
   );
-  const canExport = !!svg && !!size;
+  const canExport = !!themedSvg && !!size;
   // 文件名前缀: 已打开的文件名优先, 其次是所选示例, 最后兜底
   const base = fileName ? fileName.replace(/\.[^.]+$/, '') : sampleId ? `mermaid-${sampleId}` : DEFAULT_FILE_BASE;
   const lines = code ? code.split('\n').length : 0;
@@ -276,19 +306,19 @@ const MermaidEditor: React.FC = () => {
   };
 
   const exportAs = async (format: MermaidFormat) => {
-    if (!svg || !size) return;
+    if (!themedSvg || !size) return;
     setBusy(format);
     try {
       if (format === 'svg') {
         // 矢量导出: 固定宽高 + 补 xmlns, 保持透明背景
         const name = fileNameOf(base, 'svg');
-        const ok = await saveTextFile(name, prepareSvgForExport(svg, size), t('导出 SVG'), { filterName: 'SVG 图片', extensions: [ 'svg' ] });
+        const ok = await saveTextFile(name, prepareSvgForExport(themedSvg, size), t('导出 SVG'), { filterName: 'SVG 图片', extensions: [ 'svg' ] });
         if (ok) message.success(tt('已导出 {file}', { file: name }));
         return;
       }
       const color = bgColor;
       const target = scaleSize(size, scale);
-      const dataUrl = await rasterizeSvg(prepareSvgForExport(svg, target), {
+      const dataUrl = await rasterizeSvg(prepareSvgForExport(themedSvg, target), {
         size: target,
         mime: MIME_OF[format],
         background: color,
@@ -403,7 +433,7 @@ const MermaidEditor: React.FC = () => {
                 <Tooltip title={webpOk ? undefined : t('当前浏览器不支持 WebP 导出, 请改用 PNG')}>
                   <Button size="small" icon={<DownloadOutlined />} disabled={!canExport || !webpOk} loading={busy === 'webp'} onClick={() => { void exportAs('webp'); }}>{t('导出 WebP')}</Button>
                 </Tooltip>
-                <Button size="small" icon={<CopyOutlined />} disabled={!canExport} onClick={() => { void copy(svg, t('已复制 SVG')); }}>{t('复制 SVG')}</Button>
+                <Button size="small" icon={<CopyOutlined />} disabled={!canExport} onClick={() => { void copy(themedSvg, t('已复制 SVG')); }}>{t('复制 SVG')}</Button>
               </Space>
             }
           >
@@ -423,23 +453,23 @@ const MermaidEditor: React.FC = () => {
                 <Segmented size="small" value={bg} onChange={(v) => setBg(v as RasterBackground)} options={BACKGROUND_OPTIONS.map((o) => ({ label: t(o.label), value: o.value }))} />
               </Space>
             </Space>
-            {error ? (
+            {errorView ? (
               <Alert
                 type="error"
                 showIcon
-                message={t('渲染失败')}
+                message={errorView.title}
                 description={
-                  <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontFamily: MONO, fontSize: 12, maxHeight: 300, overflow: 'auto' }}>{error}</pre>
+                  <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontFamily: MONO, fontSize: 12, maxHeight: 300, overflow: 'auto' }}>{errorView.text}</pre>
                 }
               />
-            ) : svg ? (
+            ) : themedSvg ? (
               <div className="mmd-pvbox" style={{ maxHeight: full ? undefined : 560, overflow: 'auto', border: '1px solid rgba(128,128,128,0.2)', borderRadius: 6, padding: 8, background: isDark ? '#141414' : '#fff' }}>
                 {/* 「缩放」改变预览尺寸 (1x 自适应卡片宽度, 更大倍率按原始宽高放大后可滚动); 导出用 SVG 自身宽高 */}
                 <style>{previewCss}</style>
                 <div
                   className={bgColor ? 'mmd-preview' : 'mmd-preview mmd-preview-checker'}
                   style={bgColor ? { background: bgColor } : undefined}
-                  dangerouslySetInnerHTML={{ __html: svg }}
+                  dangerouslySetInnerHTML={{ __html: themedSvg }}
                 />
                 {rendering && <div style={{ color: '#999', fontSize: 12, marginTop: 6 }}>{t('渲染中...')}</div>}
               </div>

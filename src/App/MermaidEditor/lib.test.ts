@@ -1,15 +1,22 @@
 import {
   CODE_ACCEPT,
+  ENGINE_ERROR,
   EXT_OF,
   MIME_OF,
+  PELE_DARK_VARS,
+  PELE_FONT_FAMILY,
+  PELE_FONT_SIZE,
+  RENDER_ERROR_TITLE,
+  applyPeleTheme,
   dataUrlToBytes,
   extractCode,
   fileNameOf,
   findFencedCode,
   isBlankCode,
   markdownFileNameOf,
-  mermaidConfig,
+  parseRenderError,
   parseSvgSize,
+  peleOptions,
   prepareSvgForExport,
   scaleSize,
   svgToDataUrl,
@@ -53,29 +60,71 @@ describe('MermaidEditor 源码判空', () => {
   });
 });
 
-describe('MermaidEditor mermaid 配置', () => {
-  it('浅色 / 深色主题与本地渲染开关', () => {
-    const light = mermaidConfig(false);
-    expect(light.startOnLoad).toBe(false);
-    expect(light.theme).toBe('default');
-    expect(light.securityLevel).toBe('strict'); // 预览用 innerHTML 注入, 必须禁止图表内的脚本
-    expect(light.suppressErrorRendering).toBe(true);
-    const dark = mermaidConfig(true);
-    expect(dark.theme).toBe('dark');
+describe('MermaidEditor 渲染引擎 (pele) 选项', () => {
+  it('固定尺寸 / 不外链 / 严格按源码方向', () => {
+    const opts = peleOptions();
+    expect(opts.fontFamily).toBe(PELE_FONT_FAMILY); // 按字体测量排版, 必须与实际显示字体一致
+    expect(opts.fontSize).toBe(PELE_FONT_SIZE);
+    expect(opts.responsive).toBe(false); // 开着会给根节点写内联 max-width, 盖住预览的缩放样式
+    expect(opts.autoDirection).toBe(false); // 不因容器窄自动改竖排
+    expect(opts.links).toBe(false); // 预览用 innerHTML 注入, 避免误触跳走整页
+    expect(opts.images).toBe(false); // 不外链图片 (纯本地渲染)
   });
 
-  it('默认关闭 useMaxWidth (导出需要固定宽高) 且关闭 htmlLabels', () => {
-    const cfg = mermaidConfig(false);
-    expect(cfg.flowchart).toMatchObject({ useMaxWidth: false, htmlLabels: false });
-    for (const key of [ 'sequence', 'class', 'state', 'er', 'gantt', 'pie', 'journey' ] as const) {
-      expect(cfg[key]).toMatchObject({ useMaxWidth: false });
-    }
-    expect(mermaidConfig(false, { useMaxWidth: true }).flowchart).toMatchObject({ useMaxWidth: true });
+  it('字号与 id 前缀可覆盖', () => {
+    expect(peleOptions({ fontSize: 18 }).fontSize).toBe(18);
+    expect(peleOptions({ idPrefix: 'mmd-3' }).idPrefix).toBe('mmd-3');
+  });
+});
+
+describe('MermaidEditor 配色变量', () => {
+  const svg = '<svg class="pele" width="10" height="10" style="--_fg:var(--pele-fg,#1f1f1f);color:var(--_fg)"></svg>';
+
+  it('浅色原样返回 (pele 内置默认值即浅色)', () => {
+    expect(applyPeleTheme(svg, false)).toBe(svg);
+    expect(Object.keys(PELE_DARK_VARS)).toContain('bg');
   });
 
-  it('字号可覆盖', () => {
-    expect(mermaidConfig(false).themeVariables.fontSize).toBe('14px');
-    expect(mermaidConfig(false, { fontSize: 18 }).themeVariables.fontSize).toBe('18px');
+  it('深色配色写在 SVG 根节点样式最前', () => {
+    const dark = applyPeleTheme(svg, true);
+    expect(dark).toContain('style="--pele-bg:#1f1f1f;--pele-fg:#e6e6e6;');
+    expect(dark).toContain('--pele-line:#d4d4d4;');
+    // 原有样式与内容完整保留 (变量与引用同在一个 style 里, 顺序不影响取值)
+    expect(dark).toContain('--_fg:var(--pele-fg,#1f1f1f);color:var(--_fg)');
+    expect(dark.slice(-6)).toBe('</svg>');
+  });
+
+  it('没有内联样式时原样返回, 不抛错', () => {
+    const plain = '<svg width="10" height="10"></svg>';
+    expect(applyPeleTheme(plain, true)).toBe(plain);
+  });
+});
+
+describe('MermaidEditor 渲染错误整理', () => {
+  it('PeleError: 保留错误类型与行列信息', () => {
+    const message = "Parse error on line 3:\n  C --> >\n--------^\nExpecting 'NODE_STRING', got 'TAGEND'";
+    const err = Object.assign(new Error(message), { code: 'syntax', line: 3, column: 9, type: 'flowchart', snippet: 'C --> >' });
+    expect(parseRenderError(err)).toEqual({ code: 'syntax', line: 3, column: 9, message });
+  });
+
+  it('语义错误无行列信息 / 未识别的 code 都能兜底', () => {
+    expect(parseRenderError(Object.assign(new Error('Invalid date:2024-99-01'), { code: 'semantic', line: 0, column: 0 })))
+      .toEqual({ code: 'semantic', line: 0, column: 0, message: 'Invalid date:2024-99-01' });
+    expect(parseRenderError(Object.assign(new Error('No diagram type detected.'), { code: 'unsupported-diagram', line: 0, column: 0 })))
+      .toEqual({ code: 'unsupported-diagram', line: 0, column: 0, message: 'No diagram type detected.' });
+    // 引擎版本变化带来的未知 code 按普通错误处理 (仍然有信息可展示)
+    expect(parseRenderError(Object.assign(new Error('x'), { code: 'brand-new', line: 2, column: 5 })))
+      .toEqual({ code: null, line: 2, column: 5, message: 'x' });
+    expect(parseRenderError('boom')).toEqual({ code: null, line: 0, column: 0, message: 'boom' });
+    expect(parseRenderError(undefined)).toEqual({ code: null, line: 0, column: 0, message: 'undefined' });
+  });
+
+  it('错误标题按类型分类, 引擎加载失败单独标记', () => {
+    expect(RENDER_ERROR_TITLE.syntax).toBe('语法错误');
+    expect(RENDER_ERROR_TITLE.semantic).toBe('图表内容有误');
+    expect(RENDER_ERROR_TITLE.limit).toBe('图形过大或嵌套过深');
+    expect(RENDER_ERROR_TITLE['unsupported-diagram']).toBe('无法识别图形类型');
+    expect(ENGINE_ERROR).toMatchObject({ code: 'engine', line: 0, column: 0 });
   });
 });
 
@@ -86,7 +135,7 @@ describe('MermaidEditor SVG 尺寸解析', () => {
     expect(parseSvgSize('<svg width="120.5" height="80.25"></svg>')).toEqual({ width: 120.5, height: 80.25 });
   });
 
-  it('mermaid 默认的 width=100% 时回退 viewBox', () => {
+  it('宽高为百分比时回退 viewBox', () => {
     const svg = '<svg id="mermaid-1" width="100%" xmlns="http://www.w3.org/2000/svg" style="max-width: 300px;" viewBox="0 0 300 200" role="graphics-document"></svg>';
     expect(parseSvgSize(svg)).toEqual({ width: 300, height: 200 });
   });

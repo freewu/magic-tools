@@ -20,7 +20,7 @@ const numberAttr = (tag: string, name: string): number | null => {
 
 /**
  * 解析 SVG 的像素尺寸
- * mermaid 默认输出 `<svg ... width="100%" style="max-width:300px" viewBox="0 0 300 200">`,
+ * 渲染器可能输出 `<svg ... width="100%" style="max-width:300px" viewBox="0 0 300 200">`,
  * 因此优先取数值型 width/height, 否则回退 viewBox 的宽高。
  */
 export const parseSvgSize = (svg: string): SvgSize | null => {
@@ -46,7 +46,7 @@ export const scaleSize = (size: SvgSize, scale: number): SvgSize => ({
 });
 
 /**
- * 导出前的 SVG 处理: 把根节点的 width/height 固定为像素值 (mermaid 输出的是 100%),
+ * 导出前的 SVG 处理: 把根节点的 width/height 固定为像素值 (部分渲染器输出的是百分比),
  * 并补上 xmlns / xmlns:xlink (脱离 DOM 作为独立文件 / data URL 时必须声明)。
  * viewBox 保留, 因此缩放不失真。
  */

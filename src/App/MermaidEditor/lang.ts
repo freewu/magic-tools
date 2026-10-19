@@ -32,7 +32,7 @@ const uilangRows: Record<string, [string, string]> = {
   '全屏': ['全螢幕', 'Fullscreen'],
   '退出全屏': ['結束全螢幕', 'Exit fullscreen'],
 
-  // 示例 (按图形家族分组, 覆盖 mermaid 内置的全部可预览图形)
+  // 示例 (按图形家族分组, 覆盖 pele 可渲染的全部图形类型)
   '示例': ['範例', 'Sample'],
   '基础图': ['基礎圖', 'Basic diagrams'],
   '数据图表': ['資料圖表', 'Data charts'],
@@ -92,9 +92,9 @@ const uilangRows: Record<string, [string, string]> = {
   '白色': ['白色', 'White'],
   '深色': ['深色', 'Dark'],
   '透明': ['透明', 'Transparent'],
-  '「背景 / 缩放」同时作用于预览与位图导出; SVG 为矢量格式, 导出时始终透明背景': [
-    '「背景 / 縮放」同時作用於預覽與點陣匯出; SVG 為向量格式, 匯出時固定透明背景',
-    '“Background / Scale” apply to both the preview and raster exports; SVG is vector and always exports with a transparent background',
+  '「背景 / 缩放」同时作用于预览与位图导出; 图表配色跟随「背景」(深色背景配深色配色); SVG 为矢量格式, 导出时始终透明背景': [
+    '「背景 / 縮放」同時作用於預覽與點陣匯出; 圖表配色跟隨「背景」(深色背景配深色配色); SVG 為向量格式, 匯出時固定透明背景',
+    '“Background / Scale” apply to both the preview and raster exports; the diagram palette follows “Background” (dark background → dark palette); SVG is vector and always exports with a transparent background',
   ],
   '当前浏览器不支持 WebP 导出, 请改用 PNG': [
     '目前瀏覽器不支援 WebP 匯出, 請改用 PNG',
@@ -107,6 +107,10 @@ const uilangRows: Record<string, [string, string]> = {
   // 提示与错误
   '渲染失败': ['渲染失敗', 'Render failed'],
   '语法错误': ['語法錯誤', 'Syntax error'],
+  '无法识别图形类型': ['無法識別圖形類型', 'Diagram type not recognized'],
+  '图表内容有误': ['圖表內容有誤', 'Invalid diagram content'],
+  '图形过大或嵌套过深': ['圖形過大或巢狀過深', 'Diagram too large or too deeply nested'],
+  '第 {l} 行, 第 {c} 列': ['第 {l} 行, 第 {c} 列', 'Line {l}, column {c}'],
   '渲染引擎加载失败, 请刷新页面重试': ['渲染引擎載入失敗, 請重新整理頁面再試', 'Failed to load the renderer — please reload the page'],
   '已复制': ['已複製', 'Copied'],
   '已复制源码': ['已複製原始碼', 'Source copied'],

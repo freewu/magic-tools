@@ -227,8 +227,14 @@ export default defineConfig({
           if (/node_modules\/(?:@excalidraw|@radix-ui|jotai|jotai-scope|fractional-indexing|image-blob-reduce|open-color|perfect-freehand|pako|browser-fs-access|es6-promise-pool|fuzzy|canvas-roundrect-polyfill|i18next|@babel\/runtime|points-on-curve|tunnel-rat|png-chunk-text|png-chunks-encode|png-chunks-extract|use-isomorphic-layout-effect|react-is)\//.test(id)) {
             return undefined;
           }
-          // mermaid 与其图形依赖 (d3 / cytoscape / katex 等, 合计约 2MB): 独立 chunk 按需加载,
-          // 只在打开「Mermaid 编辑器」页时拉取; 混入 vendor-misc 会拖大其余页面的预载体积
+          // pele (https://pele.run, 单文件 ~600KB 的图形渲染引擎, 零依赖): 独立 chunk 按需加载,
+          // 只在打开「Mermaid 编辑器」页时拉取; 与入口无共享模块, 命名成固定 chunk 不会被预载
+          if (/node_modules\/pele\//.test(id)) {
+            return 'vendor-pele';
+          }
+          // mermaid 与其图形依赖 (d3 / cytoscape / katex 等, 合计约 2MB): 「Mermaid 编辑器」已改用 pele,
+          // 但「白板」的 Mermaid 转 Excalidraw 仍经 @excalidraw/mermaid-to-excalidraw 用到 mermaid,
+          // 保持独立 chunk 避免拖大 vendor-misc (其依赖与 excalidraw 共享, 不适合塞进白板那个匿名 chunk)
           // (注意此规则必须在 vendor-antd 之后: stylis 同时被 @ant-design/cssinjs 使用)
           if (/node_modules\/(?:mermaid|@mermaid-js|@braintree|@iconify|@upsetjs|cytoscape|cytoscape-[^/]+|d3|d3-[^/]+|dagre-d3-es|dompurify|es-toolkit|fastdom|katex|khroma|marked|roughjs|ts-dedent|uuid)\//.test(id)) {
             return 'vendor-mermaid';

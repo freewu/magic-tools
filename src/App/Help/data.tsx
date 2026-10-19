@@ -33,7 +33,7 @@ export const compomentList: HelpComponent[] = [
   { name: "SQL Formatter", version: "12.2.4", url: "https://github.com/sql-formatter-org/sql-formatter" },
   { name: "highlight.js", version: "11.12.0", url: "https://highlightjs.org/" },
   { name: "Shiki", version: "4.4.3", url: "https://shiki.style/" },
-  { name: "Mermaid", version: "11.17.2", url: "https://mermaid.js.org/", color: "FF3670", logo: "mermaid" },
+  { name: "Pele", version: "1.6.0", url: "https://pele.run/", color: "EC8B49" },
   { name: "markmap", version: "0.18.12", url: "https://markmap.js.org/", color: "1F6FEB" },
   { name: "Vditor", version: "4.0.0", url: "https://github.com/Vanessa219/vditor" },
   { name: "SVGO", version: "4.1.0", url: "https://github.com/svg/svgo", logo: "svg" },

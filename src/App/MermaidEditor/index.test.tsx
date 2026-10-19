@@ -19,22 +19,20 @@ jest.mock('../../lib/tauri', () => ({
   listenOpenPage: jest.fn().mockResolvedValue(() => {}),
 }));
 
-jest.mock('mermaid', () => ({
-  __esModule: true,
-  default: {
-    initialize: jest.fn(),
-    render: jest.fn(),
-    parse: jest.fn().mockResolvedValue(true),
-  },
-}));
+jest.mock('pele', () => ({ __esModule: true, render: jest.fn() }));
 
-import mermaid from 'mermaid';
+import { render as peleRender } from 'pele';
 
-const mockInitialize = mermaid.initialize as jest.Mock;
-const mockRender = mermaid.render as jest.Mock;
+const mockRender = peleRender as jest.Mock;
 
-/** mermaid 渲染出的 SVG (width/height 为数值, 便于导出断言) */
-const SVG = '<svg id="mmd" width="240" height="120" viewBox="0 0 240 120" xmlns="http://www.w3.org/2000/svg"><g><rect width="40" height="20" /></g></svg>';
+/** pele 的 PeleError (渲染 / 解析失败时抛出的错误, 带 code / line / column) */
+const peleError = (message: string, code = 'syntax', line = 0, column = 0) => Object.assign(new Error(message), { code, line, column, type: 'flowchart', snippet: '' });
+
+/** pele 渲染出的 SVG (width/height 为数值, 便于导出断言; style 与真实输出一致, 用于配色变量注入) */
+const SVG = '<svg xmlns="http://www.w3.org/2000/svg" class="pele pele-flowchart" width="240" height="120" viewBox="0 0 240 120" style="max-width:100%;height:auto;--_fg:var(--pele-fg,#1f1f1f);color:var(--_fg)"><g><rect width="40" height="20" /></g></svg>';
+
+/** 预览区里的 SVG 根节点 */
+const previewSvg = () => document.querySelector('.mmd-preview svg') as SVGElement | null;
 
 /** 被渲染过的源码 (按调用顺序) */
 let rendered: string[] = [];
@@ -103,11 +101,10 @@ const waitRendered = () => waitFor(() => expect(document.querySelector('.mmd-pre
 beforeEach(() => {
   rendered = [];
   ctxCalls.length = 0;
-  mockInitialize.mockClear();
   mockRender.mockReset();
-  mockRender.mockImplementation(async (_id: string, code: string) => {
+  mockRender.mockImplementation((code: string) => {
     rendered.push(code);
-    return { svg: SVG };
+    return { svg: SVG, type: 'flowchart', width: 240, height: 120, links: [] };
   });
   (saveTextFile as jest.Mock).mockClear().mockResolvedValue(true);
   (savePngFile as jest.Mock).mockClear().mockResolvedValue(true);
@@ -133,8 +130,10 @@ describe('MermaidEditor 初始界面', () => {
 
     await waitRendered();
     expect(rendered).toEqual([ SAMPLES[0].code ]);
-    expect(mockInitialize).toHaveBeenCalledTimes(1);
-    expect(mockInitialize.mock.calls[0][0]).toMatchObject({ theme: 'default', startOnLoad: false, securityLevel: 'strict' });
+    // pele 的渲染选项: 固定尺寸 / 不外链 / 严格按源码方向
+    expect(mockRender).toHaveBeenCalledTimes(1);
+    expect(mockRender.mock.calls[0][1]).toMatchObject({ responsive: false, autoDirection: false, links: false, images: false, fontSize: 14 });
+    expect(mockRender.mock.calls[0][1].idPrefix).toMatch(/^mmd-\d+$/); // 无障碍 title / desc 的 id 需唯一
     expect(btn('导出 SVG')).toBeEnabled();
     expect(btn('导出 PNG')).toBeEnabled();
     expect(btn('复制 SVG')).toBeEnabled();
@@ -142,11 +141,32 @@ describe('MermaidEditor 初始界面', () => {
     expect(screen.getByText(`${SAMPLES[0].code.split('\n').length} 行 / ${SAMPLES[0].code.length} 字符`)).toBeInTheDocument();
   });
 
-  test('深色模式下使用 mermaid dark 主题', async () => {
+  test('深色背景注入深色配色变量, 切回白色后还原', async () => {
+    render(<MermaidEditor />);
+    await waitRendered();
+    // 默认「白色」背景: 用 pele 内置浅色配色, 不写任何变量
+    expect(previewSvg()?.getAttribute('style')).not.toContain('--pele-fg:#e6e6e6');
+
+    fireEvent.click(screen.getByText('深色'));
+    await waitFor(() => expect(previewSvg()?.getAttribute('style')).toContain('--pele-fg:#e6e6e6'));
+    // 底色与「深色」预览底一致 (导出的 SVG 也带这套配色, 在别处打开同样可读)
+    expect(previewSvg()?.getAttribute('style')).toContain('--pele-bg:#1f1f1f');
+    // 配色变化不重新渲染图表
+    expect(mockRender).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByText('白色'));
+    await waitFor(() => expect(previewSvg()?.getAttribute('style')).not.toContain('--pele-fg:#e6e6e6'));
+  });
+
+  test('透明背景下的配色跟随应用明暗模式', async () => {
     localStorage.setItem('theme-mode', 'dark');
     render(<ThemeProvider><MermaidEditor /></ThemeProvider>);
     await waitRendered();
-    expect(mockInitialize.mock.calls[0][0]).toMatchObject({ theme: 'dark' });
+    // 默认「白色」背景仍是浅色配色 (与应用对外观无关)
+    expect(previewSvg()?.getAttribute('style')).not.toContain('--pele-fg:#e6e6e6');
+
+    fireEvent.click(screen.getByText('透明'));
+    await waitFor(() => expect(previewSvg()?.getAttribute('style')).toContain('--pele-fg:#e6e6e6'));
   });
 
   test('下拉切换示例后源码与渲染内容同步更新', async () => {
@@ -175,22 +195,34 @@ describe('MermaidEditor 初始界面', () => {
     await waitFor(() => expect(rendered[rendered.length - 1]).toBe('flowchart LR\n  A-->B'));
   });
 
-  test('渲染失败: 展示 mermaid 错误详情并禁用导出', async () => {
-    mockRender.mockRejectedValue(new Error('Parse error on line 2: Expecting \'SEMI\''));
+  test('渲染失败: 展示 pele 错误类型 / 行列位置并禁用导出', async () => {
+    mockRender.mockImplementation(() => {
+      throw peleError("Parse error on line 2:\n  A --> >\n------^\nExpecting 'NODE_STRING', got 'TAGEND'", 'syntax', 2, 7);
+    });
     render(<MermaidEditor />);
-    await waitFor(() => expect(screen.getByText('渲染失败')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('语法错误')).toBeInTheDocument());
     expect(screen.getByText(/Parse error on line 2/)).toBeInTheDocument();
+    expect(screen.getByText(/第 2 行, 第 7 列/)).toBeInTheDocument();
     expect(btn('导出 SVG')).toBeDisabled();
     expect(btn('导出 PNG')).toBeDisabled();
     expect(btn('导出 WebP')).toBeDisabled();
     expect(document.querySelector('.mmd-preview')).toBeNull();
 
     // 修好语法后恢复
-    mockRender.mockImplementation(async (_id: string, code: string) => ({ svg: SVG, bindFunctions: () => void code }));
+    mockRender.mockImplementation((code: string) => ({ svg: SVG, type: 'flowchart', width: 240, height: 120, links: [ code ] }));
     fireEvent.change(codeArea(), { target: { value: 'flowchart TD\n  A-->B' } });
     await waitRendered();
-    expect(screen.queryByText('渲染失败')).toBeNull();
+    expect(screen.queryByText('语法错误')).toBeNull();
     expect(btn('导出 PNG')).toBeEnabled();
+  });
+
+  test('无法识别图形时提示图形类型错误', async () => {
+    mockRender.mockImplementation(() => {
+      throw peleError('No diagram type detected for the given text.', 'unsupported-diagram');
+    });
+    render(<MermaidEditor />);
+    await waitFor(() => expect(screen.getByText('无法识别图形类型')).toBeInTheDocument());
+    expect(screen.getByText('No diagram type detected for the given text.')).toBeInTheDocument(); // 无行列信息时不显示位置
   });
 
   test('清空源码后回到占位提示', async () => {
@@ -373,7 +405,8 @@ describe('MermaidEditor 说明区', () => {
     expect(intro.textContent).toContain('flowchart TD');
     expect(intro.textContent).toContain('sequenceDiagram');
     expect(intro.textContent).toContain('gitGraph');
-    expect(intro.textContent).toContain('htmlLabels');
+    expect(intro.textContent).toContain('pele.run');
+    expect(intro.textContent).toContain('sankey');
   });
 });
 
@@ -404,8 +437,8 @@ describe('MermaidEditor 内置示例', () => {
       expect(s.code.length).toBeGreaterThan(20);
     }
 
-    // 需要外挂插件 / 无解析器的图形不应出现在内置示例里
-    for (const hidden of [ 'usecase', 'zenuml', 'flowchart-elk', 'info' ]) {
+    // pele 不支持的外挂插件图形 (ZenUML 等) / ELK 布局, 以及本工具未收录的图形不应出现
+    for (const hidden of [ 'usecase', 'zenuml', 'flowchart-elk', 'info', 'swimlane', 'agentflow' ]) {
       expect(ids).not.toContain(hidden);
     }
   });

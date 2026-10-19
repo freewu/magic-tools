@@ -1,21 +1,20 @@
 // Mermaid 编辑器 静态数据: 内置示例 / 导出选项
 // label / group 为 zh 原文, 界面展示时经 lang.ts 的 u() 取词
 //
-// 示例覆盖 mermaid 11.17 内置的全部图形类型 (Flowchart / Sequence / Class / State / ER /
-// Mindmap / Architecture / Block / C4 / Cynefin / Event Modeling / Gantt / Git / Ishikawa /
-// Kanban / Packet / Pie / Quadrant / Radar / Railroad (IR·ABNF·EBNF·PEG) / Requirement /
-// Sankey / Timeline / TreeView / Treemap / User Journey / Venn / Wardley / XY)。
+// 示例覆盖 pele (https://pele.run, 目标语法 = Mermaid 12.1.0) 已内置的全部图形类型
+// (Flowchart / Sequence / Class / State / ER / Mindmap / Architecture / Block / C4 / Cynefin /
+// Event Modeling / Gantt / Git / Ishikawa / Kanban / Packet / Pie / Quadrant / Radar /
+// Railroad (IR·ABNF·EBNF·PEG) / Requirement / Sankey / Timeline / TreeView / Treemap /
+// User Journey / Venn / Wardley / XY); 以上 32 个示例均已逐个跑过渲染验证。
 //
-// 未内置 (本机无法预览, 故隐藏, 不在下拉框中出现):
-//   - Use Case: mermaid 11.17 没有 usecase 解析器 (未注册, 无对应语法)
-//   - ZenUML: 官方外挂插件 (@mermaid-js/mermaid-zenuml), 未随 mermaid 主包发布
-//   - flowchart-elk: 需额外注册 ELK 布局加载器 (@mermaid-js/layout-elk), 未内置
+// pele 支持但未内置示例 (下拉框里不出现): Use Case / 泳道图 (swimlane) / Agentflow / Info
+// 完全不支持: ZenUML 等外挂插件图形 (需额外注册), flowchart-elk 的 ELK 布局 (pele 按普通布局渲染)
 //
-// 个别图形受 mermaid 自身词法限制, 示例只能写 ASCII:
+// 个别图形受语法自身限制, 示例只能写 ASCII:
 //   - sankey: 标签词法只接受 ASCII, 中文标签会报 Parse error (标题用 front-matter title)
 //   - wardley: 节点名需加引号才能使用中文 (关系两端同样要带引号)
 //   - requirement: text 字段中文需加引号
-//   - architecture: 默认内置 cloud/database/disk/internet/server 图标, 无需联网
+//   - architecture: 内置 cloud/database/disk/internet/server 图标, 无需联网
 
 export type MermaidSampleGroup = 'basic' | 'chart' | 'flow' | 'grammar';
 
