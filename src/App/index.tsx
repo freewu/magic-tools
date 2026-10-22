@@ -157,6 +157,7 @@ const list = [
   'Pomodoro',
   'Game2048',
   'Tetris',
+  'NesEmulator',
 ];
 
 import { defineLoader } from './app-modules';

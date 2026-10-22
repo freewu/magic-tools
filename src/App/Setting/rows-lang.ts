@@ -651,6 +651,33 @@ const ROWS: Record<string, Row> = {
   ],
   '最高分清空后无法恢复': ['最高分清空後無法恢復', 'The best score cannot be restored once cleared'],
   '已清空最高分记录': ['已清空最高分記錄', 'Best score cleared'],
+  // ---- NES 模拟器 ----
+  'NES 模拟器': ['NES 模擬器', 'NES Emulator'],
+  '默认倍速': ['預設倍速', 'Default speed'],
+  '显示 FPS': ['顯示 FPS', 'Show FPS'],
+  '像素平滑': ['像素平滑', 'Smooth pixels'],
+  '恢复默认键位': ['恢復預設鍵位', 'Restore default keys'],
+  '进入模拟器时的音量, 页面里随时可调': [
+    '進入模擬器時的音量, 頁面裡隨時可調',
+    'Volume used when the emulator opens — still adjustable on the page',
+  ],
+  '默认以几倍速运行, 页面里随时可切换': [
+    '預設以幾倍速執行, 頁面裡隨時可切換',
+    'Speed the emulator starts at — switchable on the page',
+  ],
+  '右上角显示实时帧率, 用于确认模拟速度是否正常': [
+    '右上角顯示即時影格率, 用於確認模擬速度是否正常',
+    'Shows a live frame rate so you can tell the emulation keeps up',
+  ],
+  '关闭时像素风锐利 (推荐), 打开后画面更柔和': [
+    '關閉時像素風銳利 (推薦), 開啟後畫面更柔和',
+    'Off keeps pixels crisp (recommended); on softens the image',
+  ],
+  '键位可在模拟器页面里逐个重新绑定': [
+    '鍵位可在模擬器頁面裡逐個重新綁定',
+    'Keys can be rebound one by one on the emulator page',
+  ],
+  '已恢复默认键位': ['已恢復預設鍵位', 'Default keys restored'],
 };
 
 /**

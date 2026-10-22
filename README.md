@@ -2,7 +2,7 @@
 
 # 🧰 Magic Tools
 
-**An all-in-one developer toolbox — 153 utilities in 10 categories, cross-platform desktop & Web.**
+**An all-in-one developer toolbox — 154 utilities in 10 categories, cross-platform desktop & Web.**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
@@ -48,8 +48,8 @@ Base64 image · ASCII image · Code screenshot · ICO icon · App icon · Domina
 ### 🎲 Generators *(15)*
 QR code (batch, logo/label) · Barcode (CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · Password generator (strength analysis) · OTP (TOTP/HOTP, QR export) · htpasswd · Mock data (JSON/CSV/SQL) · Dot-matrix font · Sudoku generator (4×4 / 6×6 / 9×9, unique solution, A4 print) · Copybook generator (mi / tian / hui / essay grids, A4 print) · Cron rules (parse + next runs) · .gitignore generator (60+ ready-made templates for languages / frameworks / editors / operating systems, stack presets, custom lines, cross-template dedupe) · Whiteboard (Excalidraw infinite canvas: shapes / arrows / text / freehand, autosaved locally, export PNG / SVG / file — no network, no collaboration) · Chat generator (9 platform styles — WeChat / QQ / Slack / Telegram / Discord / WhatsApp / LINE / DingTalk / Feishu; phone or desktop window preview, text / image / voice / time-divider messages (WeChat also supports red packet / transfer cards), global chat title, nicknames, avatars, mute toggle and phone status bar, export PNG) · Bead pattern (upload an image → chart of real bead colors: 6 brand palettes (MARD / COCO / Artkal / Artkal Mini / Perler / Hama), target width in beads, color-count limit, CIEDE2000 perceptual matching, optional dithering, automatic background removal, brightness / contrast / saturation, brush / eraser / recolor / magic-wand editing with undo & redo, mirror preview for ironing, bead count + finished size + pegboard stats, export printable PNG and code / usage CSV) · Fake meeting (three meeting-app skins — Tencent Meeting / Zoom / Microsoft Teams: fake participants with avatars and name tags, a speaking tile that moves around, ticking clock, chat panel where messages arrive over time, participant list, fake screen-share slide, immersive full screen with Esc to exit, your own tile from the camera or an uploaded photo, and a WebAudio-synthesised background murmur so it sounds busy)
 
-### 🎮 Games *(2)*
-2048 (merge numbers on a 4×4 / 5×5 / 6×6 board, arrow keys / WASD / swipe, undo up to 20 moves, per-board best score, keeps playing after reaching the goal — playable both in the desktop app and the Web version) · Tetris (10×20 falling-block classic: arrow keys / WASD / X·Z rotation / Space hard drop / C hold, 7-bag randomiser with 3-piece preview, ghost piece, wall kicks, soft & hard drop scoring, 1–4 line clears multiplied by level (level rises every 10 lines, faster gravity), best score, fullscreen — desktop and Web)
+### 🎮 Games *(3)*
+2048 (merge numbers on a 4×4 / 5×5 / 6×6 board, arrow keys / WASD / swipe, undo up to 20 moves, per-board best score, keeps playing after reaching the goal — playable both in the desktop app and the Web version) · Tetris (10×20 falling-block classic: arrow keys / WASD / X·Z rotation / Space hard drop / C hold, 7-bag randomiser with 3-piece preview, ghost piece, wall kicks, soft & hard drop scoring, 1–4 line clears multiplied by level (level rises every 10 lines, faster gravity), best score, fullscreen — desktop and Web) · NES Emulator (runs .nes ROMs locally with the jsnes core: drag & drop or pick a file, per-cartridge info (mapper / PRG / CHR / region / mirroring / battery), on-screen D-pad, USB & Bluetooth gamepads, rebindable keys, F5/F8 quick save-load plus .nesstate export/import, PNG screenshot, 0.5×–2× speed, volume, pause/reset, fullscreen)
 
 ### 🌐 Webmaster Tools *(16)*
 HTML stripper · Browser fingerprint · CSR request generator (WebCrypto RSA + PKCS#10, SAN, key + CSR download) · URL extractor · Cookie analyzer · User-Agent parser · Sitemap checker · Keyword density · TDK checker · DNS lookup (desktop only) · Whois lookup (desktop only) · MTR trace — traceroute + ping per-hop loss / RTT / jitter (desktop only) · robots.txt generator · iptables rule parser / generator (one-click scenarios — open port / block IP / block subnet / port forwarding — plus parse &amp; generate, iptables-save support) · tc traffic-control rule generator (HTB / TBF / netem, ingress via ifb) · nginx config generator (static / SPA / PHP / reverse proxy, TLS, gzip, static caching, rate limiting, hotlink protection — vhost-ready file)
@@ -132,7 +132,7 @@ magic-tools
 
 **🌐 Webmaster Tools *(16)*** — `BrowserFingerprint` · `CSRGenerator` · `CookieAnalyzer` · `DnsQuery` · `HtmlStripText` · `IptablesRules` · `KeywordDensity` · `MtrQuery` · `NginxConfig` · `RobotsTxtGenerator` · `SitemapCheck` · `TcRules` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck` · `WhoisQuery`
 
-**🎮 Games *(2)*** — `Game2048` · `Tetris`
+**🎮 Games *(3)*** — `Game2048` · `Tetris` · `NesEmulator`
 
 **🧩 Utilities *(18)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `Metronome` · `Pomodoro` · `QrDecode` · `RegexTester` · `ScreenRecorder` · `SensitiveWord` · `Teleprompter` · `WebSocketDebug` · `ZipCompress` · `ZipExtract`
 

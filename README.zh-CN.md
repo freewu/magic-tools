@@ -2,7 +2,7 @@
 
 # 🧰 Magic Tools
 
-**全能开发工具箱 —— 10 大分类、153 个实用工具，桌面 + Web 双端。**
+**全能开发工具箱 —— 10 大分类、154 个实用工具，桌面 + Web 双端。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
@@ -49,7 +49,7 @@ Base64图片 · ASCII 图片 · 代码截图 · ICO 生成 · App Icon 生成 ·
 二维码生成(批量, logo/标签) · 条形码生成(CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · 密码生成(强度分析) · OTP 密码生成器(TOTP/HOTP, 二维码导出) · htpasswd 生成 · 数据生成(JSON/CSV/SQL) · 点阵字生成器 · 数独生成器(4/6/9 宫格, 唯一解, A4 打印) · 字帖生成器(米字格/田字格/回宫格/作文格, A4 打印) · Cron 规则生成(解析 + 下次运行时间) · .gitignore 生成(60+ 现成模板: 语言/框架与工具/编辑器/操作系统, 技术栈一键组合, 自定义追加, 跨模板自动去重) · 白板(Excalidraw 无限画布: 图形/箭头/文字/手绘, 本地自动保存, 导出 PNG/SVG/画布文件 —— 不联网、无协作) · 聊天生成器(9 种平台风格: 微信/QQ/Slack/Telegram/Discord/WhatsApp/LINE/钉钉/飞书, 手机或桌面窗口预览, 文字/图片/语音/时间分隔四类消息, 微信另支持红包/转账卡片, 可设置聊天标题、昵称、头像、免打扰与手机状态栏, 导出 PNG) · 拼豆图纸 (上传图片生成拼豆图纸: 6 种品牌色卡 (MARD / COCO / Artkal / Artkal Mini / Perler / Hama)、图纸豆数、用色数限制、CIEDE2000 感知匹配、抖动、自动去背景、亮度/对比度/饱和度、画笔/橡皮/换色/魔棒与撤销重做、熨烫用的镜像预览、总豆数/成品尺寸/拼豆板统计, 导出可打印 PNG 与色号/用量 CSV) · 假装开会 (三套会议软件界面 —— 腾讯会议 / Zoom / Microsoft Teams：假参会者头像与名牌、随机高亮的发言者、走动的计时器、会逐条到来的聊天消息、参会者列表、假共享屏幕幻灯片、沉浸全屏 (Esc 退出)、自己的画面可用摄像头或上传照片代替、可合成背景人声营造“办公室很忙”氛围)
 
 ### 🎮 游戏 *(2)*
-2048(4×4 / 5×5 / 6×6 棋盘上合并数字, 方向键 / WASD / 滑动操作, 可撤销最近 20 步, 最高分按棋盘分别记录, 达到目标后还能继续挑战, 桌面版与 Web 版都能玩) · 俄罗斯方块(10×20 经典下落方块: 方向键 / WASD 移动, X·Z 双向旋转, 空格硬降, C 暂存, 7-bag 随机器 + 3 个方块预览, 幽灵方块落点提示, 贴墙自动微调; 软降 / 硬降计分, 一次消 1~4 行按等级翻倍计分 (每消 10 行升级, 等级越高下落越快), 记录最高分, 支持全屏)
+2048(4×4 / 5×5 / 6×6 棋盘上合并数字, 方向键 / WASD / 滑动操作, 可撤销最近 20 步, 最高分按棋盘分别记录, 达到目标后还能继续挑战, 桌面版与 Web 版都能玩) · 俄罗斯方块(10×20 经典下落方块: 方向键 / WASD 移动, X·Z 双向旋转, 空格硬降, C 暂存, 7-bag 随机器 + 3 个方块预览, 幽灵方块落点提示, 贴墙自动微调; 软降 / 硬降计分, 一次消 1~4 行按等级翻倍计分 (每消 10 行升级, 等级越高下落越快), 记录最高分, 支持全屏) · NES 模拟器(用 jsnes 核心在本地跑 .nes 游戏: 拖入或选择文件即可开始, 显示卡带 Mapper / PRG / CHR / 制式 / 镜像 / 电池存档, 虚拟十字键, 支持 USB / 蓝牙手柄, 键位可逐个重绑, F5 / F8 快速存读档 + .nesstate 存档导入导出, PNG 截屏, 0.5×~2× 倍速与音量调节, 暂停 / 重置 / 全屏)
 
 ### 🌐 站长工具 *(16)*
 HTML 标签去除 · 浏览器指纹 · CSR 申请文件(本机生成 RSA 私钥 + PKCS#10 请求, 支持 SAN) · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 检查 · 关键词密度 · 网页TDK信息检测 · DNS 查询(仅桌面版) · Whois 查询(仅桌面版) · MTR 查询(仅桌面版: traceroute + ping, 逐跳丢包/RTT/抖动) · robots.txt 生成 · iptables 规则(日常场景一键生成: 开放端口 / 封禁 IP / 封禁网段 / 端口转发; 也可解析已有规则或按表单生成命令, 支持 iptables-save) · tc 规则(HTB / TBF / netem 限速与弱网模拟, 入口限速走 ifb) · nginx 配置(静态站点 / SPA / PHP / 反向代理, 含 TLS、gzip、静态缓存、限流、防盗链, 直接生成 vhost 配置文件)
@@ -132,7 +132,7 @@ magic-tools
 
 **🌐 站长工具 *(16)*** — `BrowserFingerprint` · `CSRGenerator` · `CookieAnalyzer` · `DnsQuery` · `HtmlStripText` · `IptablesRules` · `KeywordDensity` · `MtrQuery` · `NginxConfig` · `RobotsTxtGenerator` · `SitemapCheck` · `TcRules` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck` · `WhoisQuery`
 
-**🎮 游戏 *(2)*** — `Game2048` · `Tetris`
+**🎮 游戏 *(3)*** — `Game2048` · `Tetris` · `NesEmulator`
 
 **🧩 其它 *(18)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `Metronome` · `Pomodoro` · `QrDecode` · `RegexTester` · `ScreenRecorder` · `SensitiveWord` · `Teleprompter` · `WebSocketDebug` · `ZipCompress` · `ZipExtract`
 
