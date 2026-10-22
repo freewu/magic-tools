@@ -6,6 +6,7 @@ import { SettingConvert } from "./setting-convert"
 import { SettingCodec } from "./setting-codec"
 import { SettingImage } from "./setting-image"
 import { SettingGenerator } from "./setting-generator"
+import { SettingGame } from "./setting-game"
 import { SettingWebmaster } from "./setting-webmaster"
 import { SettingMisc } from "./setting-misc"
 import { SettingFormatter } from "./setting-formatter"
@@ -50,6 +51,11 @@ export const itemList = [
     key : 'generator',
     label : '生成器',
     children: <SettingGenerator />
+  },
+  {
+    key : 'game',
+    label : '游戏',
+    children: <SettingGame />
   },
   {
     key : 'webmaster',

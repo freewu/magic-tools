@@ -155,6 +155,7 @@ import GitignoreGenerator from './GitignoreGenerator/lang';
 import Whiteboard from './Whiteboard/lang';
 import BeadPatternGenerator from './BeadPatternGenerator/lang';
 import FakeMeeting from './FakeMeeting/lang';
+import Game2048 from './Game2048/lang';
 
 export const langPacks = {
   Hash: Hash,
@@ -312,4 +313,5 @@ export const langPacks = {
   QrDecode,
   SensitiveWord,
   Pomodoro,
+  Game2048,
 };

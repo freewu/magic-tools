@@ -13,6 +13,7 @@ const shell: LangPack = {
     'cat.formatter': '格式化',
     'cat.image': '图片',
     'cat.generator': '生成器',
+    'cat.game': '游戏',
     'cat.webmaster': '站长工具',
     'cat.misc': '其它',
     // 设置中心左侧「系统设置」分组
@@ -42,6 +43,7 @@ const shell: LangPack = {
     'cat.formatter': '格式化',
     'cat.image': '圖片',
     'cat.generator': '產生器',
+    'cat.game': '遊戲',
     'cat.webmaster': '站長工具',
     'cat.misc': '其他',
     system: '系統設定',
@@ -65,6 +67,7 @@ const shell: LangPack = {
     'cat.formatter': 'Formatters',
     'cat.image': 'Image Tools',
     'cat.generator': 'Generators',
+    'cat.game': 'Games',
     'cat.webmaster': 'Webmaster Tools',
     'cat.misc': 'Utilities',
     system: 'System',

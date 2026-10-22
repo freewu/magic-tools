@@ -1,5 +1,5 @@
 // 分类图标: 侧边栏(尤其折叠时)展示用
-import { SwapOutlined, CodeOutlined, LockOutlined, CalculatorOutlined, GlobalOutlined, EllipsisOutlined, FormatPainterOutlined, PictureOutlined, AppstoreAddOutlined } from '@ant-design/icons';
+import { SwapOutlined, CodeOutlined, LockOutlined, CalculatorOutlined, GlobalOutlined, EllipsisOutlined, FormatPainterOutlined, PictureOutlined, AppstoreAddOutlined, TrophyOutlined } from '@ant-design/icons';
 import { Badge } from 'antd';
 import type { ReactNode } from 'react';
 
@@ -155,6 +155,7 @@ const list = [
   'QrDecode',
   'SensitiveWord',
   'Pomodoro',
+  'Game2048',
 ];
 
 import { defineLoader } from './app-modules';
@@ -222,6 +223,7 @@ export const genMenuList = (appList :Array<AppItem>) => {
     'formatter': <FormatPainterOutlined />,
     'image': <PictureOutlined />,
     'generator': <AppstoreAddOutlined />,
+    'game': <TrophyOutlined />,
     'webmaster': <GlobalOutlined />,
     'misc': <EllipsisOutlined />,
   };

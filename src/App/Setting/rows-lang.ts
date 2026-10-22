@@ -614,6 +614,24 @@ const ROWS: Record<string, Row> = {
     'Colour used to fill the empty parts of the canvas; leave empty for transparent',
   ],
   '透明': ['透明', 'Transparent'],
+  // ---- 2048 ----
+  '2048': ['2048', '2048'],
+  '默认棋盘': ['預設棋盤', 'Default board'],
+  '默认胜利目标': ['預設勝利目標', 'Default goal'],
+  '方块弹出动画': ['方塊彈出動畫', 'Tile animations'],
+  '清空最高分记录': ['清空最高分記錄', 'Clear best scores'],
+  '打开「2048」时使用的棋盘大小, 默认 ${n}×${n}': [
+    '開啟「2048」時使用的棋盤大小, 預設 ${n}×${n}',
+    'Board size used when opening 2048 — default ${n}×${n}',
+  ],
+  '合成出该数字即通关, 达成后可继续挑战, 默认 ${n}': [
+    '合成出該數字即通關, 達成後可繼續挑戰, 預設 ${n}',
+    'Reaching this tile wins the round (you may keep playing) — default ${n}',
+  ],
+  '关闭后方块移动 / 合并不再播放弹出动画 (低性能设备更流畅)': [
+    '關閉後方塊移動 / 合併不再播放彈出動畫 (低效能裝置更流暢)',
+    'Turn off to skip the pop / merge animations (smoother on slow devices)',
+  ],
 };
 
 /**

@@ -2,7 +2,7 @@
 
 # 🧰 Magic Tools
 
-**全能開發工具箱 —— 9 大分類、151 個實用工具，桌面 + Web 雙端。**
+**全能開發工具箱 —— 10 大分類、152 個實用工具，桌面 + Web 雙端。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
@@ -16,7 +16,7 @@
 
 ## ✨ 亮點
 
-- **100+ 常用開發工具**，依 9 大分類組織：編解碼、類型轉換、加解密、值計算、格式化、圖片、產生器、站長工具與實用工具。
+- **100+ 常用開發工具**，依 10 大分類組織：編解碼、類型轉換、加解密、值計算、格式化、圖片、產生器、遊戲、站長工具與實用工具。
 - **完整的密碼學套件** —— 對稱加密（AES / DES / 3DES / SM4 / ChaCha20 / Blowfish / Rabbit / RC2–RC6 / TEA / XTEA / XXTEA / 祖沖之 ZUC）、非對稱（RSA / SM2 國密）、古典密碼（凱撒 / 柵欄 / 維吉尼亞 / 希爾），以及 Cisco Type 7。
 - **雜湊與 MAC** —— MD5、SHA-1/2、SHA-3、Keccak、SM3、BCrypt、Scrypt、PBKDF2、HKDF、HMAC、CMAC、KMAC，以及 BCC / LRC / CRC 檢查碼。
 - **批次 QR Code / 條碼** —— 一次產生多筆並預覽，桌面版可一鍵選取資料夾匯出全部 PNG。
@@ -47,6 +47,9 @@ Base64 圖片 · ASCII 圖片 · 程式碼截圖 · ICO 生成 · App Icon 生�
 
 ### 🎲 產生器 *(15)*
 二維碼生成(批次, logo/標籤) · 條碼生成(CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacode) · 密碼生成(強度分析) · OTP 密碼產生器(TOTP/HOTP, 二維碼匯出) · htpasswd 生成 · 資料產生(JSON/CSV/SQL) · 點陣字產生器 · 數獨產生器(4/6/9 宮格, 唯一解, A4 列印) · 字帖產生器(米字格/田字格/回宮格/作文格, A4 列印) · Cron 規則產生(解析 + 下次執行時間) · .gitignore 產生(60+ 現成範本: 語言/框架與工具/編輯器/作業系統, 技術棧一鍵組合, 自訂追加, 跨範本自動去重) · 白板(Excalidraw 無限畫布: 圖形/箭頭/文字/手繪, 本機自動儲存, 匯出 PNG/SVG/畫布檔案 —— 不連網、無協作) · 聊天產生器(9 種平台風格: 微信/QQ/Slack/Telegram/Discord/WhatsApp/LINE/釘釘/飛書, 手機或桌面視窗預覽, 文字/圖片/語音/時間分隔四類訊息, 微信另支援紅包/轉帳卡片, 可設定聊天標題、暱稱、頭像、勿擾與手機狀態列, 匯出 PNG) · 拼豆圖紙 (上傳圖片產生拼豆圖紙: 6 種品牌色卡 (MARD / COCO / Artkal / Artkal Mini / Perler / Hama)、圖紙豆數、用色數限制、CIEDE2000 感知匹配、抖動、自動去背景、亮度/對比度/飽和度、畫筆/橡皮/換色/魔棒與復原重做、熨燙用的鏡像預覽、總豆數/成品尺寸/拼豆板統計, 匯出可列印 PNG 與色號/用量 CSV) · 假裝開會 (三套會議軟體介面 —— 騰訊會議 / Zoom / Microsoft Teams：假參與者頭像與名牌、隨機高亮的發言者、走動的計時器、會逐條到來的聊天訊息、參與者清單、假分享螢幕投影片、沉浸全螢幕 (Esc 離開)、自己的畫面可用攝影機或上傳照片代替、可合成背景人聲營造「辦公室很忙」氛圍)
+
+### 🎮 遊戲 *(1)*
+2048(4×4 / 5×5 / 6×6 棋盤上合併數字, 方向鍵 / WASD / 滑動操作, 可復原最近 20 步, 最高分依棋盤分別記錄, 達到目標後還能繼續挑戰, 桌面版與 Web 版都能玩)
 
 ### 🌐 站長工具 *(16)*
 HTML 標籤去除 · 瀏覽器指紋 · CSR 申請文件(本機產生 RSA 私鑰 + PKCS#10 請求, 支援 SAN) · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 檢查 · 關鍵詞密度 · 網頁TDK 資訊檢測 · DNS 查詢(僅桌面版) · Whois 查詢(僅桌面版) · MTR 查詢(僅桌面版: traceroute + ping, 逐跳丟包/RTT/抖動) · robots.txt 生成 · iptables 規則(日常情境一鍵產生: 開放連接埠 / 封鎖 IP / 封鎖網段 / 連接埠轉發; 也可解析現有規則或依表單產生指令, 支援 iptables-save) · tc 規則(HTB / TBF / netem 限速與弱網模擬, 入口限速走 ifb) · nginx 設定(靜態站點 / SPA / PHP / 反向代理, 含 TLS、gzip、靜態快取、限流、防盜連, 直接產生 vhost 設定檔)
@@ -128,6 +131,8 @@ magic-tools
 **🎲 產生器 *(15)*** — `BarcodeGenerator` · `BeadPatternGenerator` · `ChatGenerator` · `CopybookGenerator` · `CronRules` · `DotMatrixFont` · `FakeMeeting` · `GitignoreGenerator` · `HtpasswdGenerator` · `MockData` · `OTPGenerator` · `PasswordGenerator` · `QRCodeGenerator` · `SudokuGenerator` · `Whiteboard`
 
 **🌐 站長工具 *(16)*** — `BrowserFingerprint` · `CSRGenerator` · `CookieAnalyzer` · `DnsQuery` · `HtmlStripText` · `IptablesRules` · `KeywordDensity` · `MtrQuery` · `NginxConfig` · `RobotsTxtGenerator` · `SitemapCheck` · `TcRules` · `UrlExtract` · `UserAgentParser` · `WebTDKCheck` · `WhoisQuery`
+
+**🎮 遊戲 *(1)*** — `Game2048`
 
 **🧩 其他 *(18)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `Metronome` · `Pomodoro` · `QrDecode` · `RegexTester` · `ScreenRecorder` · `SensitiveWord` · `Teleprompter` · `WebSocketDebug` · `ZipCompress` · `ZipExtract`
 

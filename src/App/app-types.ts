@@ -12,6 +12,7 @@ export const APP_TYPES: Array<AppTypeDef> = [
   { key: 'formatter', name: '格式化' },
   { key: 'image', name: '图片' },
   { key: 'generator', name: '生成器' },
+  { key: 'game', name: '游戏' },
   { key: 'webmaster', name: '站长工具' },
   { key: 'misc', name: '其它' },
 ];
