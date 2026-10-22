@@ -156,6 +156,7 @@ const list = [
   'SensitiveWord',
   'Pomodoro',
   'Game2048',
+  'Tetris',
 ];
 
 import { defineLoader } from './app-modules';

@@ -156,6 +156,7 @@ import Whiteboard from './Whiteboard/lang';
 import BeadPatternGenerator from './BeadPatternGenerator/lang';
 import FakeMeeting from './FakeMeeting/lang';
 import Game2048 from './Game2048/lang';
+import Tetris from './Tetris/lang';
 
 export const langPacks = {
   Hash: Hash,
@@ -314,4 +315,5 @@ export const langPacks = {
   SensitiveWord,
   Pomodoro,
   Game2048,
+  Tetris,
 };

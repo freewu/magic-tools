@@ -632,6 +632,25 @@ const ROWS: Record<string, Row> = {
     '關閉後方塊移動 / 合併不再播放彈出動畫 (低效能裝置更流暢)',
     'Turn off to skip the pop / merge animations (smoother on slow devices)',
   ],
+  // ---- 俄罗斯方块 ----
+  '俄罗斯方块': ['俄羅斯方塊', 'Tetris'],
+  '默认起始等级': ['預設起始等級', 'Default start level'],
+  '幽灵方块 (落点预览)': ['幽靈方塊 (落點預覽)', 'Ghost piece (landing preview)'],
+  '显示网格线': ['顯示網格線', 'Show grid lines'],
+  '等级越高方块下落越快, 从第几级开始随时可改, 默认 ${n} 级': [
+    '等級越高方塊下落越快, 從第幾級開始隨時可改, 預設 ${n} 級',
+    'Higher levels fall faster — pick the level a new round starts at (default ${n})',
+  ],
+  '显示当前方块硬降后的落点, 关闭后界面更简洁': [
+    '顯示目前方塊硬降後的落點, 關閉後介面更簡潔',
+    'Show where the current piece will land; turn off for a cleaner board',
+  ],
+  '关闭后棋盘只留方块, 视觉更干净': [
+    '關閉後棋盤只留方塊, 視覺更乾淨',
+    'Turn off to hide the cell grid for a cleaner look',
+  ],
+  '最高分清空后无法恢复': ['最高分清空後無法恢復', 'The best score cannot be restored once cleared'],
+  '已清空最高分记录': ['已清空最高分記錄', 'Best score cleared'],
 };
 
 /**
