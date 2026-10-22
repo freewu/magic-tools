@@ -158,6 +158,7 @@ import FakeMeeting from './FakeMeeting/lang';
 import Game2048 from './Game2048/lang';
 import Tetris from './Tetris/lang';
 import NesEmulator from './NesEmulator/lang';
+import Minesweeper from './Minesweeper/lang';
 
 export const langPacks = {
   Hash: Hash,
@@ -318,4 +319,5 @@ export const langPacks = {
   Game2048,
   Tetris,
   NesEmulator,
+  Minesweeper,
 };

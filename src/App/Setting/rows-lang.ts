@@ -678,6 +678,26 @@ const ROWS: Record<string, Row> = {
     'Keys can be rebound one by one on the emulator page',
   ],
   '已恢复默认键位': ['已恢復預設鍵位', 'Default keys restored'],
+  // ---- 扫雷 ----
+  '扫雷': ['掃雷', 'Minesweeper'],
+  '默认格子大小': ['預設格子大小', 'Default cell size'],
+  '插旗经过问号': ['插旗經過問號', 'Flag → question'],
+  '清空最高纪录': ['清空最高紀錄', 'Clear best times'],
+  '小': ['小', 'S'],
+  '中': ['中', 'M'],
+  '大': ['大', 'L'],
+  '初级': ['初級', 'Beginner'],
+  '中级': ['中級', 'Intermediate'],
+  '高级': ['高級', 'Expert'],
+  '自定义': ['自訂', 'Custom'],
+  '棋盘格子越大越好点, 高级棋盘可适当调小': [
+    '棋盤格子越大越好點, 高級棋盤可適當調小',
+    'Bigger cells are easier to hit — use smaller ones on the expert board',
+  ],
+  '开启后右键在 旗 / 问号 / 空 之间循环, 关闭后只在 旗 / 空 之间切换': [
+    '開啟後右鍵在 旗 / 問號 / 空 之間循環, 關閉後只在 旗 / 空 之間切換',
+    'When on, right click cycles flag / question / blank; when off it toggles flag / blank',
+  ],
 };
 
 /**

@@ -158,6 +158,7 @@ const list = [
   'Game2048',
   'Tetris',
   'NesEmulator',
+  'Minesweeper',
 ];
 
 import { defineLoader } from './app-modules';
