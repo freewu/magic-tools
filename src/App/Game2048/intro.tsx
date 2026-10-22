@@ -19,6 +19,7 @@ const zh = `<h2>这个工具做什么</h2>
 <li><p><b>撤销</b>: 回退上一步 (最多 20 步, 刷新页面后失效), 走错了可以救一手</p></li>
 <li><p><b>棋盘</b>: 4×4 / 5×5 / 6×6 即时切换, 切换会以新边长开一局</p></li>
 <li><p><b>继续挑战</b>: 合成出目标数字后出现, 点一下继续往上打; 不点则停在结算界面</p></li>
+<li><p><b>全屏</b>: 右上角「全屏」把棋盘铺满整个屏幕 (棋盘按视口自动放大, 只留记分与操作按钮), 按 <b>Esc</b> 或点「退出全屏」返回</p></li>
 </ul>
 
 <h2>设置与存档</h2>
@@ -52,6 +53,7 @@ const tw = `<h2>這個工具做什麼</h2>
 <li><p><b>復原</b>: 回退上一步 (最多 20 步, 重新整理後失效), 走錯了可以救一手</p></li>
 <li><p><b>棋盤</b>: 4×4 / 5×5 / 6×6 即時切換, 切換會以新邊長開一局</p></li>
 <li><p><b>繼續挑戰</b>: 合成出目標數字後出現, 點一下繼續往上打; 不點則停在結算畫面</p></li>
+<li><p><b>全螢幕</b>: 右上角「全螢幕」把棋盤鋪滿整個畫面 (棋盤依視口自動放大, 只留記分與操作按鈕), 按 <b>Esc</b> 或點「退出全螢幕」返回</p></li>
 </ul>
 
 <h2>設定與存檔</h2>
@@ -77,6 +79,7 @@ const en = `<h2>What this tool does</h2>
 <li><p>After every effective move a new <b>2</b> (90%) or <b>4</b> (10%) appears in a random empty cell</p></li>
 <li><p>Merging scores the value of the new tile — two 64s make a 128 and score <b>128</b></p></li>
 <li><p>The game ends when the board is full and no neighbouring tiles can merge</p></li>
+<li><p><b>Fullscreen</b> (top-right button) fills the screen with the board — it scales up to the viewport and only keeps the score and controls; press <b>Esc</b> or click “Exit fullscreen” to go back</p></li>
 </ul>
 
 <h2>Toolbar</h2>

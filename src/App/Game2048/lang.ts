@@ -21,6 +21,8 @@ const rows: Record<string, [string, string]> = {
   '目标 {n}': ['目標 {n}', 'Goal {n}'],
   '第 {n} 步': ['第 {n} 步', 'Move {n}'],
   '已撤销 {n} 步可退': ['已復原 {n} 步可退', '{n} undo steps left'],
+  '全屏': ['全螢幕', 'Fullscreen'],
+  '退出全屏': ['退出全螢幕', 'Exit fullscreen'],
   // 提示 / 结算
   '达成 {n}!': ['達成 {n}!', 'You reached {n}!'],
   '已合成 {n}, 可以继续挑战更大的数字, 也可以重新开始': [
@@ -35,6 +37,10 @@ const rows: Record<string, [string, string]> = {
   '方向键 / WASD 移动方块 · 触屏可直接滑动 · 可撤销 {n} 步': [
     '方向鍵 / WASD 移動方塊 · 觸屏可直接滑動 · 可復原 {n} 步',
     'Arrow keys / WASD to move · swipe on touch screens · {n} undo steps',
+  ],
+  '方向键 / WASD 移动方块 · 触屏可直接滑动 · 可撤销 {n} 步 · Esc 退出全屏': [
+    '方向鍵 / WASD 移動方塊 · 觸屏可直接滑動 · 可復原 {n} 步 · Esc 退出全螢幕',
+    'Arrow keys / WASD to move · swipe on touch screens · {n} undo steps · Esc to exit fullscreen',
   ],
   '相同数字相撞即合并为两倍, 每合成出新方块得相同分数': [
     '相同數字相撞即合併為兩倍, 每合成出新方塊得相同分數',

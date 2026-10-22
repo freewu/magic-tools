@@ -76,8 +76,17 @@ export const BOARD_GAP = 10;
 /** 棋盘最大边长 (px): 超出视口宽度时按 88vw 缩放 */
 export const BOARD_MAX_PX = 460;
 
+/** 棋盘边长 (CSS 长度表达式): 普通模式居中限宽, 全屏模式按视口铺满 */
+export const BOARD_SIZE_CSS = `min(88vw, ${BOARD_MAX_PX}px)`;
+export const BOARD_SIZE_CSS_FULL = 'min(86vh, 92vw)';
+
 /** 棋盘样式 (动画 / 方块外观); 只做视觉, 不影响逻辑 */
 export const BOARD_CSS = `
+.g2048-stage { box-sizing: border-box; }
+.g2048-stage.g2048-full { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 12px; padding: 16px; overflow: auto;
+  background: var(--g2048-bg, #faf9f7); }
+.g2048-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; }
 .g2048-board { display: grid; padding: 10px; border-radius: 10px; touch-action: none; user-select: none; box-sizing: border-box; }
 .g2048-cell { position: relative; aspect-ratio: 1 / 1; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
 .g2048-tile { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; border-radius: 6px;

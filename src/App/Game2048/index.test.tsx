@@ -145,4 +145,35 @@ describe('2048 页面', () => {
     expect(screen.getByTestId('game2048-board').children).toHaveLength(36);
     expect(screen.getByText('目标 4096')).toBeInTheDocument();
   });
+
+  test('可进入全屏 (原生全屏不可用时用窗口内全屏兜底) 并从全屏继续游玩', () => {
+    seed([ [ 2, 2, 0, 0 ], emptyRow(4), emptyRow(4), emptyRow(4) ]);
+    const { container } = render(<Game2048 />);
+
+    fireEvent.click(screen.getByRole('button', { name: /全\s*屏/ }));
+    const stage = screen.getByTestId('game2048-full');
+    expect(stage).toBeInTheDocument();
+    expect(stage.className).toContain('g2048-full');
+    // 全屏下棋盘与记分都在, 且说明区隐藏
+    expect(screen.getByTestId('game2048-board')).toBeInTheDocument();
+    expect(screen.getByText('分数')).toBeInTheDocument();
+    expect(screen.queryByText('2048 说明')).not.toBeInTheDocument();
+
+    // 全屏中依旧可以操作
+    press('ArrowLeft');
+    expect(scoreText()).toBe('分数4');
+    expect(tiles(container)).toContain(4);
+
+    fireEvent.click(screen.getByRole('button', { name: /退出全\s*屏/ }));
+    expect(screen.queryByTestId('game2048-full')).not.toBeInTheDocument();
+    expect(screen.getByText('2048 说明')).toBeInTheDocument();
+  });
+
+  test('全屏下按 Esc 退出', () => {
+    render(<Game2048 />);
+    fireEvent.click(screen.getByRole('button', { name: /全\s*屏/ }));
+    expect(screen.getByTestId('game2048-full')).toBeInTheDocument();
+    press('Escape');
+    expect(screen.queryByTestId('game2048-full')).not.toBeInTheDocument();
+  });
 });

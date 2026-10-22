@@ -1,17 +1,17 @@
 // 2048: 经典数字合并游戏 (4×4 / 5×5 / 6×6)
 // 规则参考 https://play2048.co/ : 相同数字相撞合并为两倍, 每次有效移动后随机生成 2 / 4
-// 说明: 规则计算全部在 lib.ts (纯函数), 本文件只做渲染与键盘 / 触摸等副作用
+// 说明: 规则计算全部在 lib.ts (纯函数), 本文件只做渲染与键盘 / 触摸 / 全屏等副作用
 import { Alert, Button, Card, Divider, Segmented, Space, Tag, Tooltip, Typography, theme } from 'antd';
 import {
   ArrowDownOutlined, ArrowLeftOutlined, ArrowRightOutlined, ArrowUpOutlined,
-  ReloadOutlined, UndoOutlined,
+  FullscreenExitOutlined, FullscreenOutlined, ReloadOutlined, UndoOutlined,
 } from '@ant-design/icons';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '../../hook/app-context';
 import { useLocale } from '../../hook/locale-context';
 import {
-  ANIM_MS, BOARD_BG, BOARD_CSS, BOARD_GAP, BOARD_MAX_PX, BOARD_SIZES, CELL_BG, SWIPE_MIN_PX, UNDO_LIMIT,
-  type BoardSize,
+  ANIM_MS, BOARD_BG, BOARD_CSS, BOARD_GAP, BOARD_SIZE_CSS, BOARD_SIZE_CSS_FULL, BOARD_SIZES, CELL_BG,
+  SWIPE_MIN_PX, UNDO_LIMIT, type BoardSize,
 } from './data';
 import {
   cellKey, clearState, dirOfKey, getBestScore, getDefaultOptions, hasReached, isGameOver, isTypingTarget,
@@ -39,6 +39,12 @@ const readInitial = (): { opts: GameOptions; game: GameState; best: number } => 
   return { opts, game, best: Math.max(getBestScore(opts.size), game.score) };
 };
 
+type FullscreenElement = HTMLDivElement & { webkitRequestFullscreen?: () => Promise<void> | void };
+type FullscreenDocument = Document & {
+  webkitFullscreenElement?: Element | null;
+  webkitExitFullscreen?: () => Promise<void> | void;
+};
+
 const Game2048: React.FC = () => {
   const { locale } = useLocale();
   const t = (zh: string) => u(locale, zh);
@@ -64,6 +70,9 @@ const Game2048: React.FC = () => {
   const [ fx, setFx ] = useState<{ keys: string[]; spawn: string | null }>({ keys: [], spawn: null });
   /** 已通关后是否选择继续挑战 (false 时棋盘停在结算状态, 不再响应移动) */
   const [ keepPlaying, setKeepPlaying ] = useState(false);
+  /** 全屏状态: 先请求原生全屏, 失败 (内嵌 webview / 非用户手势) 时用窗口内全屏兜底 */
+  const [ full, setFull ] = useState(false);
+  const stageRef = useRef<HTMLDivElement | null>(null);
 
   const n = game.board.length;
   const over = isGameOver(game.board);
@@ -119,10 +128,60 @@ const Game2048: React.FC = () => {
     return () => window.clearTimeout(id);
   }, [ fx ]);
 
-  // 键盘: 方向键 / WASD (输入框内不拦截)
+  // ---- 全屏 ----
+  const exitFull = useCallback(() => {
+    setFull(false);
+    const doc = document as FullscreenDocument;
+    const activeFull = doc.fullscreenElement ?? doc.webkitFullscreenElement;
+    if (!activeFull) return;
+    try {
+      Promise.resolve(doc.exitFullscreen?.() ?? doc.webkitExitFullscreen?.()).catch(() => undefined);
+    } catch {
+      /* 忽略: 已退到窗口内全屏 */
+    }
+  }, []);
+
+  // 进入窗口内全屏后, 再尝试申请原生全屏 (失败也不影响, CSS 已铺满视口)
+  useEffect(() => {
+    if (!full) return;
+    const el = stageRef.current as FullscreenElement | null;
+    const request = el?.requestFullscreen?.bind(el) ?? el?.webkitRequestFullscreen?.bind(el);
+    if (!request) return;
+    try {
+      Promise.resolve(request()).catch(() => undefined);
+    } catch {
+      /* 忽略 */
+    }
+  }, [ full ]);
+
+  // 用户用 Esc / 系统手势退出原生全屏时, 同步退出窗口内全屏
+  useEffect(() => {
+    const onChange = () => {
+      const doc = document as FullscreenDocument;
+      if (!doc.fullscreenElement && !doc.webkitFullscreenElement) setFull(false);
+    };
+    document.addEventListener('fullscreenchange', onChange);
+    document.addEventListener('webkitfullscreenchange', onChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', onChange);
+      document.removeEventListener('webkitfullscreenchange', onChange);
+    };
+  }, []);
+
+  // 切换到其它工具时自动退出全屏 (全屏覆盖层随页面常驻, 不退出会盖住别的应用)
+  useEffect(() => {
+    if (!active && full) exitFull();
+  }, [ active, full, exitFull ]);
+
+  // 键盘: 方向键 / WASD (输入框内不拦截); 窗口内全屏时 Esc 退出
   useEffect(() => {
     if (!active) return;
     const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && full) {
+        const doc = document as FullscreenDocument;
+        if (!doc.fullscreenElement && !doc.webkitFullscreenElement) exitFull();
+        return;
+      }
       if (isTypingTarget(e.target as HTMLElement | null)) return;
       const dir = dirOfKey(e);
       if (!dir) return;
@@ -131,7 +190,7 @@ const Game2048: React.FC = () => {
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [ active, applyMove ]);
+  }, [ active, applyMove, full, exitFull ]);
 
   // 触摸滑动
   const touchRef = useRef<{ x: number; y: number } | null>(null);
@@ -152,7 +211,7 @@ const Game2048: React.FC = () => {
 
   const maxValue = game.board.reduce((m, row) => row.reduce((mm, v) => (v > mm ? v : mm), m), 0);
   const cellFont = (v: number) =>
-    `calc((min(88vw, ${BOARD_MAX_PX}px) - ${BOARD_GAP * (n + 1)}px) / ${n} * ${tileFontScale(v)})`;
+    `calc((var(--g2048-board) - ${BOARD_GAP * (n + 1)}px) / ${n} * ${tileFontScale(v)})`;
 
   const stat = (label: string, value: React.ReactNode) => (
     <div
@@ -169,132 +228,196 @@ const Game2048: React.FC = () => {
     </div>
   );
 
-  return (
-    <Space direction="vertical" size={ 16 } style={ { width: '100%' } }>
-      <style>{ BOARD_CSS }</style>
+  const boardNode = (
+    <div
+      className="g2048-board"
+      data-testid="game2048-board"
+      style={ {
+        gridTemplateColumns: `repeat(${n}, 1fr)`,
+        gap: BOARD_GAP,
+        background: BOARD_BG,
+        width: 'var(--g2048-board)',
+        maxWidth: '100%',
+      } }
+      onTouchStart={ onTouchStart }
+      onTouchEnd={ onTouchEnd }
+    >
+      { game.board.map((row, r) => row.map((v, c) => {
+        const key = cellKey({ r, c });
+        const merged = fx.keys.includes(key);
+        const spawned = fx.spawn === key;
+        const anim = opts.anim && (merged || spawned);
+        return (
+          <div key={ key } className="g2048-cell" style={ { background: CELL_BG } } data-cell={ key }>
+            { v > 0 ? (
+              <div
+                className={ `g2048-tile${anim && spawned ? ' g2048-tile-new' : ''}${anim && merged ? ' g2048-tile-merge' : ''}` }
+                data-tile={ v }
+                style={ { background: tileColor(v).bg, color: tileColor(v).fg, fontSize: cellFont(v) } }
+              >
+                { v }
+              </div>
+            ) : null }
+          </div>
+        );
+      })) }
+    </div>
+  );
 
-      <Card
-        size="small"
-        title={ t('2048') }
-        extra={
-          <Space size={ 8 } wrap>
-            <Button size="small" type="primary" icon={ <ReloadOutlined /> } onClick={ () => restart(size) }>
-              { t('新游戏') }
-            </Button>
-            <Tooltip title={ t('回退上一步') }>
-              <Button size="small" icon={ <UndoOutlined /> } disabled={ history.length === 0 } onClick={ undo }>
-                { t('撤销') }
-              </Button>
-            </Tooltip>
-          </Space>
-        }
-      >
-        <Space direction="vertical" size={ 12 } style={ { width: '100%' } }>
-          <Space size={ 12 } wrap align="center">
+  const dpadNode = (
+    <div style={ { display: 'grid', gridTemplateColumns: 'repeat(3, 34px)', gridAutoRows: '34px', gap: 4 } }>
+      { DPAD.map(({ dir, icon, area }) => (
+        <Button
+          key={ dir }
+          size="small"
+          style={ { gridArea: area } }
+          icon={ icon }
+          aria-label={ dir }
+          disabled={ locked }
+          onClick={ () => applyMove(dir) }
+        />
+      )) }
+    </div>
+  );
+
+  /** 通关 / 死局提示 (全屏与普通模式共用, 不遮挡棋盘) */
+  const alertsNode = (
+    <>
+      { game.won && !keepPlaying ? (
+        <Alert
+          type="success"
+          showIcon
+          message={ tT('达成 {n}!', { n: opts.win }) }
+          description={ tT('已合成 {n}, 可以继续挑战更大的数字, 也可以重新开始', { n: maxValue }) }
+          action={ (
+            <Space direction="vertical" size={ 6 }>
+              <Button size="small" type="primary" onClick={ () => setKeepPlaying(true) }>{ t('继续挑战') }</Button>
+              <Button size="small" onClick={ () => restart(size) }>{ t('重新开始') }</Button>
+            </Space>
+          ) }
+        />
+      ) : null }
+      { over ? (
+        <Alert
+          type="error"
+          showIcon
+          message={ t('游戏结束') }
+          description={ t('棋盘已满, 也再没有可以合并的方块了') }
+          action={ <Button size="small" type="primary" onClick={ () => restart(size) }>{ t('重新开始') }</Button> }
+        />
+      ) : null }
+    </>
+  );
+
+  const newGameBtn = (
+    <Button size="small" type="primary" icon={ <ReloadOutlined /> } onClick={ () => restart(size) }>
+      { t('新游戏') }
+    </Button>
+  );
+
+  const undoBtn = (
+    <Tooltip title={ t('回退上一步') }>
+      <Button size="small" icon={ <UndoOutlined /> } disabled={ history.length === 0 } onClick={ undo }>
+        { t('撤销') }
+      </Button>
+    </Tooltip>
+  );
+
+  // ---- 全屏: 只保留记分 / 棋盘 / 操作, 棋盘按视口最大化 ----
+  if (full) {
+    return (
+      <>
+        <style>{ BOARD_CSS }</style>
+        <div
+          ref={ stageRef }
+          className="g2048-stage g2048-full"
+          data-testid="game2048-full"
+          style={ {
+            '--g2048-board': BOARD_SIZE_CSS_FULL,
+            '--g2048-bg': token.colorBgContainer,
+          } as React.CSSProperties }
+        >
+          <div className="g2048-bar">
             { stat(t('分数'), game.score) }
             { stat(t('最高分'), best) }
-            <Space size={ 6 } wrap>
-              <Segmented
-                size="small"
-                value={ size }
-                onChange={ (v) => restart(Number(v) as BoardSize) }
-                options={ BOARD_SIZES.map((s) => ({ value: s, label: `${s}×${s}` })) }
-              />
-              <Text type="secondary" style={ { fontSize: 12 } }>{ t('棋盘') }</Text>
-            </Space>
             <Tag color={ maxValue >= opts.win ? 'gold' : 'default' }>{ tT('最大方块 {n}', { n: maxValue }) }</Tag>
             <Tag>{ tT('目标 {n}', { n: opts.win }) }</Tag>
             <Tag>{ tT('第 {n} 步', { n: moves }) }</Tag>
-            { history.length > 0 ? <Tag color="blue">{ tT('已撤销 {n} 步可退', { n: history.length }) }</Tag> : null }
-          </Space>
-
-          {/* 通关 / 结束提示 (不遮挡棋盘, 棋盘保持可见) */}
-          { game.won && !keepPlaying ? (
-            <Alert
-              type="success"
-              showIcon
-              message={ tT('达成 {n}!', { n: opts.win }) }
-              description={ tT('已合成 {n}, 可以继续挑战更大的数字, 也可以重新开始', { n: maxValue }) }
-              action={ (
-                <Space direction="vertical" size={ 6 }>
-                  <Button size="small" type="primary" onClick={ () => setKeepPlaying(true) }>{ t('继续挑战') }</Button>
-                  <Button size="small" onClick={ () => restart(size) }>{ t('重新开始') }</Button>
-                </Space>
-              ) }
-            />
-          ) : null}
-          { over ? (
-            <Alert
-              type="error"
-              showIcon
-              message={ t('游戏结束') }
-              description={ t('棋盘已满, 也再没有可以合并的方块了') }
-              action={ <Button size="small" type="primary" onClick={ () => restart(size) }>{ t('重新开始') }</Button> }
-            />
-          ) : null}
-
-          <div
-            className="g2048-board"
-            data-testid="game2048-board"
-            style={ {
-              gridTemplateColumns: `repeat(${n}, 1fr)`,
-              gap: BOARD_GAP,
-              background: BOARD_BG,
-              width: `min(88vw, ${BOARD_MAX_PX}px)`,
-            } }
-            onTouchStart={ onTouchStart }
-            onTouchEnd={ onTouchEnd }
-          >
-            { game.board.map((row, r) => row.map((v, c) => {
-              const key = cellKey({ r, c });
-              const merged = fx.keys.includes(key);
-              const spawned = fx.spawn === key;
-              const anim = opts.anim && (merged || spawned);
-              return (
-                <div key={ key } className="g2048-cell" style={ { background: CELL_BG } } data-cell={ key }>
-                  { v > 0 ? (
-                    <div
-                      className={ `g2048-tile${anim && spawned ? ' g2048-tile-new' : ''}${anim && merged ? ' g2048-tile-merge' : ''}` }
-                      data-tile={ v }
-                      style={ { background: tileColor(v).bg, color: tileColor(v).fg, fontSize: cellFont(v) } }
-                    >
-                      { v }
-                    </div>
-                  ) : null }
-                </div>
-              );
-            })) }
+            { newGameBtn }
+            { undoBtn }
+            <Button size="small" icon={ <FullscreenExitOutlined /> } onClick={ exitFull }>{ t('退出全屏') }</Button>
           </div>
+          { alertsNode }
+          { boardNode }
+          <div className="g2048-bar">
+            { dpadNode }
+            <Text type="secondary" style={ { fontSize: 12 } }>
+              { tT('方向键 / WASD 移动方块 · 触屏可直接滑动 · 可撤销 {n} 步 · Esc 退出全屏', { n: UNDO_LIMIT }) }
+            </Text>
+          </div>
+        </div>
+      </>
+    );
+  }
 
-          <Space size={ 12 } wrap align="start">
-            <div style={ { display: 'grid', gridTemplateColumns: 'repeat(3, 34px)', gridAutoRows: '34px', gap: 4 } }>
-              { DPAD.map(({ dir, icon, area }) => (
-                <Button
-                  key={ dir }
+  return (
+    <div className="g2048-stage" style={ { '--g2048-board': BOARD_SIZE_CSS } as React.CSSProperties }>
+      <style>{ BOARD_CSS }</style>
+      <Space direction="vertical" size={ 16 } style={ { width: '100%' } }>
+        <Card
+          size="small"
+          title={ t('2048') }
+          extra={
+            <Space size={ 8 } wrap>
+              { newGameBtn }
+              { undoBtn }
+              <Button size="small" icon={ <FullscreenOutlined /> } onClick={ () => setFull(true) }>
+                { t('全屏') }
+              </Button>
+            </Space>
+          }
+        >
+          <Space direction="vertical" size={ 12 } style={ { width: '100%' } }>
+            <Space size={ 12 } wrap align="center">
+              { stat(t('分数'), game.score) }
+              { stat(t('最高分'), best) }
+              <Space size={ 6 } wrap>
+                <Segmented
                   size="small"
-                  style={ { gridArea: area } }
-                  icon={ icon }
-                  aria-label={ dir }
-                  disabled={ locked }
-                  onClick={ () => applyMove(dir) }
+                  value={ size }
+                  onChange={ (v) => restart(Number(v) as BoardSize) }
+                  options={ BOARD_SIZES.map((s) => ({ value: s, label: `${s}×${s}` })) }
                 />
-              )) }
-            </div>
-            <Space direction="vertical" size={ 2 }>
-              <Text type="secondary" style={ { fontSize: 12 } }>
-                { tT('方向键 / WASD 移动方块 · 触屏可直接滑动 · 可撤销 {n} 步', { n: UNDO_LIMIT }) }
-              </Text>
-              <Text type="secondary" style={ { fontSize: 12 } }>{ t('相同数字相撞即合并为两倍, 每合成出新方块得相同分数') }</Text>
-              <Text type="secondary" style={ { fontSize: 12 } }>{ tT('达到 {n} 即通关, 通关后可继续挑战更高分', { n: opts.win }) }</Text>
-              { over ? <Text type="secondary" style={ { fontSize: 12 } }>{ t('本局已结束, 点「重新开始」开一局新的') }</Text> : null }
+                <Text type="secondary" style={ { fontSize: 12 } }>{ t('棋盘') }</Text>
+              </Space>
+              <Tag color={ maxValue >= opts.win ? 'gold' : 'default' }>{ tT('最大方块 {n}', { n: maxValue }) }</Tag>
+              <Tag>{ tT('目标 {n}', { n: opts.win }) }</Tag>
+              <Tag>{ tT('第 {n} 步', { n: moves }) }</Tag>
+              { history.length > 0 ? <Tag color="blue">{ tT('已撤销 {n} 步可退', { n: history.length }) }</Tag> : null }
+            </Space>
+
+            { alertsNode }
+
+            { boardNode }
+
+            <Space size={ 12 } wrap align="start">
+              { dpadNode }
+              <Space direction="vertical" size={ 2 }>
+                <Text type="secondary" style={ { fontSize: 12 } }>
+                  { tT('方向键 / WASD 移动方块 · 触屏可直接滑动 · 可撤销 {n} 步', { n: UNDO_LIMIT }) }
+                </Text>
+                <Text type="secondary" style={ { fontSize: 12 } }>{ t('相同数字相撞即合并为两倍, 每合成出新方块得相同分数') }</Text>
+                <Text type="secondary" style={ { fontSize: 12 } }>{ tT('达到 {n} 即通关, 通关后可继续挑战更高分', { n: opts.win }) }</Text>
+                { over ? <Text type="secondary" style={ { fontSize: 12 } }>{ t('本局已结束, 点「重新开始」开一局新的') }</Text> : null }
+              </Space>
             </Space>
           </Space>
-        </Space>
-      </Card>
+        </Card>
 
-      <Divider>{ t('2048 说明') }</Divider>
-      <Game2048Intro />
-    </Space>
+        <Divider>{ t('2048 说明') }</Divider>
+        <Game2048Intro />
+      </Space>
+    </div>
   );
 };
 
