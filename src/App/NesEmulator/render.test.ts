@@ -26,7 +26,7 @@ describe('画面渲染器', () => {
     expect(createRenderer(throwing)).toBeNull();
   });
 
-  test('draw 把帧缓冲整块写入 ImageData 并刷新画面', () => {
+  test('draw 把帧缓冲写入 ImageData 并刷新画面', () => {
     const { canvas, ctx, data } = makeCanvas();
     const renderer = createRenderer(canvas);
     expect(renderer).not.toBeNull();
@@ -34,12 +34,29 @@ describe('画面渲染器', () => {
     expect(canvas.height).toBe(240);
 
     const frame = new Uint32Array(256 * 240);
-    frame[0] = 0xff0000ff; // jsnes 的 0xAABBGGRR: 红
-    frame[1] = 0xff00ff00; // 绿
+    frame[0] = 0x00ff0000; // jsnes 帧缓冲是 0x00RRGGBB: 红
+    frame[1] = 0x0000ff00; // 绿
+    frame[2] = 0x000000ff; // 蓝
+    frame[3] = 0x00ffffff; // 白
     renderer?.draw(frame);
     expect(ctx.putImageData).toHaveBeenCalledTimes(1);
+    // 通道顺序要正确 (R/B 不能互换), 且 alpha 必须补成不透明, 否则画面全透明 (黑屏)
     expect(Array.from(data.slice(0, 4))).toEqual([ 255, 0, 0, 255 ]);
     expect(Array.from(data.slice(4, 8))).toEqual([ 0, 255, 0, 255 ]);
+    expect(Array.from(data.slice(8, 12))).toEqual([ 0, 0, 255, 255 ]);
+    expect(Array.from(data.slice(12, 16))).toEqual([ 255, 255, 255, 255 ]);
+    // 帧缓冲里的 0 (黑) 也要把 alpha 补成 255, 否则背景是透明而不是黑
+    expect(Array.from(data.slice(16, 20))).toEqual([ 0, 0, 0, 255 ]);
+  });
+
+  test('draw 不会把 jsnes 帧缓冲里缺失的 alpha 直接搬进 ImageData', () => {
+    const { canvas, data } = makeCanvas();
+    const renderer = createRenderer(canvas);
+    const frame = new Uint32Array(256 * 240).fill(0x00123456);
+    renderer?.draw(frame);
+    const alpha: number[] = [];
+    for (let i = 3; i < data.length; i += 4) alpha.push(data[i]);
+    expect(new Set(alpha)).toEqual(new Set([ 255 ]));
   });
 
   test('帧数据长度不足时跳过绘制', () => {

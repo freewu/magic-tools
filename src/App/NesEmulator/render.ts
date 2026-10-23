@@ -1,5 +1,5 @@
 // NES 模拟器: 画面渲染 (256×240 帧缓冲 -> canvas)
-// jsnes 的 onFrame 每帧给一个 Uint32Array (每像素 0xAABBGGRR), 直接塞进 ImageData 再 putImageData 即可
+// jsnes 的 onFrame 每帧给一个 Uint32Array (每像素 0x00RRGGBB, 不含 alpha), 需补 alpha 并交换 R/B 再 putImageData
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from './data';
 
 export interface NesRenderer {
@@ -36,8 +36,15 @@ export const createRenderer = (
   return {
     draw(frame: Uint32Array): void {
       if (!frame || frame.length < size) return;
-      // 浏览器均按小端存放 RGBA, 与 jsnes 的 0xAABBGGRR 布局一致, 直接整块拷贝最快
-      view.set(frame.subarray(0, size));
+      // jsnes 2.x 的帧缓冲是「无 alpha 的 0x00RRGGBB」, 而 ImageData 在内存里是 R,G,B,A 四字节
+      // (浏览器按小端解释 Uint32, 即 0xAABBGGRR)。直接整块拷贝有两个问题:
+      //   ① alpha 位是 0 → 画出来全透明, 看起来就是黑屏;
+      //   ② R / B 通道颠倒 → 红蓝互换。
+      // 所以逐像素补不透明 alpha (0xFF000000) 并交换 R / B。
+      for (let i = 0; i < size; i += 1) {
+        const c = frame[i];
+        view[i] = 0xff000000 | ((c & 0x0000ff) << 16) | (c & 0x00ff00) | ((c & 0xff0000) >> 16);
+      }
       ctx.putImageData(image, 0, 0);
     },
     snapshot(): string | null {
