@@ -19,8 +19,8 @@ import {
 } from './data';
 import {
   EMPTY_ROM_INFO, buildKeyLookup, encodeSaveState, formatRomSize, frameIntervalMs, gamepadButtonOf, getDefaultOptions,
-  getRecentRoms, hotkeyOf, isTypingTarget, keyDisplayName, keyLabel, normalizeKeys, parseRomHeader,
-  patchDefaultOptions, pushRecentRom, readFileBytes, readFileText, readQuickSave, rebindKey, romBaseName,
+  getRecentRoms, hotkeyOf, isTypingTarget, keyDisplayName, keyLabel, normalizeKeys, padOpacityToAlpha,
+  parseRomHeader, patchDefaultOptions, pushRecentRom, readFileBytes, readFileText, readQuickSave, rebindKey, romBaseName,
   saveRecentRoms, screenshotFileName, stateFileName, writeQuickSave, decodeSaveState, type KeyMap, type RecentRom,
   type RomError, type RomInfo,
 } from './lib';
@@ -70,6 +70,8 @@ const NesEmulator: React.FC = () => {
   const [ full, setFull ] = useState(false);
   const [ captureBtn, setCaptureBtn ] = useState<PadButton | null>(null);
   const [ recent, setRecent ] = useState<RecentRom[]>(() => getRecentRoms());
+  // 虚拟按键按下状态 (键盘 / 手柄 / 触摸都会点亮, 全屏时的按键动效靠它)
+  const [ pressed, setPressed ] = useState<Record<string, boolean>>({});
 
   const nesRef = useRef<NES | null>(null);
   const rendererRef = useRef<NesRenderer | null>(null);
@@ -89,6 +91,7 @@ const NesEmulator: React.FC = () => {
   const mutedRef = useRef(muted);
   const captureRef = useRef<PadButton | null>(null);
   const padsRef = useRef<Set<PadButton>>(new Set());
+  const pressedRef = useRef<Record<string, boolean>>({});
 
   useEffect(() => { speedRef.current = speed; }, [ speed ]);
   useEffect(() => { keysRef.current = keys; }, [ keys ]);
@@ -98,8 +101,17 @@ const NesEmulator: React.FC = () => {
 
   const loaded = romInfo.valid;
 
+  /** 更新虚拟按键的高亮状态 (相同状态直接跳过, 避免每帧 rAF 触发重渲染) */
+  const markPressed = useCallback((button: PadButton, down: boolean) => {
+    if ((pressedRef.current[button] ?? false) === down) return;
+    pressedRef.current = { ...pressedRef.current, [button]: down };
+    setPressed(pressedRef.current);
+  }, []);
+
   /** 松开所有按键 (切走 / 暂停 / 读档时避免「按键卡住」) */
   const releaseAll = useCallback(() => {
+    pressedRef.current = {};
+    setPressed(pressedRef.current);
     const nes = nesRef.current;
     if (!nes) return;
     for (const b of PAD_BUTTONS) {
@@ -152,14 +164,21 @@ const NesEmulator: React.FC = () => {
         if (b) pressed.add(b);
       });
     }
+    const held = padsRef.current;
     for (const b of pressed) {
-      if (!padsRef.current.has(b)) nes.buttonDown(1, BUTTON_CODES[b]);
+      if (!held.has(b)) nes.buttonDown(1, BUTTON_CODES[b]);
     }
-    for (const b of padsRef.current) {
+    for (const b of held) {
       if (!pressed.has(b)) nes.buttonUp(1, BUTTON_CODES[b]);
     }
     padsRef.current = pressed;
-  }, []);
+    // 手柄按下同样点亮虚拟按键; 没接手柄时不要干预, 否则每帧都会把键盘 / 触摸的高亮清掉
+    if (pad) {
+      for (const b of PAD_BUTTONS) markPressed(b, pressed.has(b));
+    } else if (held.size > 0) {
+      for (const b of held) markPressed(b, false);
+    }
+  }, [ markPressed ]);
 
   const startLoop = useCallback(() => {
     if (loopRef.current !== null) return;
@@ -507,6 +526,7 @@ const NesEmulator: React.FC = () => {
       e.preventDefault();
       if (e.repeat) return;
       audioRef.current?.resume();
+      markPressed(button, true);
       try {
         nes.buttonDown(1, BUTTON_CODES[button]);
       } catch {
@@ -519,6 +539,7 @@ const NesEmulator: React.FC = () => {
       const button = buildKeyLookup(keysRef.current)[e.key];
       if (!button) return;
       e.preventDefault();
+      markPressed(button, false);
       try {
         nes.buttonUp(1, BUTTON_CODES[button]);
       } catch {
@@ -539,6 +560,7 @@ const NesEmulator: React.FC = () => {
 
   // ---- 触摸 / 鼠标按键 ----
   const padDown = useCallback((button: PadButton) => {
+    markPressed(button, true);
     const nes = nesRef.current;
     if (!nes) return;
     audioRef.current?.resume();
@@ -547,9 +569,10 @@ const NesEmulator: React.FC = () => {
     } catch {
       /* 忽略 */
     }
-  }, []);
+  }, [ markPressed ]);
 
   const padUp = useCallback((button: PadButton) => {
+    markPressed(button, false);
     const nes = nesRef.current;
     if (!nes) return;
     try {
@@ -557,7 +580,7 @@ const NesEmulator: React.FC = () => {
     } catch {
       /* 忽略 */
     }
-  }, []);
+  }, [ markPressed ]);
 
   const padProps = (button: PadButton) => ({
     onPointerDown: (e: React.PointerEvent) => { e.preventDefault(); padDown(button); },
@@ -566,6 +589,44 @@ const NesEmulator: React.FC = () => {
     onPointerCancel: () => padUp(button),
     onContextMenu: (e: React.MouseEvent) => e.preventDefault(),
   });
+
+  /** 虚拟按键的 class (按下时加 is-down, 有缩放 + 高亮动效) */
+  const padBtnClass = (button: PadButton) => `nes-pad-btn${pressed[button] ? ' is-down' : ''}`;
+
+  /** 全屏时浮在画面底部的虚拟按键 (透明度可设置; 触摸 / 键盘 / 手柄按下都会高亮) */
+  const overlayPadNode = (
+    <div
+      className="nes-overlay-pad"
+      data-testid="nes-overlay-pad"
+      style={ { opacity: padOpacityToAlpha(opts.padOpacity) } }
+    >
+      <div className="nes-pad" data-pad-group="dpad">
+        <span />
+        <button type="button" className={ padBtnClass('Up') } data-pad="Up" aria-label={ t('上') } { ...padProps('Up') }>↑</button>
+        <span />
+        <button type="button" className={ padBtnClass('Left') } data-pad="Left" aria-label={ t('左') } { ...padProps('Left') }>←</button>
+        <span />
+        <button type="button" className={ padBtnClass('Right') } data-pad="Right" aria-label={ t('右') } { ...padProps('Right') }>→</button>
+        <span />
+        <button type="button" className={ padBtnClass('Down') } data-pad="Down" aria-label={ t('下') } { ...padProps('Down') }>↓</button>
+        <span />
+      </div>
+      <div className="nes-overlay-faces">
+        <div className="nes-overlay-row">
+          <button type="button" className={ `${padBtnClass('Select')} nes-overlay-mini` } data-pad="Select" { ...padProps('Select') }>
+            Select
+          </button>
+          <button type="button" className={ `${padBtnClass('Start')} nes-overlay-mini` } data-pad="Start" { ...padProps('Start') }>
+            Start
+          </button>
+        </div>
+        <div className="nes-overlay-row">
+          <button type="button" className={ `${padBtnClass('B')} nes-overlay-round` } data-pad="B" { ...padProps('B') }>B</button>
+          <button type="button" className={ `${padBtnClass('A')} nes-overlay-round` } data-pad="A" { ...padProps('A') }>A</button>
+        </div>
+      </div>
+    </div>
+  );
 
   // ---- 渲染 ----
   const regionLabel = romInfo.region === 'pal' ? 'PAL' : romInfo.region === 'dual' ? '双制式' : 'NTSC';
@@ -611,6 +672,7 @@ const NesEmulator: React.FC = () => {
           </Text>
         </div>
       ) : null }
+      { full && opts.showPad ? overlayPadNode : null }
     </div>
   );
 

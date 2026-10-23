@@ -2,11 +2,14 @@ import {
   DEFAULT_OPTIONS, EMPTY_ROM_INFO, NINTENDO_LOGO, clearQuickSave, clearSram, cloneKeys, decodeSaveState,
   encodeSaveState, formatRomSize, frameIntervalMs, gamepadButtonOf, getDefaultOptions, getRecentRoms, getSramEntries,
   globalChecksum, hasNintendoLogo, headerChecksum, hotkeyOf, isRomFileName, isSameOptions, isTypingTarget, keyDisplayName,
-  keyLabel, keyToPadButton, normalizeKeys, normalizeOptions, normalizeSpeed, normalizeVolume, parseRomHeader,
+  keyLabel, keyToPadButton, normalizeKeys, normalizeOptions, normalizePadOpacity, normalizeSpeed, normalizeVolume,
+  padOpacityToAlpha, parseRomHeader,
   patchDefaultOptions, pushRecentRom, readQuickSave, readSram, rebindKey, romBaseName, saveRecentRoms, screenshotFileName,
   setDefaultOptions, stateFileName, timestampSuffix, volumeToGain, writeQuickSave, writeRgba, writeSram, SRAM_LIMIT,
 } from './lib';
-import { DEFAULT_KEYS, PAD_BUTTONS, SETTINGS_STORAGE_KEY } from './data';
+import {
+  DEFAULT_KEYS, PAD_BUTTONS, PAD_OPACITY_DEFAULT, PAD_OPACITY_MAX, PAD_OPACITY_MIN, SETTINGS_STORAGE_KEY,
+} from './data';
 
 /** 构造一个头部合法的合成卡带 */
 const makeRom = (opts: {
@@ -293,6 +296,33 @@ describe('默认设置', () => {
 
   test('normalizeOptions 接受 undefined', () => {
     expect(normalizeOptions(null)).toEqual(DEFAULT_OPTIONS);
+  });
+
+  test('全屏虚拟按键默认显示, 默认透明度取内置值', () => {
+    expect(DEFAULT_OPTIONS.showPad).toBe(true);
+    expect(DEFAULT_OPTIONS.padOpacity).toBe(PAD_OPACITY_DEFAULT);
+  });
+
+  test('normalizePadOpacity 夹到 20~100 的整数, 非法值回退默认', () => {
+    expect(normalizePadOpacity(0)).toBe(PAD_OPACITY_MIN);
+    expect(normalizePadOpacity(999)).toBe(PAD_OPACITY_MAX);
+    expect(normalizePadOpacity(63.4)).toBe(63);
+    expect(normalizePadOpacity('abc')).toBe(PAD_OPACITY_DEFAULT);
+    expect(normalizePadOpacity(undefined)).toBe(PAD_OPACITY_DEFAULT);
+  });
+
+  test('padOpacityToAlpha 换算成 0.2~1 的 CSS opacity', () => {
+    expect(padOpacityToAlpha(20)).toBeCloseTo(0.2, 5);
+    expect(padOpacityToAlpha(70)).toBeCloseTo(0.7, 5);
+    expect(padOpacityToAlpha(100)).toBe(1);
+  });
+
+  test('normalizeOptions 归一化按键显示设置, isSameOptions 能识别变化', () => {
+    expect(normalizeOptions({ showPad: false }).showPad).toBe(false);
+    expect(normalizeOptions({ padOpacity: 5 }).padOpacity).toBe(PAD_OPACITY_MIN);
+    const a = normalizeOptions(DEFAULT_OPTIONS);
+    expect(isSameOptions(a, { ...a, showPad: !a.showPad })).toBe(false);
+    expect(isSameOptions(a, { ...a, padOpacity: a.padOpacity + 5 })).toBe(false);
   });
 });
 

@@ -3,8 +3,9 @@
 //       模拟核心 (jsnes) 只在页面里使用, 便于单测覆盖规则与配置逻辑。
 import { Base64 } from 'js-base64';
 import {
-  BASE_FPS, DEFAULT_KEYS, GAMEPAD_BUTTONS, HOTKEYS, QUICKSAVE_STORAGE_KEY, RECENT_LIMIT, RECENT_STORAGE_KEY,
-  SETTINGS_STORAGE_KEY, SPEED_DEFAULT, SPEED_OPTIONS, STATE_FILE_HEADER, VOLUME_DEFAULT, VOLUME_MAX, VOLUME_MIN,
+  BASE_FPS, DEFAULT_KEYS, GAMEPAD_BUTTONS, HOTKEYS, PAD_OPACITY_DEFAULT, PAD_OPACITY_MAX, PAD_OPACITY_MIN,
+  QUICKSAVE_STORAGE_KEY, RECENT_LIMIT, RECENT_STORAGE_KEY, SETTINGS_STORAGE_KEY, SHOW_PAD_DEFAULT, SPEED_DEFAULT,
+  SPEED_OPTIONS, STATE_FILE_HEADER, VOLUME_DEFAULT, VOLUME_MAX, VOLUME_MIN,
   PAD_BUTTONS, type Hotkey, type PadButton, type Speed,
 } from './data';
 
@@ -244,6 +245,16 @@ export const normalizeVolume = (v: unknown): number => {
 /** 音量 (0~100) -> WebAudio 增益 (0~1) */
 export const volumeToGain = (volume: unknown): number => normalizeVolume(volume) / 100;
 
+/** 任意输入 -> 合法的虚拟按键透明度 (0~100, 非法值回退默认) */
+export const normalizePadOpacity = (value: unknown): number => {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return PAD_OPACITY_DEFAULT;
+  return Math.min(PAD_OPACITY_MAX, Math.max(PAD_OPACITY_MIN, Math.round(n)));
+};
+
+/** 透明度 (0~100) -> CSS opacity (0.2~1) */
+export const padOpacityToAlpha = (value: unknown): number => normalizePadOpacity(value) / 100;
+
 // ---- 默认设置 (设置中心 / 「配置文件」导入导出共用 getDefault* + setDefault* 成对约定) ----
 
 export interface NesOptions {
@@ -255,6 +266,10 @@ export interface NesOptions {
   smooth: boolean;
   /** 默认倍速 */
   speed: number;
+  /** 全屏时是否在画面下方浮出虚拟按键 */
+  showPad: boolean;
+  /** 虚拟按键透明度 (0~100) */
+  padOpacity: number;
   /** 玩家 1 键位 */
   keys: KeyMap;
 }
@@ -264,6 +279,8 @@ export const DEFAULT_OPTIONS: NesOptions = {
   showFps: true,
   smooth: false,
   speed: SPEED_DEFAULT,
+  showPad: SHOW_PAD_DEFAULT,
+  padOpacity: PAD_OPACITY_DEFAULT,
   keys: normalizeKeys(DEFAULT_KEYS),
 };
 
@@ -273,6 +290,8 @@ export const normalizeOptions = (raw?: Partial<NesOptions> | null): NesOptions =
   showFps: raw?.showFps === undefined ? DEFAULT_OPTIONS.showFps : raw.showFps === true,
   smooth: raw?.smooth === undefined ? DEFAULT_OPTIONS.smooth : raw.smooth === true,
   speed: normalizeSpeed(raw?.speed),
+  showPad: raw?.showPad === undefined ? DEFAULT_OPTIONS.showPad : raw.showPad === true,
+  padOpacity: raw?.padOpacity === undefined ? DEFAULT_OPTIONS.padOpacity : normalizePadOpacity(raw.padOpacity),
   keys: normalizeKeys(raw?.keys ?? DEFAULT_OPTIONS.keys),
 });
 
@@ -305,6 +324,7 @@ export const patchDefaultOptions = (patch: Partial<NesOptions>): NesOptions =>
 /** 两组选项是否一致 (用于「保存为默认设置」按钮的禁用状态) */
 export const isSameOptions = (a: NesOptions, b: NesOptions): boolean =>
   a.volume === b.volume && a.showFps === b.showFps && a.smooth === b.smooth && a.speed === b.speed
+  && a.showPad === b.showPad && a.padOpacity === b.padOpacity
   && PAD_BUTTONS.every((btn) => (a.keys[btn] ?? []).join('|') === (b.keys[btn] ?? []).join('|'));
 
 // ---- 存档 (jsnes 的 toJSON 结果) ----

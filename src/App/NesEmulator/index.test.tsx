@@ -271,4 +271,79 @@ describe('NES 模拟器页面', () => {
     expect(screen.queryByTestId('nes-full')).not.toBeInTheDocument();
     expect(screen.getByText('卡带信息')).toBeInTheDocument();
   });
+
+  test('全屏时画面下方浮出虚拟按键, 默认半透明', async () => {
+    render(<NesEmulator />);
+    await loadRom(makeRom());
+    await waitFor(() => expect(mockInstances).toHaveLength(1));
+
+    // 非全屏不渲染浮层按键
+    expect(screen.queryByTestId('nes-overlay-pad')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /全屏/ }));
+    const pad = await screen.findByTestId('nes-overlay-pad', {}, { timeout: 5000 });
+    // 浮在画面里 (与 canvas 同属一个 .nes-screen)
+    expect(pad.closest('.nes-screen')).toBe(screen.getByTestId('nes-screen'));
+    // 默认透明度 70%
+    expect(pad.style.opacity).toBe('0.7');
+    // 8 个按键都在
+    expect(pad.querySelectorAll('[data-pad]')).toHaveLength(8);
+  }, 20000);
+
+  test('虚拟按键按下有动效 (is-down) 且能驱动模拟器', async () => {
+    render(<NesEmulator />);
+    await loadRom(makeRom());
+    await waitFor(() => expect(mockInstances).toHaveLength(1));
+    const nes = mockInstances[0];
+
+    fireEvent.click(screen.getByRole('button', { name: /全屏/ }));
+    const pad = await screen.findByTestId('nes-overlay-pad', {}, { timeout: 5000 });
+    const aBtn = pad.querySelector('[data-pad="A"]') as HTMLElement;
+    expect(aBtn.className).not.toContain('is-down');
+
+    fireEvent.pointerDown(aBtn);
+    await waitFor(() => expect(aBtn.className).toContain('is-down'), { timeout: 5000 });
+    expect(nes.downs).toContainEqual([ 1, 0 ]);
+
+    fireEvent.pointerUp(aBtn);
+    await waitFor(() => expect(aBtn.className).not.toContain('is-down'), { timeout: 5000 });
+    expect(nes.ups).toContainEqual([ 1, 0 ]);
+  }, 20000);
+
+  test('键盘按下同样点亮虚拟按键, 松开熄灭', async () => {
+    render(<NesEmulator />);
+    await loadRom(makeRom());
+    await waitFor(() => expect(mockInstances).toHaveLength(1));
+
+    fireEvent.click(screen.getByRole('button', { name: /全屏/ }));
+    const pad = await screen.findByTestId('nes-overlay-pad', {}, { timeout: 5000 });
+    const startBtn = pad.querySelector('[data-pad="Start"]') as HTMLElement;
+
+    fireEvent.keyDown(window, { key: 'Enter' });
+    await waitFor(() => expect(startBtn.className).toContain('is-down'), { timeout: 5000 });
+    fireEvent.keyUp(window, { key: 'Enter' });
+    await waitFor(() => expect(startBtn.className).not.toContain('is-down'), { timeout: 5000 });
+  }, 20000);
+
+  test('设置里关掉虚拟按键后全屏不再显示浮层', async () => {
+    localStorage.setItem('magic-tools-nes-settings', JSON.stringify({ showPad: false, padOpacity: 40 }));
+    render(<NesEmulator />);
+    await loadRom(makeRom());
+    await waitFor(() => expect(mockInstances).toHaveLength(1));
+
+    fireEvent.click(screen.getByRole('button', { name: /全屏/ }));
+    await waitFor(() => expect(screen.getByTestId('nes-full')).toBeInTheDocument(), { timeout: 5000 });
+    expect(screen.queryByTestId('nes-overlay-pad')).not.toBeInTheDocument();
+  }, 20000);
+
+  test('自定义透明度生效', async () => {
+    localStorage.setItem('magic-tools-nes-settings', JSON.stringify({ showPad: true, padOpacity: 40 }));
+    render(<NesEmulator />);
+    await loadRom(makeRom());
+    await waitFor(() => expect(mockInstances).toHaveLength(1));
+
+    fireEvent.click(screen.getByRole('button', { name: /全屏/ }));
+    const pad = await screen.findByTestId('nes-overlay-pad', {}, { timeout: 5000 });
+    expect(pad.style.opacity).toBe('0.4');
+  }, 20000);
 });

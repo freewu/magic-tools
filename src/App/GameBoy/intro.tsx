@@ -19,6 +19,7 @@ const zh = `<h2>这个工具做什么</h2>
 <li><p><b>P</b> / <b>Esc</b>: 暂停 / 继续; <b>R</b>: 重置; <b>M</b>: 静音; <b>F11</b>: 全屏</p></li>
 <li><p><b>F5</b>: 快速存档; <b>F8</b>: 快速读档</p></li>
 <li><p>手机 / 平板可以用页面上的虚拟十字键与 A / B / Start / Select 按钮</p></li>
+<li><p><b>全屏</b>时画面下方会浮出半透明虚拟按键, 触摸即可操作, 按下有缩放高亮动效; 不需要时可在设置里关闭, 或调低「按键透明度」减少遮挡</p></li>
 <li><p>插上 <b>USB / 蓝牙手柄</b> 后无需设置, 按键自动映射 (标准 Gamepad 布局)</p></li>
 <li><p>键位不顺手? 在「按键设置」里点一下对应按键, 再按下新的键即可 (每个按键都会即时生效)</p></li>
 </ul>
@@ -58,6 +59,7 @@ const tw = `<h2>這個工具做什麼</h2>
 <li><p><b>P</b> / <b>Esc</b>: 暫停 / 繼續; <b>R</b>: 重置; <b>M</b>: 靜音; <b>F11</b>: 全螢幕</p></li>
 <li><p><b>F5</b>: 快速存檔; <b>F8</b>: 快速讀檔</p></li>
 <li><p>手機 / 平板可以用頁面上的虛擬十字鍵與 A / B / Start / Select 按鈕</p></li>
+<li><p><b>全螢幕</b>時畫面下方會浮出半透明虛擬按鍵, 觸控即可操作, 按下有縮放高亮動效; 不需要時可在設定裡關閉, 或調低「按鍵透明度」減少遮擋</p></li>
 <li><p>插上 <b>USB / 藍牙手把</b> 後無需設定, 按鍵自動對應 (標準 Gamepad 佈局)</p></li>
 <li><p>鍵位不順手? 在「按鍵設定」裡點一下對應按鍵, 再按下新的鍵即可 (每個按鍵都會即時生效)</p></li>
 </ul>
@@ -97,6 +99,7 @@ const en = `<h2>What this does</h2>
 <li><p><b>P</b> / <b>Esc</b>: pause / resume; <b>R</b>: reset; <b>M</b>: mute; <b>F11</b>: fullscreen</p></li>
 <li><p><b>F5</b>: quick save; <b>F8</b>: quick load</p></li>
 <li><p>On phones and tablets use the on-screen D-pad and A / B / Start / Select buttons</p></li>
+<li><p>In <b>fullscreen</b> a translucent button pad floats over the bottom of the screen for touch play, with a scale / highlight animation on press; turn it off or lower its opacity in settings</p></li>
 <li><p>Plug in a <b>USB / Bluetooth gamepad</b> — standard Gamepad mapping works without setup</p></li>
 <li><p>Prefer another layout? In “Controls” click a button, then press the new key (applies immediately)</p></li>
 </ul>

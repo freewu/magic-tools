@@ -329,11 +329,80 @@ describe('GameBoy 模拟器页面', () => {
     await waitFor(() => expect(mockCreate).toHaveBeenCalledTimes(1), { timeout: 5000 });
 
     fireEvent.click(screen.getByRole('button', { name: /全屏/ }));
-    expect(screen.getByTestId('gb-full')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByTestId('gb-full')).toBeInTheDocument(), { timeout: 5000 });
     expect(screen.queryByText('卡带信息')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /退出全屏/ }));
-    expect(screen.queryByTestId('gb-full')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByTestId('gb-full')).not.toBeInTheDocument(), { timeout: 5000 });
     expect(screen.getByText('卡带信息')).toBeInTheDocument();
-  });
+  }, 20000);
+
+  test('全屏时画面下方浮出虚拟按键, 默认半透明', async () => {
+    render(<GameBoyEmulator />);
+    await loadRom(makeRom());
+    await waitFor(() => expect(mockCreate).toHaveBeenCalledTimes(1), { timeout: 5000 });
+
+    expect(screen.queryByTestId('gb-overlay-pad')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /全屏/ }));
+    const pad = await screen.findByTestId('gb-overlay-pad', {}, { timeout: 5000 });
+    expect(pad.closest('.gb-screen')).toBe(screen.getByTestId('gb-screen'));
+    expect(pad.style.opacity).toBe('0.7');
+    expect(pad.querySelectorAll('[data-pad]')).toHaveLength(8);
+  }, 20000);
+
+  test('虚拟按键按下有动效 (is-down) 且能驱动模拟器', async () => {
+    render(<GameBoyEmulator />);
+    await loadRom(makeRom());
+    await waitFor(() => expect(mockCreate).toHaveBeenCalledTimes(1), { timeout: 5000 });
+    const machine = mockMachineRef.current;
+
+    fireEvent.click(screen.getByRole('button', { name: /全屏/ }));
+    const pad = await screen.findByTestId('gb-overlay-pad', {}, { timeout: 5000 });
+    const bBtn = pad.querySelector('[data-pad="B"]') as HTMLElement;
+    expect(bBtn.className).not.toContain('is-down');
+
+    fireEvent.pointerDown(bBtn);
+    await waitFor(() => expect(bBtn.className).toContain('is-down'), { timeout: 5000 });
+    expect(machine.presses).toContain('B');
+
+    fireEvent.pointerUp(bBtn);
+    await waitFor(() => expect(bBtn.className).not.toContain('is-down'), { timeout: 5000 });
+    expect(machine.releases).toContain('B');
+  }, 20000);
+
+  test('键盘按下同样点亮虚拟按键, 松开熄灭', async () => {
+    render(<GameBoyEmulator />);
+    await loadRom(makeRom());
+    await waitFor(() => expect(mockCreate).toHaveBeenCalledTimes(1), { timeout: 5000 });
+
+    fireEvent.click(screen.getByRole('button', { name: /全屏/ }));
+    const pad = await screen.findByTestId('gb-overlay-pad', {}, { timeout: 5000 });
+    const startBtn = pad.querySelector('[data-pad="Start"]') as HTMLElement;
+
+    fireEvent.keyDown(window, { key: 'Enter' });
+    await waitFor(() => expect(startBtn.className).toContain('is-down'), { timeout: 5000 });
+    fireEvent.keyUp(window, { key: 'Enter' });
+    await waitFor(() => expect(startBtn.className).not.toContain('is-down'), { timeout: 5000 });
+  }, 20000);
+
+  test('设置里关掉虚拟按键后全屏不再显示浮层, 自定义透明度生效', async () => {
+    localStorage.setItem('magic-tools-gameboy-settings', JSON.stringify({ showPad: false, padOpacity: 40 }));
+    const first = render(<GameBoyEmulator />);
+    await loadRom(makeRom());
+    await waitFor(() => expect(mockCreate).toHaveBeenCalledTimes(1), { timeout: 5000 });
+    fireEvent.click(screen.getByRole('button', { name: /全屏/ }));
+    await waitFor(() => expect(screen.getByTestId('gb-full')).toBeInTheDocument(), { timeout: 5000 });
+    expect(screen.queryByTestId('gb-overlay-pad')).not.toBeInTheDocument();
+    first.unmount();
+    cleanup();
+
+    localStorage.setItem('magic-tools-gameboy-settings', JSON.stringify({ showPad: true, padOpacity: 40 }));
+    render(<GameBoyEmulator />);
+    await loadRom(makeRom());
+    await waitFor(() => expect(mockCreate).toHaveBeenCalledTimes(2), { timeout: 5000 });
+    fireEvent.click(screen.getByRole('button', { name: /全屏/ }));
+    const pad = await screen.findByTestId('gb-overlay-pad', {}, { timeout: 5000 });
+    expect(pad.style.opacity).toBe('0.4');
+  }, 20000);
 });

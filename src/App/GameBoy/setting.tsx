@@ -1,6 +1,6 @@
 import { Button, Divider, Form, Segmented, Slider, Switch, message } from 'antd';
 import { useState } from 'react';
-import { DEFAULT_KEYS, SPEED_OPTIONS, VOLUME_MAX, VOLUME_MIN } from './data';
+import { DEFAULT_KEYS, PAD_OPACITY_MAX, PAD_OPACITY_MIN, SPEED_OPTIONS, VOLUME_MAX, VOLUME_MIN } from './data';
 import { clearSram, getDefaultOptions, getSramEntries, normalizeKeys, patchDefaultOptions, type GbOptions } from './lib';
 import { u } from './lang';
 import { useLocale } from '../../hook/locale-context';
@@ -41,6 +41,24 @@ export const GameBoySetting: React.FC = () => {
       </Form.Item>
       <Form.Item label={ st('像素平滑') } extra={ st('关闭时像素风锐利 (推荐), 打开后画面更柔和') }>
         <Switch checked={ opts.smooth } onChange={ (v) => patch({ smooth: v }) } />
+      </Form.Item>
+      <Form.Item
+        label={ st('全屏虚拟按键') }
+        extra={ st('全屏时在画面下方浮出触摸按键, 键盘 / 手柄按下也会同步高亮') }
+      >
+        <Switch checked={ opts.showPad } onChange={ (v) => patch({ showPad: v }) } data-testid="gb-show-pad" />
+      </Form.Item>
+      <Form.Item label={ st('按键透明度') } extra={ st('调低可减少按键对画面的遮挡 (20% 几乎全透)') }>
+        <Slider
+          min={ PAD_OPACITY_MIN }
+          max={ PAD_OPACITY_MAX }
+          step={ 5 }
+          value={ opts.padOpacity }
+          disabled={ !opts.showPad }
+          style={ { maxWidth: 320 } }
+          tooltip={ { formatter: (v) => `${v ?? 0}%` } }
+          onChange={ (v) => patch({ padOpacity: Number(v) }) }
+        />
       </Form.Item>
       <Form.Item label={ st('恢复默认键位') } extra={ st('键位可在模拟器页面里逐个重新绑定') }>
         <Button

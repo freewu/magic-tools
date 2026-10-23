@@ -2,12 +2,13 @@ import '@testing-library/jest-dom';
 import {
   DEFAULT_OPTIONS, buildKeyLookup, cloneKeys, decodeSaveState, encodeSaveState, formatRomSize, frameIntervalMs,
   gamepadButtonOf, getDefaultOptions, getRecentRoms, hotkeyOf, isRomFileName, isSameOptions, isTypingTarget,
-  keyDisplayName, keyLabel, keyToPadButton, normalizeKeys, normalizeOptions, normalizeSpeed, normalizeVolume,
+  keyDisplayName, keyLabel, keyToPadButton, normalizeKeys, normalizeOptions, normalizePadOpacity, normalizeSpeed,
+  normalizeVolume, padOpacityToAlpha,
   parseRomHeader, patchDefaultOptions, pushRecentRom, readFileBytes, readFileText, readQuickSave, rebindKey,
   romBaseName, saveRecentRoms, screenshotFileName, setDefaultOptions, stateFileName, volumeToGain, writeQuickSave,
   clearQuickSave, EMPTY_ROM_INFO, type RecentRom,
 } from './lib';
-import { DEFAULT_KEYS, STATE_FILE_HEADER, VOLUME_DEFAULT } from './data';
+import { DEFAULT_KEYS, PAD_OPACITY_DEFAULT, PAD_OPACITY_MAX, PAD_OPACITY_MIN, STATE_FILE_HEADER, VOLUME_DEFAULT } from './data';
 
 /** 构造一个最小可用的 iNES 文件 (默认 1 个 PRG bank + 1 个 CHR bank) */
 const makeRom = (
@@ -239,6 +240,42 @@ describe('倍速 / 音量', () => {
     expect(volumeToGain(0)).toBe(0);
     expect(volumeToGain(70)).toBeCloseTo(0.7, 5);
     expect(volumeToGain(100)).toBe(1);
+  });
+});
+
+describe('全屏虚拟按键: 显示开关 / 透明度', () => {
+  test('默认显示按键, 默认透明度取内置值', () => {
+    expect(DEFAULT_OPTIONS.showPad).toBe(true);
+    expect(DEFAULT_OPTIONS.padOpacity).toBe(PAD_OPACITY_DEFAULT);
+  });
+
+  test('normalizePadOpacity 夹到 20~100 的整数, 非法值回退默认', () => {
+    expect(normalizePadOpacity(0)).toBe(PAD_OPACITY_MIN);
+    expect(normalizePadOpacity(5)).toBe(PAD_OPACITY_MIN);
+    expect(normalizePadOpacity(500)).toBe(PAD_OPACITY_MAX);
+    expect(normalizePadOpacity(63.4)).toBe(63);
+    expect(normalizePadOpacity('abc')).toBe(PAD_OPACITY_DEFAULT);
+    expect(normalizePadOpacity(undefined)).toBe(PAD_OPACITY_DEFAULT);
+  });
+
+  test('padOpacityToAlpha 换算成 0.2~1 的 CSS opacity', () => {
+    expect(padOpacityToAlpha(PAD_OPACITY_MIN)).toBeCloseTo(0.2, 5);
+    expect(padOpacityToAlpha(70)).toBeCloseTo(0.7, 5);
+    expect(padOpacityToAlpha(100)).toBe(1);
+  });
+
+  test('normalizeOptions 保留 / 归一化 按键显示设置', () => {
+    expect(normalizeOptions({ showPad: false }).showPad).toBe(false);
+    expect(normalizeOptions({ showPad: 'yes' as unknown as boolean }).showPad).toBe(false);
+    expect(normalizeOptions({ padOpacity: 12 }).padOpacity).toBe(PAD_OPACITY_MIN);
+    expect(normalizeOptions({}).showPad).toBe(true);
+  });
+
+  test('isSameOptions 能识别按键显示设置的变化', () => {
+    const a = normalizeOptions(DEFAULT_OPTIONS);
+    expect(isSameOptions(a, { ...a, showPad: !a.showPad })).toBe(false);
+    expect(isSameOptions(a, { ...a, padOpacity: a.padOpacity + 5 })).toBe(false);
+    expect(isSameOptions(a, { ...a, showPad: a.showPad, padOpacity: a.padOpacity })).toBe(true);
   });
 });
 

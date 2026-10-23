@@ -678,6 +678,16 @@ const ROWS: Record<string, Row> = {
     'Keys can be rebound one by one on the emulator page',
   ],
   '已恢复默认键位': ['已恢復預設鍵位', 'Default keys restored'],
+  '全屏虚拟按键': ['全螢幕虛擬按鍵', 'On-screen pad in fullscreen'],
+  '按键透明度': ['按鍵透明度', 'Pad opacity'],
+  '全屏时在画面下方浮出触摸按键, 键盘 / 手柄按下也会同步高亮': [
+    '全螢幕時在畫面下方浮出觸控按鍵, 鍵盤 / 手把按下也會同步高亮',
+    'Floats touch buttons over the bottom of the picture in fullscreen — keyboard / gamepad presses highlight too',
+  ],
+  '调低可减少按键对画面的遮挡 (20% 几乎全透)': [
+    '調低可減少按鍵對畫面的遮擋 (20% 幾乎全透)',
+    'Lower it to keep the picture visible (20% is almost fully transparent)',
+  ],
   // ---- GameBoy 模拟器 ----
   'GameBoy 模拟器': ['GameBoy 模擬器', 'GameBoy Emulator'],
   '清空电池存档': ['清空電池存檔', 'Clear battery saves'],

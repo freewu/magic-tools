@@ -79,6 +79,14 @@ export const HOTKEYS: Record<string, Hotkey> = {
   F11: 'fullscreen',
 };
 
+/** 全屏虚拟按键: 默认是否显示 */
+export const SHOW_PAD_DEFAULT = true;
+
+/** 全屏虚拟按键透明度范围 / 默认值 (0~100, 越小越透, 不要低于 20 否则几乎看不见) */
+export const PAD_OPACITY_MIN = 20;
+export const PAD_OPACITY_MAX = 100;
+export const PAD_OPACITY_DEFAULT = 70;
+
 /** 音量范围 / 默认值 (0~100) */
 export const VOLUME_MIN = 0;
 export const VOLUME_MAX = 100;
@@ -163,5 +171,26 @@ export const GB_CSS = `
   border: none; border-radius: 6px; background: rgba(148, 163, 184, 0.18); color: inherit; font-weight: 700;
   cursor: pointer; user-select: none; touch-action: none; }
 .gb-pad-btn:active { background: rgba(16, 185, 129, 0.55); }
+/* 全屏时浮在画面底部的虚拟按键 (透明可调, 按下有缩放 + 高亮动效) */
+.gb-overlay-pad { --gb-key: clamp(30px, 7.4vh, 60px); position: absolute; left: 0; right: 0; bottom: 0;
+  box-sizing: border-box; display: flex; align-items: flex-end; justify-content: space-between; gap: 4%;
+  padding: 0 2.4% 2%; pointer-events: none; transition: opacity 0.18s ease; }
+.gb-overlay-pad > * { pointer-events: auto; }
+.gb-overlay-pad .gb-pad { grid-template-columns: repeat(3, var(--gb-key));
+  grid-template-rows: repeat(3, var(--gb-key)); gap: 2px; }
+.gb-overlay-pad .gb-pad-btn { width: var(--gb-key); height: var(--gb-key); color: #f8fafc;
+  font-size: calc(var(--gb-key) * 0.4); border: 1px solid rgba(226, 232, 240, 0.35);
+  border-radius: calc(var(--gb-key) * 0.26); background: rgba(15, 23, 42, 0.55);
+  -webkit-tap-highlight-color: transparent; touch-action: none;
+  transition: transform 0.07s ease, background 0.12s ease, box-shadow 0.12s ease; }
+.gb-overlay-pad .gb-pad-btn:active, .gb-overlay-pad .gb-pad-btn.is-down {
+  background: rgba(16, 185, 129, 0.85); transform: scale(0.9);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5), 0 0 calc(var(--gb-key) * 0.35) rgba(16, 185, 129, 0.8); }
+.gb-overlay-faces { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.gb-overlay-row { display: flex; align-items: center; gap: 8px; }
+.gb-overlay-pad .gb-overlay-mini { width: auto; min-width: calc(var(--gb-key) * 1.15);
+  height: calc(var(--gb-key) * 0.52); padding: 0 8px; font-size: calc(var(--gb-key) * 0.24);
+  border-radius: 999px; letter-spacing: 0.04em; }
+.gb-overlay-pad .gb-overlay-round { border-radius: 50%; }
 @media (prefers-reduced-motion: reduce) { .gb-canvas { scroll-behavior: auto; } }
 `;
