@@ -154,6 +154,26 @@ describe('NES 模拟器页面', () => {
     expect(mockInstances).toHaveLength(0);
   });
 
+  test('把 ROM 拖到页面任意位置即可载入 (不再局限于画面区)', async () => {
+    render(<NesEmulator />);
+    const file = new File([ makeRom() as unknown as BlobPart ], 'dropped.nes');
+    const stage = document.querySelector('.nes-stage') as HTMLElement;
+    await act(async () => {
+      fireEvent.drop(stage, { dataTransfer: { files: [ file ], types: [ 'Files' ] } });
+    });
+    await waitFor(() => expect(mockInstances).toHaveLength(1));
+    expect(screen.getByText(/dropped · Mapper 0/)).toBeInTheDocument();
+  });
+
+  test('拖拽经过页面时画面区高亮, 离开后取消', () => {
+    render(<NesEmulator />);
+    const stage = document.querySelector('.nes-stage') as HTMLElement;
+    fireEvent.dragOver(stage, { dataTransfer: { files: [], types: [ 'Files' ] } });
+    expect(document.querySelector('.nes-screen.nes-drop')).toBeTruthy();
+    fireEvent.dragLeave(stage, { dataTransfer: { files: [], types: [ 'Files' ] } });
+    expect(document.querySelector('.nes-screen.nes-drop')).toBeNull();
+  });
+
   test('暂停 / 继续按钮切换运行状态', async () => {
     render(<NesEmulator />);
     await loadRom(makeRom());

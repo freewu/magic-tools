@@ -40,6 +40,11 @@ const rows: Record<string, [string, string]> = {
   'ROM 中没有 PRG 数据': ['ROM 中沒有 PRG 資料', 'ROM contains no PRG data'],
   'ROM 文件不完整 (可能下载未完成)': ['ROM 檔案不完整 (可能下載未完成)', 'ROM file looks truncated'],
   'ROM 载入失败: {msg}': ['ROM 載入失敗: {msg}', 'Failed to load the ROM: {msg}'],
+  'ROM 载入失败 (Mapper {mapper}): {msg}': [
+    'ROM 載入失敗 (Mapper {mapper}): {msg}',
+    'Failed to load the ROM (mapper {mapper}): {msg}',
+  ],
+  '载入中…': ['載入中…', 'Loading…'],
   'ROM 只在本地内存中运行, 不会上传; 长期保存请自行保留 ROM 文件': [
     'ROM 只在本機記憶體中執行, 不會上傳; 長期保存請自行保留 ROM 檔案',
     'The ROM runs in local memory only and is never uploaded — keep your own copy for later',

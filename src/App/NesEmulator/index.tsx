@@ -61,6 +61,10 @@ const NesEmulator: React.FC = () => {
   const [ romInfo, setRomInfo ] = useState<RomInfo>(EMPTY_ROM_INFO);
   const [ romName, setRomName ] = useState('');
   const [ playing, setPlaying ] = useState(false);
+  // 读文件 / 解析 ROM 头期间给个反馈, 避免大文件看起来像「没反应」
+  const [ loading, setLoading ] = useState(false);
+  // 拖拽经过页面时高亮画面区域
+  const [ dragging, setDragging ] = useState(false);
   const [ fps, setFps ] = useState(0);
   const [ error, setError ] = useState<string | null>(null);
   const [ full, setFull ] = useState(false);
@@ -240,6 +244,7 @@ const NesEmulator: React.FC = () => {
   }, []);
 
   const loadRom = useCallback(async (file: Blob, fileName: string) => {
+    setLoading(true);
     try {
       const bytes = await readFileBytes(file);
       const info = parseRomHeader(bytes);
@@ -255,7 +260,8 @@ const NesEmulator: React.FC = () => {
       try {
         nes = buildEmulator(bytes);
       } catch (err) {
-        const msg = tT('ROM 载入失败: {msg}', { msg: String((err as Error)?.message ?? err) });
+        // jsnes 未实现的 mapper 会直接抛出: 把 mapper 号带上, 方便判断是模拟器不支持而不是文件坏了
+        const msg = tT('ROM 载入失败 (Mapper {mapper}): {msg}', { mapper: info.mapper, msg: String((err as Error)?.message ?? err) });
         setError(msg);
         message.error(msg);
         return;
@@ -278,6 +284,8 @@ const NesEmulator: React.FC = () => {
       const msg = tT('ROM 载入失败: {msg}', { msg: String((err as Error)?.message ?? err) });
       setError(msg);
       message.error(msg);
+    } finally {
+      setLoading(false);
     }
   }, [ buildEmulator, pause, t, tT ]);
 
@@ -289,10 +297,27 @@ const NesEmulator: React.FC = () => {
 
   const onDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    setDragging(false);
     const file = e.dataTransfer?.files?.[0];
     if (!file) return;
     void loadRom(file, file.name);
   }, [ loadRom ]);
+
+  // 整个页面都能接收拖拽 (桌面端 HTML5 拖放需要 tauri.conf.json 里 dragDropEnabled: false)
+  const dropProps = {
+    onDragOver: (e: React.DragEvent<HTMLDivElement>) => {
+      if (!e.dataTransfer?.types?.includes('Files')) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+      if (!dragging) setDragging(true);
+    },
+    onDragLeave: (e: React.DragEvent<HTMLDivElement>) => {
+      // 只有真正离开整个容器才取消高亮 (子元素间移动也会触发 dragleave)
+      if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
+      setDragging(false);
+    },
+    onDrop,
+  };
 
   // ---- 重置 / 存档 / 截屏 ----
   const reset = useCallback(() => {
@@ -564,10 +589,8 @@ const NesEmulator: React.FC = () => {
 
   const screenNode = (
     <div
-      className="nes-screen"
+      className={ `nes-screen${dragging ? ' nes-drop' : ''}` }
       data-testid="nes-screen"
-      onDragOver={ (e) => e.preventDefault() }
-      onDrop={ onDrop }
     >
       <canvas
         ref={ canvasRef }
@@ -705,6 +728,7 @@ const NesEmulator: React.FC = () => {
   const infoNode = (
     <Space direction="vertical" size={ 10 } style={ { width: '100%' } }>
       <Space size={ 6 } wrap>
+        { loading ? <Tag color="processing">{ t('载入中…') }</Tag> : null }
         <Tag color={ playing ? 'green' : 'default' }>{ playing ? t('运行中') : t('已暂停') }</Tag>
         { opts.showFps && loaded ? <Tag color="blue">{ `FPS ${fps}` }</Tag> : null }
         { romInfo.battery ? <Tag color="gold">{ t('电池存档') }</Tag> : null }
@@ -774,6 +798,7 @@ const NesEmulator: React.FC = () => {
           ref={ stageRef }
           className="nes-stage nes-full"
           data-testid="nes-full"
+          { ...dropProps }
           style={ { background: '#000' } }
         >
           { screenNode }
@@ -796,7 +821,7 @@ const NesEmulator: React.FC = () => {
   }
 
   return (
-    <div className="nes-stage" style={ { width: '100%' } }>
+    <div className="nes-stage" style={ { width: '100%' } } { ...dropProps }>
       <style>{ NES_CSS }</style>
       { hiddenInputs }
       <Space direction="vertical" size={ 16 } style={ { width: '100%' } }>
