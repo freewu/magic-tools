@@ -1,9 +1,10 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import AppStore from './index';
 import { LocaleProvider } from '../../hook/locale-context';
 import { AppContext } from '../../hook/app-context';
+import { ALL_APP_TYPES, setVisibleAppTypes } from '../../lib/app-type-filter';
 
 // App/index.tsx 有顶层 await + import.meta.glob (jest commonjs 不支持), 故打桩成固定应用列表
 jest.mock('../index', () => {
@@ -146,5 +147,55 @@ describe('AppStore 搜索', () => {
     search('dns');
     expect(screen.getByText('共 0 个应用')).toBeInTheDocument();
     expect(screen.getByText('没有匹配的应用')).toBeInTheDocument();
+  });
+});
+
+describe('AppStore 展示分类开关', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  test('未勾选的分类整组不展示, 总数随之减少', () => {
+    setVisibleAppTypes(ALL_APP_TYPES.filter((k) => k !== 'crypto'));
+    renderPage();
+    expect(screen.queryByText('AES 加解密')).not.toBeInTheDocument();
+    expect(screen.queryByText('SM4 加解密')).not.toBeInTheDocument();
+    expect(screen.getByText('经纬度格式转换')).toBeInTheDocument();
+    expect(screen.getByText('共 3 个应用')).toBeInTheDocument();
+  });
+
+  test('分类筛选下拉只列出展示中的分类', async () => {
+    setVisibleAppTypes([ 'crypto' ]);
+    renderPage();
+    expect(screen.getByText('共 2 个应用')).toBeInTheDocument();
+    fireEvent.mouseDown(screen.getByRole('combobox'));
+    // 下拉项仅「全部分类」+「加解密」
+    expect(await screen.findAllByTitle('加解密')).not.toHaveLength(0);
+    expect(screen.queryByTitle('站长工具')).not.toBeInTheDocument();
+  });
+
+  test('设置变更后实时过滤, 无需刷新', () => {
+    renderPage();
+    expect(screen.getByText('共 5 个应用')).toBeInTheDocument();
+    act(() => {
+      setVisibleAppTypes([ 'webmaster' ]);
+    });
+    expect(screen.getByText('共 1 个应用')).toBeInTheDocument();
+    expect(screen.getByText('DNS 查询')).toBeInTheDocument();
+    expect(screen.queryByText('AES 加解密')).not.toBeInTheDocument();
+  });
+
+  test('当前分类筛选被隐藏时回落到「全部分类」', async () => {
+    renderPage();
+    fireEvent.mouseDown(screen.getByRole('combobox'));
+    const options = await screen.findAllByTitle('加解密');
+    fireEvent.click(options[options.length - 1]);
+    await waitFor(() => expect(screen.getByText('共 2 个应用')).toBeInTheDocument());
+    act(() => {
+      setVisibleAppTypes([ 'convert' ]);
+    });
+    // 加解密被隐藏 → 筛选回落全部分类, 只剩转换类应用
+    expect(screen.getByText('经纬度格式转换')).toBeInTheDocument();
+    expect(screen.getByText('共 1 个应用')).toBeInTheDocument();
   });
 });

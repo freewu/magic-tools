@@ -6,6 +6,7 @@ import { LocaleProvider } from '../../hook/locale-context';
 import { AppContext } from '../../hook/app-context';
 import { getFavorites, setFavorites } from '../../lib/favorite';
 import { getDefaultGroupByType, setDefaultGroupByType } from './lib';
+import { ALL_APP_TYPES, setVisibleAppTypes } from '../../lib/app-type-filter';
 
 // jsdom 未实现 PointerEvent: 提供最小实现 (继承 MouseEvent 保留 clientX/clientY),
 // 使拖动排序用例可真实走通 pointerdown/move/up 逻辑
@@ -302,5 +303,18 @@ describe('我的收藏 按类型展示', () => {
     expect(document.querySelectorAll('.appstore-group').length).toBe(2);
     act(() => { setDefaultGroupByType(false); });
     expect(document.querySelectorAll('.appstore-group').length).toBe(0);
+  });
+});
+
+describe('我的收藏不受「应用中心展示类型」设置影响', () => {
+  test('分类被隐藏后, 收藏页仍展示对应应用与分组', () => {
+    setFavorites([ 'AESCrypto', 'DnsQuery' ]);
+    act(() => { setVisibleAppTypes(ALL_APP_TYPES.filter((k) => k !== 'crypto')); });
+    renderPage();
+    expect(screen.getByText('AES 加解密')).toBeInTheDocument();
+    expect(screen.getByText('DNS 查询')).toBeInTheDocument();
+    act(() => { setDefaultGroupByType(true); });
+    const names = Array.from(document.querySelectorAll('.appstore-group-name')).map((el) => el.textContent);
+    expect(names).toContain('加解密');
   });
 });

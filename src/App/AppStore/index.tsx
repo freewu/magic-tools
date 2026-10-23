@@ -7,6 +7,7 @@ import shell from "../../i18n/shell";
 import { appNameOf } from "../app-i18n";
 import appstoreLang from "./lang";
 import { matchQuery } from "./lib";
+import { useVisibleAppTypes } from "../../hook/use-visible-app-types";
 import { Empty, Input, Select, Space, Typography } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useMemo, useState } from 'react';
@@ -19,10 +20,17 @@ const AppStore = () => {
   const [ filter, setFilter ] = useState<string>('all');
   // 搜索关键词: 匹配应用名 (三语) / 目录名 / 分类名, 多个关键词为「与」关系
   const [ query, setQuery ] = useState<string>('');
-  const menu = useMemo(() => genMenuList(appList), []);
+  // 设置里可勾选展示的分类: 未勾选的分类整组隐藏 (不影响「我的收藏」)
+  const visibleTypes = useVisibleAppTypes();
+  const menu = useMemo(
+    () => genMenuList(appList).filter((g) => visibleTypes.includes(g.key)),
+    [visibleTypes]
+  );
+  // 当前筛选的分类被隐藏时回落到「全部分类」
+  const activeFilter = filter === 'all' || menu.some((g) => g.key === filter) ? filter : 'all';
   const groups = useMemo(
-    () => (filter === 'all' ? menu : menu.filter((g) => g.key === filter)),
-    [menu, filter]
+    () => (activeFilter === 'all' ? menu : menu.filter((g) => g.key === activeFilter)),
+    [menu, activeFilter]
   );
   // 应用卡片名随语言: AppItem label 替换为当前语言包名称; 按关键词过滤 (空关键词保留全部)
   const visible = useMemo(
@@ -73,7 +81,7 @@ const AppStore = () => {
           />
           <Select
             size="small"
-            value={ filter }
+            value={ activeFilter }
             style={ { width: 180 } }
             onChange={ (v: string) => setFilter(v) }
             options={ [

@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom"
 import { appList, genMenuList } from "../App";
 import { appNameOf } from "../App/app-i18n";
 import { getSiderFlag } from "../lib/setting";
+import { useVisibleAppTypes } from "../hook/use-visible-app-types";
 import { openUrl } from "../lib/tauri";
 import { useUpdate } from "./update-context";
 import { getVersion } from "../version";
@@ -66,8 +67,10 @@ const MainSider: React.FC = () => {
   };
 
   // 菜单分类名 + 工具名随语言实时重算 (分类徽标逻辑与原 genMenuList 一致)
+  // 设置里未勾选的分类整组隐藏 (应用中心与左侧菜单同步, 不影响「我的收藏」)
+  const visibleTypes = useVisibleAppTypes();
   const menuItems = useMemo(() => {
-    return genMenuList(appList).map((g) => ({
+    return genMenuList(appList).filter((g) => visibleTypes.includes(g.key)).map((g) => ({
       key: g.key,
       icon: g.icon,
       label: (
@@ -82,7 +85,7 @@ const MainSider: React.FC = () => {
         label: appNameOf(locale, c.key, c.label),
       })),
     }));
-  }, [locale]);
+  }, [locale, visibleTypes]);
 
   return (
   <Sider trigger={null} collapsible collapsed={ collapsed } width={ width } style={ { height: '100%' } }>
