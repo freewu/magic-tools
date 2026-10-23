@@ -83,6 +83,13 @@ declare module '@shikijs/langs/*' {
   const lang: any;
   export default lang;
 }
+// ---- boytacean (GameBoy 模拟器核心) ----
+// wasm 资源以 `?url` 方式引入, 由 vite 输出静态文件地址 (核心内部的 import.meta.url 在打包后会失效)
+declare module 'boytacean/boytacean_bg.wasm?url' {
+  const url: string;
+  export default url;
+}
+
 declare module '@shikijs/themes/*' {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const theme: any;

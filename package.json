@@ -103,6 +103,7 @@
     "base-x": "^4.0.0",
     "bcryptjs": "^3.0.2",
     "bignumber.js": "^9.3.1",
+    "boytacean": "^0.13.2",
     "color-convert": "^2.0.1",
     "crypto-js": "^4.1.1",
     "deepmerge": "^4.3.1",

@@ -3,6 +3,7 @@ import { Game2048Setting } from "../Game2048/setting";
 import { TetrisSetting } from "../Tetris/setting";
 import { NesEmulatorSetting } from "../NesEmulator/setting";
 import { MinesweeperSetting } from "../Minesweeper/setting";
+import { GameBoySetting } from "../GameBoy/setting";
 
 export const SettingGame = () => {
 
@@ -12,6 +13,7 @@ export const SettingGame = () => {
       <TetrisSetting />
       <NesEmulatorSetting />
       <MinesweeperSetting />
+      <GameBoySetting />
     </Form>
   )
 }

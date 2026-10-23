@@ -678,6 +678,14 @@ const ROWS: Record<string, Row> = {
     'Keys can be rebound one by one on the emulator page',
   ],
   '已恢复默认键位': ['已恢復預設鍵位', 'Default keys restored'],
+  // ---- GameBoy 模拟器 ----
+  'GameBoy 模拟器': ['GameBoy 模擬器', 'GameBoy Emulator'],
+  '清空电池存档': ['清空電池存檔', 'Clear battery saves'],
+  '已清空电池存档': ['已清空電池存檔', 'Battery saves cleared'],
+  '电池存档按 ROM 名称保存在本机浏览器, 清空后 RPG 进度会丢失': [
+    '電池存檔依 ROM 名稱保存在本機瀏覽器, 清空後 RPG 進度會遺失',
+    'Battery saves are stored per ROM name in this browser — clearing them loses RPG progress',
+  ],
   // ---- 扫雷 ----
   '扫雷': ['掃雷', 'Minesweeper'],
   '默认格子大小': ['預設格子大小', 'Default cell size'],
