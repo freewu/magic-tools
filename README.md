@@ -6,7 +6,7 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
-![version](https://img.shields.io/badge/magic--tools-v2.23.2-007EC6?style=flat-square&labelColor=24292F) ![ci](https://img.shields.io/github/actions/workflow/status/freewu/magic-tools/ci.yml?style=flat-square&label=CI&labelColor=24292F&logo=githubactions&logoColor=fff) ![Tauri](https://img.shields.io/badge/Tauri-2-0E7490?style=flat-square&labelColor=24292F&logo=tauri&logoColor=fff) ![React](https://img.shields.io/badge/React-18-087EA4?style=flat-square&labelColor=24292F&logo=react&logoColor=fff) ![Ant Design](https://img.shields.io/badge/Ant_Design-5-0170FE?style=flat-square&labelColor=24292F&logo=antdesign&logoColor=fff) ![MIT License](https://img.shields.io/badge/license-MIT-4F46E5?style=flat-square&labelColor=24292F)
+![version](https://img.shields.io/badge/magic--tools-v2.24.0-007EC6?style=flat-square&labelColor=24292F) ![ci](https://img.shields.io/github/actions/workflow/status/freewu/magic-tools/ci.yml?style=flat-square&label=CI&labelColor=24292F&logo=githubactions&logoColor=fff) ![Tauri](https://img.shields.io/badge/Tauri-2-0E7490?style=flat-square&labelColor=24292F&logo=tauri&logoColor=fff) ![React](https://img.shields.io/badge/React-18-087EA4?style=flat-square&labelColor=24292F&logo=react&logoColor=fff) ![Ant Design](https://img.shields.io/badge/Ant_Design-5-0170FE?style=flat-square&labelColor=24292F&logo=antdesign&logoColor=fff) ![MIT License](https://img.shields.io/badge/license-MIT-4F46E5?style=flat-square&labelColor=24292F)
 
 [Download Desktop](#-download) &nbsp;·&nbsp; [Try Online](https://freewu.github.io/magic-tools/) &nbsp;·&nbsp; [Report Issue](https://github.com/freewu/magic-tools/issues/new)
 
@@ -95,7 +95,7 @@ magic-tools
 │   │   ├── app-modules.ts    # build-time collection via import.meta.glob (replaces webpack context)
 │   │   ├── app-i18n.ts       # app registry: appNameOf() trilingual names for tools & fixed pages
 │   │   ├── lang-packs.ts     # aggregates every tool's default language pack (lang.ts default export)
-│   │   └── <Tool>/           # one folder per tool (151, grouped list below) — 2-step registration
+│   │   └── <Tool>/           # one folder per tool (156, grouped list below) — 2-step registration
 │   │       ├── define.tsx    # registration metadata: AppName (zh-CN default) / Icon / Type (category)
 │   │       ├── index.tsx     # tool page component (default export; lazy-loaded)
 │   │       ├── lang.ts       # default language pack + rows (zh phrase = key → [zh-TW, en]) + lookup helpers
@@ -114,7 +114,7 @@ magic-tools
 
 ### Existing tools under `src/App/`
 
-151 tool folders live under [`src/App/`](src/App/) and each holds one tool declared by its `define.tsx`. **Adding a tool takes two steps:** (1) append the folder name to the `list` array in [`src/App/index.tsx`](src/App/index.tsx) — that hand-maintained registry drives the sidebar / App Center menu order and routing, while `import.meta.glob` only discovers the page component; (2) add its `lang.ts` default export to [`src/App/lang-packs.ts`](src/App/lang-packs.ts) so names/UI strings can be translated. Grouped below by the `Type` registered in `define.tsx` (same categories as the sidebar / [feature overview](#-feature-overview)). Some tools add tool-specific files besides the common ones (e.g. `AESCrypto/gcm.ts`, `Hash/sm3.ts`+`keccak.ts`, `CronRules/parse.tsx`, `Setting/setting-*.tsx`):
+156 tool folders live under [`src/App/`](src/App/) and each holds one tool declared by its `define.tsx`. **Adding a tool takes two steps:** (1) append the folder name to the `list` array in [`src/App/index.tsx`](src/App/index.tsx) — that hand-maintained registry drives the sidebar / App Center menu order and routing, while `import.meta.glob` only discovers the page component; (2) add its `lang.ts` default export to [`src/App/lang-packs.ts`](src/App/lang-packs.ts) so names/UI strings can be translated. Grouped below by the `Type` registered in `define.tsx` (same categories as the sidebar / [feature overview](#-feature-overview)). Some tools add tool-specific files besides the common ones (e.g. `AESCrypto/gcm.ts`, `Hash/sm3.ts`+`keccak.ts`, `CronRules/parse.tsx`, `Setting/setting-*.tsx`):
 
 **🔐 Cryptography *(23)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `SM9Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto` · `ZucCrypto`
 

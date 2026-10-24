@@ -83,6 +83,42 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-10-23 V2.24.0 Release", "2026-10-23 V2.24.0 Release", "2026-10-23 V2.24.0 Release"),
+    items: trio(
+      [
+        "新增「游戏」分类 (分类总数 9 → 10), 首批收录 5 个游戏: 2048 / 俄罗斯方块 / 扫雷 / NES 模拟器 / GameBoy 模拟器, 桌面版与 Web 版都能玩",
+        "新增 2048 (4×4 / 5×5 / 6×6 棋盘, 方向键 / WASD / 触屏滑动, 最多 20 步撤销, 每种棋盘各自记录最高分, 达成 2048 后可继续冲分, 支持全屏); 俄罗斯方块 (10×20 棋盘, 7-bag 随机器 + 3 个预览、幽灵方块、墙踢、C 暂存, 软降 / 硬降计分, 1~4 行消除按等级加成, 每 10 行升一级且下落更快, 记录最高分, 支持全屏); 扫雷 (初级 9×9/10、中级 16×16/40、高级 30×16/99 或自定义行列与雷数, 首次点击含其 3×3 范围必定安全, 旗子 → 问号 → 空白三态标记, 双击 / 中键连开, 触屏长按插旗, 每种棋盘记录最快通关时间, 三种格子尺寸、计时器与全屏)",
+        "新增 NES 模拟器 (jsnes 2.1.0 核心, 本机运行 .nes): 拖入页面或选文件即可载入, 显示卡带信息 (Mapper / PRG / CHR / 制式 / 镜像 / 电池), 键盘重绑、USB / 蓝牙手柄 (标准 Gamepad 布局)、F5 / F8 快速存读档、.nesstate 存档导入导出、PNG 截屏、0.5×~2× 倍速、音量、暂停 / 重置、全屏与「最近打开」列表",
+        "新增 GameBoy 模拟器 (Rust + WebAssembly 的 boytacean 0.13.2 核心, 本机运行 .gb / .gbc): 按卡带头自动识别 DMG / CGB 模式, 显示卡带信息 (标题 / 类型 / 容量 / RAM / 电池), 键盘重绑、手柄、F5 / F8 快速存读档与 .gbstate 导入导出、按 ROM 名自动读写电池存档 (SRAM)、PNG 截屏、0.5×~2× 倍速、音量、暂停 / 重置 / 全屏",
+        "设置中心新增「应用中心展示类型」: 可勾选要展示的分类, 应用中心与左侧菜单实时同步过滤 (全部取消也允许, 可在设置里重新勾选); 不影响「我的收藏」",
+        "NES / GameBoy 模拟器全屏时画面下方浮出半透明虚拟按键: 十字键 + A / B / Start / Select 触摸即可操作, 按下有缩放 + 高亮动效, 键盘与手柄按下也会同步点亮; 设置中心可关掉这层按键或调节「按键透明度」(20%~100%, 默认 70%, 调低减少对画面的遮挡)",
+        "修复 NES 模拟器把 ROM 拖入页面没有反应、载入后没有声音的问题; 修复 NES 模拟器画面黑屏 (帧缓冲缺 alpha 通道且 R / B 通道颠倒, 载入 ROM 后只有声音没有画面); 测试基础设施放宽时间余量 (jest 单用例超时 5s → 30s, waitFor / findBy* 轮询窗口 1s → 10s), 修复满负载跑全量测试时随机失败的用例 (模拟器按钮等可用再点)",
+        "工程: 新增运行依赖 jsnes 2.1.0 与 boytacean 0.13.2 (WASM, 均按需加载不影响首屏); 两个模拟器的设置项统一走「默认设置 + 导入导出」约定; jest 配置新增 testTimeout: 30000, jest.setup.ts 里 asyncUtilTimeout 调为 10s; 全量测试 3760 → 4072 条; 工具总数 151 → 156, 分类 9 → 10",
+      ],
+      [
+        "新增「遊戲」分類 (分類總數 9 → 10), 首批收錄 5 個遊戲: 2048 / 俄羅斯方塊 / 踩地雷 / NES 模擬器 / GameBoy 模擬器, 桌面版與 Web 版都能玩",
+        "新增 2048 (4×4 / 5×5 / 6×6 棋盤, 方向鍵 / WASD / 觸控滑動, 最多 20 步復原, 每種棋盤各自記錄最高分, 達成 2048 後可繼續衝分, 支援全螢幕); 俄羅斯方塊 (10×20 棋盤, 7-bag 隨機器 + 3 個預覽、幽靈方塊、牆踢、C 暫存, 軟降 / 硬降計分, 1~4 行消除依等級加成, 每 10 行升一級且下落更快, 記錄最高分, 支援全螢幕); 踩地雷 (初級 9×9/10、中級 16×16/40、高級 30×16/99 或自訂行列與雷數, 首次點擊含其 3×3 範圍必定安全, 旗子 → 問號 → 空白三態標記, 雙擊 / 中鍵連開, 觸控長按插旗, 每種棋盤記錄最快通關時間, 三種格子尺寸、計時器與全螢幕)",
+        "新增 NES 模擬器 (jsnes 2.1.0 核心, 本機執行 .nes): 拖入頁面或選檔即可載入, 顯示卡帶資訊 (Mapper / PRG / CHR / 制式 / 鏡像 / 電池), 鍵盤重綁、USB / 藍牙手把 (標準 Gamepad 佈局)、F5 / F8 快速存讀檔、.nesstate 存檔匯入匯出、PNG 截圖、0.5×~2× 倍速、音量、暫停 / 重置、全螢幕與「最近開啟」清單",
+        "新增 GameBoy 模擬器 (Rust + WebAssembly 的 boytacean 0.13.2 核心, 本機執行 .gb / .gbc): 依卡帶頭自動辨識 DMG / CGB 模式, 顯示卡帶資訊 (標題 / 類型 / 容量 / RAM / 電池), 鍵盤重綁、手把、F5 / F8 快速存讀檔與 .gbstate 匯入匯出、依 ROM 名稱自動讀寫電池存檔 (SRAM)、PNG 截圖、0.5×~2× 倍速、音量、暫停 / 重置 / 全螢幕",
+        "設定中心新增「應用中心展示類型」: 可勾選要展示的分類, 應用中心與左側選單即時同步過濾 (全部取消也允許, 可在設定裡重新勾選); 不影響「我的收藏」",
+        "NES / GameBoy 模擬器全螢幕時畫面下方浮出半透明虛擬按鍵: 十字鍵 + A / B / Start / Select 觸控即可操作, 按下有縮放 + 高亮動效, 鍵盤與手把按下也會同步點亮; 設定中心可關掉這層按鍵或調整「按鍵透明度」(20%~100%, 預設 70%, 調低減少對畫面的遮擋)",
+        "修正 NES 模擬器把 ROM 拖入頁面沒有反應、載入後沒有聲音的問題; 修正 NES 模擬器畫面黑屏 (影格緩衝缺 alpha 通道且 R / B 通道顛倒, 載入 ROM 後只有聲音沒有畫面); 測試基礎設施放寬時間餘量 (jest 單用例逾時 5s → 30s, waitFor / findBy* 輪詢視窗 1s → 10s), 修正滿載跑全量測試時隨機失敗的用例 (模擬器按鈕等可用再點)",
+        "工程: 新增執行相依 jsnes 2.1.0 與 boytacean 0.13.2 (WASM, 均按需載入不影響首屏); 兩個模擬器的設定項統一走「預設設定 + 匯入匯出」約定; jest 設定新增 testTimeout: 30000, jest.setup.ts 裡 asyncUtilTimeout 調為 10s; 全量測試 3760 → 4072 筆; 工具總數 151 → 156, 分類 9 → 10",
+      ],
+      [
+        "New “Games” category (categories went from 9 to 10) with 5 games to start: 2048, Tetris, Minesweeper, NES Emulator and GameBoy Emulator — playable in the desktop app and the Web version",
+        "New 2048 (4×4 / 5×5 / 6×6 boards, arrow keys / WASD / swipe, undo up to 20 moves, per-board best score, keeps playing after reaching 2048, fullscreen); Tetris (10×20 board, 7-bag randomiser with 3-piece preview, ghost piece, wall kicks, C hold, soft / hard drop scoring, 1–4 line clears multiplied by level, level rises every 10 lines with faster gravity, best score, fullscreen); Minesweeper (beginner 9×9/10, intermediate 16×16/40, expert 30×16/99 or any custom board, the first click and its 3×3 area are always mine-free, flag → question → blank marking, chord with double click / middle click, long-press flagging on touch, per-board fastest-clear records, three cell sizes, timer, fullscreen)",
+        "New NES Emulator (jsnes 2.1.0 core, runs .nes ROMs locally): drop a file anywhere or pick one, per-cartridge info (mapper / PRG / CHR / region / mirroring / battery), rebindable keys, USB & Bluetooth gamepads (standard mapping), F5 / F8 quick save-load, .nesstate export / import, PNG screenshot, 0.5×–2× speed, volume, pause / reset, fullscreen and a “recently opened” list",
+        "New GameBoy Emulator (Rust + WebAssembly boytacean 0.13.2 core, runs .gb / .gbc cartridges locally): DMG / CGB mode detected from the cartridge header, cartridge info (title / type / size / RAM / battery), rebindable keys, gamepads, F5 / F8 quick save-load with .gbstate export / import, automatic battery saves (SRAM) per ROM name, PNG screenshot, 0.5×–2× speed, volume, pause / reset / fullscreen",
+        "Settings gains “App Center categories”: tick the categories you want and the App Center plus the sidebar filter immediately (you may untick everything and re-tick them later); “Favorites” is never filtered",
+        "NES and GameBoy emulators now float a translucent button pad over the bottom of the picture in fullscreen: D-pad plus A / B / Start / Select for touch play, with a scale / highlight animation on press — keyboard and gamepad presses light up too; turn the pad off or tune “Pad opacity” (20%–100%, default 70%) in settings",
+        "Fixed the NES emulator ignoring dropped ROMs and producing no sound after loading; fixed the NES emulator showing a black screen (the framebuffer lacked an alpha channel and had R / B swapped, so the ROM loaded with sound but no picture); widened the test time budget (jest per-test timeout 5s → 30s, waitFor / findBy* polling window 1s → 10s) and hardened the tests that failed randomly under load (wait for toolbar buttons to be enabled)",
+        "Engineering: added jsnes 2.1.0 and boytacean 0.13.2 (WASM) as runtime dependencies, both loaded on demand so the first screen is unaffected; both emulators share the “default options + import / export” settings convention; jest now sets testTimeout: 30000 and jest.setup.ts raises asyncUtilTimeout to 10s; the full suite went from 3760 to 4072 tests; tools went from 151 to 156 and categories from 9 to 10",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-10-19 V2.23.2 Release", "2026-10-19 V2.23.2 Release", "2026-10-19 V2.23.2 Release"),
     items: trio(
       [

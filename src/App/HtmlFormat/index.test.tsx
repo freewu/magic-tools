@@ -161,14 +161,17 @@ describe('HtmlFormat 保存格式化结果 (弹保存对话框)', () => {
     mockSave.mockResolvedValue(false);
     const { container } = render(<HtmlFormat />);
     fireEvent.change(rawArea(container), { target: { value: HTML } });
-    fireEvent.click(btn('保存 .html'));
-    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(notice()).not.toContain('已保存'));
+    const saveBtn = btn('保存 .html');
+    fireEvent.click(saveBtn);
+    await waitFor(() => expect(mockSave).toHaveBeenCalledTimes(1), WAIT);
+    await waitFor(() => expect(notice()).not.toContain('已保存'), WAIT);
 
     mockSave.mockRejectedValue(new Error('disk full'));
+    // 上一次保存的收尾可能还没跑完 (按钮处于 saving 禁用态), 等它恢复可用再点
+    await waitFor(() => expect(btn('保存 .html')).toBeEnabled(), WAIT);
     fireEvent.click(btn('保存 .html'));
-    await waitFor(() => expect(notice()).toContain('保存失败'));
-  });
+    await waitFor(() => expect(notice()).toContain('保存失败'), WAIT);
+  }, 30000);
 });
 
 describe('HtmlFormat 格式化结果 / 树状结构 分页签', () => {

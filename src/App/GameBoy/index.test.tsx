@@ -1,6 +1,9 @@
 import '@testing-library/jest-dom';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 
+// 模拟器用例要等 rAF / 定时器推进, 满负载跑全量测试时单个用例可能超过 jest 默认的 5s
+jest.setTimeout(20000);
+
 // wasm 核心不能跑在 jsdom 里: 用桩机记录调用
 const mockMachineRef: { current: any } = { current: null };
 const mockCreate = jest.fn();
@@ -120,6 +123,17 @@ const loadRom = async (bytes: Uint8Array, name = 'Test.gb') => {
 const press = (key: string) => fireEvent.keyDown(window, { key });
 const release = (key: string) => fireEvent.keyUp(window, { key });
 
+/**
+ * 点工具栏按钮前先等它可用: 载入 ROM 后按钮要等一次渲染才解除 disabled,
+ * 全量跑测时 CPU 紧张, 直接点可能落在仍 disabled 的按钮上 (事件被丢弃, 断言随机失败)
+ */
+const clickButton = async (name: RegExp) => {
+  const btn = await screen.findByRole('button', { name });
+  await waitFor(() => expect(btn).toBeEnabled());
+  fireEvent.click(btn);
+  return btn;
+};
+
 beforeEach(() => {
   localStorage.clear();
   mockMachineRef.current = null;
@@ -207,18 +221,18 @@ describe('GameBoy 模拟器页面', () => {
     await loadRom(makeRom());
     await waitFor(() => expect(mockCreate).toHaveBeenCalledTimes(1), { timeout: 5000 });
 
-    fireEvent.click(screen.getByRole('button', { name: /暂停/ }));
-    expect(screen.getByRole('button', { name: /继续/ })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: /继续/ }));
-    expect(screen.getByRole('button', { name: /暂停/ })).toBeInTheDocument();
+    await clickButton(/暂停/);
+    await waitFor(() => expect(screen.getByRole('button', { name: /继续/ })).toBeInTheDocument());
+    await clickButton(/继续/);
+    await waitFor(() => expect(screen.getByRole('button', { name: /暂停/ })).toBeInTheDocument());
   });
 
   test('重置按钮调用核心 reset', async () => {
     render(<GameBoyEmulator />);
     await loadRom(makeRom());
     await waitFor(() => expect(mockCreate).toHaveBeenCalledTimes(1), { timeout: 5000 });
-    fireEvent.click(screen.getByRole('button', { name: /重置/ }));
-    expect(mockMachineRef.current.resets).toBe(1);
+    await clickButton(/重置/);
+    await waitFor(() => expect(mockMachineRef.current.resets).toBe(1));
   });
 
   test('键盘方向键 / A 键下发给核心, 抬起时释放', async () => {
@@ -275,7 +289,7 @@ describe('GameBoy 模拟器页面', () => {
     await loadRom(makeRom(), 'Zelda.gb');
     await waitFor(() => expect(mockCreate).toHaveBeenCalledTimes(1), { timeout: 5000 });
 
-    fireEvent.click(screen.getByRole('button', { name: /保存状态/ }));
+    await clickButton(/保存状态/);
     await waitFor(() => expect(saveTextFile).toHaveBeenCalledTimes(1), { timeout: 5000 });
     expect((saveTextFile as jest.Mock).mock.calls[0][0]).toBe('Zelda.gbstate');
 
@@ -328,11 +342,11 @@ describe('GameBoy 模拟器页面', () => {
     await loadRom(makeRom());
     await waitFor(() => expect(mockCreate).toHaveBeenCalledTimes(1), { timeout: 5000 });
 
-    fireEvent.click(screen.getByRole('button', { name: /全屏/ }));
+    await clickButton(/全屏/);
     await waitFor(() => expect(screen.getByTestId('gb-full')).toBeInTheDocument(), { timeout: 5000 });
     expect(screen.queryByText('卡带信息')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /退出全屏/ }));
+    await clickButton(/退出全屏/);
     await waitFor(() => expect(screen.queryByTestId('gb-full')).not.toBeInTheDocument(), { timeout: 5000 });
     expect(screen.getByText('卡带信息')).toBeInTheDocument();
   }, 20000);
@@ -344,7 +358,7 @@ describe('GameBoy 模拟器页面', () => {
 
     expect(screen.queryByTestId('gb-overlay-pad')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /全屏/ }));
+    await clickButton(/全屏/);
     const pad = await screen.findByTestId('gb-overlay-pad', {}, { timeout: 5000 });
     expect(pad.closest('.gb-screen')).toBe(screen.getByTestId('gb-screen'));
     expect(pad.style.opacity).toBe('0.7');
@@ -357,7 +371,7 @@ describe('GameBoy 模拟器页面', () => {
     await waitFor(() => expect(mockCreate).toHaveBeenCalledTimes(1), { timeout: 5000 });
     const machine = mockMachineRef.current;
 
-    fireEvent.click(screen.getByRole('button', { name: /全屏/ }));
+    await clickButton(/全屏/);
     const pad = await screen.findByTestId('gb-overlay-pad', {}, { timeout: 5000 });
     const bBtn = pad.querySelector('[data-pad="B"]') as HTMLElement;
     expect(bBtn.className).not.toContain('is-down');
@@ -376,7 +390,7 @@ describe('GameBoy 模拟器页面', () => {
     await loadRom(makeRom());
     await waitFor(() => expect(mockCreate).toHaveBeenCalledTimes(1), { timeout: 5000 });
 
-    fireEvent.click(screen.getByRole('button', { name: /全屏/ }));
+    await clickButton(/全屏/);
     const pad = await screen.findByTestId('gb-overlay-pad', {}, { timeout: 5000 });
     const startBtn = pad.querySelector('[data-pad="Start"]') as HTMLElement;
 
@@ -391,7 +405,7 @@ describe('GameBoy 模拟器页面', () => {
     const first = render(<GameBoyEmulator />);
     await loadRom(makeRom());
     await waitFor(() => expect(mockCreate).toHaveBeenCalledTimes(1), { timeout: 5000 });
-    fireEvent.click(screen.getByRole('button', { name: /全屏/ }));
+    await clickButton(/全屏/);
     await waitFor(() => expect(screen.getByTestId('gb-full')).toBeInTheDocument(), { timeout: 5000 });
     expect(screen.queryByTestId('gb-overlay-pad')).not.toBeInTheDocument();
     first.unmount();
@@ -401,7 +415,7 @@ describe('GameBoy 模拟器页面', () => {
     render(<GameBoyEmulator />);
     await loadRom(makeRom());
     await waitFor(() => expect(mockCreate).toHaveBeenCalledTimes(2), { timeout: 5000 });
-    fireEvent.click(screen.getByRole('button', { name: /全屏/ }));
+    await clickButton(/全屏/);
     const pad = await screen.findByTestId('gb-overlay-pad', {}, { timeout: 5000 });
     expect(pad.style.opacity).toBe('0.4');
   }, 20000);

@@ -1,6 +1,6 @@
 {
   "name": "magic-tools",
-  "version": "2.23.2",
+  "version": "2.24.0",
   "description": "Developer Tools Application",
   "keywords": [
     "Developer Tools"
@@ -76,6 +76,7 @@
     "testEnvironmentOptions": {
       "url": "http://localhost/"
     },
+    "testTimeout": 30000,
     "testPathIgnorePatterns": [
       "dist"
     ],

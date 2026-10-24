@@ -2,6 +2,7 @@
 // jsdom 环境下缺少 TextEncoder / TextDecoder (部分 jsdom 版本不会暴露这两个全局对象)
 // 浏览器与 Node 环境中均可用, 这里仅为让 ts-jest 单元测试正常运行
 import { TextEncoder, TextDecoder } from 'util';
+import { configure } from '@testing-library/dom';
 
 declare const global: any;
 if(typeof global.TextEncoder === 'undefined') {
@@ -66,3 +67,8 @@ if(typeof global.matchMedia === 'undefined') {
     dispatchEvent: () => false,
   });
 }
+
+// 机器负载高 (CI / 同时跑多个项目) 时, 异步保存、antd message 提示等常常晚于
+// testing-library 默认的 1s 轮询窗口 → 用例随机失败 (jest 单用例超时已放宽到 30s)。
+// 这里把 waitFor / findBy* 的默认等待也放宽到 10s: 条件满足立即返回, 不影响正常用例耗时。
+configure({ asyncUtilTimeout: 10000 });

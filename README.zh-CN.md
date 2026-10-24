@@ -6,7 +6,7 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
-![version](https://img.shields.io/badge/magic--tools-v2.23.2-007EC6?style=flat-square&labelColor=24292F) ![ci](https://img.shields.io/github/actions/workflow/status/freewu/magic-tools/ci.yml?style=flat-square&label=CI&labelColor=24292F&logo=githubactions&logoColor=fff) ![Tauri](https://img.shields.io/badge/Tauri-2-0E7490?style=flat-square&labelColor=24292F&logo=tauri&logoColor=fff) ![React](https://img.shields.io/badge/React-18-087EA4?style=flat-square&labelColor=24292F&logo=react&logoColor=fff) ![Ant Design](https://img.shields.io/badge/Ant_Design-5-0170FE?style=flat-square&labelColor=24292F&logo=antdesign&logoColor=fff) ![MIT License](https://img.shields.io/badge/license-MIT-4F46E5?style=flat-square&labelColor=24292F)
+![version](https://img.shields.io/badge/magic--tools-v2.24.0-007EC6?style=flat-square&labelColor=24292F) ![ci](https://img.shields.io/github/actions/workflow/status/freewu/magic-tools/ci.yml?style=flat-square&label=CI&labelColor=24292F&logo=githubactions&logoColor=fff) ![Tauri](https://img.shields.io/badge/Tauri-2-0E7490?style=flat-square&labelColor=24292F&logo=tauri&logoColor=fff) ![React](https://img.shields.io/badge/React-18-087EA4?style=flat-square&labelColor=24292F&logo=react&logoColor=fff) ![Ant Design](https://img.shields.io/badge/Ant_Design-5-0170FE?style=flat-square&labelColor=24292F&logo=antdesign&logoColor=fff) ![MIT License](https://img.shields.io/badge/license-MIT-4F46E5?style=flat-square&labelColor=24292F)
 
 [下载桌面版](#-下载) · [在线体验](https://freewu.github.io/magic-tools/) · [提交 Issue](https://github.com/freewu/magic-tools/issues/new)
 
@@ -95,7 +95,7 @@ magic-tools
 │   │   ├── app-modules.ts    # 构建期用 import.meta.glob 静态收集 (替代 webpack context 动态导入)
 │   │   ├── app-i18n.ts       # 应用注册表: appNameOf() 等取各工具/固定页三语名称
 │   │   ├── lang-packs.ts     # 汇总各工具 lang.ts 的默认语言包 (default 导出)
-│   │   └── <工具>/           # 每工具一个目录 (当前 151 个, 清单见下) — 两步注册
+│   │   └── <工具>/           # 每工具一个目录 (当前 156 个, 清单见下) — 两步注册
 │   │       ├── define.tsx    # 注册元数据: AppName(zh-CN 默认名) / Icon / Type(分组)
 │   │       ├── index.tsx     # 工具页面组件 (默认导出, 懒加载)
 │   │       ├── lang.ts       # 默认语言包 + 三语词条 (zh 短语即 key, 值=[zh-TW, en]) + 本地取词函数
@@ -114,7 +114,7 @@ magic-tools
 
 ### `src/App/` 现有工具清单
 
-[`src/App/`](src/App/) 下现有 **151** 个工具目录, 每个目录 = 一个工具, 由其中 `define.tsx` 声明。**新增工具需两步登记**：(1) 把目录名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 数组 (该数组决定侧边栏/应用中心菜单顺序与路由; `import.meta.glob` 只负责发现页面组件, 不决定菜单); (2) 把其 `lang.ts` 默认导出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名称与界面文案才能随语言切换。按下表 `Type` 分组列出 (与侧边栏/上方功能总览一致), 括号内为目录数。除下列公共文件外, 个别工具另有私有文件 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
+[`src/App/`](src/App/) 下现有 **156** 个工具目录, 每个目录 = 一个工具, 由其中 `define.tsx` 声明。**新增工具需两步登记**：(1) 把目录名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 数组 (该数组决定侧边栏/应用中心菜单顺序与路由; `import.meta.glob` 只负责发现页面组件, 不决定菜单); (2) 把其 `lang.ts` 默认导出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名称与界面文案才能随语言切换。按下表 `Type` 分组列出 (与侧边栏/上方功能总览一致), 括号内为目录数。除下列公共文件外, 个别工具另有私有文件 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
 
 **🔐 加解密 *(23)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `SM9Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto` · `ZucCrypto`
 
