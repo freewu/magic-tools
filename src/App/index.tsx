@@ -160,6 +160,7 @@ const list = [
   'NesEmulator',
   'Minesweeper',
   'GameBoy',
+  'FreeCell',
 ];
 
 import { defineLoader } from './app-modules';

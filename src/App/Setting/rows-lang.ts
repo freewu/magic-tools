@@ -716,6 +716,24 @@ const ROWS: Record<string, Row> = {
     '開啟後右鍵在 旗 / 問號 / 空 之間循環, 關閉後只在 旗 / 空 之間切換',
     'When on, right click cycles flag / question / blank; when off it toggles flag / blank',
   ],
+  // ---- 空档接龙 (FreeCell) ----
+  '空档接龙': ['新接龍', 'FreeCell'],
+  '自动收牌 (安全牌)': ['自動收牌 (安全牌)', 'Auto collect (safe cards)'],
+  '允许多张连续移动': ['允許多張連續移動', 'Allow multi-card moves'],
+  '双击自动移牌': ['雙擊自動移牌', 'Double-click auto move'],
+  '清空战绩记录': ['清空戰績記錄', 'Clear records'],
+  '每次移动后自动把可以安全上收的牌送上收集区, 省得逐张点击': [
+    '每次移動後自動把可以安全上收的牌送上收集區, 省得逐張點擊',
+    'After each move, send cards that are safe to play onto the foundations so you do not have to click them one by one',
+  ],
+  '开启后一次可搬 (空自由格 + 1) × 2^空列 张牌; 关闭则只能一张一张搬': [
+    '開啟後一次可搬 (空自由格 + 1) × 2^空列 張牌; 關閉則只能一張一張搬',
+    'When on, a run of (empty free cells + 1) × 2^empty columns cards moves at once; when off only one card at a time',
+  ],
+  '双击一张牌时自动送到收集区或能接住它的牌桌列': [
+    '雙擊一張牌時自動送到收集區或能接住它的牌桌列',
+    'Double-clicking a card sends it to a foundation or to a tableau column that accepts it',
+  ],
 };
 
 /**

@@ -1,0 +1,209 @@
+import '@testing-library/jest-dom';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import FreeCell from './index';
+import { dealFromSeed, type Card } from './lib';
+
+// app-context 依赖 App/index.tsx 的顶层 await + import.meta.glob (jest commonjs 不支持), 故打桩
+jest.mock('../../hook/app-context', () => ({
+  AppContext: require('react').createContext(null),
+}));
+
+const press = (key: string) => fireEvent.keyDown(window, { key });
+
+/** 棋盘上所有牌的唯一 id */
+const cardIds = (container: HTMLElement) =>
+  Array.from(container.querySelectorAll('[data-card]')).map((el) => el.getAttribute('data-card') as string);
+
+/** 8 列各自的张数 */
+const columnCounts = (container: HTMLElement) =>
+  Array.from({ length: 8 }, (_, i) =>
+    Number(container.querySelector(`[data-testid="tableau-${i}"]`)?.getAttribute('data-count')));
+
+const freeEmpty = (container: HTMLElement, i: number) =>
+  container.querySelector(`[data-testid="free-${i}"]`)?.getAttribute('data-empty') === '1';
+
+const freeCard = (container: HTMLElement, i: number) =>
+  container.querySelector(`[data-testid="free-${i}"] [data-card]`)?.getAttribute('data-card') ?? null;
+
+const foundationCount = (container: HTMLElement, suit: string) =>
+  Number(container.querySelector(`[data-testid="foundation-${suit}"]`)?.getAttribute('data-count'));
+
+const stat = (testId: string) => Number(screen.getByTestId(testId).textContent);
+
+/** 「已收牌」显示为 "n/52", 只取前一个数字 */
+const collected = () => Number((screen.getByTestId('stat-collected').textContent ?? '').split('/')[0]);
+
+/** 某列的顶牌 (data-card 元素) */
+const topCardEl = (container: HTMLElement, col: number): HTMLElement | null => {
+  const pile = container.querySelectorAll(`[data-testid="tableau-${col}"] [data-card]`);
+  return (pile[pile.length - 1] as HTMLElement | undefined) ?? null;
+};
+
+const seedInput = () => screen.getByRole('spinbutton') as HTMLInputElement;
+
+/** 找出一个「某列顶牌是 A」的局号 (确定性发牌, 便于断言双击上收) */
+const seedWithTopAce = (): { seed: number; card: Card } => {
+  for (let seed = 1; seed < 5000; seed += 1) {
+    const s = dealFromSeed(seed);
+    for (const pile of s.tableau) {
+      const top = pile[pile.length - 1];
+      if (top.rank === 1) return { seed, card: top };
+    }
+  }
+  throw new Error('no seed with a top ace found');
+};
+
+const useSeed = (seed: number) => localStorage.setItem('magic-tools-freecell-seed', String(seed));
+
+beforeEach(() => {
+  localStorage.clear();
+});
+
+afterEach(() => {
+  cleanup();
+  jest.restoreAllMocks();
+});
+
+describe('空档接龙页面', () => {
+  test('初始渲染 52 张牌, 8 列分别为 7/7/7/7/6/6/6/6, 4 自由格与 4 收集区全空', () => {
+    const { container } = render(<FreeCell />);
+    expect(cardIds(container)).toHaveLength(52);
+    expect(new Set(cardIds(container)).size).toBe(52);
+    expect(columnCounts(container)).toEqual([ 7, 7, 7, 7, 6, 6, 6, 6 ]);
+    for (let i = 0; i < 4; i += 1) expect(freeEmpty(container, i)).toBe(true);
+    for (const suit of [ 'S', 'H', 'D', 'C' ]) expect(foundationCount(container, suit)).toBe(0);
+    expect(stat('stat-moves')).toBe(0);
+    expect(collected()).toBe(0);
+    expect(screen.getByTestId('stat-time')).toHaveTextContent('00:00');
+    expect(screen.getAllByText('用时').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('步数').length).toBeGreaterThan(0);
+  });
+
+  test('局号输入框显示上次局号 (默认 617)', () => {
+    render(<FreeCell />);
+    expect(seedInput().value).toBe('617');
+    useSeed(2001);
+    cleanup();
+    render(<FreeCell />);
+    expect(seedInput().value).toBe('2001');
+  });
+
+  test('点击顶牌会选中它', () => {
+    const { container } = render(<FreeCell />);
+    const top = topCardEl(container, 0);
+    expect(top).not.toBeNull();
+    fireEvent.click(top!);
+    expect(topCardEl(container, 0)).toHaveAttribute('data-selected', '1');
+    // 再点一次取消选中
+    fireEvent.click(topCardEl(container, 0)!);
+    expect(topCardEl(container, 0)).toHaveAttribute('data-selected', '0');
+  });
+
+  test('把顶牌挪进空自由格: 步数 +1, 自由格不再为空', () => {
+    const { container } = render(<FreeCell />);
+    fireEvent.click(topCardEl(container, 0)!);
+    fireEvent.click(container.querySelector('[data-testid="free-0"]')!);
+    expect(freeEmpty(container, 0)).toBe(false);
+    expect(stat('stat-moves')).toBe(1);
+    expect(columnCounts(container)[0]).toBe(6);
+    expect(cardIds(container)).toHaveLength(52);
+  });
+
+  test('撤销可以恢复上一步', () => {
+    const { container } = render(<FreeCell />);
+    fireEvent.click(topCardEl(container, 0)!);
+    fireEvent.click(container.querySelector('[data-testid="free-0"]')!);
+    expect(stat('stat-moves')).toBe(1);
+    fireEvent.click(screen.getByText('撤销 (Z)'));
+    expect(freeEmpty(container, 0)).toBe(true);
+    expect(stat('stat-moves')).toBe(0);
+    expect(columnCounts(container)[0]).toBe(7);
+  });
+
+  test('键盘 Z 也能撤销', () => {
+    const { container } = render(<FreeCell />);
+    fireEvent.click(topCardEl(container, 0)!);
+    fireEvent.click(container.querySelector('[data-testid="free-0"]')!);
+    press('z');
+    expect(freeEmpty(container, 0)).toBe(true);
+  });
+
+  test('双击 A 自动送进收集区', () => {
+    const { seed, card } = seedWithTopAce();
+    useSeed(seed);
+    const { container } = render(<FreeCell />);
+    fireEvent.doubleClick(screen.getByTestId(`card-${card.suit}${card.rank}`));
+    // 自动收牌可能顺带把后面露出来的安全牌也收掉, 故只校验下限
+    expect(foundationCount(container, card.suit)).toBeGreaterThanOrEqual(1);
+    expect(stat('stat-moves')).toBe(1);
+    expect(collected()).toBeGreaterThanOrEqual(1);
+  });
+
+  test('设置关闭「双击自动移牌」后双击不动牌', () => {
+    localStorage.setItem(
+      'magic-tools-freecell-defaults',
+      JSON.stringify({ autoCollect: true, superMove: true, doubleClick: false })
+    );
+    const { seed, card } = seedWithTopAce();
+    useSeed(seed);
+    const { container } = render(<FreeCell />);
+    fireEvent.doubleClick(screen.getByTestId(`card-${card.suit}${card.rank}`));
+    expect(foundationCount(container, card.suit)).toBe(0);
+    expect(stat('stat-moves')).toBe(0);
+  });
+
+  test('提示按钮会高亮一处可行的移动', () => {
+    const { container } = render(<FreeCell />);
+    fireEvent.click(screen.getByText('提示 (H)'));
+    expect(container.querySelectorAll('.fc-card.is-hint').length).toBeGreaterThan(0);
+  });
+
+  test('自动收牌按钮把安全牌送上收集区 (不计步数)', () => {
+    const { seed, card } = seedWithTopAce();
+    useSeed(seed);
+    const { container } = render(<FreeCell />);
+    fireEvent.click(screen.getByText('自动收牌 (A)'));
+    expect(foundationCount(container, card.suit)).toBeGreaterThanOrEqual(1);
+    expect(stat('stat-moves')).toBe(0);
+    expect(collected()).toBeGreaterThanOrEqual(1);
+  });
+
+  test('改局号后点发牌会换成另一局, 牌数仍是 52', () => {
+    const { container } = render(<FreeCell />);
+    const before = cardIds(container).join(',');
+    fireEvent.change(seedInput(), { target: { value: '1234' } });
+    fireEvent.click(screen.getByText('发牌'));
+    expect(seedInput().value).toBe('1234');
+    expect(cardIds(container)).toHaveLength(52);
+    expect(cardIds(container).join(',')).not.toBe(before);
+    expect(localStorage.getItem('magic-tools-freecell-seed')).toBe('1234');
+  });
+
+  test('新局使用随机局号 (N 键同效)', () => {
+    jest.spyOn(Math, 'random').mockReturnValue(0.5);
+    render(<FreeCell />);
+    fireEvent.click(screen.getByText('新局 (N)'));
+    expect(seedInput().value).toBe('500001');
+    press('n');
+    expect(seedInput().value).toBe('500001');
+  });
+
+  test('全屏模式只保留牌桌, Esc / 按钮可退出', () => {
+    const { container } = render(<FreeCell />);
+    fireEvent.click(screen.getByText('全屏'));
+    expect(screen.getByTestId('freecell-full')).toBeInTheDocument();
+    expect(container.querySelectorAll('[data-card]')).toHaveLength(52);
+    fireEvent.click(screen.getByText('退出全屏'));
+    expect(screen.queryByTestId('freecell-full')).not.toBeInTheDocument();
+    expect(screen.getByTestId('freecell-top')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('全屏'));
+    press('Escape');
+    expect(screen.queryByTestId('freecell-full')).not.toBeInTheDocument();
+  });
+
+  test('说明区展示玩法要点', () => {
+    render(<FreeCell />);
+    expect(screen.getByText('空档接龙说明')).toBeInTheDocument();
+    expect(screen.getByText('这个工具做什么')).toBeInTheDocument();
+  });
+});
