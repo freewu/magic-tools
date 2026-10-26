@@ -5,6 +5,7 @@ import { NesEmulatorSetting } from "../NesEmulator/setting";
 import { MinesweeperSetting } from "../Minesweeper/setting";
 import { GameBoySetting } from "../GameBoy/setting";
 import { FreeCellSetting } from "../FreeCell/setting";
+import { SpiderSolitaireSetting } from "../SpiderSolitaire/setting";
 
 export const SettingGame = () => {
 
@@ -16,6 +17,7 @@ export const SettingGame = () => {
       <MinesweeperSetting />
       <GameBoySetting />
       <FreeCellSetting />
+      <SpiderSolitaireSetting />
     </Form>
   )
 }

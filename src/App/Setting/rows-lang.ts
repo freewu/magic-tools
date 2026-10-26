@@ -734,6 +734,30 @@ const ROWS: Record<string, Row> = {
     '雙擊一張牌時自動送到收集區或能接住它的牌桌列',
     'Double-clicking a card sends it to a foundation or to a tableau column that accepts it',
   ],
+  // ---- 蜘蛛纸牌 (Spider Solitaire) ----
+  '蜘蛛纸牌': ['蜘蛛紙牌', 'Spider Solitaire'],
+  '一花色 (简单)': ['一花色 (簡單)', 'One suit (easy)'],
+  '两花色 (中等)': ['兩花色 (中等)', 'Two suits (medium)'],
+  '四花色 (困难)': ['四花色 (困難)', 'Four suits (hard)'],
+  '有空列时禁止发牌': ['有空列時禁止發牌', 'Require a full board to deal'],
+  '自动收走同花顺': ['自動收走同花順', 'Auto collect completed runs'],
+  '花色越少越好过: 一花色只有黑桃, 四花色则是两副完整的牌': [
+    '花色越少越好過: 一花色只有黑桃, 四花色則是兩副完整的牌',
+    'Fewer suits is easier: one suit uses spades only, four suits use two complete decks',
+  ],
+  '经典规则: 牌桌上有空列时不能从牌堆发牌, 先把空列填上': [
+    '經典規則: 牌桌上有空列時不能從牌堆發牌, 先把空列填上',
+    'Classic rule: you cannot deal from the stock while a column is empty — fill it first',
+  ],
+  '双击自动移到可接的列': ['雙擊自動移到可接的列', 'Double-click auto move to a column'],
+  '双击一张牌时自动移到能接住它的牌桌列': [
+    '雙擊一張牌時自動移到能接住它的牌桌列',
+    'Double-clicking a card moves it to a tableau column that accepts it',
+  ],
+  '凑齐 K 到 A 的同花顺时自动收走; 关闭后需手动点「收牌 (C)」': [
+    '湊齊 K 到 A 的同花順時自動收走; 關閉後需手動點「收牌 (C)」',
+    'A completed King-to-Ace same-suit run is collected automatically; when off, use “Collect (C)”',
+  ],
 };
 
 /**

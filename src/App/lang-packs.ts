@@ -161,6 +161,7 @@ import NesEmulator from './NesEmulator/lang';
 import Minesweeper from './Minesweeper/lang';
 import GameBoy from './GameBoy/lang';
 import FreeCell from './FreeCell/lang';
+import SpiderSolitaire from './SpiderSolitaire/lang';
 
 export const langPacks = {
   Hash: Hash,
@@ -324,4 +325,5 @@ export const langPacks = {
   Minesweeper,
   GameBoy,
   FreeCell,
+  SpiderSolitaire,
 };

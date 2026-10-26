@@ -161,6 +161,7 @@ const list = [
   'Minesweeper',
   'GameBoy',
   'FreeCell',
+  'SpiderSolitaire',
 ];
 
 import { defineLoader } from './app-modules';
