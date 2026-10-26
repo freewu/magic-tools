@@ -66,12 +66,27 @@ const dropOn = (el: Element | null) => {
   (document as unknown as { elementFromPoint: () => Element | null }).elementFromPoint = () => el;
 };
 
+/**
+ * jsdom 没有 PointerEvent, fireEvent.pointerDown 拿不到 clientX/clientY,
+ * 这里用带坐标的 MouseEvent 冒充 pointer 事件, 才能真正测到拖拽阈值与幽灵牌位置
+ */
+const pointer = (
+  target: Element | Window,
+  type: 'pointerdown' | 'pointermove' | 'pointerup' | 'pointercancel',
+  x: number,
+  y: number
+) =>
+  fireEvent(
+    target,
+    new MouseEvent(type, { bubbles: true, cancelable: true, clientX: x, clientY: y, button: 0 })
+  );
+
 /** 模拟一次指针拖拽: 按下 -> 移动 (超过阀值) -> 松手 */
 const drag = (fromEl: HTMLElement, target: Element | null) => {
-  fireEvent.pointerDown(fromEl, { clientX: 20, clientY: 20, button: 0, pointerId: 1 });
+  pointer(fromEl, 'pointerdown', 20, 20);
   dropOn(target);
-  fireEvent.pointerMove(window, { clientX: 80, clientY: 90, pointerId: 1 });
-  fireEvent.pointerUp(window, { clientX: 80, clientY: 90, pointerId: 1 });
+  pointer(window, 'pointermove', 80, 90);
+  pointer(window, 'pointerup', 80, 90);
 };
 
 /** 一段连牌里最下面那张 (拖拽从这里按下) */
@@ -279,13 +294,18 @@ describe('蜘蛛纸牌页面', () => {
     useSeed(seed);
     const { container } = render(<SpiderSolitaire />);
     const from = cardEl(container, runHead(state, move));
-    fireEvent.pointerDown(from, { clientX: 20, clientY: 20, button: 0, pointerId: 1 });
+    pointer(from, 'pointerdown', 20, 20);
     dropOn(colEl(container, move.to));
-    fireEvent.pointerMove(window, { clientX: 80, clientY: 90, pointerId: 1 });
-    expect(screen.getByTestId('spider-drag')).toBeInTheDocument();
-    expect(container.querySelectorAll('.sp-card.is-dragging').length).toBeGreaterThan(0);
+    pointer(window, 'pointermove', 80, 90);
+    const ghostLayer = screen.getByTestId('spider-drag');
+    expect(ghostLayer).toBeInTheDocument();
+    // 幽灵牌跟随指针 (按下点偏移被扣掉): 抬起点 80 - 20 = 60px
+    expect(ghostLayer.style.left).toBe('60px');
+    expect(ghostLayer.style.top).toBe('70px');
+    expect(ghostLayer.querySelectorAll('[data-card]')).toHaveLength(0);
+    expect(container.querySelectorAll('.sp-card.is-dragging').length).toBe(move.count);
     expect(colEl(container, move.to)).toHaveClass('is-drop');
-    fireEvent.pointerUp(window, { clientX: 80, clientY: 90, pointerId: 1 });
+    pointer(window, 'pointerup', 80, 90);
     expect(screen.queryByTestId('spider-drag')).not.toBeInTheDocument();
     expect(stat('stat-moves')).toBe(1);
   });
@@ -310,10 +330,10 @@ describe('蜘蛛纸牌页面', () => {
     const { seed, state, move } = seedWithMove();
     useSeed(seed);
     const { container } = render(<SpiderSolitaire />);
-    fireEvent.pointerDown(cardEl(container, runHead(state, move)), { clientX: 20, clientY: 20, button: 0, pointerId: 1 });
+    pointer(cardEl(container, runHead(state, move)), 'pointerdown', 20, 20);
     dropOn(colEl(container, move.to));
-    fireEvent.pointerMove(window, { clientX: 80, clientY: 90, pointerId: 1 });
-    fireEvent.pointerCancel(window, { pointerId: 1 });
+    pointer(window, 'pointermove', 80, 90);
+    pointer(window, 'pointercancel', 80, 90);
     expect(stat('stat-moves')).toBe(0);
     expect(screen.queryByTestId('spider-drag')).not.toBeInTheDocument();
   });
@@ -321,9 +341,9 @@ describe('蜘蛛纸牌页面', () => {
   test('小幅度移动仍算点击 (不会误拖)', () => {
     const { container } = render(<SpiderSolitaire />);
     const top = colEl(container, 0).querySelector('[data-up="1"]') as HTMLElement;
-    fireEvent.pointerDown(top, { clientX: 20, clientY: 20, button: 0, pointerId: 1 });
-    fireEvent.pointerMove(window, { clientX: 22, clientY: 21, pointerId: 1 });
-    fireEvent.pointerUp(window, { clientX: 22, clientY: 21, pointerId: 1 });
+    pointer(top, 'pointerdown', 20, 20);
+    pointer(window, 'pointermove', 22, 21);
+    pointer(window, 'pointerup', 22, 21);
     expect(screen.queryByTestId('spider-drag')).not.toBeInTheDocument();
     expect(stat('stat-moves')).toBe(0);
     expect(columnCounts(container)[0]).toBe(6);

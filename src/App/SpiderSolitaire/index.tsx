@@ -51,6 +51,18 @@ type DragState = {
 /** 移动超过该距离才算拖拽, 否则视为点击 */
 const DRAG_THRESHOLD = 5;
 
+/**
+ * 取指针坐标: 有的环境 (jsdom / 部分合成事件) 拿不到 clientX, 此时得到 NaN。
+ * 坐标不可用时按「已经移动」处理 (宁可拖起来也别吞掉用户的滑动), 只把幽灵牌放在原点。
+ */
+const pointerPos = (e: { clientX?: number; clientY?: number }): { x: number; y: number } => ({
+  x: e.clientX as number,
+  y: e.clientY as number,
+});
+
+/** 幽灵牌定位 (坐标不可用时返回 undefined, 交给 CSS 定位) */
+const finiteOrUndefined = (v: number): number | undefined => (Number.isFinite(v) ? v : undefined);
+
 /** 指针位置下的目标列 (靠容器上的 data-drop 标记) */
 const dropColumnAt = (x: number, y: number): number | null => {
   const doc = document as Document & { elementFromPoint?: (px: number, py: number) => Element | null };
@@ -158,17 +170,17 @@ const SpiderSolitaire: React.FC = () => {
       const pending = pendingRef.current;
       if (!pending) return;
       const current = dragRef.current;
+      const { x, y } = pointerPos(e);
       if (!current) {
         // 未过阀值: 仍然当作点击, 不进入拖拽
-        if (Math.abs(e.clientX - pending.x) < DRAG_THRESHOLD
-          && Math.abs(e.clientY - pending.y) < DRAG_THRESHOLD) return;
-        const started: DragState = { ...pending, x: e.clientX, y: e.clientY, over: dropColumnAt(e.clientX, e.clientY) };
+        if (Math.abs(x - pending.x) < DRAG_THRESHOLD && Math.abs(y - pending.y) < DRAG_THRESHOLD) return;
+        const started: DragState = { ...pending, x, y, over: dropColumnAt(x, y) };
         dragRef.current = started;
         setDrag(started);
         setSel(null);
         setHint(null);
       } else {
-        const next: DragState = { ...current, x: e.clientX, y: e.clientY, over: dropColumnAt(e.clientX, e.clientY) };
+        const next: DragState = { ...current, x, y, over: dropColumnAt(x, y) };
         dragRef.current = next;
         setDrag(next);
       }
@@ -206,15 +218,16 @@ const SpiderSolitaire: React.FC = () => {
     const cards = pile.slice(Math.max(0, pile.length - count));
     if (!cards.length || !cards.every((card) => card.faceUp)) return;
     const rect = e.currentTarget.getBoundingClientRect();
+    const { x, y } = pointerPos(e);
     pendingRef.current = {
       from: col,
       count,
       start: pile.length - count,
       cards,
-      x: e.clientX,
-      y: e.clientY,
-      offX: Math.max(0, e.clientX - rect.left),
-      offY: Math.max(0, e.clientY - rect.top),
+      x,
+      y,
+      offX: Number.isFinite(x) ? Math.max(0, x - rect.left) : 0,
+      offY: Number.isFinite(y) ? Math.max(0, y - rect.top) : 0,
     };
   };
 
@@ -501,7 +514,8 @@ const SpiderSolitaire: React.FC = () => {
   }));
 
   const seedNode = (
-    <Space size={ 6 } wrap>
+    <Space size={ 6 } wrap align="center">
+      <Text type="secondary" style={ { fontSize: 12 } }>{ t('局号') }</Text>
       <InputNumber
         size="small"
         min={ SEED_MIN }
@@ -509,8 +523,7 @@ const SpiderSolitaire: React.FC = () => {
         precision={ 0 }
         value={ seedInput }
         onChange={ (v) => setSeedInput(typeof v === 'number' ? v : null) }
-        addonBefore={ t('局号') }
-        style={ { width: 168 } }
+        style={ { width: 116 } }
         data-testid="spider-seed"
       />
       <Tooltip title={ t('难度') }>
@@ -725,8 +738,8 @@ const SpiderSolitaire: React.FC = () => {
       data-testid="spider-drag"
       style={ {
         ...stageVars(full),
-        left: drag.x - drag.offX,
-        top: drag.y - drag.offY,
+        left: finiteOrUndefined(drag.x - drag.offX),
+        top: finiteOrUndefined(drag.y - drag.offY),
         width: 'var(--sp-w)',
         height: drag.cards.length > 1
           ? `calc(var(--sp-h) + ${drag.cards.length - 1} * var(--sp-fan-up))`
