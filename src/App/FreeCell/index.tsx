@@ -733,6 +733,8 @@ const FreeCell: React.FC = () => {
     '--fc-h': `calc(${fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS} * 1.4)`,
     '--fc-fan': `calc(${fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS} * 0.3)`,
     '--fc-bg': token.colorBgLayout,
+    '--fc-bar-bg': token.colorBgElevated,
+    '--fc-bar-line': token.colorBorderSecondary,
     '--fc-card-bg': '#ffffff',
   }) as React.CSSProperties;
 
@@ -758,23 +760,30 @@ const FreeCell: React.FC = () => {
     </div>
   ) : null;
 
-  // ---- 全屏: 只保留牌桌与统计 ----
+  // ---- 全屏: 顶部固定工具条 (局号 / 发牌 / 新局 / 撤销 ...) + 牌桌 ----
   if (full) {
     return (
       <>
         <style>{ FC_CSS }</style>
         <div ref={ stageRef } className="fc-stage fc-full" data-testid="freecell-full" style={ stageVars(true) }>
-          <div style={ { display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'space-between' } }>
-            <Space size={ 6 } wrap>
+          <div className="fc-toolbar" data-testid="freecell-toolbar">
+            { seedNode }
+            <Button
+              size="small"
+              className="fc-exit"
+              icon={ <FullscreenExitOutlined /> }
+              onClick={ exitFull }
+            >
+              { t('退出全屏') }
+            </Button>
+          </div>
+          <div className="fc-subbar">
+            <Space size={ 12 } wrap align="center">
               { statsNode }
               { recordsNode }
             </Space>
-            <Button size="small" icon={ <FullscreenExitOutlined /> } onClick={ exitFull }>{ t('退出全屏') }</Button>
           </div>
           { boardNode }
-          <div style={ { display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' } }>
-            { seedNode }
-          </div>
           { winNode }
           { stuckNode }
           <Text type="secondary" style={ { fontSize: 12, textAlign: 'center' } }>{ t('Esc 退出全屏') }</Text>

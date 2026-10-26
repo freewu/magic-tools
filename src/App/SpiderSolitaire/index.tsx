@@ -92,21 +92,40 @@ const dealtOrderOf = (next: GameState, prev: GameState): Record<string, number> 
   return map;
 };
 
-/** 指针位置下的目标列 (靠容器上的 data-drop 标记) */
+/**
+ * 指针位置下的目标列 (靠容器上的 data-drop 标记)。
+ * 优先用命中测试; 命中不到 (弹层遮挡 / 落在牌与牌之间的缝隙) 时,
+ * 再按列的矩形范围做一次几何判断, 避免「拖到列上了却识别不出目标」。
+ */
 const dropColumnAt = (x: number, y: number): number | null => {
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  const readCol = (node: Element | null | undefined): number | null => {
+    const raw = (node as HTMLElement | undefined)?.dataset?.drop;
+    if (!raw) return null;
+    const col = Number(raw);
+    return Number.isFinite(col) ? col : null;
+  };
   const doc = document as Document & { elementFromPoint?: (px: number, py: number) => Element | null };
-  if (typeof doc.elementFromPoint !== 'function') return null;
-  let el: Element | null = null;
-  try {
-    el = doc.elementFromPoint(x, y);
-  } catch {
-    return null;
+  if (typeof doc.elementFromPoint === 'function') {
+    let el: Element | null = null;
+    try {
+      el = doc.elementFromPoint(x, y);
+    } catch {
+      el = null;
+    }
+    const direct = readCol(el?.closest?.('[data-drop]'));
+    if (direct !== null) return direct;
   }
-  const holder = el?.closest?.('[data-drop]') as HTMLElement | null | undefined;
-  const raw = holder?.dataset?.drop;
-  if (!raw) return null;
-  const col = Number(raw);
-  return Number.isFinite(col) ? col : null;
+  const cols = Array.from(document.querySelectorAll('[data-drop]'));
+  for (const node of cols) {
+    const rect = node.getBoundingClientRect?.();
+    if (!rect || (!rect.width && !rect.height)) continue;
+    if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+      const col = readCol(node);
+      if (col !== null) return col;
+    }
+  }
+  return null;
 };
 
 const SpiderSolitaire: React.FC = () => {
@@ -256,20 +275,22 @@ const SpiderSolitaire: React.FC = () => {
      * 落回原列 (手指抖了一下又放回来) 或取消时当作一次点击, 不能吞掉后面补发的 click,
      * 否则会表现为「点了牌却选不中」。
      */
-    const end = (drop: boolean) => {
+    const end = (drop: boolean, e?: PointerEvent) => {
       const started = dragRef.current;
       pendingRef.current = null;
       dragRef.current = null;
       if (!started) return;
       setDrag(null);
-      const target = drop ? started.over : null;
+      // 松手那一刻的坐标比最后一次 pointermove 更准: 快速拖动时 move 可能还停在半路
+      const atUp = e ? dropColumnAt(e.clientX, e.clientY) : null;
+      const target = drop ? (atUp ?? started.over) : null;
       if (target === null || target === started.from) return;
       suppressClick.current = true;
       window.setTimeout(() => { suppressClick.current = false; }, 0);
       tryMoveRef.current(started.from, started.count, target);
     };
 
-    const onUp = () => end(true);
+    const onUp = (e: PointerEvent) => end(true, e);
     const onCancel = () => end(false);
     /** 窗口失焦 (alt+tab / 拖到窗口外松手) 时可能收不到 pointerup, 兜底清掉拖拽状态 */
     const onBlur = () => end(false);
@@ -316,7 +337,7 @@ const SpiderSolitaire: React.FC = () => {
   };
 
   const isDragSource = (col: number, index: number): boolean =>
-    !!drag && drag.from === col && index >= drag.start;
+    !!drag && drag.from === col && index >= drag.start && index < drag.start + drag.count;
 
   // ---- 开局 / 重开 ----
   const startGame = useCallback((n: unknown, suits?: Difficulty) => {
@@ -513,7 +534,7 @@ const SpiderSolitaire: React.FC = () => {
 
   // ---- 渲染辅助 ----
   const selectedCard = (col: number, index: number): boolean =>
-    !!sel && sel.col === col && index >= sel.start;
+    !!sel && sel.col === col && index >= sel.start && index < sel.start + sel.count;
 
   const hintKeys = useMemo(() => {
     const keys = new Set<string>();
@@ -604,6 +625,8 @@ const SpiderSolitaire: React.FC = () => {
     '--sp-fan-up': `calc(${fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS} * 0.32)`,
     '--sp-fan-down': `calc(${fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS} * 0.15)`,
     '--sp-bg': token.colorBgLayout,
+    '--sp-bar-bg': token.colorBgElevated,
+    '--sp-bar-line': token.colorBorderSecondary,
     '--sp-card-bg': '#ffffff',
   }) as React.CSSProperties;
 
@@ -854,23 +877,30 @@ const SpiderSolitaire: React.FC = () => {
     </div>
   ) : null;
 
-  // ---- 全屏: 只保留牌桌与统计 ----
+  // ---- 全屏: 顶部固定工具条 (局号 / 难度 / 发牌 / 新局 / 撤销 ...) + 牌桌 ----
   if (full) {
     return (
       <>
         <style>{ SP_CSS }</style>
         <div ref={ stageRef } className="sp-stage sp-full" data-testid="spider-full" style={ stageVars(true) }>
-          <div style={ { display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'space-between' } }>
-            <Space size={ 6 } wrap>
+          <div className="sp-toolbar" data-testid="spider-toolbar">
+            { seedNode }
+            <Button
+              size="small"
+              className="sp-exit"
+              icon={ <FullscreenExitOutlined /> }
+              onClick={ exitFull }
+            >
+              { t('退出全屏') }
+            </Button>
+          </div>
+          <div className="sp-subbar">
+            <Space size={ 12 } wrap align="center">
               { statsNode }
               { recordsNode }
             </Space>
-            <Button size="small" icon={ <FullscreenExitOutlined /> } onClick={ exitFull }>{ t('退出全屏') }</Button>
           </div>
           { boardNode }
-          <div style={ { display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' } }>
-            { seedNode }
-          </div>
           { winNode }
           { stuckNode }
           <Text type="secondary" style={ { fontSize: 12, textAlign: 'center' } }>{ t('Esc 退出全屏') }</Text>

@@ -97,7 +97,7 @@ export const SP_CSS = `
 .sp-card.is-selected { outline: none; background: #dbeafe;
   box-shadow: inset 0 0 0 2px #1677ff, 0 1px 3px rgba(0, 0, 0, 0.35); }
 .sp-card.is-dragging { opacity: 0.25; }
-.sp-card.sp-card-ghost { position: absolute; left: 0; cursor: grabbing;
+.sp-card.sp-card-ghost { position: absolute; left: 0; cursor: grabbing; pointer-events: none;
   box-shadow: 0 14px 26px rgba(0, 0, 0, 0.34), inset 0 0 0 1px rgba(148, 163, 184, 0.55);
   transform: rotate(-1.6deg) scale(1.03); }
 .sp-card.is-hint { background: #fff7e6; animation: sp-pulse 1.1s ease-in-out infinite; }
@@ -112,6 +112,12 @@ export const SP_CSS = `
   from { opacity: 0; transform: translate(-34px, -170px) rotate(5deg) scale(0.94); }
   to { opacity: 1; transform: none; }
 }
+/* 全屏顶部工具条: 吸顶, 牌桌再长也能随时开局 / 撤销 / 看提示 */
+.sp-toolbar { position: sticky; top: 0; z-index: 30; display: flex; flex-wrap: wrap; gap: 8px;
+  align-items: center; justify-content: center; padding: 6px 8px; border-radius: 8px;
+  background: var(--sp-bar-bg, #ffffff); box-shadow: 0 1px 0 var(--sp-bar-line, rgba(148, 163, 184, 0.35)); }
+.sp-toolbar .sp-exit { margin-left: auto; }
+.sp-subbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; }
 .sp-drag-layer { position: fixed; z-index: 1200; pointer-events: none; touch-action: none; }
 .sp-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: flex-start; }
 .sp-col { position: relative; width: var(--sp-w); border-radius: 6px; }

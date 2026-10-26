@@ -1,8 +1,10 @@
 import '@testing-library/jest-dom';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import SpiderSolitaire from './index';
-import { DEFAULT_OPTIONS, dealFromSeed, findHint, type Card, type GameState, type Move } from './lib';
-import type { Difficulty } from './data';
+import {
+  DEFAULT_OPTIONS, dealFromSeed, dealStock, findHint, runFrom, type Card, type GameState, type Move,
+} from './lib';
+import { INITIAL_COUNTS, type Difficulty } from './data';
 
 // app-context 依赖 App/index.tsx 的顶层 await + import.meta.glob (jest commonjs 不支持), 故打桩
 jest.mock('../../hook/app-context', () => ({
@@ -87,6 +89,20 @@ const drag = (fromEl: HTMLElement, target: Element | null) => {
   dropOn(target);
   pointer(window, 'pointermove', 80, 90);
   pointer(window, 'pointerup', 80, 90);
+};
+
+/** 发一轮牌 (拿不到就抛错, 简化用例里的类型收敛) */
+const dealRow = (st: GameState): GameState => {
+  const res = dealStock(st, DEFAULT_OPTIONS);
+  if (!res.ok) throw new Error(`deal failed: ${res.reason}`);
+  return res.state;
+};
+
+/** 重算发过 deals 轮之后的牌局 (给连牌高亮的用例用) */
+const dealStockRows = (seed: number, deals: number): Card[][] => {
+  let st = dealFromSeed(seed, 1);
+  for (let i = 0; i < deals; i += 1) st = dealRow(st);
+  return st.tableau;
 };
 
 /** 一段连牌里最下面那张 (拖拽从这里按下) */
@@ -302,6 +318,100 @@ describe('蜘蛛纸牌页面', () => {
     fireEvent.click(screen.getByText('全屏'));
     press('Escape');
     expect(screen.queryByTestId('spider-full')).not.toBeInTheDocument();
+  });
+
+  test('全屏时工具条 (局号 / 发牌 / 新局 / 撤销 ...) 在最上方', () => {
+    const { container } = render(<SpiderSolitaire />);
+    fireEvent.click(screen.getByText('全屏'));
+    const stage = screen.getByTestId('spider-full');
+    const bar = screen.getByTestId('spider-toolbar');
+    expect(bar).toBeInTheDocument();
+    // 是牌桌之前的第一个子节点
+    expect(stage.firstElementChild).toBe(bar);
+    // 开局 / 操作按钮都在工具条里, 不用滚到底部去找
+    [ '发牌', '新局 (N)', '重开本局 (R)', '撤销 (Z)', '提示 (H)', '发一轮牌 (D)', '收牌 (C)', '退出全屏' ]
+      .forEach((label) => {
+        expect(bar.textContent).toContain(label);
+      });
+    expect(bar.querySelector('[data-testid="spider-seed"]')).toBeTruthy();
+    expect(bar.querySelector('[data-testid="spider-difficulty"]')).toBeTruthy();
+    // 牌桌在工具条下面
+    const board = screen.getByTestId('spider-tableau');
+    expect(bar.compareDocumentPosition(board) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(container.querySelectorAll('[data-card]')).toHaveLength(TABLEAU_CARDS);
+  });
+
+  test('全屏时点工具条上的新局会重新发牌', () => {
+    const { container } = render(<SpiderSolitaire />);
+    fireEvent.click(screen.getByText('全屏'));
+    fireEvent.click(screen.getByText('新局 (N)'));
+    expect(columnCounts(container)).toEqual([ ...INITIAL_COUNTS ]);
+    expect(stockCount(container)).toBe(50);
+    expect(screen.getByTestId('spider-full')).toBeInTheDocument();
+  });
+
+  test('命中测试失效时按列的矩形范围兜底, 仍然能落位', () => {
+    const { seed, state, move } = seedWithMove();
+    useSeed(seed);
+    const { container } = render(<SpiderSolitaire />);
+    // elementFromPoint 永远找不到 (例如被弹层遮挡 / 落在缝隙上)
+    dropOn(null);
+    const target = colEl(container, move.to);
+    jest.spyOn(target, 'getBoundingClientRect').mockReturnValue({
+      left: 0, top: 0, right: 300, bottom: 300, width: 300, height: 300, x: 0, y: 0,
+      toJSON: () => ({}),
+    } as DOMRect);
+    drag(cardEl(container, runHead(state, move)), null);
+    expect(stat('stat-moves')).toBe(1);
+    expect(columnCounts(container)[move.to]).toBe(state.tableau[move.to].length + move.count);
+  });
+
+  test('落点以松手时的坐标为准 (最后一次 pointermove 还在半路也能落对)', () => {
+    const { seed, state, move } = seedWithMove();
+    useSeed(seed);
+    const { container } = render(<SpiderSolitaire />);
+    const target = colEl(container, move.to);
+    // 只有松手那一处 (80, 90) 能命中目标列, 中途的移动全落空
+    (document as unknown as { elementFromPoint: (x: number, y: number) => Element | null }).elementFromPoint =
+      (x: number, y: number) => (x === 80 && y === 90 ? target : null);
+    pointer(cardEl(container, runHead(state, move)), 'pointerdown', 20, 20);
+    pointer(window, 'pointermove', 30, 30);
+    expect(stat('stat-moves')).toBe(0);
+    pointer(window, 'pointerup', 80, 90);
+    expect(stat('stat-moves')).toBe(1);
+  });
+
+  test('选中多张连牌时只高亮这几张, 不会一直高亮到列底', () => {
+    // 连牌只会在发牌后出现 (新牌落在同花降序的牌上), 找一个发过 k 轮后有连牌的局号
+    let found: { seed: number; deals: number; row: number; col: number; head: number; len: number } | null = null;
+    for (let seed = 1; seed < 400 && !found; seed += 1) {
+      let st = dealFromSeed(seed, 1);
+      for (let deals = 1; deals <= 5 && !found; deals += 1) {
+        const res = dealStock(st, DEFAULT_OPTIONS);
+        if (!res.ok) break;
+        st = res.state;
+        st.tableau.forEach((pile, col) => {
+          if (found) return;
+          pile.forEach((card, head) => {
+            if (found || !card.faceUp) return;
+            const run = runFrom(st, col, head);
+            if (run && run.length >= 2) {
+              found = { seed, deals, row: st.tableau[col].length, col, head, len: run.length };
+            }
+          });
+        });
+      }
+    }
+    expect(found).not.toBeNull();
+    const { seed, deals, head, len } = found!;
+    const col = found!.col;
+    useSeed(seed);
+    const { container } = render(<SpiderSolitaire />);
+    const dealBtn = screen.getByText('发一轮牌 (D)');
+    for (let i = 0; i < deals; i += 1) fireEvent.click(dealBtn);
+    const pile = dealStockRows(seed, deals);
+    fireEvent.click(cardEl(container, pile[col][head]));
+    expect(container.querySelectorAll('[data-selected="1"]')).toHaveLength(len);
   });
 
   test('拖拽一张牌到合法目标列可以直接落位', () => {

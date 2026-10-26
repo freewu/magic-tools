@@ -257,6 +257,22 @@ describe('空档接龙页面', () => {
     expect(from.getAttribute('data-selected')).toBe('1');
   });
 
+  test('全屏时工具条 (局号 / 发牌 / 新局 / 撤销 ...) 在最上方', () => {
+    const { container } = render(<FreeCell />);
+    fireEvent.click(screen.getByText('全屏'));
+    const stage = screen.getByTestId('freecell-full');
+    const bar = screen.getByTestId('freecell-toolbar');
+    expect(stage.firstElementChild).toBe(bar);
+    [ '发牌', '新局 (N)', '重开本局 (R)', '撤销 (Z)', '提示 (H)', '自动收牌 (A)', '退出全屏' ]
+      .forEach((label) => {
+        expect(bar.textContent).toContain(label);
+      });
+    expect(bar.querySelector('[data-testid="freecell-seed"]')).toBeTruthy();
+    const board = screen.getByTestId('freecell-tableau');
+    expect(bar.compareDocumentPosition(board) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(container.querySelectorAll('[data-card]')).toHaveLength(52);
+  });
+
   test('拖拽顶牌到空自由格可以直接落位', () => {
     const { container } = render(<FreeCell />);
     const from = topCardEl(container, 0)!;

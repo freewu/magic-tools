@@ -51,6 +51,12 @@ export const FC_CSS = `
 .fc-stage { box-sizing: border-box; }
 .fc-stage.fc-full { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column;
   gap: 12px; padding: 12px; overflow: auto; background: var(--fc-bg, #12161f); }
+/* 全屏顶部工具条: 吸顶, 牌桌再长也能随时开局 / 撤销 / 看提示 */
+.fc-toolbar { position: sticky; top: 0; z-index: 30; display: flex; flex-wrap: wrap; gap: 8px;
+  align-items: center; justify-content: center; padding: 6px 8px; border-radius: 8px;
+  background: var(--fc-bar-bg, #ffffff); box-shadow: 0 1px 0 var(--fc-bar-line, rgba(148, 163, 184, 0.35)); }
+.fc-toolbar .fc-exit { margin-left: auto; }
+.fc-subbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; }
 .fc-slot { width: var(--fc-w); height: var(--fc-h); border-radius: 6px; box-sizing: border-box; }
 .fc-slot-empty { box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.4);
   background: rgba(148, 163, 184, 0.08); }
