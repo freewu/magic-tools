@@ -39,6 +39,48 @@ type Selection =
 const refOf = (sel: Selection): PileRef =>
   sel.kind === 'tableau' ? { kind: 'tableau', index: sel.col } : { kind: sel.kind, index: sel.index };
 
+/** 正在被拖动的牌组 */
+type DragState = {
+  from: PileRef;
+  count: number;
+  /** 牌桌列里这段连牌的起始下标 (自由格 / 收集区固定为 0) */
+  start: number;
+  cards: CardData[];
+  /** 当前指针位置与指针相对被抓那张牌左上角的偏移 (幽灵牌跟手) */
+  x: number;
+  y: number;
+  offX: number;
+  offY: number;
+  /** 指针当前悬停的落点 */
+  over: PileRef | null;
+};
+
+/** 移动超过该距离才算拖拽, 否则视为点击 */
+const DRAG_THRESHOLD = 5;
+
+const parseDropKey = (key: string | undefined): PileRef | null => {
+  if (!key) return null;
+  const [ kind, raw ] = key.split('-');
+  const index = Number(raw);
+  if (!Number.isFinite(index)) return null;
+  if (kind !== 'tableau' && kind !== 'free' && kind !== 'foundation') return null;
+  return { kind, index };
+};
+
+/** 指针位置下的可落位牌堆 (靠容器上的 data-drop 标记) */
+const dropTargetAt = (x: number, y: number): PileRef | null => {
+  const doc = document as Document & { elementFromPoint?: (px: number, py: number) => Element | null };
+  if (typeof doc.elementFromPoint !== 'function') return null;
+  let el: Element | null = null;
+  try {
+    el = doc.elementFromPoint(x, y);
+  } catch {
+    return null;
+  }
+  const holder = el?.closest?.('[data-drop]') as HTMLElement | null | undefined;
+  return parseDropKey(holder?.dataset?.drop);
+};
+
 const FreeCell: React.FC = () => {
   const { locale } = useLocale();
   const t = (zh: string) => u(locale, zh);
@@ -114,9 +156,101 @@ const FreeCell: React.FC = () => {
     return commit({ from, to: target, count });
   }, [ state, opts.superMove, commit ]);
 
+  // ---- 拖拽 (鼠标 / 触摸统一走 Pointer Events) ----
+  const tryMoveRef = useRef(tryMove);
+  useEffect(() => {
+    tryMoveRef.current = tryMove;
+  }, [ tryMove ]);
+
+  const [ drag, setDrag ] = useState<DragState | null>(null);
+  const dragRef = useRef<DragState | null>(null);
+  const pendingRef = useRef<Omit<DragState, 'over'> | null>(null);
+  /** 拖拽刚结束时浏览器还会补一个 click, 用它吞掉, 避免拖完又选中一次 */
+  const suppressClick = useRef(false);
+
+  const clearDrag = useCallback(() => {
+    pendingRef.current = null;
+    dragRef.current = null;
+    setDrag(null);
+  }, []);
+
+  useEffect(() => {
+    const onMove = (e: PointerEvent) => {
+      const pending = pendingRef.current;
+      if (!pending) return;
+      const current = dragRef.current;
+      if (!current) {
+        // 未过阀值: 仍然当作点击, 不进入拖拽
+        if (Math.abs(e.clientX - pending.x) < DRAG_THRESHOLD
+          && Math.abs(e.clientY - pending.y) < DRAG_THRESHOLD) return;
+        const started: DragState = { ...pending, x: e.clientX, y: e.clientY, over: dropTargetAt(e.clientX, e.clientY) };
+        dragRef.current = started;
+        setDrag(started);
+        setSel(null);
+        setHint(null);
+      } else {
+        const next: DragState = { ...current, x: e.clientX, y: e.clientY, over: dropTargetAt(e.clientX, e.clientY) };
+        dragRef.current = next;
+        setDrag(next);
+      }
+      if (e.cancelable) e.preventDefault();
+    };
+
+    const end = (drop: boolean) => {
+      const started = dragRef.current;
+      pendingRef.current = null;
+      dragRef.current = null;
+      if (!started) return;
+      setDrag(null);
+      suppressClick.current = true;
+      window.setTimeout(() => { suppressClick.current = false; }, 0);
+      if (drop && started.over) tryMoveRef.current(started.from, started.count, started.over);
+    };
+
+    const onUp = () => end(true);
+    const onCancel = () => end(false);
+    window.addEventListener('pointermove', onMove, { passive: false });
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onCancel);
+    return () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onCancel);
+    };
+  }, []);
+
+  /** 按下牌面: 先记下候选拖拽, 指针移动超阀值后才真正拖起来 */
+  const startDrag = (ref: PileRef, count: number, e: React.PointerEvent<HTMLElement>) => {
+    // 只响应左键 / 触摸 (jsdom 等环境里 button 可能是 undefined)
+    if (won || (typeof e.button === 'number' && e.button > 0)) return;
+    const pile = pileOf(state, ref);
+    const cards = pile.slice(Math.max(0, pile.length - count));
+    if (!cards.length) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    pendingRef.current = {
+      from: ref,
+      count,
+      start: ref.kind === 'tableau' ? pile.length - count : 0,
+      cards,
+      x: e.clientX,
+      y: e.clientY,
+      offX: Math.max(0, e.clientX - rect.left),
+      offY: Math.max(0, e.clientY - rect.top),
+    };
+  };
+
+  const isDragSource = (ref: PileRef, index: number): boolean => {
+    if (!drag || drag.from.kind !== ref.kind || drag.from.index !== ref.index) return false;
+    return ref.kind === 'tableau' ? index >= drag.start : true;
+  };
+
+  const isDropTarget = (ref: PileRef): boolean =>
+    !!drag?.over && drag.over.kind === ref.kind && drag.over.index === ref.index;
+
   // ---- 开局 / 重开 ----
   const startGame = useCallback((n: unknown) => {
     const value = normalizeSeed(n);
+    clearDrag();
     setSeed(value);
     setSeedInput(value);
     setLastSeed(value);
@@ -128,10 +262,11 @@ const FreeCell: React.FC = () => {
     setRunning(false);
     setWon(false);
     setRecords(recordPlay());
-  }, []);
+  }, [ clearDrag ]);
 
   const undo = useCallback(() => {
     if (!history.length) return;
+    clearDrag();
     const prev = history[history.length - 1];
     setHistory(history.slice(0, -1));
     setState(prev);
@@ -139,7 +274,7 @@ const FreeCell: React.FC = () => {
     setHint(null);
     setWon(false);
     if (!running && prev.moves > 0) setRunning(true);
-  }, [ history, running ]);
+  }, [ history, running, clearDrag ]);
 
   const collectNow = useCallback(() => {
     const { state: next, played } = autoCollect(state, true);
@@ -234,7 +369,7 @@ const FreeCell: React.FC = () => {
 
   // ---- 点击交互 ----
   const clickTableauCard = (col: number, index: number) => {
-    if (won) return;
+    if (suppressClick.current || won) return;
     if (sel && !(sel.kind === 'tableau' && sel.col === col)) {
       if (tryMove(refOf(sel), sel.count, { kind: 'tableau', index: col })) return;
     }
@@ -253,13 +388,13 @@ const FreeCell: React.FC = () => {
   };
 
   const clickColumn = (col: number) => {
-    if (won) return;
+    if (suppressClick.current || won) return;
     if (sel && tryMove(refOf(sel), sel.count, { kind: 'tableau', index: col })) return;
     setSel(null);
   };
 
   const clickFree = (index: number) => {
-    if (won) return;
+    if (suppressClick.current || won) return;
     if (sel && tryMove(refOf(sel), sel.count, { kind: 'free', index })) return;
     const card = state.free[index];
     setHint(null);
@@ -267,7 +402,7 @@ const FreeCell: React.FC = () => {
   };
 
   const clickFoundation = (index: number) => {
-    if (won) return;
+    if (suppressClick.current || won) return;
     if (sel && tryMove(refOf(sel), sel.count, { kind: 'foundation', index })) return;
     const pile = state.foundations[index];
     setHint(null);
@@ -320,21 +455,31 @@ const FreeCell: React.FC = () => {
     [ state, won, opts.superMove ]
   );
 
-  /** 一张牌的牌面 */
+  /** 一张牌的牌面 (ghost = 拖拽时跟随指针的幽灵牌, 不带 testid 以免与牌堆里的重复) */
   const face = (
     card: CardData,
-    extra: { selected?: boolean; style?: React.CSSProperties; onClick?: React.MouseEventHandler; onDoubleClick?: React.MouseEventHandler }
+    extra: {
+      selected?: boolean;
+      dragging?: boolean;
+      ghost?: boolean;
+      style?: React.CSSProperties;
+      onClick?: React.MouseEventHandler;
+      onDoubleClick?: React.MouseEventHandler;
+      onPointerDown?: React.PointerEventHandler<HTMLDivElement>;
+    }
   ) => (
     <div
       key={ cardId(card) }
       className={ `fc-card ${isRedCard(card) ? 'is-red' : 'is-black'}`
-        + `${extra.selected ? ' is-selected' : ''}${hintKeys.has(cardId(card)) ? ' is-hint' : ''}` }
+        + `${extra.selected ? ' is-selected' : ''}${hintKeys.has(cardId(card)) ? ' is-hint' : ''}`
+        + `${extra.dragging ? ' is-dragging' : ''}${extra.ghost ? ' fc-card-ghost' : ''}` }
       style={ extra.style }
-      data-testid={ `card-${cardId(card)}` }
-      data-card={ cardId(card) }
-      data-selected={ extra.selected ? '1' : '0' }
+      data-testid={ extra.ghost ? undefined : `card-${cardId(card)}` }
+      data-card={ extra.ghost ? undefined : cardId(card) }
+      data-selected={ extra.ghost ? undefined : (extra.selected ? '1' : '0') }
       onClick={ extra.onClick }
       onDoubleClick={ extra.onDoubleClick }
+      onPointerDown={ extra.onPointerDown }
     >
       <span className="fc-rank">{ RANK_LABEL[card.rank] }{ SUIT_SYMBOL[card.suit] }</span>
       <span className="fc-suit-big">{ SUIT_SYMBOL[card.suit] }</span>
@@ -426,14 +571,19 @@ const FreeCell: React.FC = () => {
           { state.free.map((card, i) => (
             <div
               key={ `free-${i}` }
-              className={ `fc-slot${card ? '' : ' fc-slot-empty'}` }
+              className={ `fc-slot${card ? '' : ' fc-slot-empty'}${isDropTarget({ kind: 'free', index: i }) ? ' is-drop' : ''}` }
               style={ { display: 'flex' } }
               data-testid={ `free-${i}` }
+              data-drop={ `free-${i}` }
               data-empty={ card ? '0' : '1' }
               onClick={ () => clickFree(i) }
               onDoubleClick={ card ? () => doubleClick({ kind: 'free', index: i }) : undefined }
             >
-              { card ? face(card, { selected: selectedCard({ kind: 'free', index: i }, 0) }) : null }
+              { card ? face(card, {
+                selected: selectedCard({ kind: 'free', index: i }, 0),
+                dragging: isDragSource({ kind: 'free', index: i }, 0),
+                onPointerDown: (e) => startDrag({ kind: 'free', index: i }, 1, e),
+              }) : null }
             </div>
           )) }
         </div>
@@ -444,7 +594,7 @@ const FreeCell: React.FC = () => {
             return (
               <div
                 key={ `fnd-${suit}` }
-                className={ `fc-slot${card ? '' : ' fc-slot-empty'}` }
+                className={ `fc-slot${card ? '' : ' fc-slot-empty'}${isDropTarget({ kind: 'foundation', index: i }) ? ' is-drop' : ''}` }
                 style={ {
                   display: 'flex',
                   alignItems: 'center',
@@ -452,11 +602,16 @@ const FreeCell: React.FC = () => {
                   outline: isHintTarget({ kind: 'foundation', index: i }) ? '2px dashed #faad14' : undefined,
                 } }
                 data-testid={ `foundation-${suit}` }
+                data-drop={ `foundation-${i}` }
                 data-count={ pile.length }
                 onClick={ () => clickFoundation(i) }
                 onDoubleClick={ card ? () => doubleClick({ kind: 'foundation', index: i }) : undefined }
               >
-                { card ? face(card, { selected: selectedCard({ kind: 'foundation', index: i }, 0) }) : (
+                { card ? face(card, {
+                  selected: selectedCard({ kind: 'foundation', index: i }, 0),
+                  dragging: isDragSource({ kind: 'foundation', index: i }, 0),
+                  onPointerDown: (e) => startDrag({ kind: 'foundation', index: i }, 1, e),
+                }) : (
                   <span
                     style={ {
                       fontSize: 'calc(var(--fc-w) * 0.4)',
@@ -477,7 +632,7 @@ const FreeCell: React.FC = () => {
         { state.tableau.map((pile, col) => (
           <div
             key={ `col-${col}` }
-            className={ `fc-col${pile.length ? '' : ' is-empty'}` }
+            className={ `fc-col${pile.length ? '' : ' is-empty'}${isDropTarget({ kind: 'tableau', index: col }) ? ' is-drop' : ''}` }
             style={ {
               height: pile.length > 1 ? `calc(var(--fc-h) + ${pile.length - 1} * var(--fc-fan))` : undefined,
               outline: isHintTarget({ kind: 'tableau', index: col }) && !pile.length
@@ -485,18 +640,26 @@ const FreeCell: React.FC = () => {
                 : undefined,
             } }
             data-testid={ `tableau-${col}` }
+            data-drop={ `tableau-${col}` }
             data-count={ pile.length }
             onClick={ () => clickColumn(col) }
           >
-            { pile.map((card, i) => face(card, {
-              selected: selectedCard({ kind: 'tableau', index: col }, i),
-              style: { position: 'absolute', left: 0, top: `calc(${i} * var(--fc-fan))`, zIndex: i },
-              onClick: (e) => { e.stopPropagation(); clickTableauCard(col, i); },
-              onDoubleClick: (e) => {
-                e.stopPropagation();
-                if (i === pile.length - 1) doubleClick({ kind: 'tableau', index: col }, 1);
-              },
-            })) }
+            { pile.map((card, i) => {
+              const run = runFrom(state, col, i);
+              return face(card, {
+                selected: selectedCard({ kind: 'tableau', index: col }, i),
+                dragging: isDragSource({ kind: 'tableau', index: col }, i),
+                style: { position: 'absolute', left: 0, top: `calc(${i} * var(--fc-fan))`, zIndex: i },
+                onPointerDown: (e) => {
+                  if (run) startDrag({ kind: 'tableau', index: col }, run.length, e);
+                },
+                onClick: (e) => { e.stopPropagation(); clickTableauCard(col, i); },
+                onDoubleClick: (e) => {
+                  e.stopPropagation();
+                  if (i === pile.length - 1) doubleClick({ kind: 'tableau', index: col }, 1);
+                },
+              });
+            }) }
           </div>
         )) }
       </div>
@@ -534,7 +697,8 @@ const FreeCell: React.FC = () => {
 
   const hintText = (
     <Space direction="vertical" size={ 2 }>
-      <Text type="secondary" style={ { fontSize: 12 } }>{ t('选中牌后点击目标位置即可移动') }</Text>
+      <Text type="secondary" style={ { fontSize: 12 } }>{ t('拖动牌到目标位置, 或选中牌后点击目标位置即可移动') }</Text>
+      <Text type="secondary" style={ { fontSize: 12 } }>{ t('拖动时会高亮可放下的位置, 无效位置会弹回') }</Text>
       <Text type="secondary" style={ { fontSize: 12 } }>{ t('双击一张牌可自动移动到收集区或牌桌') }</Text>
       <Text type="secondary" style={ { fontSize: 12 } }>
         { t('键盘: N 新局 · R 重开本局 · Z 撤销 · H 提示 · A 自动收牌') }
@@ -550,6 +714,28 @@ const FreeCell: React.FC = () => {
     '--fc-bg': token.colorBgLayout,
     '--fc-card-bg': '#ffffff',
   }) as React.CSSProperties;
+
+  /** 拖拽时跟随指针的幽灵牌层 (fixed 定位, 不接事件, 避免影响 elementFromPoint) */
+  const ghostNode = drag ? (
+    <div
+      className="fc-drag-layer"
+      data-testid="freecell-drag"
+      style={ {
+        ...stageVars(full),
+        left: drag.x - drag.offX,
+        top: drag.y - drag.offY,
+        width: 'var(--fc-w)',
+        height: drag.cards.length > 1
+          ? `calc(var(--fc-h) + ${drag.cards.length - 1} * var(--fc-fan))`
+          : undefined,
+      } }
+    >
+      { drag.cards.map((card, i) => face(card, {
+        ghost: true,
+        style: { top: `calc(${i} * var(--fc-fan))` },
+      })) }
+    </div>
+  ) : null;
 
   // ---- 全屏: 只保留牌桌与统计 ----
   if (full) {
@@ -571,6 +757,8 @@ const FreeCell: React.FC = () => {
           { winNode }
           { stuckNode }
           <Text type="secondary" style={ { fontSize: 12, textAlign: 'center' } }>{ t('Esc 退出全屏') }</Text>
+          {/* 幽灵牌层必须在全屏元素内部, 否则全屏时会被裁掉 */}
+          { ghostNode }
         </div>
       </>
     );
@@ -605,6 +793,7 @@ const FreeCell: React.FC = () => {
         <Divider>{ t('空档接龙说明') }</Divider>
         <FreeCellIntro />
       </Space>
+      { ghostNode }
     </div>
   );
 };

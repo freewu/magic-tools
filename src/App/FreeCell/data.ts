@@ -58,7 +58,14 @@ export const FC_CSS = `
   box-sizing: border-box; background: var(--fc-card-bg, #ffffff); color: #1f2933;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(148, 163, 184, 0.55);
   display: flex; flex-direction: column; justify-content: space-between; padding: 2px 4px;
-  font-weight: 700; line-height: 1.05; user-select: none; cursor: pointer; }
+  font-weight: 700; line-height: 1.05; user-select: none; cursor: pointer;
+  touch-action: none; }
+.fc-card.is-dragging { opacity: 0.25; }
+.fc-card.fc-card-ghost { position: absolute; left: 0; cursor: grabbing;
+  box-shadow: 0 14px 26px rgba(0, 0, 0, 0.34), inset 0 0 0 1px rgba(148, 163, 184, 0.55);
+  transform: rotate(-1.6deg) scale(1.03); }
+.fc-drag-layer { position: fixed; z-index: 1200; pointer-events: none; touch-action: none; }
+.fc-slot.is-drop, .fc-col.is-drop { outline: 2px solid #1677ff; outline-offset: 2px; }
 .fc-card.is-red { color: #cf1322; }
 .fc-card.is-black { color: #1f2933; }
 .fc-card .fc-rank { font-size: calc(var(--fc-w) * 0.25); }
@@ -72,7 +79,7 @@ export const FC_CSS = `
   50% { box-shadow: 0 0 0 5px rgba(250, 173, 20, 0.42); }
 }
 .fc-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: flex-start; }
-.fc-col { position: relative; width: var(--fc-w); border-radius: 6px; }
+.fc-col { position: relative; width: var(--fc-w); border-radius: 6px; transition: outline-color 0.1s; }
 .fc-col.is-empty { box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.4);
   background: rgba(148, 163, 184, 0.08); height: var(--fc-h); }
 .fc-col .fc-card { position: absolute; left: 0; }

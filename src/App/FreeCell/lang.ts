@@ -40,7 +40,14 @@ const rows: Record<string, [string, string]> = {
     '無路可走, 可復原 (Z) 或重開本局 (R)',
     'No moves left — undo (Z) or redeal (R)',
   ],
-  '选中牌后点击目标位置即可移动': ['選中牌後點擊目標位置即可移動', 'Pick a card, then click where it should go'],
+  '拖动牌到目标位置, 或选中牌后点击目标位置即可移动': [
+    '拖動牌到目標位置, 或選中牌後點擊目標位置即可移動',
+    'Drag a card onto its target, or pick it and click where it should go',
+  ],
+  '拖动时会高亮可放下的位置, 无效位置会弹回': [
+    '拖動時會高亮可放下的位置, 無效位置會彈回',
+    'Valid targets light up while dragging; invalid drops bounce back',
+  ],
   '双击一张牌可自动移动到收集区或牌桌': [
     '雙擊一張牌可自動移動到收集區或牌桌',
     'Double-click a card to send it to a foundation or tableau',

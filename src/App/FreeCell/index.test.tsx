@@ -55,6 +55,19 @@ const seedWithTopAce = (): { seed: number; card: Card } => {
 
 const useSeed = (seed: number) => localStorage.setItem('magic-tools-freecell-seed', String(seed));
 
+/** jsdom 没有实现 elementFromPoint, 这里手动指定拖拽落点 */
+const dropOn = (el: Element | null) => {
+  (document as unknown as { elementFromPoint: () => Element | null }).elementFromPoint = () => el;
+};
+
+/** 模拟一次指针拖拽: 按下 -> 移动 (超过阀值) -> 松手 */
+const drag = (fromEl: HTMLElement, target: Element | null) => {
+  fireEvent.pointerDown(fromEl, { clientX: 20, clientY: 20, button: 0, pointerId: 1 });
+  dropOn(target);
+  fireEvent.pointerMove(window, { clientX: 80, clientY: 90, pointerId: 1 });
+  fireEvent.pointerUp(window, { clientX: 80, clientY: 90, pointerId: 1 });
+};
+
 beforeEach(() => {
   localStorage.clear();
 });
@@ -62,6 +75,7 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   jest.restoreAllMocks();
+  delete (document as unknown as { elementFromPoint?: () => Element | null }).elementFromPoint;
 });
 
 describe('空档接龙页面', () => {
@@ -199,6 +213,77 @@ describe('空档接龙页面', () => {
     fireEvent.click(screen.getByText('全屏'));
     press('Escape');
     expect(screen.queryByTestId('freecell-full')).not.toBeInTheDocument();
+  });
+
+  test('拖拽顶牌到空自由格可以直接落位', () => {
+    const { container } = render(<FreeCell />);
+    const from = topCardEl(container, 0)!;
+    const target = container.querySelector('[data-testid="free-0"]')!;
+    drag(from, target);
+    expect(freeEmpty(container, 0)).toBe(false);
+    expect(freeCard(container, 0)).toBe(from.getAttribute('data-card'));
+    expect(stat('stat-moves')).toBe(1);
+    // 拖拽结束后不应再触发选中
+    expect(container.querySelectorAll('[data-selected="1"]')).toHaveLength(0);
+  });
+
+  test('拖拽时显示跟随指针的幽灵牌, 松手后消失', () => {
+    const { container } = render(<FreeCell />);
+    const from = topCardEl(container, 0)!;
+    fireEvent.pointerDown(from, { clientX: 20, clientY: 20, button: 0, pointerId: 1 });
+    dropOn(container.querySelector('[data-testid="free-1"]'));
+    fireEvent.pointerMove(window, { clientX: 80, clientY: 90, pointerId: 1 });
+    const ghost = screen.getByTestId('freecell-drag');
+    expect(ghost).toBeInTheDocument();
+    // 源牌变暗, 悬停的落点高亮
+    expect(container.querySelectorAll('.fc-card.is-dragging')).toHaveLength(1);
+    expect(container.querySelector('[data-testid="free-1"]')).toHaveClass('is-drop');
+    fireEvent.pointerUp(window, { clientX: 80, clientY: 90, pointerId: 1 });
+    expect(screen.queryByTestId('freecell-drag')).not.toBeInTheDocument();
+    expect(freeEmpty(container, 1)).toBe(false);
+  });
+
+  test('拖到已占用的自由格 (非法目标) 不会动牌', () => {
+    const { container } = render(<FreeCell />);
+    // 先合法地把第 0 列顶牌放进 free-0
+    drag(topCardEl(container, 0)!, container.querySelector('[data-testid="free-0"]'));
+    expect(stat('stat-moves')).toBe(1);
+    // 再把第 1 列顶牌拖到已占用的 free-0
+    drag(topCardEl(container, 1)!, container.querySelector('[data-testid="free-0"]'));
+    expect(stat('stat-moves')).toBe(1);
+    expect(columnCounts(container)[1]).toBe(7);
+  });
+
+  test('拖拽中途取消 (pointercancel) 不会动牌', () => {
+    const { container } = render(<FreeCell />);
+    const from = topCardEl(container, 0)!;
+    fireEvent.pointerDown(from, { clientX: 20, clientY: 20, button: 0, pointerId: 1 });
+    dropOn(container.querySelector('[data-testid="free-2"]'));
+    fireEvent.pointerMove(window, { clientX: 80, clientY: 90, pointerId: 1 });
+    fireEvent.pointerCancel(window, { pointerId: 1 });
+    expect(stat('stat-moves')).toBe(0);
+    expect(freeEmpty(container, 2)).toBe(true);
+    expect(screen.queryByTestId('freecell-drag')).not.toBeInTheDocument();
+  });
+
+  test('小幅度移动仍算点击 (不会误拖)', () => {
+    const { container } = render(<FreeCell />);
+    const from = topCardEl(container, 0)!;
+    fireEvent.pointerDown(from, { clientX: 20, clientY: 20, button: 0, pointerId: 1 });
+    fireEvent.pointerMove(window, { clientX: 22, clientY: 21, pointerId: 1 });
+    fireEvent.pointerUp(window, { clientX: 22, clientY: 21, pointerId: 1 });
+    expect(screen.queryByTestId('freecell-drag')).not.toBeInTheDocument();
+    expect(stat('stat-moves')).toBe(0);
+    expect(columnCounts(container)[0]).toBe(7);
+  });
+
+  test('每次拖拽只记一步, 且可撤销', () => {
+    const { container } = render(<FreeCell />);
+    drag(topCardEl(container, 0)!, container.querySelector('[data-testid="free-3"]'));
+    expect(stat('stat-moves')).toBe(1);
+    fireEvent.click(screen.getByText('撤销 (Z)'));
+    expect(stat('stat-moves')).toBe(0);
+    expect(freeEmpty(container, 3)).toBe(true);
   });
 
   test('说明区展示玩法要点', () => {

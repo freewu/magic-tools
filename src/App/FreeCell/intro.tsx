@@ -29,6 +29,7 @@ const zh = `<h2>这个工具做什么</h2>
 
 <h2>操作</h2>
 <ul>
+<li><p><b>拖动</b> 一张牌 (或一段连牌) 到目标列 / 自由格 / 收集区松手即可; 拖动时会高亮可以放下的位置, 放到不能接的地方会自动弹回</p></li>
 <li><p><b>点击</b> 选中一张牌 (或一段连牌), 再 <b>点击目标列 / 自由格 / 收集区</b> 即可移动; 点自己一次取消选中</p></li>
 <li><p><b>双击</b> 一张牌: 自动送到收集区, 送不进去就找能接住它的牌桌列, 再不行就放进空自由格</p></li>
 <li><p><b>N</b> 新局 (随机局号)、<b>R</b> 重开本局、<b>Z</b> 撤销、<b>H</b> 提示、<b>A</b> 自动收牌、<b>Esc</b> 退出全屏</p></li>
@@ -78,6 +79,7 @@ const tw = `<h2>這個工具做什麼</h2>
 
 <h2>操作</h2>
 <ul>
+<li><p><b>拖動</b> 一張牌 (或一段連牌) 到目標列 / 自由格 / 收集區鬆手即可; 拖動時會高亮可以放下的位置, 放到不能接的地方會自動彈回</p></li>
 <li><p><b>點擊</b> 選中一張牌 (或一段連牌), 再 <b>點擊目標列 / 自由格 / 收集區</b> 即可移動; 再點自己一次取消選取</p></li>
 <li><p><b>雙擊</b> 一張牌: 自動送到收集區, 送不進去就找能接住它的牌桌列, 再不行就放進空自由格</p></li>
 <li><p><b>N</b> 新局 (隨機局號)、<b>R</b> 重開本局、<b>Z</b> 復原、<b>H</b> 提示、<b>A</b> 自動收牌、<b>Esc</b> 退出全螢幕</p></li>
@@ -127,6 +129,7 @@ const en = `<h2>What this tool does</h2>
 
 <h2>Controls</h2>
 <ul>
+<li><p><b>Drag</b> a card (or a run) onto a column / free cell / foundation and drop it — valid targets light up while dragging and an illegal drop bounces back</p></li>
 <li><p><b>Click</b> a card (or a run) to select it, then <b>click the destination</b> column / free cell / foundation; clicking it again deselects</p></li>
 <li><p><b>Double-click</b> a card: it goes to a foundation if possible, otherwise to a tableau column that accepts it, otherwise to an empty free cell</p></li>
 <li><p><b>N</b> new deal (random number), <b>R</b> redeal, <b>Z</b> undo, <b>H</b> hint, <b>A</b> auto collect, <b>Esc</b> exit fullscreen</p></li>
