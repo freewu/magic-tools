@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import SpiderSolitaire from './index';
 import { DEFAULT_OPTIONS, dealFromSeed, findHint, type Card, type GameState, type Move } from './lib';
 import type { Difficulty } from './data';
@@ -231,6 +231,33 @@ describe('蜘蛛纸牌页面', () => {
     expect(stockCount(container)).toBe(30);
   });
 
+  test('发牌有动画: 初始 54 张 + 每轮新发的 10 张带 data-deal, 动画结束后自动清除', async () => {
+    const { container } = render(<SpiderSolitaire />);
+    const dealing = () => Array.from(container.querySelectorAll('[data-deal]')) as HTMLElement[];
+    // 初始发牌: 牌桌上每张牌都带动画标记, 顺序 0 .. 53
+    expect(dealing()).toHaveLength(TABLEAU_CARDS);
+    const orders = dealing()
+      .map((el) => Number(el.style.getPropertyValue('--sp-order')))
+      .sort((a, b) => a - b);
+    expect(orders[0]).toBe(0);
+    expect(orders[orders.length - 1]).toBe(TABLEAU_CARDS - 1);
+    // 动画结束后标记自动清掉 (之后移动牌不会重播)
+    await waitFor(() => expect(dealing()).toHaveLength(0), { timeout: 6000 });
+
+    // 发一轮牌: 只有新发的 10 张带动画标记, 顺序互不相同
+    fireEvent.click(screen.getByText('发一轮牌 (D)'));
+    expect(dealing()).toHaveLength(10);
+    expect(new Set(dealing().map((el) => el.style.getPropertyValue('--sp-order'))).size).toBe(10);
+    await waitFor(() => expect(dealing()).toHaveLength(0), { timeout: 6000 });
+    expect(columnCounts(container)).toEqual([ 7, 7, 7, 7, 6, 6, 6, 6, 6, 6 ]);
+  });
+
+  test('新局会重新播放发牌动画', () => {
+    const { container } = render(<SpiderSolitaire />);
+    fireEvent.click(screen.getByText('新局 (N)'));
+    expect(container.querySelectorAll('[data-deal]')).toHaveLength(TABLEAU_CARDS);
+  });
+
   test('点牌堆也能发牌', () => {
     const { container } = render(<SpiderSolitaire />);
     fireEvent.click(screen.getByTestId('spider-stock'));
@@ -308,6 +335,35 @@ describe('蜘蛛纸牌页面', () => {
     pointer(window, 'pointerup', 80, 90);
     expect(screen.queryByTestId('spider-drag')).not.toBeInTheDocument();
     expect(stat('stat-moves')).toBe(1);
+  });
+
+  test('拖起来又放回原列时按点击处理, 不会吞掉选中', () => {
+    const { container } = render(<SpiderSolitaire />);
+    const from = colEl(container, 0).querySelector('[data-up="1"]') as HTMLElement;
+    pointer(from, 'pointerdown', 20, 20);
+    dropOn(colEl(container, 0));
+    pointer(window, 'pointermove', 90, 100);
+    expect(screen.getByTestId('spider-drag')).toBeInTheDocument();
+    pointer(window, 'pointerup', 90, 100);
+    expect(screen.queryByTestId('spider-drag')).not.toBeInTheDocument();
+    expect(stat('stat-moves')).toBe(0);
+    // 松手后浏览器补发的 click 必须还能选中
+    fireEvent.click(from);
+    expect(from.getAttribute('data-selected')).toBe('1');
+  });
+
+  test('窗口失焦 (拖到窗口外松手) 会放弃拖拽, 不会卡住后续点击', () => {
+    const { container } = render(<SpiderSolitaire />);
+    const from = colEl(container, 0).querySelector('[data-up="1"]') as HTMLElement;
+    pointer(from, 'pointerdown', 20, 20);
+    dropOn(colEl(container, 1));
+    pointer(window, 'pointermove', 90, 100);
+    expect(screen.getByTestId('spider-drag')).toBeInTheDocument();
+    fireEvent.blur(window);
+    expect(screen.queryByTestId('spider-drag')).not.toBeInTheDocument();
+    expect(stat('stat-moves')).toBe(0);
+    fireEvent.click(from);
+    expect(from.getAttribute('data-selected')).toBe('1');
   });
 
   test('拖到接不住的那一列不会动牌', () => {

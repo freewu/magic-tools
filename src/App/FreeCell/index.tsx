@@ -196,26 +196,38 @@ const FreeCell: React.FC = () => {
       if (e.cancelable) e.preventDefault();
     };
 
+    /**
+     * 松手 / 取消: 只有落到别的位置才算移动。
+     * 落回原处 (手指抖了一下又放回来) 或取消时当作一次点击, 不能吞掉后面补发的 click,
+     * 否则会表现为「点了牌却选不中」。
+     */
     const end = (drop: boolean) => {
       const started = dragRef.current;
       pendingRef.current = null;
       dragRef.current = null;
       if (!started) return;
       setDrag(null);
+      const target = drop ? started.over : null;
+      if (!target) return;
+      if (target.kind === started.from.kind && target.index === started.from.index) return;
       suppressClick.current = true;
       window.setTimeout(() => { suppressClick.current = false; }, 0);
-      if (drop && started.over) tryMoveRef.current(started.from, started.count, started.over);
+      tryMoveRef.current(started.from, started.count, target);
     };
 
     const onUp = () => end(true);
     const onCancel = () => end(false);
+    /** 窗口失焦 (alt+tab / 拖到窗口外松手) 时可能收不到 pointerup, 兜底清掉拖拽状态 */
+    const onBlur = () => end(false);
     window.addEventListener('pointermove', onMove, { passive: false });
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointercancel', onCancel);
+    window.addEventListener('blur', onBlur);
     return () => {
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onCancel);
+      window.removeEventListener('blur', onBlur);
     };
   }, []);
 
@@ -226,6 +238,15 @@ const FreeCell: React.FC = () => {
     const pile = pileOf(state, ref);
     const cards = pile.slice(Math.max(0, pile.length - count));
     if (!cards.length) return;
+    // 捕获指针: 拖到窗口外松手也能收到 pointerup / pointercancel, 不会卡在拖拽状态
+    try {
+      const el = e.currentTarget as HTMLElement & { setPointerCapture?: (id: number) => void };
+      if (typeof el.setPointerCapture === 'function' && typeof e.pointerId === 'number') {
+        el.setPointerCapture(e.pointerId);
+      }
+    } catch {
+      /* 个别环境不支持指针捕获, 忽略 */
+    }
     const rect = e.currentTarget.getBoundingClientRect();
     pendingRef.current = {
       from: ref,
@@ -505,7 +526,8 @@ const FreeCell: React.FC = () => {
 
   // ---- 各部分 ----
   const seedNode = (
-    <Space size={ 6 } wrap>
+    <Space size={ 6 } wrap align="center">
+      <Text type="secondary" style={ { fontSize: 12 } }>{ t('局号') }</Text>
       <InputNumber
         size="small"
         min={ SEED_MIN }
@@ -513,8 +535,7 @@ const FreeCell: React.FC = () => {
         precision={ 0 }
         value={ seedInput }
         onChange={ (v) => setSeedInput(typeof v === 'number' ? v : null) }
-        addonBefore={ t('局号') }
-        style={ { width: 168 } }
+        style={ { width: 116 } }
         data-testid="freecell-seed"
       />
       <Tooltip title={ t('发牌') }>
@@ -722,8 +743,8 @@ const FreeCell: React.FC = () => {
       data-testid="freecell-drag"
       style={ {
         ...stageVars(full),
-        left: drag.x - drag.offX,
-        top: drag.y - drag.offY,
+        left: Number.isFinite(drag.x - drag.offX) ? drag.x - drag.offX : undefined,
+        top: Number.isFinite(drag.y - drag.offY) ? drag.y - drag.offY : undefined,
         width: 'var(--fc-w)',
         height: drag.cards.length > 1
           ? `calc(var(--fc-h) + ${drag.cards.length - 1} * var(--fc-fan))`

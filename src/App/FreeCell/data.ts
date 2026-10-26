@@ -71,12 +71,13 @@ export const FC_CSS = `
 .fc-card .fc-rank { font-size: calc(var(--fc-w) * 0.25); }
 .fc-card .fc-suit-big { align-self: center; font-size: calc(var(--fc-w) * 0.42); }
 .fc-card .fc-suit-mini { align-self: flex-end; font-size: calc(var(--fc-w) * 0.22); }
-.fc-card.is-selected { outline: 2px solid #1677ff; outline-offset: 1px; }
-.fc-card.is-hint { outline: 2px dashed #faad14; outline-offset: 2px;
-  animation: fc-pulse 1.1s ease-in-out infinite; }
+/* 牌大多被下一张盖住, 只有顶部一条窄边可见, 所以高亮要走 inset 描边 + 底色 */
+.fc-card.is-selected { outline: none; background: #dbeafe;
+  box-shadow: inset 0 0 0 2px #1677ff, 0 1px 3px rgba(0, 0, 0, 0.35); }
+.fc-card.is-hint { background: #fff7e6; animation: fc-pulse 1.1s ease-in-out infinite; }
 @keyframes fc-pulse {
-  0%, 100% { box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.18); }
-  50% { box-shadow: 0 0 0 5px rgba(250, 173, 20, 0.42); }
+  0%, 100% { box-shadow: inset 0 0 0 2px rgba(250, 173, 20, 0.5), 0 1px 3px rgba(0, 0, 0, 0.35); }
+  50% { box-shadow: inset 0 0 0 3px rgba(250, 173, 20, 1), 0 1px 3px rgba(0, 0, 0, 0.35); }
 }
 .fc-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: flex-start; }
 .fc-col { position: relative; width: var(--fc-w); border-radius: 6px; transition: outline-color 0.1s; }

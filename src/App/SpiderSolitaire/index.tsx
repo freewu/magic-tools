@@ -10,8 +10,9 @@ import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'r
 import { AppContext } from '../../hook/app-context';
 import { useLocale } from '../../hook/locale-context';
 import {
-  CARD_SIZE_CSS, CARD_SIZE_CSS_FULL, DIFFICULTIES, HISTORY_LIMIT, IS_RED, RANK_LABEL, SEED_MAX, SEED_MIN,
-  SERIES_COUNT, SP_CSS, SUIT_SYMBOL, type Difficulty,
+  CARD_SIZE_CSS, CARD_SIZE_CSS_FULL, DEAL_ANIM_TOTAL_MS, DEAL_ROW_ANIM_TOTAL_MS, DEAL_ROW_STAGGER_STEP,
+  DIFFICULTIES, HISTORY_LIMIT,
+  IS_RED, RANK_LABEL, SEED_MAX, SEED_MIN, SERIES_COUNT, SP_CSS, SUIT_SYMBOL, type Difficulty,
 } from './data';
 import {
   applyMove, canMove, cardId, cloneState, collectCompleted, collectedCount, dealFromSeed, dealStock,
@@ -63,6 +64,34 @@ const pointerPos = (e: { clientX?: number; clientY?: number }): { x: number; y: 
 /** 幽灵牌定位 (坐标不可用时返回 undefined, 交给 CSS 定位) */
 const finiteOrUndefined = (v: number): number | undefined => (Number.isFinite(v) ? v : undefined);
 
+/**
+ * 一副刚摆好的牌局里, 每张牌在发牌动画中的顺序 (逐轮发: 第 0 轮每列一张, 再第 1 轮 ...)
+ */
+const dealOrderOf = (next: GameState): Record<string, number> => {
+  const map: Record<string, number> = {};
+  const cols = next.tableau.length;
+  const rows = next.tableau.reduce((max, pile) => Math.max(max, pile.length), 0);
+  for (let row = 0; row < rows; row += 1) {
+    for (let col = 0; col < cols; col += 1) {
+      const card = next.tableau[col][row];
+      if (card) map[cardId(card)] = row * cols + col;
+    }
+  }
+  return map;
+};
+
+/** 发一轮牌之后, 每列新增的那张牌 (发牌动画只放在新牌上) */
+const dealtOrderOf = (next: GameState, prev: GameState): Record<string, number> => {
+  const map: Record<string, number> = {};
+  next.tableau.forEach((pile, col) => {
+    if (pile.length <= (prev.tableau[col]?.length ?? 0)) return;
+    const card = pile[pile.length - 1];
+    // 逐张发一轮: 间隔放大到 3 个错开单位, 视觉上能看清是一张一张落下来的
+    if (card) map[cardId(card)] = col * DEAL_ROW_STAGGER_STEP;
+  });
+  return map;
+};
+
 /** 指针位置下的目标列 (靠容器上的 data-drop 标记) */
 const dropColumnAt = (x: number, y: number): number | null => {
   const doc = document as Document & { elementFromPoint?: (px: number, py: number) => Element | null };
@@ -92,7 +121,8 @@ const SpiderSolitaire: React.FC = () => {
   const [ opts, setOpts ] = useState(() => getDefaultOptions());
   const [ seed, setSeed ] = useState<number>(() => getLastSeed());
   const [ seedInput, setSeedInput ] = useState<number | null>(() => getLastSeed());
-  const [ state, setState ] = useState<GameState>(() => dealFromSeed(getLastSeed(), getDefaultOptions().suits));
+  const [ initial ] = useState<GameState>(() => dealFromSeed(getLastSeed(), getDefaultOptions().suits));
+  const [ state, setState ] = useState<GameState>(initial);
   const [ history, setHistory ] = useState<GameState[]>([]);
   const [ sel, setSel ] = useState<Selection | null>(null);
   const [ hint, setHint ] = useState<Move | null>(null);
@@ -104,10 +134,43 @@ const SpiderSolitaire: React.FC = () => {
   const stageRef = useRef<HTMLDivElement | null>(null);
   /** 计时器回调里要读到最新用时, 用 ref 同步一份 */
   const elapsedRef = useRef(0);
+  /** 刚发到桌面上的牌 (uid -> 动画顺序), 用来播放发牌动画 */
+  const [ dealAnim, setDealAnim ] = useState<Record<string, number>>(() => dealOrderOf(initial));
+  const dealTimer = useRef<number | null>(null);
 
   useEffect(() => {
     elapsedRef.current = elapsed;
   }, [ elapsed ]);
+
+  const stopDealAnim = useCallback(() => {
+    if (dealTimer.current !== null) {
+      window.clearTimeout(dealTimer.current);
+      dealTimer.current = null;
+    }
+  }, []);
+
+  /** 播一次发牌动画, ms 之后自动清掉标记 (清掉后移动牌就不会重播) */
+  const playDealAnim = useCallback((map: Record<string, number>, ms: number) => {
+    stopDealAnim();
+    setDealAnim(map);
+    if (!Object.keys(map).length) return;
+    dealTimer.current = window.setTimeout(() => {
+      dealTimer.current = null;
+      setDealAnim({});
+    }, ms);
+  }, [ stopDealAnim ]);
+
+  /** 已经结束动画就不再需要标记 (移动 / 撤销 / 收牌时清掉, 免得牌换了位置又飞一次) */
+  const clearDealAnim = useCallback(() => {
+    stopDealAnim();
+    setDealAnim((cur) => (Object.keys(cur).length ? {} : cur));
+  }, [ stopDealAnim ]);
+
+  // 首屏也要有发牌动画: 摆好的牌逐张飞出来
+  useEffect(() => {
+    playDealAnim(dealOrderOf(initial), DEAL_ANIM_TOTAL_MS);
+    return stopDealAnim;
+  }, [ initial, playDealAnim, stopDealAnim ]);
 
   // ---- 计时 ----
   useEffect(() => {
@@ -137,10 +200,11 @@ const SpiderSolitaire: React.FC = () => {
     setState(next);
     setSel(null);
     setHint(null);
+    clearDealAnim();
     if (!running && !won) setRunning(true);
     finishIfWin(next, next.moves);
     return true;
-  }, [ state, opts.autoCollect, running, won, pushHistory, finishIfWin ]);
+  }, [ state, opts.autoCollect, running, won, pushHistory, finishIfWin, clearDealAnim ]);
 
   const tryMove = useCallback((from: number, count: number, to: number): boolean => {
     if (!canMove(state, { from, to, count })) return false;
@@ -187,26 +251,37 @@ const SpiderSolitaire: React.FC = () => {
       if (e.cancelable) e.preventDefault();
     };
 
+    /**
+     * 松手 / 取消: 只有落到「别的列」才算移动。
+     * 落回原列 (手指抖了一下又放回来) 或取消时当作一次点击, 不能吞掉后面补发的 click,
+     * 否则会表现为「点了牌却选不中」。
+     */
     const end = (drop: boolean) => {
       const started = dragRef.current;
       pendingRef.current = null;
       dragRef.current = null;
       if (!started) return;
       setDrag(null);
+      const target = drop ? started.over : null;
+      if (target === null || target === started.from) return;
       suppressClick.current = true;
       window.setTimeout(() => { suppressClick.current = false; }, 0);
-      if (drop && started.over !== null) tryMoveRef.current(started.from, started.count, started.over);
+      tryMoveRef.current(started.from, started.count, target);
     };
 
     const onUp = () => end(true);
     const onCancel = () => end(false);
+    /** 窗口失焦 (alt+tab / 拖到窗口外松手) 时可能收不到 pointerup, 兜底清掉拖拽状态 */
+    const onBlur = () => end(false);
     window.addEventListener('pointermove', onMove, { passive: false });
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointercancel', onCancel);
+    window.addEventListener('blur', onBlur);
     return () => {
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
       window.removeEventListener('pointercancel', onCancel);
+      window.removeEventListener('blur', onBlur);
     };
   }, []);
 
@@ -217,6 +292,15 @@ const SpiderSolitaire: React.FC = () => {
     const pile = state.tableau[col] ?? [];
     const cards = pile.slice(Math.max(0, pile.length - count));
     if (!cards.length || !cards.every((card) => card.faceUp)) return;
+    // 捕获指针: 拖到窗口外松手也能收到 pointerup / pointercancel, 不会卡在拖拽状态
+    try {
+      const el = e.currentTarget as HTMLElement & { setPointerCapture?: (id: number) => void };
+      if (typeof el.setPointerCapture === 'function' && typeof e.pointerId === 'number') {
+        el.setPointerCapture(e.pointerId);
+      }
+    } catch {
+      /* 个别环境不支持指针捕获, 忽略 */
+    }
     const rect = e.currentTarget.getBoundingClientRect();
     const { x, y } = pointerPos(e);
     pendingRef.current = {
@@ -242,7 +326,9 @@ const SpiderSolitaire: React.FC = () => {
     setSeed(value);
     setSeedInput(value);
     setLastSeed(value);
-    setState(dealFromSeed(value, difficulty));
+    const next = dealFromSeed(value, difficulty);
+    setState(next);
+    playDealAnim(dealOrderOf(next), DEAL_ANIM_TOTAL_MS);
     setHistory([]);
     setSel(null);
     setHint(null);
@@ -250,7 +336,7 @@ const SpiderSolitaire: React.FC = () => {
     setRunning(false);
     setWon(false);
     setRecords(recordPlay());
-  }, [ clearDrag, state.suits ]);
+  }, [ clearDrag, state.suits, playDealAnim ]);
 
   const undo = useCallback(() => {
     if (!history.length) return;
@@ -274,9 +360,11 @@ const SpiderSolitaire: React.FC = () => {
     setState(result.state);
     setSel(null);
     setHint(null);
+    // 只有新发的 10 张牌播动画
+    playDealAnim(dealtOrderOf(result.state, state), DEAL_ROW_ANIM_TOTAL_MS);
     if (!running && !won) setRunning(true);
     finishIfWin(result.state, result.state.moves);
-  }, [ state, opts, running, won, pushHistory, finishIfWin, t ]);
+  }, [ state, opts, running, won, pushHistory, finishIfWin, t, playDealAnim ]);
 
   const collectNow = useCallback(() => {
     const { state: next, collected } = collectCompleted(state);
@@ -288,9 +376,10 @@ const SpiderSolitaire: React.FC = () => {
     setState(next);
     setSel(null);
     setHint(null);
+    clearDealAnim();
     finishIfWin(next, next.moves);
     message.success(tT('已收 {n} 组', { n: collected }));
-  }, [ state, pushHistory, finishIfWin, t, tT ]);
+  }, [ state, pushHistory, finishIfWin, t, tT, clearDealAnim ]);
 
   const showHint = useCallback(() => {
     const found = findHint(state, opts, true);
@@ -449,19 +538,29 @@ const SpiderSolitaire: React.FC = () => {
       selected?: boolean;
       dragging?: boolean;
       ghost?: boolean;
+      /** 不能移动的明牌 (不成同花色的降序连牌) */
+      loose?: boolean;
       style?: React.CSSProperties;
       onClick?: React.MouseEventHandler;
       onDoubleClick?: React.MouseEventHandler;
       onPointerDown?: React.PointerEventHandler<HTMLDivElement>;
     }
-  ) => (
+  ) => {
+    // 刚开始发到桌上的牌带上动画标记 (幽灵牌是复制品, 不播)
+    const order = extra.ghost ? undefined : dealAnim[cardId(card)];
+    const style = order === undefined
+      ? extra.style
+      : { ...(extra.style ?? {}), ['--sp-order' as string]: order } as React.CSSProperties;
+    return (
     <div
       key={ cardId(card) }
       className={ `sp-card ${isRedCard(card) ? 'is-red' : 'is-black'}`
         + `${card.faceUp ? '' : ' is-down'}${extra.selected ? ' is-selected' : ''}`
         + `${hintKeys.has(cardId(card)) ? ' is-hint' : ''}`
-        + `${extra.dragging ? ' is-dragging' : ''}${extra.ghost ? ' sp-card-ghost' : ''}` }
-      style={ extra.style }
+        + `${extra.dragging ? ' is-dragging' : ''}${extra.ghost ? ' sp-card-ghost' : ''}`
+        + `${extra.loose ? ' is-loose' : ''}` }
+      style={ style }
+      data-deal={ order === undefined ? undefined : '1' }
       data-testid={ extra.ghost ? undefined : `card-${cardId(card)}` }
       data-card={ extra.ghost ? undefined : cardId(card) }
       data-suit={ extra.ghost ? undefined : card.suit }
@@ -480,7 +579,8 @@ const SpiderSolitaire: React.FC = () => {
         </>
       ) : null }
     </div>
-  );
+    );
+  };
 
   const stat = (label: string, value: React.ReactNode, testId: string) => (
     <div
@@ -501,8 +601,8 @@ const SpiderSolitaire: React.FC = () => {
   const stageVars = (fullscreen: boolean) => ({
     '--sp-w': fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS,
     '--sp-h': `calc(${fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS} * 1.4)`,
-    '--sp-fan-up': `calc(${fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS} * 0.3)`,
-    '--sp-fan-down': `calc(${fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS} * 0.13)`,
+    '--sp-fan-up': `calc(${fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS} * 0.32)`,
+    '--sp-fan-down': `calc(${fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS} * 0.15)`,
     '--sp-bg': token.colorBgLayout,
     '--sp-card-bg': '#ffffff',
   }) as React.CSSProperties;
@@ -671,6 +771,7 @@ const SpiderSolitaire: React.FC = () => {
                 return face(card, {
                   selected: selectedCard(col, i),
                   dragging: isDragSource(col, i),
+                  loose: card.faceUp && !run,
                   style: { position: 'absolute', left: 0, top: offsetCss(positions[i]), zIndex: i },
                   onPointerDown: (e) => {
                     if (run) startDrag(col, run.length, e);

@@ -60,6 +60,14 @@ export const SEED_STORAGE_KEY = 'magic-tools-spider-seed';
 /** 撤销历史的最大深度 */
 export const HISTORY_LIMIT = 3000;
 
+/** 发牌动画: 单张动画时长 / 相邻两张之间的错开间隔 / 清标记的兜底时长 */
+export const DEAL_ANIM_MS = 300;
+export const DEAL_STAGGER_MS = 18;
+export const DEAL_ANIM_TOTAL_MS = 1500;
+/** 发一轮牌 (10 张) 的动画总时长: 每张间隔 3 个错开单位, 看得清是逐张发下来的 */
+export const DEAL_ROW_ANIM_TOTAL_MS = 900;
+export const DEAL_ROW_STAGGER_STEP = 3;
+
 /** 牌面宽度 (CSS 长度): 普通模式按视口自适应, 全屏模式更大一些 */
 export const CARD_SIZE_CSS = 'min(7.4vw, 62px)';
 export const CARD_SIZE_CSS_FULL = 'min(6.2vw, 82px)';
@@ -80,21 +88,29 @@ export const SP_CSS = `
 .sp-card .sp-rank { font-size: calc(var(--sp-w) * 0.26); }
 .sp-card .sp-suit-big { align-self: center; font-size: calc(var(--sp-w) * 0.4); }
 .sp-card .sp-suit-mini { align-self: flex-end; font-size: calc(var(--sp-w) * 0.2); }
+.sp-card.is-loose { cursor: default; }
 .sp-card.is-down { cursor: default;
   background: repeating-linear-gradient(45deg, #1e40af 0 5px, #2563eb 5px 10px);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35), inset 0 0 0 2px rgba(255, 255, 255, 0.85); }
 .sp-card.is-down::after { content: ''; position: absolute; inset: 3px; border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.45); }
-.sp-card.is-selected { outline: 2px solid #1677ff; outline-offset: 1px; }
+.sp-card.is-selected { outline: none; background: #dbeafe;
+  box-shadow: inset 0 0 0 2px #1677ff, 0 1px 3px rgba(0, 0, 0, 0.35); }
 .sp-card.is-dragging { opacity: 0.25; }
 .sp-card.sp-card-ghost { position: absolute; left: 0; cursor: grabbing;
   box-shadow: 0 14px 26px rgba(0, 0, 0, 0.34), inset 0 0 0 1px rgba(148, 163, 184, 0.55);
   transform: rotate(-1.6deg) scale(1.03); }
-.sp-card.is-hint { outline: 2px dashed #faad14; outline-offset: 1px;
-  animation: sp-pulse 1.1s ease-in-out infinite; }
+.sp-card.is-hint { background: #fff7e6; animation: sp-pulse 1.1s ease-in-out infinite; }
 @keyframes sp-pulse {
-  0%, 100% { box-shadow: 0 0 0 2px rgba(250, 173, 20, 0.18); }
-  50% { box-shadow: 0 0 0 5px rgba(250, 173, 20, 0.42); }
+  0%, 100% { box-shadow: inset 0 0 0 2px rgba(250, 173, 20, 0.5), 0 1px 3px rgba(0, 0, 0, 0.35); }
+  50% { box-shadow: inset 0 0 0 3px rgba(250, 173, 20, 1), 0 1px 3px rgba(0, 0, 0, 0.35); }
+}
+/* 发牌动画: 从牌堆方向飞入, 按 --sp-order 逐张错开 */
+.sp-card[data-deal] { animation: sp-deal-in 300ms cubic-bezier(0.2, 0.7, 0.3, 1) backwards;
+  animation-delay: calc(var(--sp-order, 0) * 18ms); }
+@keyframes sp-deal-in {
+  from { opacity: 0; transform: translate(-34px, -170px) rotate(5deg) scale(0.94); }
+  to { opacity: 1; transform: none; }
 }
 .sp-drag-layer { position: fixed; z-index: 1200; pointer-events: none; touch-action: none; }
 .sp-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: flex-start; }
@@ -114,5 +130,7 @@ export const SP_CSS = `
   box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.5); background: var(--sp-card-bg, #fff); }
 .sp-mini.is-empty { box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.3); background: transparent;
   opacity: 0.45; }
-@media (prefers-reduced-motion: reduce) { .sp-card.is-hint { animation: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .sp-card.is-hint, .sp-card[data-deal] { animation: none; }
+}
 `;

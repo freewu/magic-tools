@@ -49,7 +49,11 @@ import {
   type Card,
   type GameState,
 } from './lib';
-import { DEFAULTS_STORAGE_KEY, RECORDS_STORAGE_KEY, SEED_STORAGE_KEY, SERIES_COUNT, type Suit } from './data';
+import {
+  DEAL_ANIM_MS, DEAL_ANIM_TOTAL_MS, DEAL_ROW_ANIM_TOTAL_MS, DEAL_ROW_STAGGER_STEP, DEAL_STAGGER_MS,
+  DEFAULTS_STORAGE_KEY,
+  INITIAL_COUNTS, RECORDS_STORAGE_KEY, SEED_STORAGE_KEY, SERIES_COUNT, SP_CSS, STOCK_DEAL_SIZE, type Suit,
+} from './data';
 
 /** 造一张牌 */
 const mk = (suit: Suit, rank: number, faceUp = true, uid = 0): Card => ({ uid, suit, rank, faceUp });
@@ -575,6 +579,32 @@ describe('战绩与局号', () => {
     expect(getLastSeed()).toBe(1);
     localStorage.setItem(SEED_STORAGE_KEY, 'NaN');
     expect(getLastSeed()).toBe(2026);
+  });
+});
+
+describe('样式与动画 (data.ts)', () => {
+  test('选中高亮用 inset 描边 + 底色, 否则会被下一张牌盖住看不见', () => {
+    expect(SP_CSS).toMatch(/\.sp-card\.is-selected[^}]*inset/s);
+    expect(SP_CSS).toMatch(/\.sp-card\.is-selected[^}]*background/s);
+  });
+
+  test('提示高亮同样用 inset 描边', () => {
+    expect(SP_CSS).toMatch(/@keyframes sp-pulse[\s\S]*?inset[\s\S]*?\}/);
+  });
+
+  test('发牌动画按 --sp-order 错开, 且总时长够所有牌飞完', () => {
+    expect(SP_CSS).toMatch(/\.sp-card\[data-deal\]/);
+    expect(SP_CSS).toMatch(/@keyframes sp-deal-in/);
+    expect(SP_CSS).toMatch(/var\(--sp-order/);
+    const dealt = INITIAL_COUNTS.reduce((a, b) => a + b, 0);
+    expect(DEAL_ANIM_TOTAL_MS).toBeGreaterThan(DEAL_ANIM_MS + DEAL_STAGGER_MS * dealt);
+    expect(DEAL_ROW_ANIM_TOTAL_MS).toBeGreaterThan(
+      DEAL_ANIM_MS + DEAL_STAGGER_MS * STOCK_DEAL_SIZE * DEAL_ROW_STAGGER_STEP
+    );
+  });
+
+  test('尊重 reduced-motion: 动画可关闭', () => {
+    expect(SP_CSS).toMatch(/prefers-reduced-motion[\s\S]*?animation: none/);
   });
 });
 
