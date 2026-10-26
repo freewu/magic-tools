@@ -606,6 +606,17 @@ describe('样式与动画 (data.ts)', () => {
   test('尊重 reduced-motion: 动画可关闭', () => {
     expect(SP_CSS).toMatch(/prefers-reduced-motion[\s\S]*?animation: none/);
   });
+
+  test('拖动时给可落位列加 is-ok 高亮, 不可移动的牌用 not-allowed', () => {
+    expect(SP_CSS).toMatch(/\.sp-col\.is-ok[^}]*outline/s);
+    expect(SP_CSS).toMatch(/\.sp-card\.is-loose[^}]*not-allowed/s);
+  });
+
+  test('触屏上拖牌不会被系统菜单 / 原生拖拽打断', () => {
+    expect(SP_CSS).toMatch(/\.sp-card \{[^}]*-webkit-touch-callout: none/s);
+    expect(SP_CSS).toMatch(/\.sp-card \{[^}]*-webkit-user-drag: none/s);
+    expect(SP_CSS).toMatch(/\.sp-card \{[^}]*touch-action: none/s);
+  });
 });
 
 describe('杂项', () => {

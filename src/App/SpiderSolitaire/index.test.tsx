@@ -476,7 +476,7 @@ describe('蜘蛛纸牌页面', () => {
     expect(from.getAttribute('data-selected')).toBe('1');
   });
 
-  test('拖到接不住的那一列不会动牌', () => {
+  test('拖到接不住的那一列不会动牌', async () => {
     const { seed, state, move } = seedWithMove();
     useSeed(seed);
     const { container } = render(<SpiderSolitaire />);
@@ -490,6 +490,66 @@ describe('蜘蛛纸牌页面', () => {
     drag(cardEl(container, runHead(state, move)), colEl(container, bad));
     expect(stat('stat-moves')).toBe(0);
     expect(columnCounts(container)).toEqual([ 6, 6, 6, 6, 5, 5, 5, 5, 5, 5 ]);
+    // 落点接不住时要说明原因, 否则看起来就像「拖不动」
+    expect(await screen.findByText('这里接不上: 只能放到比它大 1 的牌上')).toBeInTheDocument();
+  });
+
+  test('按住的牌上方压着不成连牌的牌时, 拖动会提示原因', async () => {
+    // 发一轮牌后每列会有多张明牌, 其中必有「不能作为连牌一起搬」的牌
+    let found: { seed: number; card: Card } | null = null;
+    for (let seed = 1; seed < 400 && !found; seed += 1) {
+      const st = dealRow(dealFromSeed(seed, 1));
+      st.tableau.some((pile, col) => {
+        const index = pile.length - 2;
+        const card = pile[index];
+        if (!card || !card.faceUp) return false;
+        if (runFrom(st, col, index)) return false;
+        found = { seed, card };
+        return true;
+      });
+    }
+    expect(found).not.toBeNull();
+    useSeed((found as unknown as { seed: number }).seed);
+    const { container } = render(<SpiderSolitaire />);
+    fireEvent.click(screen.getByText('发一轮牌 (D)'));
+    const card = (found as unknown as { card: Card }).card;
+    pointer(cardEl(container, card), 'pointerdown', 20, 20);
+    pointer(window, 'pointermove', 80, 90);
+    expect(await screen.findByText('这张牌上方压着不成连牌的牌, 只能移动同花色的降序连牌'))
+      .toBeInTheDocument();
+    expect(screen.queryByTestId('spider-drag')).not.toBeInTheDocument();
+    expect(stat('stat-moves')).toBe(0);
+  });
+
+  test('松手落在两列之间的缝隙里, 就近吸附到最近的列', () => {
+    const { seed, state, move } = seedWithMove();
+    useSeed(seed);
+    const { container } = render(<SpiderSolitaire />);
+    dropOn(null);
+    // 目标列只占 (0,0)-(100,100), 松手在它右边 50px 的缝里 (容差 = 列宽 * 0.7)
+    const target = colEl(container, move.to);
+    jest.spyOn(target, 'getBoundingClientRect').mockReturnValue({
+      left: 0, top: 0, right: 100, bottom: 100, width: 100, height: 100, x: 0, y: 0,
+      toJSON: () => ({}),
+    } as DOMRect);
+    pointer(cardEl(container, runHead(state, move)), 'pointerdown', 20, 20);
+    pointer(window, 'pointermove', 150, 60);
+    pointer(window, 'pointerup', 150, 60);
+    expect(stat('stat-moves')).toBe(1);
+    expect(columnCounts(container)[move.to]).toBe(state.tableau[move.to].length + move.count);
+  });
+
+  test('拖动时高亮接得住的列, 松手后取消', () => {
+    const { seed, state, move } = seedWithMove();
+    useSeed(seed);
+    const { container } = render(<SpiderSolitaire />);
+    dropOn(null);
+    pointer(cardEl(container, runHead(state, move)), 'pointerdown', 20, 20);
+    pointer(window, 'pointermove', 80, 90);
+    expect(colEl(container, move.to).className).toContain('is-ok');
+    expect(colEl(container, move.from).className).not.toContain('is-ok');
+    pointer(window, 'pointerup', 80, 90);
+    expect(container.querySelectorAll('.is-ok')).toHaveLength(0);
   });
 
   test('拖拽中途取消 (pointercancel) 不会动牌', () => {

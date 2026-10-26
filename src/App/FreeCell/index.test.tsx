@@ -301,7 +301,7 @@ describe('空档接龙页面', () => {
     expect(freeEmpty(container, 1)).toBe(false);
   });
 
-  test('拖到已占用的自由格 (非法目标) 不会动牌', () => {
+  test('拖到已占用的自由格 (非法目标) 不会动牌', async () => {
     const { container } = render(<FreeCell />);
     // 先合法地把第 0 列顶牌放进 free-0
     drag(topCardEl(container, 0)!, container.querySelector('[data-testid="free-0"]'));
@@ -310,6 +310,8 @@ describe('空档接龙页面', () => {
     drag(topCardEl(container, 1)!, container.querySelector('[data-testid="free-0"]'));
     expect(stat('stat-moves')).toBe(1);
     expect(columnCounts(container)[1]).toBe(7);
+    // 落点接不住时要说明原因, 否则看起来就像「拖不动」
+    expect(await screen.findByText('这里接不上: 只能放到比它大 1 的牌上')).toBeInTheDocument();
   });
 
   test('拖拽中途取消 (pointercancel) 不会动牌', () => {

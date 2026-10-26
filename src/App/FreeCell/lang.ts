@@ -36,6 +36,10 @@ const rows: Record<string, [string, string]> = {
   '暂无可自动收的牌': ['暫無可自動收的牌', 'Nothing to collect right now'],
   '没有可走的牌': ['沒有可走的牌', 'No move found'],
   '只能移动连续的降序异色牌组': ['只能移動連續的降序異色牌組', 'Only descending, alternating-color runs can move'],
+  '这里接不上: 只能放到比它大 1 的牌上': [
+    '這裡接不上: 只能放到比它大 1 的牌上',
+    'No fit here — it only goes on a card one rank higher',
+  ],
   '无路可走, 可撤销 (Z) 或重开本局 (R)': [
     '無路可走, 可復原 (Z) 或重開本局 (R)',
     'No moves left — undo (Z) or redeal (R)',

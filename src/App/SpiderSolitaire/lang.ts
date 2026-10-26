@@ -47,6 +47,14 @@ const rows: Record<string, [string, string]> = {
     'Valid targets light up while dragging; invalid drops bounce back',
   ],
   '只能移动同花色的降序连牌': ['只能移動同花色的降序連牌', 'Only same-suit descending runs can move'],
+  '这张牌上方压着不成连牌的牌, 只能移动同花色的降序连牌': [
+    '這張牌上方壓著不成連牌的牌, 只能移動同花色的降序連牌',
+    'Cards on top of this one break the run — only same-suit descending runs can move',
+  ],
+  '这里接不上: 只能放到比它大 1 的牌上': [
+    '這裡接不上: 只能放到比它大 1 的牌上',
+    'No fit here — it only goes on a card one rank higher',
+  ],
   '双击一张牌可自动移到能接住它的列': [
     '雙擊一張牌可自動移到能接住它的列',
     'Double-click a card to send it to a column that accepts it',

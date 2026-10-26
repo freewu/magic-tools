@@ -69,22 +69,56 @@ const parseDropKey = (key: string | undefined): PileRef | null => {
 
 /** 指针位置下的可落位牌堆 (靠容器上的 data-drop 标记) */
 const dropTargetAt = (x: number, y: number): PileRef | null => {
-  const doc = document as Document & { elementFromPoint?: (px: number, py: number) => Element | null };
-  if (typeof doc.elementFromPoint !== 'function') return null;
-  let el: Element | null = null;
-  try {
-    el = doc.elementFromPoint(x, y);
-  } catch {
-    return null;
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  const nodes = Array.from(document.querySelectorAll('[data-drop]'));
+  // 先按矩形范围判断: 几何位置最可靠 (elementFromPoint 会被弹层 / 指针捕获 / 拖拽层干扰)
+  for (const node of nodes) {
+    const rect = node.getBoundingClientRect?.();
+    if (!rect || (!rect.width && !rect.height)) continue;
+    if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+      const hit = parseDropKey((node as HTMLElement).dataset?.drop);
+      if (hit) return hit;
+    }
   }
-  const holder = el?.closest?.('[data-drop]') as HTMLElement | null | undefined;
-  return parseDropKey(holder?.dataset?.drop);
+  const doc = document as Document & { elementFromPoint?: (px: number, py: number) => Element | null };
+  if (typeof doc.elementFromPoint === 'function') {
+    let el: Element | null = null;
+    try {
+      el = doc.elementFromPoint(x, y);
+    } catch {
+      el = null;
+    }
+    const direct = parseDropKey((el?.closest?.('[data-drop]') as HTMLElement | null | undefined)?.dataset?.drop);
+    if (direct) return direct;
+  }
+  // 没命中 (落在牌堆之间的缝隙 / 弹层遮挡): 按矩形就近吸附, 别让用户白拖一趟
+  let best: PileRef | null = null;
+  let bestScore = Infinity;
+  for (const node of nodes) {
+    const rect = node.getBoundingClientRect?.();
+    if (!rect || (!rect.width && !rect.height)) continue;
+    const target = parseDropKey((node as HTMLElement).dataset?.drop);
+    if (!target) continue;
+    const dx = x < rect.left ? rect.left - x : x > rect.right ? x - rect.right : 0;
+    const dy = y < rect.top ? rect.top - y : y > rect.bottom ? y - rect.bottom : 0;
+    if (dx > Math.max(8, rect.width * 0.7)) continue;
+    if (dy > Math.max(8, rect.height * 0.35)) continue;
+    const score = dx + dy * 0.25;
+    if (score < bestScore) {
+      bestScore = score;
+      best = target;
+    }
+  }
+  return best;
 };
 
 const FreeCell: React.FC = () => {
   const { locale } = useLocale();
   const t = (zh: string) => u(locale, zh);
   const tT = (zh: string, vars: Record<string, string | number>) => uT(locale, zh, vars);
+  // 全局 pointer 监听是在 effect([]) 里挂的, 用 ref 取最新语言, 避免切语言后提示还是旧文案
+  const localeRef = useRef(locale);
+  useEffect(() => { localeRef.current = locale; }, [ locale ]);
   const { token } = theme.useToken();
   // 页面在 KeepAlive 容器中常驻: 只有当前显示本应用时才响应全局键盘事件
   const appCtx = useContext(AppContext);
@@ -201,21 +235,25 @@ const FreeCell: React.FC = () => {
      * 落回原处 (手指抖了一下又放回来) 或取消时当作一次点击, 不能吞掉后面补发的 click,
      * 否则会表现为「点了牌却选不中」。
      */
-    const end = (drop: boolean) => {
+    const end = (drop: boolean, e?: PointerEvent) => {
       const started = dragRef.current;
       pendingRef.current = null;
       dragRef.current = null;
       if (!started) return;
       setDrag(null);
-      const target = drop ? started.over : null;
+      // 松手那一刻的坐标比最后一次 pointermove 更准: 快速拖动时 move 可能还停在半路
+      const atUp = e ? dropTargetAt(e.clientX, e.clientY) : null;
+      const target = drop ? (atUp ?? started.over) : null;
       if (!target) return;
       if (target.kind === started.from.kind && target.index === started.from.index) return;
       suppressClick.current = true;
       window.setTimeout(() => { suppressClick.current = false; }, 0);
-      tryMoveRef.current(started.from, started.count, target);
+      if (tryMoveRef.current(started.from, started.count, target)) return;
+      // 落点接不住: 明确告诉用户原因, 否则看起来就像「拖不动」
+      message.warning(u(localeRef.current, '这里接不上: 只能放到比它大 1 的牌上'));
     };
 
-    const onUp = () => end(true);
+    const onUp = (e: PointerEvent) => end(true, e);
     const onCancel = () => end(false);
     /** 窗口失焦 (alt+tab / 拖到窗口外松手) 时可能收不到 pointerup, 兜底清掉拖拽状态 */
     const onBlur = () => end(false);
@@ -731,7 +769,8 @@ const FreeCell: React.FC = () => {
   const stageVars = (fullscreen: boolean) => ({
     '--fc-w': fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS,
     '--fc-h': `calc(${fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS} * 1.4)`,
-    '--fc-fan': `calc(${fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS} * 0.3)`,
+    // 可视条给个 13px 下限: 窄屏上按比例算只有 9px, 手指一按就落到上面那张牌上
+    '--fc-fan': `clamp(13px, calc(${fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS} * 0.3), 40px)`,
     '--fc-bg': token.colorBgLayout,
     '--fc-bar-bg': token.colorBgElevated,
     '--fc-bar-line': token.colorBorderSecondary,

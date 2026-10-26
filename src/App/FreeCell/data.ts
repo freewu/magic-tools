@@ -64,7 +64,9 @@ export const FC_CSS = `
   box-sizing: border-box; background: var(--fc-card-bg, #ffffff); color: #1f2933;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(148, 163, 184, 0.55);
   display: flex; flex-direction: column; justify-content: space-between; padding: 2px 4px;
-  font-weight: 700; line-height: 1.05; user-select: none; cursor: pointer;
+  font-weight: 700; line-height: 1.05; cursor: pointer;
+  /* 触摸设备: 长按不要弹系统菜单 / 不要参与原生拖拽, 否则拖牌会被打断 (pointercancel) */
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-user-drag: none;
   touch-action: none; }
 .fc-card.is-dragging { opacity: 0.25; }
 .fc-card.fc-card-ghost { position: absolute; left: 0; cursor: grabbing;

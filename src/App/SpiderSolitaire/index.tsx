@@ -52,6 +52,10 @@ type DragState = {
 /** 移动超过该距离才算拖拽, 否则视为点击 */
 const DRAG_THRESHOLD = 5;
 
+/** 落点容差: 松手位置常落在两列之间的缝里, 按列宽 / 列高的比例就近吸附 */
+const DROP_SNAP_X = 0.7;
+const DROP_SNAP_Y = 0.35;
+
 /**
  * 取指针坐标: 有的环境 (jsdom / 部分合成事件) 拿不到 clientX, 此时得到 NaN。
  * 坐标不可用时按「已经移动」处理 (宁可拖起来也别吞掉用户的滑动), 只把幽灵牌放在原点。
@@ -105,6 +109,16 @@ const dropColumnAt = (x: number, y: number): number | null => {
     const col = Number(raw);
     return Number.isFinite(col) ? col : null;
   };
+  const cols = Array.from(document.querySelectorAll('[data-drop]'));
+  // 先按列的矩形范围判断: 几何位置最可靠 (elementFromPoint 会被弹层 / 指针捕获 / 拖拽层干扰)
+  for (const node of cols) {
+    const rect = node.getBoundingClientRect?.();
+    if (!rect || (!rect.width && !rect.height)) continue;
+    if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+      const col = readCol(node);
+      if (col !== null) return col;
+    }
+  }
   const doc = document as Document & { elementFromPoint?: (px: number, py: number) => Element | null };
   if (typeof doc.elementFromPoint === 'function') {
     let el: Element | null = null;
@@ -116,22 +130,34 @@ const dropColumnAt = (x: number, y: number): number | null => {
     const direct = readCol(el?.closest?.('[data-drop]'));
     if (direct !== null) return direct;
   }
-  const cols = Array.from(document.querySelectorAll('[data-drop]'));
+  // 都没命中 (落在列与列之间的缝隙 / 空列下方一点): 就近吸附最近的一列, 别让用户白拖一趟
+  let best: number | null = null;
+  let bestScore = Infinity;
   for (const node of cols) {
     const rect = node.getBoundingClientRect?.();
     if (!rect || (!rect.width && !rect.height)) continue;
-    if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-      const col = readCol(node);
-      if (col !== null) return col;
+    const col = readCol(node);
+    if (col === null) continue;
+    const dx = x < rect.left ? rect.left - x : x > rect.right ? x - rect.right : 0;
+    const dy = y < rect.top ? rect.top - y : y > rect.bottom ? y - rect.bottom : 0;
+    if (dx > Math.max(8, rect.width * DROP_SNAP_X)) continue;
+    if (dy > Math.max(8, rect.height * DROP_SNAP_Y)) continue;
+    const score = dx + dy * 0.25;
+    if (score < bestScore) {
+      bestScore = score;
+      best = col;
     }
   }
-  return null;
+  return best;
 };
 
 const SpiderSolitaire: React.FC = () => {
   const { locale } = useLocale();
   const t = (zh: string) => u(locale, zh);
   const tT = (zh: string, vars: Record<string, string | number>) => uT(locale, zh, vars);
+  // 全局 pointer 监听是在 effect([]) 里挂的, 用 ref 取最新语言, 避免切语言后提示还是旧文案
+  const localeRef = useRef(locale);
+  useEffect(() => { localeRef.current = locale; }, [ locale ]);
   const { token } = theme.useToken();
   // 页面在 KeepAlive 容器中常驻: 只有当前显示本应用时才响应全局键盘事件
   const appCtx = useContext(AppContext);
@@ -239,21 +265,34 @@ const SpiderSolitaire: React.FC = () => {
   const [ drag, setDrag ] = useState<DragState | null>(null);
   const dragRef = useRef<DragState | null>(null);
   const pendingRef = useRef<Omit<DragState, 'over'> | null>(null);
+  /** 按住了一张「搬不动」的牌 (上方压着不成连牌的牌): 拖动超阀值时提示一次, 不做拖拽 */
+  const blockedRef = useRef<{ x: number; y: number } | null>(null);
   /** 拖拽刚结束时浏览器还会补一个 click, 用它吞掉, 避免拖完又选中一次 */
   const suppressClick = useRef(false);
 
   const clearDrag = useCallback(() => {
     pendingRef.current = null;
+    blockedRef.current = null;
     dragRef.current = null;
     setDrag(null);
   }, []);
 
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
+      const { x, y } = pointerPos(e);
+      const blocked = blockedRef.current;
+      if (blocked) {
+        // 按住的牌搬不动: 移动超阀值后只说清楚原因, 不要一声不响
+        if (Math.abs(x - blocked.x) < DRAG_THRESHOLD && Math.abs(y - blocked.y) < DRAG_THRESHOLD) return;
+        blockedRef.current = null;
+        suppressClick.current = true;
+        window.setTimeout(() => { suppressClick.current = false; }, 0);
+        message.info(u(localeRef.current, '这张牌上方压着不成连牌的牌, 只能移动同花色的降序连牌'));
+        return;
+      }
       const pending = pendingRef.current;
       if (!pending) return;
       const current = dragRef.current;
-      const { x, y } = pointerPos(e);
       if (!current) {
         // 未过阀值: 仍然当作点击, 不进入拖拽
         if (Math.abs(x - pending.x) < DRAG_THRESHOLD && Math.abs(y - pending.y) < DRAG_THRESHOLD) return;
@@ -278,6 +317,7 @@ const SpiderSolitaire: React.FC = () => {
     const end = (drop: boolean, e?: PointerEvent) => {
       const started = dragRef.current;
       pendingRef.current = null;
+      blockedRef.current = null;
       dragRef.current = null;
       if (!started) return;
       setDrag(null);
@@ -287,7 +327,9 @@ const SpiderSolitaire: React.FC = () => {
       if (target === null || target === started.from) return;
       suppressClick.current = true;
       window.setTimeout(() => { suppressClick.current = false; }, 0);
-      tryMoveRef.current(started.from, started.count, target);
+      if (tryMoveRef.current(started.from, started.count, target)) return;
+      // 落点接不住: 明确告诉用户原因, 否则看起来就像「拖不动」
+      message.warning(u(localeRef.current, '这里接不上: 只能放到比它大 1 的牌上'));
     };
 
     const onUp = (e: PointerEvent) => end(true, e);
@@ -307,10 +349,21 @@ const SpiderSolitaire: React.FC = () => {
   }, []);
 
   /** 按下牌面: 先记下候选拖拽, 指针移动超阀值后才真正拖起来 */
-  const startDrag = (col: number, count: number, e: React.PointerEvent<HTMLElement>) => {
+  const startDrag = (
+    col: number,
+    count: number,
+    e: React.PointerEvent<HTMLElement>,
+    blocked = false
+  ) => {
     // 只响应左键 / 触摸 (jsdom 等环境里 button 可能是 undefined)
     if (won || (typeof e.button === 'number' && e.button > 0)) return;
+    const { x, y } = pointerPos(e);
     const pile = state.tableau[col] ?? [];
+    // 这张牌上方压着不成连牌的牌: 搬不动, 但拖动时要给出提示, 不能一声不响
+    if (blocked) {
+      blockedRef.current = { x, y };
+      return;
+    }
     const cards = pile.slice(Math.max(0, pile.length - count));
     if (!cards.length || !cards.every((card) => card.faceUp)) return;
     // 捕获指针: 拖到窗口外松手也能收到 pointerup / pointercancel, 不会卡在拖拽状态
@@ -323,7 +376,6 @@ const SpiderSolitaire: React.FC = () => {
       /* 个别环境不支持指针捕获, 忽略 */
     }
     const rect = e.currentTarget.getBoundingClientRect();
-    const { x, y } = pointerPos(e);
     pendingRef.current = {
       from: col,
       count,
@@ -536,6 +588,17 @@ const SpiderSolitaire: React.FC = () => {
   const selectedCard = (col: number, index: number): boolean =>
     !!sel && sel.col === col && index >= sel.start && index < sel.start + sel.count;
 
+  /** 拖拽中哪些列接得住这段牌 (高亮出来, 避免拖到接不上的地方白费力气) */
+  const droppable = useMemo(() => {
+    const set = new Set<number>();
+    if (!drag) return set;
+    state.tableau.forEach((_, to) => {
+      if (to === drag.from) return;
+      if (canMove(state, { from: drag.from, to, count: drag.count })) set.add(to);
+    });
+    return set;
+  }, [ drag?.from, drag?.count, state ]);
+
   const hintKeys = useMemo(() => {
     const keys = new Set<string>();
     if (!hint) return keys;
@@ -622,8 +685,10 @@ const SpiderSolitaire: React.FC = () => {
   const stageVars = (fullscreen: boolean) => ({
     '--sp-w': fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS,
     '--sp-h': `calc(${fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS} * 1.4)`,
-    '--sp-fan-up': `calc(${fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS} * 0.32)`,
-    '--sp-fan-down': `calc(${fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS} * 0.15)`,
+    // 明牌可视条不小于 13px: 窄屏 (手机上 10 列只有 ~28px 宽) 时按比例算出来只有 9px,
+    // 手指一按就落到上面那张牌上, 表现为「多张牌时拖不动」, 所以下面给个下限
+    '--sp-fan-up': `clamp(13px, calc(${fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS} * 0.32), 40px)`,
+    '--sp-fan-down': `clamp(7px, calc(${fullscreen ? CARD_SIZE_CSS_FULL : CARD_SIZE_CSS} * 0.15), 20px)`,
     '--sp-bg': token.colorBgLayout,
     '--sp-bar-bg': token.colorBgElevated,
     '--sp-bar-line': token.colorBorderSecondary,
@@ -781,7 +846,8 @@ const SpiderSolitaire: React.FC = () => {
           return (
             <div
               key={ `col-${col}` }
-              className={ `sp-col${pile.length ? '' : ' is-empty'}${drag?.over === col ? ' is-drop' : ''}` }
+              className={ `sp-col${pile.length ? '' : ' is-empty'}`
+                + `${drag?.over === col ? ' is-drop' : ''}${droppable.has(col) ? ' is-ok' : ''}` }
               style={ { height: `calc(var(--sp-h) + ${offsetCss(last)})` } }
               data-testid={ `tableau-${col}` }
               data-drop={ col }
@@ -797,7 +863,7 @@ const SpiderSolitaire: React.FC = () => {
                   loose: card.faceUp && !run,
                   style: { position: 'absolute', left: 0, top: offsetCss(positions[i]), zIndex: i },
                   onPointerDown: (e) => {
-                    if (run) startDrag(col, run.length, e);
+                    startDrag(col, run ? run.length : 1, e, card.faceUp && !run);
                   },
                   onClick: (e) => { e.stopPropagation(); clickCard(col, i); },
                   onDoubleClick: (e) => {

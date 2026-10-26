@@ -81,14 +81,16 @@ export const SP_CSS = `
   box-sizing: border-box; background: var(--sp-card-bg, #ffffff); color: #1f2933;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(148, 163, 184, 0.55);
   display: flex; flex-direction: column; justify-content: space-between; padding: 1px 3px;
-  font-weight: 700; line-height: 1.05; user-select: none; cursor: pointer;
+  font-weight: 700; line-height: 1.05; cursor: pointer;
+  /* 触摸设备: 长按不要弹系统菜单 / 不要参与原生拖拽, 否则拖牌会被打断 (pointercancel) */
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-user-drag: none;
   touch-action: none; overflow: hidden; }
 .sp-card.is-red { color: #cf1322; }
 .sp-card.is-black { color: #1f2933; }
 .sp-card .sp-rank { font-size: calc(var(--sp-w) * 0.26); }
 .sp-card .sp-suit-big { align-self: center; font-size: calc(var(--sp-w) * 0.4); }
 .sp-card .sp-suit-mini { align-self: flex-end; font-size: calc(var(--sp-w) * 0.2); }
-.sp-card.is-loose { cursor: default; }
+.sp-card.is-loose { cursor: not-allowed; }
 .sp-card.is-down { cursor: default;
   background: repeating-linear-gradient(45deg, #1e40af 0 5px, #2563eb 5px 10px);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35), inset 0 0 0 2px rgba(255, 255, 255, 0.85); }
@@ -124,6 +126,7 @@ export const SP_CSS = `
 .sp-col.is-empty { box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.4);
   background: rgba(148, 163, 184, 0.08); height: var(--sp-h); }
 .sp-col .sp-card { position: absolute; left: 0; }
+.sp-col.is-ok, .sp-slot.is-ok { outline: 2px dashed rgba(82, 196, 26, 0.65); outline-offset: 2px; }
 .sp-col.is-drop, .sp-slot.is-drop { outline: 2px solid #1677ff; outline-offset: 2px; }
 .sp-slot { width: var(--sp-w); height: var(--sp-h); border-radius: 6px; box-sizing: border-box;
   display: flex; align-items: center; justify-content: center; }
