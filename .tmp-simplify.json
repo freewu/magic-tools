@@ -1,118 +1,106 @@
 {
-  "V2.24.0": {
+  "V2.21.1": {
     "zh": [
-      "新增应用: 2048、俄罗斯方块、扫雷、NES 模拟器、GameBoy 模拟器 (新增「游戏」分类, 工具总数 151 → 156)",
-      "新增功能: 设置中心可勾选应用中心要展示的分类, 侧边栏与应用中心实时同步过滤 (不影响收藏); NES / GameBoy 模拟器全屏时画面浮出半透明虚拟按键 (透明度可调, 键盘 / 手柄按下同步高亮)",
-      "问题修复: NES 模拟器拖入 ROM 没有反应、载入后没有声音、画面黑屏 (帧缓冲缺 alpha 通道且 R / B 颠倒)"
+      "新增功能: 设置中心新增配置导入 / 导出 (导出全部本地设置与各应用的默认配置为 JSON, 导入时校验并合并写回, 完成后自动重载生效)",
+      "体验改进: 我的收藏支持按类型分组展示 (分组视图下自动停用拖动排序); 「收藏按类型展示」的默认值可在设置中心配置, 改动实时同步到已打开的收藏页"
     ],
     "tw": [
-      "新增應用: 2048、俄羅斯方塊、踩地雷、NES 模擬器、GameBoy 模擬器 (新增「遊戲」分類, 工具總數 151 → 156)",
-      "新增功能: 設定中心可勾選應用中心要展示的分類, 側邊欄與應用中心即時同步過濾 (不影響收藏); NES / GameBoy 模擬器全螢幕時畫面浮出半透明虛擬按鍵 (透明度可調, 鍵盤 / 手把按下同步高亮)",
-      "問題修正: NES 模擬器拖入 ROM 沒有反應、載入後沒有聲音、畫面黑屏 (影格緩衝缺 alpha 通道且 R / B 顛倒)"
+      "新增功能: 設定中心新增設定匯入 / 匯出 (匯出全部本機設定與各應用的預設設定為 JSON, 匯入時驗證並合併寫回, 完成後自動重新載入生效)",
+      "體驗改進: 我的收藏支援依類型分組展示 (分組檢視下自動停用拖曳排序); 「收藏依類型展示」的預設值可在設定中心設定, 變更即時同步到已開啟的收藏頁"
     ],
     "en": [
-      "New apps: 2048, Tetris, Minesweeper, NES Emulator and GameBoy Emulator (a new Games category; tools 151 → 156)",
-      "New features: Settings can choose which categories the App Center shows, filtering the sidebar and the App Center live (Favorites untouched); the NES and GameBoy emulators float a translucent pad over the picture in fullscreen (adjustable opacity, keyboard and gamepad presses light it up)",
-      "Fixes: NES ROMs dropped on the page were ignored, there was no sound after loading, and the picture stayed black (framebuffer missing its alpha channel with R / B swapped)"
+      "New features: Settings gained config import / export (dumps every local setting plus each app’s default options to JSON, then validates and merges on import, reloading the page when done)",
+      "Improvements: Favorites can be grouped by category (drag sorting is disabled in that view), with the default configurable in Settings and synced live to an open Favorites page"
     ]
   },
-  "V2.23.2": {
+  "V2.21.0": {
     "zh": [
-      "体验改进: Mermaid 编辑器的渲染引擎由 mermaid 换成 pele (零依赖单文件引擎, 仍内置 32 种图形示例); 图表配色跟随「背景」设置, 切换背景不再重新渲染; 错误提示按类型分类并给出「第 N 行, 第 M 列」定位; 图表里的 HTML 只按纯文本渲染, 链接与外部图片默认不生效",
-      "问题修复: 首屏白预载 3.6MB 的 mermaid 分包 (入口静态依赖了用不到的引擎), 改为纯按需加载, 首屏预载 gzip 1523KB → 585KB",
-      "帮助页「使用组件」把 Mermaid 11.17.2 换为 Pele 1.6.0"
+      "新增功能: 新增系统级页面「我的收藏」(收藏 / 取消收藏、按名称搜索、一键清空, 应用卡片右上角一键收藏, 状态全局实时同步), 支持拖动排序与可拖动悬浮入口 (位置持久化, 右键复位, 角标显示收藏数); 提词器新增阅读基准线 (颜色可自定义, 可拖动调整位置); 番茄时钟全屏支持空格 / 回车开始与暂停",
+      "体验改进: 收藏卡片用光标区分「按住拖动排序」与「点击打开应用」; 应用中心「默认展示应用」下拉新增「我的收藏」选项",
+      "问题修复: 桌面版收藏拖动排序失效 (改用 Pointer Events 实现); 番茄时钟「跳过当前阶段」按钮与阶段页签挤在同一行"
     ],
     "tw": [
-      "體驗改進: Mermaid 編輯器的渲染引擎由 mermaid 換成 pele (零相依單檔引擎, 仍內建 32 種圖形範例); 圖表配色跟隨「背景」設定, 切換背景不再重新渲染; 錯誤提示依類型分類並給出「第 N 行, 第 M 列」定位; 圖表中的 HTML 只按純文字渲染, 連結與外部圖片預設不生效",
-      "問題修正: 首屏白預載 3.6MB 的 mermaid 分包 (入口靜態相依了用不到的引擎), 改為純按需載入, 首屏預載 gzip 1523KB → 585KB",
-      "說明頁「使用元件」把 Mermaid 11.17.2 換為 Pele 1.6.0"
+      "新增功能: 新增系統級頁面「我的收藏」(收藏 / 取消收藏、依名稱搜尋、一鍵清空, 應用卡片右上角一鍵收藏, 狀態全域即時同步), 支援拖曳排序與可拖曳懸浮入口 (位置持久化, 右鍵復位, 角標顯示收藏數); 提詞器新增閱讀基準線 (顏色可自訂, 可拖曳調整位置); 番茄時鐘全螢幕支援空白鍵 / Enter 開始與暫停",
+      "體驗改進: 收藏卡片用游標區分「按住拖曳排序」與「點擊開啟應用」; 應用中心「預設展示應用」下拉新增「我的收藏」選項",
+      "問題修正: 桌面版收藏拖曳排序失效 (改用 Pointer Events 實作); 番茄時鐘「跳過目前階段」按鈕與階段頁籤擠在同一列"
     ],
     "en": [
-      "Improvements: the Mermaid Editor now renders with pele instead of mermaid (a dependency-free single-file engine, still shipping 32 diagram samples); diagram colours follow the Background setting and switching backgrounds no longer re-renders; errors are grouped by kind with line / column positions; HTML inside diagrams is rendered as plain text and links or remote images stay inert",
-      "Fixes: the first screen preloaded a 3.6MB mermaid chunk it never used — it is now loaded strictly on demand, cutting preloaded gzip from 1523KB to 585KB",
-      "The Help components list moved from Mermaid 11.17.2 to Pele 1.6.0"
+      "New features: a new system page Favorites (star / unstar, search by name, clear all, a star on every App Center card, synced globally in real time) with drag sorting and a draggable floating launcher (position persisted, right-click to reset, badge showing the count); the Teleprompter gained a reading baseline (custom colour, draggable position); fullscreen Pomodoro responds to Space / Enter",
+      "Improvements: cursor shapes on Favorites cards distinguish “hold to reorder” from “click to open”; the App Center’s default-page dropdown gained a Favorites entry",
+      "Fixes: drag sorting did not work in the desktop build (it now uses Pointer Events) and Pomodoro’s skip button collided with the stage tabs"
     ]
   },
-  "V2.23.1": {
+  "V2.20.0": {
     "zh": [
-      "新增功能: 敏感词检测新增扩展词库 (17 个分类 / 约 7.4 万条, 勾选后才按需加载) 与打码预览 (高亮被打码位置, 可复制结果); XML / HTML 格式化新增结构树视图; Markdown 编辑器 / Mermaid 编辑器新增全屏模式",
-      "体验改进: XML / HTML 格式化拆成「格式化结果 / 结构树」分页签并支持打开本地文件与原生保存; Markdown 系工具支持打开本地文件并沿用原文件名保存; 敏感词打码字符可选可填; CSS 配色色卡编码跟随颜色类型; 应用中心撤下上一版本新增应用的 NEW 徽标"
+      "新增应用: 番茄时钟 (专注 / 短休 / 长休自动轮换, 按截止时刻推算切后台不漂移, 桌面通知, 5 种合成音色或自定义音频, 纯色 / 图片背景与阶段配色, 全屏)、白板 (Excalidraw 驱动的无限画布, 自动保存到本机, 全屏, 不联网不上传)",
+      "问题修复: 桌面版启动失败 (通知插件权限配置类型写错导致初始化 panic); 白板渲染不开 (容器高度塌陷与样式未加载)"
     ],
     "tw": [
-      "新增功能: 敏感詞檢測新增擴充詞庫 (17 個分類 / 約 7.4 萬筆, 勾選後才按需載入) 與打碼預覽 (高亮被打碼位置, 可複製結果); XML / HTML 格式化新增結構樹視圖; Markdown 編輯器 / Mermaid 編輯器新增全螢幕模式",
-      "體驗改進: XML / HTML 格式化拆成「格式化結果 / 結構樹」分頁籤並支援開啟本機檔案與原生儲存; Markdown 系列工具支援開啟本機檔案並沿用原檔名儲存; 敏感詞打碼字元可選可填; CSS 配色色卡編碼跟隨顏色類型; 應用中心撤下上一版本新增應用的 NEW 徽標"
+      "新增應用: 番茄時鐘 (專注 / 短休 / 長休自動輪換, 依截止時刻推算切背景不漂移, 桌面通知, 5 種合成音色或自訂音訊, 純色 / 圖片背景與階段配色, 全螢幕)、白板 (Excalidraw 驅動的無限畫布, 自動儲存到本機, 全螢幕, 不連網不上傳)",
+      "問題修正: 桌面版啟動失敗 (通知外掛權限設定型別寫錯導致初始化 panic); 白板無法渲染 (容器高度塌陷與樣式未載入)"
     ],
     "en": [
-      "New features: Sensitive Word Detection gained an extended lexicon (17 categories, about 74k entries, loaded only when ticked) and a masking preview that highlights masked spots and can copy the result; XML and HTML Formatter gained a structure-tree view; the Markdown and Mermaid editors gained fullscreen",
-      "Improvements: XML / HTML Formatter now separates formatted output and the structure tree into tabs, opens local files and saves through the native dialog; Markdown-style tools open local files and reuse the file name when saving; masking characters are selectable or free-form; CSS Colors code labels follow the chosen colour type; the App Center dropped the previous version’s NEW badges"
+      "New apps: Pomodoro (focus / short break / long break rotate automatically, deadline-based timing that survives backgrounding, desktop notifications, five synthesised tones or your own audio, solid or picture backgrounds with per-stage colours, fullscreen) and Whiteboard (an Excalidraw-powered infinite canvas that autosaves locally, works fullscreen and never goes online)",
+      "Fixes: the desktop build failed to start (a notification plugin permission typed as an object instead of null panicked during Tauri setup) and the Whiteboard would not render (collapsed container height plus missing styles)"
     ]
   },
-  "V2.23.0": {
+  "V2.19.0": {
     "zh": [
-      "新增应用: 拼豆图纸、假装开会、Zip 压缩、Zip 解压、GIF 拆解、GIF 生成 (工具总数 145 → 151)",
-      "新增功能: 应用中心新增 NEW 徽标 (应用在 define.tsx 里导出 IsNew = true 即展示, 用于标记本版本新增的应用); Shield Badge 生成的 SVG 源码支持格式化查看与单行切换",
-      "体验改进: Zip 压缩 / 解压窗口宽度改为铺满内容区"
+      "新增应用: 敏感词检测 (Aho–Corasick 扫描, 通用 / 小红书 / 微信公众号三套词库, 给出危险等级 / 命中位置 / 替换建议, 一键打码与 TXT / HTML 报告导出, 宽松匹配能揪出「微 信」这类绕过写法)",
+      "新增功能: 提词器新增开始前倒计时 (关闭 / 3~30 秒, 舞台大数字覆盖层, 期间再点开始立即开滚); 节拍器新增预排拍 (关闭 / 1 / 2 / 4 / 8 拍, 660Hz + 琥珀色与正拍区分)",
+      "其它: Windows 发布新增内置完整 WebView2 离线运行时的 NSIS 安装包, 没有装 WebView2 的机器也能直接用"
     ],
     "tw": [
-      "新增應用: 拼豆圖紙、假裝開會、Zip 壓縮、Zip 解壓、GIF 拆解、GIF 產生 (工具總數 145 → 151)",
-      "新增功能: 應用中心新增 NEW 徽標 (應用在 define.tsx 匯出 IsNew = true 即展示, 用來標記本版本新增的應用); Shield Badge 產生的 SVG 原始碼支援格式化檢視與單行切換",
-      "體驗改進: Zip 壓縮 / 解壓視窗寬度改為鋪滿內容區"
+      "新增應用: 敏感詞檢測 (Aho–Corasick 掃描, 通用 / 小紅書 / 微信公眾號三套詞庫, 給出危險等級 / 命中位置 / 替換建議, 一鍵打碼與 TXT / HTML 報告匯出, 寬鬆比對能揪出「微 信」這類繞過寫法)",
+      "新增功能: 提詞器新增開始前倒數 (關閉 / 3~30 秒, 舞台大數字覆蓋層, 期間再按開始立即開滾); 節拍器新增預排拍 (關閉 / 1 / 2 / 4 / 8 拍, 660Hz + 琥珀色與正拍區分)",
+      "其它: Windows 發佈新增內建完整 WebView2 離線執行階段的 NSIS 安裝檔, 沒裝 WebView2 的機器也能直接用"
     ],
     "en": [
-      "New apps: Bead Pattern, Fake Meeting, Zip Compress, Zip Extract, GIF Splitter and GIF Maker (tools 145 → 151)",
-      "New features: the App Center shows a NEW badge for apps that export IsNew = true from their define.tsx, marking the apps added in this release; Shield Badge can now pretty-print its SVG source or show it as a single line",
-      "Improvements: the Zip Compress / Extract windows now fill the content area"
+      "New apps: Sensitive Word Detection (Aho–Corasick scanning with three lexicons — general, Xiaohongshu and WeChat official accounts — reporting severity, positions and replacement hints, one-click masking and TXT / HTML reports, with a loose mode that catches obfuscations like “微 信”)",
+      "New features: the Teleprompter counts down before scrolling (off or 3–30 seconds, a big overlay on stage, pressing start again skips it); the Metronome gained count-in bars (off or 1 / 2 / 4 / 8 beats at 660Hz in amber, distinct from the downbeat)",
+      "Also: the Windows release added an NSIS installer bundling the full offline WebView2 runtime, so machines without WebView2 can install it directly"
     ]
   },
-  "V2.22.2": {
+  "V2.18.0": {
     "zh": [
-      "新增功能: 中文拼音新增拼音注音排版 (拼音以小字显示在汉字正上方, 可切换拼音文本, 整段转换保留多音字上下文); CSS 配色新增拼豆 / 绣线色卡 (MARD / COCO / Artkal / Perler / Hama / DMC) 并支持按系列分组展示",
-      "体验改进: 色卡上的色号文字改为反色显示, 深色与中间色调也看得清; 节拍器倒计时改为 3~10 秒数字倒计时 (每秒一个预备拍); 经纬度格式转换的示例改为顶部彩色标签; 四个编解码工具按钮增加间距; Gzip 编解码输入输出铺满整宽; SM9 的「密钥生成」页更名「密钥管理」",
-      "问题修复: 经纬度格式转换输入为空时结果区整块消失 (现在始终显示四种格式的结果区)"
+      "新增应用: BOM 检查、像素图、思维导图、节拍器、屏幕录制 (仅 Web 版)、二维码解析 (工具总数 134 → 140)",
+      "新增功能: 应用中心为仅 Web 版可用的工具增加「仅 Web」徽标, 与「仅桌面版」同一套样式",
+      "其它: 构建工具链升级到 Vite 8 (Rolldown) 与 TypeScript 5.9, 前端构建耗时从约 26 秒降到约 2 秒"
     ],
     "tw": [
-      "新增功能: 中文拼音新增拼音注音排版 (拼音以小字顯示在漢字正上方, 可切換拼音文字, 整段轉換保留多音字上下文); CSS 配色新增拼豆 / 繡線色卡 (MARD / COCO / Artkal / Perler / Hama / DMC) 並支援依系列分組展示",
-      "體驗改進: 色卡上的色號文字改為反色顯示, 深色與中間色調也看得清; 節拍器倒數改為 3~10 秒數字倒數 (每秒一個預備拍); 經緯度格式轉換的範例改為頂部彩色標籤; 四個編解碼工具按鈕增加間距; Gzip 編解碼輸入輸出鋪滿整寬; SM9 的「金鑰產生」頁更名「金鑰管理」",
-      "問題修正: 經緯度格式轉換輸入為空時結果區整塊消失 (現在始終顯示四種格式的結果區)"
+      "新增應用: BOM 檢查、像素圖、思維導圖、節拍器、螢幕錄製 (僅 Web 版)、QR Code 解析 (工具總數 134 → 140)",
+      "新增功能: 應用中心為僅 Web 版可用的工具增加「僅 Web」徽標, 與「僅桌面版」同一套樣式",
+      "其它: 建置工具鏈升級到 Vite 8 (Rolldown) 與 TypeScript 5.9, 前端建置耗時從約 26 秒降到約 2 秒"
     ],
     "en": [
-      "New features: Chinese Pinyin gained ruby annotation (pinyin in small type above each character, switchable to plain pinyin text, converted as a whole so heteronyms keep their context); CSS Colors gained bead and floss palettes (MARD / COCO / Artkal / Perler / Hama / DMC) grouped by series",
-      "Improvements: colour-code labels are drawn in the inverse colour so dark and mid tones stay readable; the Metronome counts down 3–10 seconds with a preparatory beat each second; Latitude / Longitude shows its examples as coloured tags at the top; the four codec tools got proper button spacing; Gzip fields fill the width; SM9 renamed Key Generation to Key Management",
-      "Fixes: Latitude / Longitude hid the whole result area when the input was empty — all four formats now always show"
+      "New apps: BOM Check, Pixel Art, Mind Map, Metronome, Screen Recorder (Web only) and QR Code Reader (tools 134 → 140)",
+      "New features: App Center cards mark Web-only tools with a “Web only” badge matching the existing “Desktop only” style",
+      "Also: the toolchain moved to Vite 8 (Rolldown) and TypeScript 5.9, cutting the renderer build from about 26 seconds to about 2"
     ]
   },
-  "V2.22.1": {
+  "V2.17.1": {
     "zh": [
-      "新增功能: 思维导图支持整页全屏, 参数改下拉选择, 三个导出按钮合并为「导出图片」(SVG / PNG / WebP); 即时渲染 Markdown 支持全屏; 六个换算页新增常用预设彩色标签; ASCII 文字字体选择改为弹窗 (可预览 289 款字体, 带搜索与首字母筛选); SM9 加解密合并为单页 (用户 ID 只读, 设置页可按 ID 生成密钥); IP 转换的结果区常驻",
-      "体验改进: 七个换算工具改用 bignumber.js 精确计算, 消除浮点误差; Cisco Type 7 更名为 Cisco Type 7 加解密并统一为上下双框布局; 15 个加解密工具按钮增加间距",
-      "问题修复: 换算页预设标签与单位挤在同一行、标签文案冗余; 官网下载卡片在手机端 4 列挤压"
+      "体验改进: 侧边栏宽度可拖动调整 (180~420 px, 宽度自动记忆, 双击分隔条恢复默认, 聚焦后可用 ← / → 微调), 收起时自动隐藏; 设置中心新增「侧边栏宽度」滑杆, 调整立即生效"
     ],
     "tw": [
-      "新增功能: 思維導圖支援整頁全螢幕, 參數改下拉選擇, 三個匯出按鈕合併為「匯出圖片」(SVG / PNG / WebP); 即時渲染 Markdown 支援全螢幕; 六個換算頁新增常用預設彩色標籤; ASCII 文字字型選擇改為彈窗 (可預覽 289 款字型, 帶搜尋與首字母篩選); SM9 加解密合併為單頁 (使用者 ID 唯讀, 設定頁可依 ID 產生金鑰); IP 轉換的結果區常駐",
-      "體驗改進: 七個換算工具改用 bignumber.js 精確計算, 消除浮點誤差; Cisco Type 7 更名為 Cisco Type 7 加解密並統一為上下雙框版面; 15 個加解密工具按鈕增加間距",
-      "問題修正: 換算頁預設標籤與單位擠在同一行、標籤文案冗餘; 官網下載卡片在手機端 4 欄擠壓"
+      "體驗改進: 側邊欄寬度可拖曳調整 (180~420 px, 寬度自動記憶, 雙擊分隔列恢復預設, 聚焦後可用 ← / → 微調), 收起時自動隱藏; 設定中心新增「側邊欄寬度」滑桿, 調整立即生效"
     ],
     "en": [
-      "New features: Mind Map gained a full-page fullscreen mode, dropdown parameters and a single Export Image button offering SVG / PNG / WebP; Instant Markdown gained fullscreen; the six converters got one-click preset tags; ASCII Art picks fonts from a dialog previewing all 289 figlet fonts with search and first-letter filters; SM9 merged its encrypt / decrypt tabs into one page with a read-only user ID; IP Converter keeps its result area visible",
-      "Improvements: the seven unit converters use bignumber.js for exact arithmetic, removing floating-point drift; Cisco Type 7 became Cisco Type 7 Cipher with the same two-box layout as the other ciphers; 15 cipher tools got button spacing",
-      "Fixes: preset tags collided with units on the converter pages, tag labels were redundant, and the website download cards squeezed into four columns on phones"
+      "Improvements: the sidebar width can be dragged (180–420 px, remembered across launches, double-click the splitter to reset, arrow keys to nudge) and hides itself when collapsed; Settings gained a matching Sidebar width slider that applies immediately"
     ]
   },
-  "V2.22.0": {
+  "V2.17.0": {
     "zh": [
-      "新增应用: 祖冲之序列密码 (国密 ZUC, Rust + WebAssembly, 纯本机计算)、聊天生成器 (9 种平台风格, 文字 / 图片 / 语音 / 时间四类消息可排序, 导出 PNG)",
-      "新增功能: 聊天生成器支持微信专属红包 / 转账卡片 (切到其他平台自动退化为纯文字), 免打扰开关与按平台区分的标题栏",
-      "问题修复: 聊天生成器预览外框黑边过大、iOS / 安卓风格切换看不出差异、深色模式下消息行底色刺眼、电量配色规则"
+      "新增功能: 新增 SM9 加解密 (国密标识密码, GmSSL 编译为 WebAssembly, 本机生成主密钥对、按用户 ID 提取私钥并完成加密解密 / 签名验签); JWT 编解码器新增「生成」页签 (HS256 / HS384 / HS512 与 none, 可编辑 Header / Payload 并一键写入 iat / exp)",
+      "体验改进: JWT 编解码器改为「解析 / 生成」双页签; 应用中心支持搜索 (按应用名 / 目录名 / 分类名, 多关键词为「与」关系, 无匹配时给出空状态)"
     ],
     "tw": [
-      "新增應用: 祖沖之序列密碼 (國密 ZUC, Rust + WebAssembly, 純本機計算)、聊天產生器 (9 種平台風格, 文字 / 圖片 / 語音 / 時間四類訊息可排序, 匯出 PNG)",
-      "新增功能: 聊天產生器支援微信專屬紅包 / 轉帳卡片 (切到其他平台自動退化為純文字), 勿擾開關與依平台區分的標題列",
-      "問題修正: 聊天產生器預覽外框黑邊過大、iOS / 安卓風格切換看不出差異、深色模式下訊息列底色刺眼、電量配色規則"
+      "新增功能: 新增 SM9 加解密 (國密標識密碼, GmSSL 編譯為 WebAssembly, 本機產生主金鑰對、依使用者 ID 擷取私鑰並完成加解密 / 簽章驗章); JWT 編解碼器新增「產生」頁籤 (HS256 / HS384 / HS512 與 none, 可編輯 Header / Payload 並一鍵寫入 iat / exp)",
+      "體驗改進: JWT 編解碼器改為「解析 / 產生」雙頁籤; 應用中心支援搜尋 (依應用名 / 目錄名 / 分類名, 多關鍵字為「且」關係, 無符合時給出空狀態)"
     ],
     "en": [
-      "New apps: ZUC Cipher (the Chinese GB/T 33133 stream cipher, Rust + WebAssembly, computed locally) and Chat Generator (nine platform styles, four message kinds that can be reordered, PNG export)",
-      "New features: Chat Generator supports WeChat-only red packet and transfer cards (they degrade to plain text on other platforms), a do-not-disturb switch and per-platform title bars",
-      "Fixes: oversized black borders in the Chat Generator preview, indistinguishable iOS / Android styles, glaring message rows in dark mode and the battery colour rules"
+      "New features: SM9 Cipher (the Chinese identity-based scheme, GmSSL compiled to WebAssembly: generate master key pairs, extract a user key from an ID and encrypt / decrypt or sign / verify locally) and a Generate tab in JWT Codec (HS256 / HS384 / HS512 and none, editable header and payload, one-click iat / exp)",
+      "Improvements: JWT Codec now splits into Decode and Generate tabs, and the App Center gained a search box (app name, folder name or category, space-separated terms are ANDed, with an empty state when nothing matches)"
     ]
   }
 }
