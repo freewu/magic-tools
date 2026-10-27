@@ -12,11 +12,13 @@ import {
 } from '@ant-design/icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  BUTTON_LABELS, DEFAULT_KEYS, ROM_ACCEPT, SEGA_BUTTONS, SEGA_CSS, type SegaButton,
+  BUTTON_IDS, BUTTON_LABELS, DEFAULT_KEYS, PAD_DPAD_GRID, PAD_FACE_ROWS, PAD_SYSTEM, ROM_ACCEPT, SEGA_BUTTONS, SEGA_CSS,
+  type SegaButton,
 } from './data';
 import {
   coreLabelOf, coreOfRomName, formatFileSize, getDefaultOptions, getKeys, isCustomKeys, isRomFileName, keyLabelOf,
-  keyOwner, keysToIds, parsePlayerMessage, pickRomFile, playerUrl, resetKeys, setKeys, type SegaKeys,
+  keyOwner, keysToIds, padOpacityToAlpha, parsePlayerMessage, pickRomFile, playerUrl, resetKeys, setKeys,
+  type SegaKeys,
 } from './lib';
 import { u, uT } from './lang';
 import SegaEmulatorIntro from './intro';
@@ -33,6 +35,8 @@ type FullscreenDocument = Document & {
 type PlayerWindow = Window & {
   __mtStartRom?: (file: File) => void;
   __mtSetKeys?: (ids: Record<string, number>) => void;
+  /** 游戏层虚拟按键: 直接把按下 / 松开喂给模拟核心 */
+  __mtInput?: (id: number, down: boolean) => void;
 };
 
 /** 错误提示: 标题固定, 细节来自播放器页 (没有细节时给默认文案) */
@@ -56,6 +60,8 @@ const SegaEmulator: React.FC = () => {
   const [ romName, setRomName ] = useState('');
   const [ frameSrc, setFrameSrc ] = useState('');
   const [ frameKey, setFrameKey ] = useState(0);
+  // 游戏层虚拟按键的按下状态 (键盘 / 手柄 / 触屏都会点亮): 用编号做 key, 与 EmulatorJS 对齐
+  const [ pressed, setPressed ] = useState<Record<number, boolean>>({});
   // 键位: 点一下按键 -> 按新键; 存本机, 并实时推给播放器页 (游戏运行中也能改)
   const [ keys, setKeysState ] = useState<SegaKeys>(() => getKeys());
   const [ binding, setBinding ] = useState<SegaButton | null>(null);
@@ -72,6 +78,19 @@ const SegaEmulator: React.FC = () => {
   const keysRef = useRef(keys);
   keysRef.current = keys;
   const keysGridRef = useRef<HTMLDivElement | null>(null);
+  const pressedRef = useRef<Record<number, boolean>>({});
+
+  /** 记录某个按键的按下状态 (状态没变直接跳过, 避免无意义重渲染) */
+  const markPressed = useCallback((id: number, down: boolean) => {
+    if (pressedRef.current[id] === down) return;
+    pressedRef.current = { ...pressedRef.current, [id]: down };
+    setPressed(pressedRef.current);
+  }, []);
+
+  const clearPressed = useCallback(() => {
+    pressedRef.current = {};
+    setPressed(pressedRef.current);
+  }, []);
 
   /** 写本机并同步给正在跑的模拟器 (没启动时只是更新 iframe 里的备用键位) */
   const applyKeys = useCallback((next: SegaKeys) => {
@@ -121,6 +140,7 @@ const SegaEmulator: React.FC = () => {
     romFileRef.current = file;
     setError(null);
     setPhase('loading');
+    clearPressed();
     setRomFile(file);
     setRomName(file.name);
     setFrameSrc(playerUrl({
@@ -187,13 +207,15 @@ const SegaEmulator: React.FC = () => {
       } else if (msg.kind === 'error') {
         setPhase('ready');
         setPlayerError(msg.message || u(localeRef.current, '模拟核心载入失败, 请刷新页面重试'));
+      } else if (msg.kind === 'input') {
+        markPressed(msg.id, msg.down);
       } else {
         loadFileRef.current(msg.file);
       }
     };
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
-  }, []);
+  }, [ markPressed ]);
 
   // 全屏状态跟随浏览器 (含 Esc 退出 / 模拟器内部按钮)
   useEffect(() => {
@@ -258,6 +280,7 @@ const SegaEmulator: React.FC = () => {
     if (!romFileRef.current) return;
     setPhase('loading');
     setError(null);
+    clearPressed();
     setFrameKey((k) => k + 1);
   };
 
@@ -278,6 +301,65 @@ const SegaEmulator: React.FC = () => {
       closable
       onClose={ () => setError(null) }
     />
+  ) : null;
+
+  /** 游戏层虚拟按键: 触摸 / 鼠标按下时直接把输入喂给模拟核心 (同源 iframe) */
+  const pressPad = (btn: SegaButton, down: boolean) => {
+    const win = (frameRef.current?.contentWindow ?? null) as PlayerWindow | null;
+    win?.__mtInput?.(BUTTON_IDS[btn], down);
+    markPressed(BUTTON_IDS[btn], down);
+  };
+
+  const padButton = (btn: SegaButton, wide = false) => {
+    const id = BUTTON_IDS[btn];
+    const down = pressed[id] === true;
+    return (
+      <button
+        key={ btn }
+        type="button"
+        className={ `sega-pad-btn${wide ? ' is-wide' : ''}${down ? ' is-down' : ''}` }
+        data-testid={ `sega-pad-${btn}` }
+        aria-label={ BUTTON_LABELS[btn] }
+        aria-pressed={ down }
+        onPointerDown={ (e) => {
+          e.preventDefault();
+          (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+          pressPad(btn, true);
+        } }
+        onPointerUp={ (e) => {
+          (e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId);
+          pressPad(btn, false);
+        } }
+        onPointerCancel={ () => pressPad(btn, false) }
+        onLostPointerCapture={ () => pressPad(btn, false) }
+        onContextMenu={ (e) => e.preventDefault() }
+      >
+        { BUTTON_LABELS[btn] }
+      </button>
+    );
+  };
+
+  /** 游戏层虚拟按键浮层 (半透明, 透明度可在设置里调; 键盘 / 手柄 / 触屏按下都会亮起) */
+  const padNode = romFile && optsRef.current.showPad ? (
+    <div
+      className="sega-pad"
+      style={ { opacity: padOpacityToAlpha(optsRef.current.padOpacity) } }
+      data-testid="sega-pad"
+    >
+      <div className="sega-pad-cluster sega-pad-dpad">
+        { PAD_DPAD_GRID.map((btn, i) => (btn ? padButton(btn) : <span key={ `gap-${i}` } />)) }
+      </div>
+      <div className="sega-pad-cluster sega-pad-faces">
+        { PAD_FACE_ROWS.map((row) => (
+          <div className="sega-pad-row" key={ row.join('') }>
+            { row.map((btn) => padButton(btn)) }
+          </div>
+        )) }
+        <div className="sega-pad-row">
+          { PAD_SYSTEM.map((btn) => padButton(btn, true)) }
+        </div>
+      </div>
+    </div>
   ) : null;
 
   const stageNode = romFile ? (
@@ -358,6 +440,7 @@ const SegaEmulator: React.FC = () => {
               data-testid="sega-stage"
             >
               { stageNode }
+              { padNode }
             </div>
             { phase !== 'running' ? (
               <Text type="secondary" style={ { fontSize: 12 } }>
@@ -421,6 +504,9 @@ const SegaEmulator: React.FC = () => {
             </Text>
             <Text type="secondary" style={ { fontSize: 12 } }>
               { t('触屏设备请用画面上的虚拟手柄; 外接手柄无需设置, 可以与键盘同时使用') }
+            </Text>
+            <Text type="secondary" style={ { fontSize: 12 } }>
+              { t('画面上的半透明按键可用鼠标 / 触屏点, 也可在「设置 → 游戏 → Sega 模拟器」里关掉或调整透明度') }
             </Text>
           </Space>
         </Card>

@@ -18,6 +18,7 @@ const zh = `<h2>这个工具做什么</h2>
 <li><p>键盘: 默认 <b>方向键</b> 十字键, <b>Z / X / C</b> 对应 A / B / C, <b>A / S / D</b> 对应 X / Y / Z, <b>Enter</b> = Start, <b>V</b> = Mode</p></li>
 <li><p><b>按键配置</b>: 画面下方的「按键配置」区点一下某个按键, 再按键盘上的新键即可重绑 (按 <b>Esc</b> 取消); 改完<b>立刻生效</b>, 游戏运行中也能改, 设置存在本机, 下次打开还在。点「恢复默认」一键还原。同一个键不能分配给两个按键</p></li>
 <li><p>手机 / 平板: 触摸屏会自动出现<b>虚拟按键</b>; 也可在底部菜单里换成外接手柄</p></li>
+<li><p><b>游戏层虚拟按键</b>: 画面上直接浮着一层<b>半透明按键</b> (左侧十字键, 右侧 X / Y / Z + A / B / C, 底部 Mode / Start), 鼠标或手指按下去就会传给游戏; <b>键盘 / 手柄按下时对应按键会同步缩放高亮</b>。透明度可在 <b>设置 → 游戏 → Sega 模拟器</b> 里调 (20%~100%), 不想看可以整个关掉</p></li>
 <li><p>插上 <b>USB / 蓝牙手柄</b> 后无需设置, 在底部菜单「控制器」里确认映射即可</p></li>
 <li><p><b>全屏</b>: 用页面右上角的全屏按钮, 或用模拟器底部菜单的全屏按钮 (全屏后按 <b>Esc</b> 退出)</p></li>
 </ul>
@@ -56,6 +57,7 @@ const tw = `<h2>這個工具做什麼</h2>
 <li><p>鍵盤: 預設 <b>方向鍵</b> 十字鍵, <b>Z / X / C</b> 對應 A / B / C, <b>A / S / D</b> 對應 X / Y / Z, <b>Enter</b> = Start, <b>V</b> = Mode</p></li>
 <li><p><b>按鍵設定</b>: 畫面下方的「按鍵設定」區點一下某個按鍵, 再按鍵盤上的新鍵即可重綁 (按 <b>Esc</b> 取消); 改完<b>立刻生效</b>, 遊戲執行中也能改, 設定存在本機, 下次開啟還在。點「恢復預設」一鍵還原。同一個鍵不能分配給兩個按鍵</p></li>
 <li><p>手機 / 平板: 觸控螢幕會自動出現<b>虛擬按鍵</b>; 也可在底部選單裡換成外接手把</p></li>
+<li><p><b>遊戲層虛擬按鍵</b>: 畫面上直接浮著一層<b>半透明按鍵</b> (左側十字鍵, 右側 X / Y / Z + A / B / C, 底部 Mode / Start), 滑鼠或手指按下去就會傳給遊戲; <b>鍵盤 / 手把按下時對應按鍵會同步縮放高亮</b>。透明度可在 <b>設定 → 遊戲 → Sega 模擬器</b> 裡調 (20%~100%), 不想看可以整個關掉</p></li>
 <li><p>插上 <b>USB / 藍牙手把</b> 後無需設定, 在底部選單「控制器」裡確認對應即可</p></li>
 <li><p><b>全螢幕</b>: 用頁面右上角的全螢幕按鈕, 或用模擬器底部選單的全螢幕按鈕 (全螢幕後按 <b>Esc</b> 退出)</p></li>
 </ul>
@@ -94,6 +96,7 @@ const en = `<h2>What this does</h2>
 <li><p>Keyboard: <b>arrow keys</b> for the D-pad, <b>Z / X / C</b> for A / B / C, <b>A / S / D</b> for X / Y / Z, <b>Enter</b> = Start, <b>V</b> = Mode</p></li>
 <li><p><b>Button mapping</b>: in the panel below the screen click a button, then press the new key (<b>Esc</b> cancels). Changes take effect <b>immediately</b>, even mid-game, and are saved on this device. “Reset to default” restores the defaults. One key cannot drive two buttons</p></li>
 <li><p>Phones and tablets get <b>on-screen buttons</b> automatically; an external pad can be selected in the bottom menu</p></li>
+<li><p><b>Pad over the game</b>: a translucent layer of buttons sits on the picture (D-pad on the left, X / Y / Z + A / B / C on the right, Mode / Start at the bottom). Click or touch them and the input reaches the game, while <b>keyboard / gamepad presses light the matching button up</b>. Tune the opacity (20%–100%) or turn the layer off under <b>Settings → Games → Sega Emulator</b></p></li>
 <li><p>Plug in a <b>USB / Bluetooth gamepad</b> — no setup needed, just confirm the mapping under “Control Settings”</p></li>
 <li><p><b>Fullscreen</b>: use the button next to the title or the one in the bottom menu (<b>Esc</b> leaves fullscreen)</p></li>
 </ul>

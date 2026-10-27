@@ -764,6 +764,11 @@ const ROWS: Record<string, Row> = {
     '進入模擬器時的音量, 也可在模擬器底部選單裡隨時調整',
     'Volume the emulator starts at — also adjustable from its bottom menu',
   ],
+  '显示游戏层虚拟按键': ['顯示遊戲層虛擬按鍵', 'On-screen pad over the game'],
+  '在画面上浮出半透明按键, 触屏可直接当手柄用; 键盘 / 手柄按下会同步高亮': [
+    '在畫面上浮出半透明按鍵, 觸屏可直接當手把用; 鍵盤 / 手把按下會同步高亮',
+    'Floats semi-transparent buttons over the picture — works as a touch pad, and keyboard / gamepad presses highlight too',
+  ],
   '启动后自动全屏': ['啟動後自動全螢幕', 'Start in fullscreen'],
   '选好 ROM 后立刻进入全屏 (手机 / 平板建议开启)': [
     '選好 ROM 後立刻進入全螢幕 (手機 / 平板建議開啟)',

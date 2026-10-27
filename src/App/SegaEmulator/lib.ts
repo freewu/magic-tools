@@ -1,22 +1,28 @@
 // Sega 模拟器: 选项读写 / ROM 文件名解析 / 播放器页 URL / 消息解析等纯逻辑
 // 页面 (index.tsx) 只做渲染与副作用, 这里全部是可直接单测的纯函数
 import {
-  BUTTON_IDS, CORE_BY_EXT, CORE_LABELS, DEFAULT_CORE, DEFAULT_KEYS, KEYS_STORAGE_KEY, MSG_ERROR, MSG_LOADING, MSG_READY,
-  MSG_ROM_FILE, MSG_STARTED, PLAYER_PAGE, ROM_EXTENSIONS, SEGA_BUTTONS, SETTINGS_STORAGE_KEY, VOLUME_DEFAULT, VOLUME_MAX,
-  VOLUME_MIN, type SegaButton,
+  BUTTON_IDS, CORE_BY_EXT, CORE_LABELS, DEFAULT_CORE, DEFAULT_KEYS, KEYS_STORAGE_KEY, MSG_ERROR, MSG_INPUT, MSG_LOADING,
+  MSG_READY, MSG_ROM_FILE, MSG_STARTED, PAD_OPACITY_DEFAULT, PAD_OPACITY_MAX, PAD_OPACITY_MIN, PAD_SHOW_DEFAULT, PLAYER_PAGE,
+  ROM_EXTENSIONS, SEGA_BUTTONS, SETTINGS_STORAGE_KEY, VOLUME_DEFAULT, VOLUME_MAX, VOLUME_MIN, type SegaButton,
 } from './data';
 
-/** 模拟器选项 (设置中心「默认音量 / 启动后自动全屏」) */
+/** 模拟器选项 (设置中心「默认音量 / 启动后自动全屏 / 游戏层按键」) */
 export type SegaOptions = {
   /** 默认音量 (0~100) */
   volume: number;
   /** 选择 ROM 后自动进入全屏 */
   autoFullscreen: boolean;
+  /** 是否在画面 (游戏层) 上浮出半透明虚拟按键 */
+  showPad: boolean;
+  /** 虚拟按键透明度 (20~100, 越小越透) */
+  padOpacity: number;
 };
 
 export const DEFAULT_OPTIONS: SegaOptions = {
   volume: VOLUME_DEFAULT,
   autoFullscreen: false,
+  showPad: PAD_SHOW_DEFAULT,
+  padOpacity: PAD_OPACITY_DEFAULT,
 };
 
 /** 任意输入 -> 合法音量 (非法值回退默认, 越界 clamp) */
@@ -26,10 +32,22 @@ export const normalizeVolume = (value: unknown): number => {
   return Math.min(VOLUME_MAX, Math.max(VOLUME_MIN, Math.round(num)));
 };
 
+/** 任意输入 -> 合法的虚拟按键透明度 (非法值回退默认, 越界 clamp) */
+export const normalizePadOpacity = (value: unknown): number => {
+  const num = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(num)) return PAD_OPACITY_DEFAULT;
+  return Math.min(PAD_OPACITY_MAX, Math.max(PAD_OPACITY_MIN, Math.round(num)));
+};
+
+/** 透明度 (20~100) -> CSS opacity (0.2~1), 下限保证还看得见 */
+export const padOpacityToAlpha = (value: unknown): number => normalizePadOpacity(value) / 100;
+
 /** 任意输入 -> 完整合法的选项 */
 export const normalizeOptions = (raw?: Partial<SegaOptions> | null): SegaOptions => ({
   volume: raw?.volume === undefined ? DEFAULT_OPTIONS.volume : normalizeVolume(raw.volume),
   autoFullscreen: raw?.autoFullscreen === undefined ? DEFAULT_OPTIONS.autoFullscreen : raw.autoFullscreen === true,
+  showPad: raw?.showPad === undefined ? DEFAULT_OPTIONS.showPad : raw.showPad === true,
+  padOpacity: raw?.padOpacity === undefined ? DEFAULT_OPTIONS.padOpacity : normalizePadOpacity(raw.padOpacity),
 });
 
 /** 读取默认设置 (非法值 / 读取失败一律回退默认) */
@@ -239,7 +257,9 @@ export type PlayerMessage =
   | { kind: 'ready'; name: string }
   | { kind: 'started'; name: string }
   | { kind: 'error'; message: string }
-  | { kind: 'rom-file'; file: File };
+  | { kind: 'rom-file'; file: File }
+  /** 手柄按键按下 / 松开 (游戏层虚拟按键的动效靠它; id 为 EmulatorJS 的按钮编号) */
+  | { kind: 'input'; id: number; down: boolean };
 
 /** 是否像 File (跨 realm 时 instanceof 会失效, 用字段判断) */
 export const isFileLike = (value: unknown): value is File => {
@@ -251,7 +271,12 @@ export const isFileLike = (value: unknown): value is File => {
 /** 解析播放器页发来的消息 (非法消息返回 null) */
 export const parsePlayerMessage = (data: unknown): PlayerMessage | null => {
   if (typeof data !== 'object' || data === null) return null;
-  const msg = data as { type?: unknown; name?: unknown; message?: unknown; file?: unknown };
+  const msg = data as { type?: unknown; name?: unknown; message?: unknown; file?: unknown; id?: unknown; down?: unknown };
+  if (msg.type === MSG_INPUT) {
+    const id = Number(msg.id);
+    if (!Number.isInteger(id) || id < 0) return null;
+    return { kind: 'input', id, down: msg.down === true };
+  }
   if (msg.type === MSG_LOADING) return { kind: 'loading', name: String(msg.name ?? '') };
   if (msg.type === MSG_READY) return { kind: 'ready', name: String(msg.name ?? '') };
   if (msg.type === MSG_STARTED) return { kind: 'started', name: String(msg.name ?? '') };

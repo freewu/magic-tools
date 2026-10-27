@@ -134,6 +134,27 @@
     }
   };
 
+  // 按键动效: 键盘 / 手柄 / 播放器自带的触屏按键, 最终都会走 gameManager.simulateInput,
+  // 在这里挂一层, 把「按下 / 松开」回报给父页面 (状态没变化就不发, 避免手柄轴每帧刷消息)
+  var inputState = {};
+  var hookInput = function () {
+    var emu = window.EJS_emulator;
+    var gm = emu && emu.gameManager;
+    if (!gm || typeof gm.simulateInput !== 'function' || gm.__mtHooked) return;
+    var nativeSim = gm.simulateInput.bind(gm);
+    gm.simulateInput = function (player, button, value) {
+      if (player === 0) {
+        var down = !!value;
+        if (inputState[button] !== down) {
+          inputState[button] = down;
+          notify({ type: 'sega-input', id: button, down: down });
+        }
+      }
+      return nativeSim(player, button, value);
+    };
+    gm.__mtHooked = true;
+  };
+
   var dataPath = new URL('./data/', location.href).href;
   var text = HINT[language] || HINT['zh-CN'];
   var hintElem = document.getElementById('mt-hint');
@@ -226,6 +247,7 @@
         // 顺带在这里应用父页面给的键位 (EmulatorJS 在 start 之前刚读完自己存的映射, 这里覆盖才有效)
         emu.on('start', function () {
           applyKeys();
+          hookInput();
           notify({ type: 'sega-started', name: gameName });
         });
         // 核心下载 / 初始化是异步的, 真报错走它自己的 startGameError; 这里包一层回报给父页面
@@ -251,6 +273,14 @@
   window.__mtSetKeys = function (next) {
     keyMap = next && typeof next === 'object' ? next : null;
     applyKeys();
+  };
+
+  /** 由父页面调用 (同源): 游戏层虚拟按键被按下 / 松开时, 直接喂给模拟核心 */
+  window.__mtInput = function (id, down) {
+    var emu = window.EJS_emulator;
+    var gm = emu && emu.gameManager;
+    if (!gm || typeof gm.simulateInput !== 'function') return;
+    gm.simulateInput(0, Number(id), down ? 1 : 0);
   };
 
   // 拖到本页 (iframe) 上的 ROM: 交给父页面重新挂载 iframe 再载入

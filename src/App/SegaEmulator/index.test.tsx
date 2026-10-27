@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import SegaEmulator from './index';
-import { DEFAULT_KEYS, KEYS_STORAGE_KEY } from './data';
+import { DEFAULT_KEYS, KEYS_STORAGE_KEY, SETTINGS_STORAGE_KEY } from './data';
 
 // app-context 依赖 App/index.tsx 的顶层 await + import.meta.glob (jest commonjs 不支持), 故打桩
 jest.mock('../../hook/app-context', () => ({
@@ -24,6 +24,11 @@ const postFromPlayer = (data: unknown, source?: unknown) => {
 
 /** 当前渲染出来的键位 (data-testid -> 显示文本) */
 const keyText = (btn: string) => screen.getByTestId(`sega-key-${btn}`).textContent ?? '';
+
+/** 用 MouseEvent 冒充 pointer 事件 (jsdom 没有 PointerEvent) */
+const pointer = (el: Element, type: 'pointerdown' | 'pointerup', pointerId = 1) => {
+  fireEvent(el, new MouseEvent(type, { bubbles: true, cancelable: true, button: 0 } as MouseEventInit));
+};
 
 /** 绑定一个键: 点按键进入待绑定, 再按键盘上的新键 */
 const bindKey = (btn: string, code: number, key = 'k') => {
@@ -297,6 +302,81 @@ describe('Sega 模拟器页面', () => {
     bindKey('Start', 32, ' ');
     expect(push).toHaveBeenCalledTimes(1);
     expect(push.mock.calls[0][0]['3']).toBe(32);
+  });
+
+  test('游戏层虚拟按键: 选好 ROM 后浮出 12 个半透明按键, 默认不透明度 70%', async () => {
+    render(<SegaEmulator />);
+    // 还没选 ROM 时不浮出
+    expect(screen.queryByTestId('sega-pad')).not.toBeInTheDocument();
+
+    pick(fileOf('sonic.md'));
+    await screen.findByTestId('sega-frame');
+
+    const pad = screen.getByTestId('sega-pad');
+    expect(pad.style.opacity).toBe('0.7');
+    // 十字键 + 6 个动作键 + Mode / Start
+    [ 'Up', 'Down', 'Left', 'Right', 'A', 'B', 'C', 'X', 'Y', 'Z', 'Start', 'Mode' ].forEach((btn) => {
+      expect(screen.getByTestId(`sega-pad-${btn}`)).toBeInTheDocument();
+    });
+    // 动作键按真机丝印排列
+    expect(screen.getByTestId('sega-pad-X')).toHaveTextContent('X');
+    expect(screen.getByTestId('sega-pad-Up')).toHaveTextContent('上');
+  });
+
+  test('游戏层虚拟按键: 透明度 / 开关跟随设置', async () => {
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify({ padOpacity: 35 }));
+    render(<SegaEmulator />);
+    pick(fileOf('sonic.md'));
+    await screen.findByTestId('sega-frame');
+    expect(screen.getByTestId('sega-pad').style.opacity).toBe('0.35');
+
+    // 关掉开关后不再浮出
+    cleanup();
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify({ showPad: false }));
+    render(<SegaEmulator />);
+    pick(fileOf('bare.md'));
+    await screen.findByTestId('sega-frame');
+    expect(screen.queryByTestId('sega-pad')).not.toBeInTheDocument();
+  });
+
+  test('游戏层虚拟按键: 播放器页回报按下 / 松开时点亮对应按键', async () => {
+    render(<SegaEmulator />);
+    pick(fileOf('sonic.md'));
+    const frame = (await screen.findByTestId('sega-frame')) as HTMLIFrameElement;
+
+    // 编号 0 = B (键盘按下 B 时由播放器页上报)
+    postFromPlayer({ type: 'sega-input', id: 0, down: true }, frame.contentWindow);
+    const b = screen.getByTestId('sega-pad-B');
+    expect(b.className).toContain('is-down');
+    expect(b).toHaveAttribute('aria-pressed', 'true');
+
+    postFromPlayer({ type: 'sega-input', id: 0, down: false }, frame.contentWindow);
+    expect(screen.getByTestId('sega-pad-B').className).not.toContain('is-down');
+
+    // 重新开始后清空点亮状态
+    postFromPlayer({ type: 'sega-input', id: 4, down: true }, frame.contentWindow);
+    expect(screen.getByTestId('sega-pad-Up').className).toContain('is-down');
+    fireEvent.click(screen.getByRole('button', { name: /重新开始/ }));
+    expect(screen.getByTestId('sega-pad-Up').className).not.toContain('is-down');
+  });
+
+  test('游戏层虚拟按键: 鼠标 / 手指按下会把输入喂给模拟器', async () => {
+    render(<SegaEmulator />);
+    pick(fileOf('sonic.md'));
+    const frame = (await screen.findByTestId('sega-frame')) as HTMLIFrameElement;
+
+    const input = jest.fn();
+    (frame.contentWindow as unknown as { __mtInput: jest.Mock }).__mtInput = input;
+
+    const a = screen.getByTestId('sega-pad-A');
+    pointer(a, 'pointerdown');
+    // 编号 1 = A (对齐 EmulatorJS 的 RetroArch 布局)
+    expect(input).toHaveBeenCalledWith(1, true);
+    expect(screen.getByTestId('sega-pad-A').className).toContain('is-down');
+
+    pointer(a, 'pointerup');
+    expect(input).toHaveBeenCalledWith(1, false);
+    expect(screen.getByTestId('sega-pad-A').className).not.toContain('is-down');
   });
 
   test('鼠标拖动经过舞台时高亮拖放区', () => {

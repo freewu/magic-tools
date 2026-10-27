@@ -2,22 +2,26 @@
 import {
   DEFAULT_OPTIONS, coreLabelOf, coreOfRomName, extOf, formatFileSize, getDefaultOptions, getKeys, isCustomKeys,
   isFileLike, isRomFileName, keyLabelOf, keyOwner, keysParam, keysToIds, normalizeKeys, normalizeOptions,
-  normalizeVolume, parsePlayerMessage, patchDefaultOptions, pickRomFile, playerLang, playerUrl, resetKeys,
-  romBaseName, setDefaultOptions, setKeys,
+  normalizePadOpacity, normalizeVolume, padOpacityToAlpha, parsePlayerMessage, patchDefaultOptions, pickRomFile,
+  playerLang, playerUrl, resetKeys, romBaseName, setDefaultOptions, setKeys,
 } from './lib';
 import {
-  BUTTON_IDS, DEFAULT_KEYS, KEYS_STORAGE_KEY, SEGA_BUTTONS, SETTINGS_STORAGE_KEY, VOLUME_DEFAULT, VOLUME_MAX,
+  BUTTON_IDS, DEFAULT_KEYS, KEYS_STORAGE_KEY, PAD_OPACITY_DEFAULT, PAD_OPACITY_MAX, PAD_OPACITY_MIN, SEGA_BUTTONS,
+  SETTINGS_STORAGE_KEY, VOLUME_DEFAULT, VOLUME_MAX,
 } from './data';
 
 beforeEach(() => {
   localStorage.clear();
 });
 
-describe('选项 (默认音量 / 启动后自动全屏)', () => {
+describe('选项 (默认音量 / 自动全屏 / 游戏层按键)', () => {
   test('未设置过时使用默认值', () => {
     expect(getDefaultOptions()).toEqual(DEFAULT_OPTIONS);
     expect(DEFAULT_OPTIONS.volume).toBe(VOLUME_DEFAULT);
     expect(DEFAULT_OPTIONS.autoFullscreen).toBe(false);
+    // 游戏层虚拟按键默认开着, 默认 70% 不透明度
+    expect(DEFAULT_OPTIONS.showPad).toBe(true);
+    expect(DEFAULT_OPTIONS.padOpacity).toBe(PAD_OPACITY_DEFAULT);
   });
 
   test('音量越界 clamp, 非法值回退默认', () => {
@@ -32,10 +36,27 @@ describe('选项 (默认音量 / 启动后自动全屏)', () => {
 
   test('normalizeOptions 补全缺失字段', () => {
     expect(normalizeOptions(null)).toEqual(DEFAULT_OPTIONS);
-    expect(normalizeOptions({ volume: 10 })).toEqual({ volume: 10, autoFullscreen: false });
-    expect(normalizeOptions({ autoFullscreen: true })).toEqual({ volume: VOLUME_DEFAULT, autoFullscreen: true });
+    expect(normalizeOptions({ volume: 10 })).toEqual({ ...DEFAULT_OPTIONS, volume: 10 });
+    expect(normalizeOptions({ autoFullscreen: true })).toEqual({ ...DEFAULT_OPTIONS, autoFullscreen: true });
     // 非布尔值一律按关闭处理
     expect(normalizeOptions({ autoFullscreen: 'yes' as unknown as boolean }).autoFullscreen).toBe(false);
+    expect(normalizeOptions({ showPad: 1 as unknown as boolean }).showPad).toBe(false);
+    expect(normalizeOptions({ padOpacity: 5 }).padOpacity).toBe(PAD_OPACITY_MIN);
+  });
+
+  test('虚拟按键透明度: 越界 clamp / 非法回退 / 换算成 CSS opacity', () => {
+    expect(normalizePadOpacity(0)).toBe(PAD_OPACITY_MIN);
+    expect(normalizePadOpacity(500)).toBe(PAD_OPACITY_MAX);
+    expect(normalizePadOpacity(52.6)).toBe(53);
+    expect(normalizePadOpacity('55')).toBe(55);
+    expect(normalizePadOpacity(undefined)).toBe(PAD_OPACITY_DEFAULT);
+    expect(normalizePadOpacity('abc')).toBe(PAD_OPACITY_DEFAULT);
+    expect(normalizePadOpacity(Number.NaN)).toBe(PAD_OPACITY_DEFAULT);
+    // 默认 70 -> 0.7; 下限 20 -> 0.2 (永远看得见)
+    expect(padOpacityToAlpha(PAD_OPACITY_DEFAULT)).toBe(0.7);
+    expect(padOpacityToAlpha(PAD_OPACITY_MAX)).toBe(1);
+    expect(padOpacityToAlpha(0)).toBe(0.2);
+    expect(padOpacityToAlpha(undefined)).toBe(0.7);
   });
 
   test('存储内容损坏时回退默认', () => {
@@ -45,11 +66,16 @@ describe('选项 (默认音量 / 启动后自动全屏)', () => {
 
   test('patchDefaultOptions 只改提供的字段, 并写入 localStorage', () => {
     setDefaultOptions({ volume: 30, autoFullscreen: true });
-    expect(getDefaultOptions()).toEqual({ volume: 30, autoFullscreen: true });
+    expect(getDefaultOptions()).toEqual({ ...DEFAULT_OPTIONS, volume: 30, autoFullscreen: true });
 
     const next = patchDefaultOptions({ volume: 70 });
-    expect(next).toEqual({ volume: 70, autoFullscreen: true });
-    expect(JSON.parse(localStorage.getItem(SETTINGS_STORAGE_KEY) ?? '{}')).toEqual({ volume: 70, autoFullscreen: true });
+    expect(next).toEqual({ ...DEFAULT_OPTIONS, volume: 70, autoFullscreen: true });
+    expect(JSON.parse(localStorage.getItem(SETTINGS_STORAGE_KEY) ?? '{}'))
+      .toEqual({ ...DEFAULT_OPTIONS, volume: 70, autoFullscreen: true });
+
+    // 关掉游戏层按键后仍然可以单独调透明度
+    expect(patchDefaultOptions({ showPad: false, padOpacity: 40 }))
+      .toEqual({ ...DEFAULT_OPTIONS, volume: 70, autoFullscreen: true, showPad: false, padOpacity: 40 });
   });
 });
 
@@ -241,6 +267,17 @@ describe('播放器页消息', () => {
     const msg = parsePlayerMessage({ type: 'sega-rom-file', file });
     expect(msg?.kind).toBe('rom-file');
     expect(msg && msg.kind === 'rom-file' ? msg.file : null).toBe(file);
+  });
+
+  test('sega-input 解析按下 / 松开 (驱动游戏层按键动效)', () => {
+    expect(parsePlayerMessage({ type: 'sega-input', id: 0, down: true })).toEqual({ kind: 'input', id: 0, down: true });
+    expect(parsePlayerMessage({ type: 'sega-input', id: 11, down: false })).toEqual({ kind: 'input', id: 11, down: false });
+    // down 缺省按松开处理
+    expect(parsePlayerMessage({ type: 'sega-input', id: 4 })).toEqual({ kind: 'input', id: 4, down: false });
+    // 编号非法直接丢弃
+    expect(parsePlayerMessage({ type: 'sega-input', id: -1, down: true })).toBeNull();
+    expect(parsePlayerMessage({ type: 'sega-input', id: 'x', down: true })).toBeNull();
+    expect(parsePlayerMessage({ type: 'sega-input', down: true })).toBeNull();
   });
 
   test('无关消息 / 缺字段一律返回 null', () => {

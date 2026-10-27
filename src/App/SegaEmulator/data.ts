@@ -40,6 +40,14 @@ export const VOLUME_MIN = 0;
 export const VOLUME_MAX = 100;
 export const VOLUME_DEFAULT = 80;
 
+/** 游戏层虚拟按键: 默认是否显示 */
+export const PAD_SHOW_DEFAULT = true;
+
+/** 游戏层虚拟按键透明度范围 / 默认值 (20~100, 越小越透; 下限 20 是为了还看得见) */
+export const PAD_OPACITY_MIN = 20;
+export const PAD_OPACITY_MAX = 100;
+export const PAD_OPACITY_DEFAULT = 70;
+
 /** 设置持久化 key */
 export const SETTINGS_STORAGE_KEY = 'magic-tools-segaemulator-settings';
 
@@ -64,6 +72,28 @@ export const BUTTON_IDS: Record<SegaButton, number> = {
   B: 0, A: 1, Mode: 2, Start: 3, Up: 4, Down: 5, Left: 6, Right: 7, C: 8, Y: 9, X: 10, Z: 11,
 };
 
+/** 按钮编号 -> 按键 (播放器页只回传编号, 这里反查成按键名) */
+export const BUTTON_BY_ID: Record<number, SegaButton> = Object.entries(BUTTON_IDS).reduce(
+  (acc, [ name, id ]) => { acc[id] = name as SegaButton; return acc; },
+  {} as Record<number, SegaButton>,
+);
+
+/** 游戏层虚拟按键布局: 十字键 3×3 网格 (null = 留空) */
+export const PAD_DPAD_GRID: readonly (SegaButton | null)[] = [
+  null, 'Up', null,
+  'Left', null, 'Right',
+  null, 'Down', null,
+];
+
+/** 游戏层虚拟按键布局: 右侧动作键 (上排 XYZ / 下排 ABC, 与六键手柄一致) */
+export const PAD_FACE_ROWS: readonly (readonly SegaButton[])[] = [
+  [ 'X', 'Y', 'Z' ],
+  [ 'A', 'B', 'C' ],
+];
+
+/** 游戏层虚拟按键布局: 底部系统键 */
+export const PAD_SYSTEM: readonly SegaButton[] = [ 'Mode', 'Start' ];
+
 /** 按键显示名 (十字键用中文, 动作键用真机上的丝印) */
 export const BUTTON_LABELS: Record<SegaButton, string> = {
   Up: '上', Down: '下', Left: '左', Right: '右',
@@ -86,6 +116,8 @@ export const MSG_READY = 'sega-ready';
 export const MSG_STARTED = 'sega-started';
 export const MSG_ERROR = 'sega-error';
 export const MSG_ROM_FILE = 'sega-rom-file';
+/** 按键按下 / 松开 (驱动游戏层虚拟按键的动效) */
+export const MSG_INPUT = 'sega-input';
 
 /** 舞台 (iframe 容器) 与拖放区样式: 深浅色都用主题变量, 不写死颜色 */
 export const SEGA_CSS = `
@@ -138,6 +170,77 @@ export const SEGA_CSS = `
 .sega-drop-hint {
   font-size: 12px;
   opacity: .65;
+}
+/* 游戏层虚拟按键: 浮在画面上方 (不挡画面点击), 透明度可调, 按键按下有缩放 + 高亮动效 */
+.sega-pad {
+  --sega-pad-key: clamp(26px, 5.6vh, 52px);
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  transition: opacity .18s ease;
+}
+.sega-pad-cluster {
+  position: absolute;
+  bottom: 3%;
+  display: flex;
+  gap: 6px;
+}
+.sega-pad-dpad {
+  left: 2.4%;
+  display: grid;
+  grid-template-columns: repeat(3, var(--sega-pad-key));
+  grid-template-rows: repeat(3, var(--sega-pad-key));
+  gap: 3px;
+}
+.sega-pad-faces {
+  right: 2.4%;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.sega-pad-row {
+  display: flex;
+  gap: 6px;
+}
+.sega-pad-btn {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--sega-pad-key);
+  height: var(--sega-pad-key);
+  border: 1px solid rgba(226, 232, 240, .38);
+  border-radius: calc(var(--sega-pad-key) * .28);
+  background: rgba(15, 23, 42, .55);
+  color: #f8fafc;
+  font: 700 calc(var(--sega-pad-key) * .38)/1 inherit;
+  pointer-events: auto;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  transition: transform .07s ease, background .12s ease, box-shadow .12s ease;
+}
+.sega-pad-btn:active,
+.sega-pad-btn.is-down {
+  background: rgba(22, 119, 255, .85);
+  transform: scale(.9);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .5), 0 0 calc(var(--sega-pad-key) * .35) rgba(22, 119, 255, .8);
+}
+.sega-pad-btn.is-wide {
+  width: auto;
+  min-width: calc(var(--sega-pad-key) * 1.5);
+  height: calc(var(--sega-pad-key) * .55);
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: calc(var(--sega-pad-key) * .26);
+  letter-spacing: .04em;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sega-pad-btn {
+    transition: none;
+  }
 }
 /* 按键配置: 每格一个按钮, 点一下进入待绑定 (虚线高亮), 再按键盘上的新键 */
 .sega-keys {

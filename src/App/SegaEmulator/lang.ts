@@ -69,6 +69,11 @@ const rows: Record<string, [string, string]> = {
     '觸屏裝置請用畫面上的虛擬手柄; 外接手柄無需設定, 可以與鍵盤同時使用',
     'On touch devices use the on-screen pad; USB / Bluetooth gamepads need no setup and work alongside the keyboard',
   ],
+  // 游戏层虚拟按键
+  '画面上的半透明按键可用鼠标 / 触屏点, 也可在「设置 → 游戏 → Sega 模拟器」里关掉或调整透明度': [
+    '畫面上的半透明按鍵可用滑鼠 / 觸屏點, 也可在「設定 → 遊戲 → Sega 模擬器」裡關掉或調整透明度',
+    'The translucent buttons on the picture are clickable; turn them off or tune the opacity under Settings → Games → Sega Emulator',
+  ],
   // 设置
   '默认音量': ['預設音量', 'Default volume'],
   '进入模拟器时的音量, 也可在模拟器底部菜单里随时调整': [

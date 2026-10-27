@@ -1,6 +1,6 @@
 import { Divider, Form, Slider, Switch } from 'antd';
 import { useState } from 'react';
-import { VOLUME_MAX, VOLUME_MIN } from './data';
+import { PAD_OPACITY_DEFAULT, PAD_OPACITY_MAX, PAD_OPACITY_MIN, VOLUME_MAX, VOLUME_MIN } from './data';
 import { getDefaultOptions, patchDefaultOptions, type SegaOptions } from './lib';
 import { useLocale } from '../../hook/locale-context';
 import { row as _r } from '../Setting/rows-lang';
@@ -38,6 +38,32 @@ export const SegaEmulatorSetting: React.FC = () => {
           onChange={ (v) => patch({ autoFullscreen: v }) }
           data-testid="sega-auto-fullscreen"
         />
+      </Form.Item>
+      <Form.Item
+        label={ st('显示游戏层虚拟按键') }
+        extra={ st('在画面上浮出半透明按键, 触屏可直接当手柄用; 键盘 / 手柄按下会同步高亮') }
+      >
+        <Switch
+          checked={ opts.showPad }
+          onChange={ (v) => patch({ showPad: v }) }
+          data-testid="sega-show-pad"
+        />
+      </Form.Item>
+      <Form.Item
+        label={ st('按键透明度') }
+        extra={ st('调低可减少按键对画面的遮挡 (20% 几乎全透)') }
+      >
+        { /* antd 的 Slider 不转发 data-testid, 这里套一层容器作为定位 / 测试用的锚点 */ }
+        <div data-testid="sega-pad-opacity" style={ { maxWidth: 320 } }>
+          <Slider
+            min={ PAD_OPACITY_MIN }
+            max={ PAD_OPACITY_MAX }
+            value={ opts.padOpacity }
+            disabled={ !opts.showPad }
+            tooltip={ { formatter: (v) => `${v ?? PAD_OPACITY_DEFAULT}%` } }
+            onChange={ (v) => patch({ padOpacity: Number(v) }) }
+          />
+        </div>
       </Form.Item>
     </>
   );
