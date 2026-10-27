@@ -1,51 +1,48 @@
-// Help「使用组件」badge 数据与地址拼接
-import { compomentList, componentBadgeUrl, DEFAULT_BADGE_COLOR } from './data';
+// Help「使用组件」badge: 本地生成 shields.io 风格 SVG (data URL), 不请求网络
+import {
+  compomentList,
+  componentBadgeSrc,
+  DEFAULT_BADGE_COLOR,
+  DEFAULT_BADGE_LABEL_COLOR,
+} from './data';
+
+/** data URL -> SVG 源码 (便于断言内部结构) */
+const svgOf = (src: string) => {
+  expect(src.startsWith('data:image/svg+xml;charset=utf-8,')).toBe(true);
+  return decodeURIComponent(src.slice('data:image/svg+xml;charset=utf-8,'.length));
+};
 
 describe('Help 使用组件 badge', () => {
-  test('缺省底色 / flat-square / 深色标签, 无图标时不带 logo 参数', () => {
-    const url = componentBadgeUrl({ name: 'Vditor', version: '4.0.0', url: '' });
-    expect(url.startsWith('https://img.shields.io/badge/Vditor-4.0.0-')).toBe(true);
-    expect(url).toContain(DEFAULT_BADGE_COLOR);
-    expect(url).toContain('style=flat-square');
-    expect(url).toContain('labelColor=24292F');
-    expect(url).not.toContain('logo=');
+  test('生成 data URL, 内含组件名与版本号', () => {
+    const src = componentBadgeSrc({ name: 'Vditor', version: '4.0.0', url: '' });
+    expect(src).not.toContain('img.shields.io'); // 不再请求 shields.io
+    expect(src.startsWith('data:image/svg+xml')).toBe(true);
+    const svg = svgOf(src);
+    expect(svg.startsWith('<svg ')).toBe(true);
+    expect(svg).toContain('>Vditor<');
+    expect(svg).toContain('>4.0.0<');
+    expect(svg).toContain('height="20"');
   });
 
-  test('品牌色 + simple-icons 图标 (logoColor 缺省白色)', () => {
-    const url = componentBadgeUrl({
-      name: 'React',
-      version: '18.3.1',
-      url: '',
-      color: '087EA4',
-      logo: 'react',
-    });
-    expect(url).toContain('/badge/React-18.3.1-087EA4?');
-    expect(url).toContain('logo=react');
-    expect(url).toContain('logoColor=fff');
+  test('缺省底色 / 标签底色与 shields.io 一致', () => {
+    const svg = svgOf(componentBadgeSrc({ name: 'pkg', version: '1.0.0', url: '' }));
+    expect(svg).toContain(`fill="#${DEFAULT_BADGE_COLOR}"`);
+    expect(svg).toContain(`fill="#${DEFAULT_BADGE_LABEL_COLOR}"`);
   });
 
-  test('logoColor 可自定义', () => {
-    const url = componentBadgeUrl({
-      name: 'JSON5',
-      version: '2.2.3',
-      url: '',
-      logo: 'json',
-      logoColor: '1B1F24',
-    });
-    expect(url).toContain('logoColor=1B1F24');
+  test('自定义品牌色写进状态段背景', () => {
+    const svg = svgOf(componentBadgeSrc({ name: 'React', version: '18.3.1', url: '', color: '087EA4' }));
+    expect(svg).toContain('fill="#087EA4"');
+    expect(svg).not.toContain(`fill="#${DEFAULT_BADGE_COLOR}"`);
   });
 
-  test('badge 文本按 shields 规则转义: - => --, 空格 => _, _ => __', () => {
-    const dashed = componentBadgeUrl({ name: 'fast-xml-parser', version: '4.5.7', url: '', color: '005FAD' });
-    expect(dashed).toContain('/badge/fast--xml--parser-4.5.7-005FAD?');
-
-    const spaced = componentBadgeUrl({ name: 'Ant Design', version: '5.29.3', url: '' });
-    expect(spaced).toContain('/badge/Ant_Design-5.29.3-');
-
-    expect(componentBadgeUrl({ name: 'a_b', version: '1.0.0', url: '' })).toContain('/badge/a__b-1.0.0-');
+  test('特殊字符按 XML 转义, 不会破坏 SVG', () => {
+    const svg = svgOf(componentBadgeSrc({ name: 'a&b', version: '1.0.0', url: '' }));
+    expect(svg).toContain('>a&amp;b<');
+    expect(svg).not.toContain('>a&b<');
   });
 
-  test('组件清单: 名称唯一 / 均有版本号 / 均为 shields badge 地址', () => {
+  test('组件清单: 名称唯一 / 均有版本号 / 均为 https 主页 / badge 均可本地生成', () => {
     expect(compomentList.length).toBeGreaterThan(0);
     const names = compomentList.map((c) => c.name);
     expect(new Set(names).size).toBe(names.length);
@@ -55,10 +52,9 @@ describe('Help 使用组件 badge', () => {
       expect(item.version).toMatch(/^\d+\.\d+/);
       expect(item.url.startsWith('https://')).toBe(true);
 
-      const url = componentBadgeUrl(item);
-      expect(url.startsWith('https://img.shields.io/badge/')).toBe(true);
-      expect(url).toContain(item.version);
-      expect(url).toContain(item.color || DEFAULT_BADGE_COLOR);
+      const svg = svgOf(componentBadgeSrc(item));
+      expect(svg).toContain(`>${item.version.replace(/&/g, '&amp;')}<`);
+      expect(svg).toContain(`fill="#${item.color || DEFAULT_BADGE_COLOR}"`);
     });
   });
 });
