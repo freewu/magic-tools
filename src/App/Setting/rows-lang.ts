@@ -758,6 +758,17 @@ const ROWS: Record<string, Row> = {
     '湊齊 K 到 A 的同花順時自動收走; 關閉後需手動點「收牌 (C)」',
     'A completed King-to-Ace same-suit run is collected automatically; when off, use “Collect (C)”',
   ],
+  // ---- Sega 模拟器 ----
+  'Sega 模拟器': ['Sega 模擬器', 'Sega Emulator'],
+  '进入模拟器时的音量, 也可在模拟器底部菜单里随时调整': [
+    '進入模擬器時的音量, 也可在模擬器底部選單裡隨時調整',
+    'Volume the emulator starts at — also adjustable from its bottom menu',
+  ],
+  '启动后自动全屏': ['啟動後自動全螢幕', 'Start in fullscreen'],
+  '选好 ROM 后立刻进入全屏 (手机 / 平板建议开启)': [
+    '選好 ROM 後立刻進入全螢幕 (手機 / 平板建議開啟)',
+    'Go fullscreen as soon as a ROM is picked (recommended on phones and tablets)',
+  ],
 };
 
 /**

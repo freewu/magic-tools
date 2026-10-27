@@ -162,6 +162,7 @@ const list = [
   'GameBoy',
   'FreeCell',
   'SpiderSolitaire',
+  'SegaEmulator',
 ];
 
 import { defineLoader } from './app-modules';

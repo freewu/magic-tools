@@ -1,0 +1,228 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Sega Emulator</title>
+<!-- EmulatorJS 4.2.3 (GPL-3.0) 官方样式; 它全部选择器都挂在 .ejs_parent 下, 不会影响外层页面 -->
+<link rel="stylesheet" href="./data/emulator.css" />
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    overflow: hidden;
+  }
+  #mt-player {
+    width: 100%;
+    height: 100%;
+  }
+  #mt-hint {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 24px;
+    color: #d5dae0;
+    background: #000;
+    font: 14px/1.7 -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    text-align: center;
+  }
+  #mt-hint[hidden] {
+    display: none;
+  }
+</style>
+</head>
+<body>
+<div id="mt-player"></div>
+<div id="mt-hint" hidden></div>
+<script>
+// Sega (Mega Drive / Genesis) 播放器页: 由「Sega 模拟器」工具页以 iframe 方式内嵌。
+// 说明:
+//   1. 模拟核心为 Genesis Plus GX (libretro) 的 wasm 构建, 页面控制器为 EmulatorJS 4.2.3;
+//      两者都随仓库内置 (src/public/emulatorjs), 运行期不联网、不上传 ROM。
+//   2. 页面在<iframe> 里运行, 目的是隔离 EmulatorJS 的全局样式 / 全局变量;
+//      父页面通过 window.__mtStartRom(file) 把 ROM 直接交给本页 (同源, 无需 postMessage 传文件)。
+//   3. 用户在<iframe> 上拖入 ROM 时, 本页把文件 postMessage 给父页面, 由父页面重新挂载并载入
+//      (EmulatorJS 一个页面只允许实例化一次, 换 ROM 只能整页重来)。
+(function () {
+  'use strict';
+
+  // Genesis Plus GX 一台机器一颗核心名; core 由父页面按 ROM 扩展名给出, 只接受白名单
+  var CORES = { segaMD: true, segaMS: true, segaGG: true };
+  // 官方 loader.js 的加载顺序 (data/src 里都是普通脚本, 顺序不能改)
+  var SCRIPTS = [
+    'emulator.js',
+    'nipplejs.js',
+    'shaders.js',
+    'storage.js',
+    'gamepad.js',
+    'GameManager.js',
+    'socket.io.min.js',
+    'compression.js'
+  ];
+
+  var HINT = {
+    'zh-CN': { loading: '正在载入模拟核心… (首次约 1.2MB)', failed: '模拟核心载入失败, 请刷新页面重试' },
+    'zh-TW': { loading: '正在載入模擬核心… (首次約 1.2MB)', failed: '模擬核心載入失敗, 請重新整理頁面重試' },
+    'en-US': { loading: 'Loading the emulator core… (~1.2MB the first time)', failed: 'Could not load the emulator core, please reload the page' }
+  };
+
+  var query = new URLSearchParams(location.search);
+
+  // 线程核心 (genesis_plus_gx*-thread-wasm.data) 需要 SharedArrayBuffer, 也就是 COOP/COEP 跨源隔离;
+  // Web 版 (GitHub Pages) 与桌面端 WebView 都给不了这两个响应头, 线程核心也未内置。
+  // 这里把 SharedArrayBuffer 藏起来: EmulatorJS 便不会在菜单里出现「Threads」开关
+  // (条件就是 typeof window.SharedArrayBuffer === "function"), 也不会去找线程核心。
+  (function () {
+    try {
+      Object.defineProperty(window, 'SharedArrayBuffer', { value: undefined, configurable: true, writable: true });
+    } catch (e) { /* 不可配置时只靠下面的 defaultOptions 保持关闭 */ }
+  })();
+
+  // 离线加固: EmulatorJS 在 hostname 为 localhost / 127.0.0.1 (含桌面端的 tauri://localhost) 或开着
+  // EJS_DEBUG_XX 时会去 cdn.emulatorjs.org 查版本号。本工具自带全部资源, 这里把该域名拦成本地 404,
+  // 其余请求 (核心 .data / 语言包) 原样放行。
+  (function () {
+    if (typeof window.fetch !== 'function') return;
+    var nativeFetch = window.fetch.bind(window);
+    window.fetch = function (input, init) {
+      var url = typeof input === 'string' ? input : (input && input.url) || '';
+      if (url.indexOf('cdn.emulatorjs.org') >= 0) {
+        return Promise.resolve(new Response('{}', { status: 404, statusText: 'offline' }));
+      }
+      return nativeFetch(input, init);
+    };
+  })();
+  var language = query.get('lang') || 'zh-CN';
+  var core = query.get('core');
+  if (!CORES[core]) core = 'segaMD';
+  var volume = Number(query.get('volume'));
+  if (!isFinite(volume)) volume = 100;
+  volume = Math.min(100, Math.max(0, volume)) / 100;
+  var dataPath = new URL('./data/', location.href).href;
+  var text = HINT[language] || HINT['zh-CN'];
+  var hintElem = document.getElementById('mt-hint');
+  var started = false;
+
+  var setHint = function (msg) {
+    if (!msg) {
+      hintElem.hidden = true;
+      hintElem.textContent = '';
+      return;
+    }
+    hintElem.textContent = msg;
+    hintElem.hidden = false;
+  };
+
+  var notify = function (payload) {
+    try {
+      window.parent.postMessage(payload, '*');
+    } catch (e) {
+      /* 忽略: 跨源 / 父页面已卸载 */
+    }
+  };
+
+  var loadScript = function (src) {
+    return new Promise(function (resolve, reject) {
+      var elem = document.createElement('script');
+      elem.src = src;
+      elem.async = false;
+      elem.onload = function () { resolve(); };
+      elem.onerror = function () { reject(new Error('script failed: ' + src)); };
+      document.head.appendChild(elem);
+    });
+  };
+
+  // 界面语言包 (缺文件就回退英文, 与 EmulatorJS 自身行为一致)
+  var loadLanguage = function () {
+    if (language === 'en-US') return Promise.resolve({});
+    return fetch(dataPath + 'localization/' + language + '.json')
+      .then(function (res) {
+        if (!res.ok) throw new Error('missing language');
+        return res.json();
+      })
+      .then(function (json) { return { language: language, langJson: json }; })
+      .catch(function () { return {}; });
+  };
+
+  var buildConfig = function (gameUrl, gameName, lang) {
+    return Object.assign({
+      gameUrl: gameUrl,
+      gameName: gameName,
+      dataPath: dataPath,
+      system: core,
+      color: '#1677ff',
+      volume: volume,
+      // 由用户点「开始」按钮启动: 既保证音频有手势, 也避免自动播放被浏览器拦截
+      startOnLoad: false,
+      fullscreenOnLoad: false,
+      alignStartButton: 'center',
+      backgroundColor: '#000000',
+      // 多线程核心需要 SharedArrayBuffer (COOP/COEP), Web 版与桌面端都没有, 固定关闭
+      threads: false,
+      noAutoFocus: true,
+      disableDatabases: false,
+      shaders: {},
+      filePaths: {},
+      buttonOpts: {}
+    }, lang);
+  };
+
+  /** 由父页面调用 (同源): 载入 ROM 并启动模拟器 */
+  var startRom = function (file) {
+    if (started || !file) return;
+    started = true;
+    setHint(text.loading);
+    notify({ type: 'sega-loading', name: file.name || 'game.bin' });
+
+    var gameUrl = URL.createObjectURL(file);
+    var gameName = file.name || 'game.bin';
+    var ready = Promise.resolve();
+    SCRIPTS.forEach(function (name) {
+      ready = ready.then(function () { return loadScript(dataPath + 'src/' + name); });
+    });
+
+    ready
+      .then(loadLanguage)
+      .then(function (lang) {
+        if (typeof window.EmulatorJS !== 'function') throw new Error('EmulatorJS missing');
+        var emu = new window.EmulatorJS('#mt-player', buildConfig(gameUrl, gameName, lang));
+        // 真正开跑后才回报「已启动」: 中间还有核心下载 / 初始化, 期间用户可能停在开始按钮上
+        emu.on('start', function () { notify({ type: 'sega-started', name: gameName }); });
+        // 核心下载 / 初始化是异步的, 真报错走它自己的 startGameError; 这里包一层回报给父页面
+        var nativeError = typeof emu.startGameError === 'function' ? emu.startGameError.bind(emu) : null;
+        emu.startGameError = function (message) {
+          setHint(text.failed);
+          notify({ type: 'sega-error', message: String(message || '') });
+          if (nativeError) return nativeError(message);
+        };
+        window.EJS_emulator = emu;
+        setHint('');
+        notify({ type: 'sega-ready', name: gameName });
+      })
+      .catch(function (err) {
+        setHint(text.failed);
+        notify({ type: 'sega-error', message: String((err && err.message) || err) });
+      });
+  };
+
+  window.__mtStartRom = startRom;
+
+  // 拖到本页 (iframe) 上的 ROM: 交给父页面重新挂载 iframe 再载入
+  document.addEventListener('dragover', function (e) {
+    e.preventDefault();
+  });
+  document.addEventListener('drop', function (e) {
+    e.preventDefault();
+    var files = e.dataTransfer && e.dataTransfer.files;
+    if (files && files.length > 0) notify({ type: 'sega-rom-file', file: files[0] });
+  });
+})();
+</script>
+</body>
+</html>
