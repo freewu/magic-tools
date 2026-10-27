@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import "./appstore.css"
 import Icon from '@ant-design/icons';
 import { DesktopOutlined, GlobalOutlined, StarFilled, StarOutlined } from "@ant-design/icons";
+import { appIconOf } from "../app-icons";
 import { AppContext } from "../../hook/app-context";
 import { useLocale } from "../../hook/locale-context";
 import { tr } from "../../i18n/lang";
@@ -13,7 +14,7 @@ import appstoreLang from "./lang";
 
 export type AppItemProps = {
   uri: string, // 
-  icon: any,
+  icon: string, // antd 图标名 (define.tsx 的 Icon, 由 app-icons.ts 映射为组件)
   label: string,
   desktop?: boolean, // 仅桌面版可用 (浏览器演示版无法提供该能力)
   web?: boolean, // 仅 Web 版可用 (桌面版内嵌 WebView 无法提供该能力)
@@ -21,6 +22,8 @@ export type AppItemProps = {
 }
 
 const AppItem = ({ uri, label, icon, desktop, web, isNew } :AppItemProps) => {
+
+  const AppIcon = appIconOf(icon);
 
   const navigate = useNavigate();
   const { app, setApp } = useContext(AppContext)!
@@ -81,8 +84,8 @@ const AppItem = ({ uri, label, icon, desktop, web, isNew } :AppItemProps) => {
           <span className="app-new-badge">NEW</span>
         </Tooltip>
       ) }
-      <Space className="app-name">
-        {/* { icon } */}
+      <Space className="app-name" size={ 4 }>
+        <AppIcon className="app-icon" style={ { fontSize: 13 } } />
         { label }
       </Space>
     </div>

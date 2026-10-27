@@ -1,5 +1,5 @@
 const AppName = 'PPI计算';
-const Icon = '';
+const Icon = 'Monitor';
 const Type = 'value-calc';
 
 export {

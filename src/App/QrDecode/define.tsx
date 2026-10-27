@@ -1,5 +1,5 @@
 const AppName = '二维码解析';
-const Icon = '';
+const Icon = 'Scan';
 const Type = 'misc';
 
 export {

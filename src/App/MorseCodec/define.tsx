@@ -1,5 +1,5 @@
 const AppName = '摩斯码编解码';
-const Icon = '';
+const Icon = 'Sound';
 const Type = 'codec';
 
 export {

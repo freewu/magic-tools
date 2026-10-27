@@ -1,5 +1,5 @@
 const AppName = 'JWT 编解码器';
-const Icon = '';
+const Icon = 'Idcard';
 const Type = 'codec';
 
 export {

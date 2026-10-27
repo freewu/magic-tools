@@ -1,5 +1,5 @@
 const AppName = 'JSON5 格式化';
-const Icon = '';
+const Icon = 'FileAdd';
 const Type = 'formatter';
 
 export {

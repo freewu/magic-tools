@@ -1,5 +1,5 @@
 const AppName = '容量转换';
-const Icon = '';
+const Icon = 'Container';
 const Type = 'convert';
 
 export {

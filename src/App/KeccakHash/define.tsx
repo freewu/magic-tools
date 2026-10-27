@@ -1,5 +1,5 @@
 const AppName = 'Keccak Hash 值计算';
-const Icon = '';
+const Icon = 'HeatMap';
 const Type = 'value-calc';
 
 export {

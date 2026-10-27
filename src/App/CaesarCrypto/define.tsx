@@ -1,5 +1,5 @@
 const AppName = '凯撒加解密';
-const Icon = '';
+const Icon = 'Translation';
 const Type = 'crypto';
 
 export {

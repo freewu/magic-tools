@@ -1,5 +1,5 @@
 const AppName = 'CIDR 计算器';
-const Icon = '';
+const Icon = 'Partition';
 const Type = 'misc';
 
 export {

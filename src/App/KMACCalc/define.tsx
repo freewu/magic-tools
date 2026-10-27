@@ -1,5 +1,5 @@
 const AppName = 'KMAC 计算';
-const Icon = '';
+const Icon = 'Insurance';
 const Type = 'value-calc';
 
 export {

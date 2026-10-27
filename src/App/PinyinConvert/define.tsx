@@ -1,5 +1,5 @@
 const AppName = '中文拼音';
-const Icon = '';
+const Icon = 'FontSize';
 const Type = 'convert';
 
 export {

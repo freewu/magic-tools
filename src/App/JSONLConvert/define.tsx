@@ -1,5 +1,5 @@
 const AppName = 'JSONL 转换';
-const Icon = '';
+const Icon = 'FileSync';
 const Type = 'convert';
 
 export {

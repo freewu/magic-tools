@@ -1,5 +1,5 @@
 const AppName = 'Mermaid 编辑器';
-const Icon = '';
+const Icon = 'FunnelPlot';
 const Type = 'formatter';
 
 export {

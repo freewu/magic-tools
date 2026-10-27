@@ -1,5 +1,5 @@
 const AppName = 'robots.txt 生成';
-const Icon = '';
+const Icon = 'Robot';
 const Type = 'webmaster';
 
 export {

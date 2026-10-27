@@ -1,5 +1,5 @@
 const AppName = 'HTTP Basic Auth 编解码';
-const Icon = '';
+const Icon = 'UserSwitch';
 const Type = 'codec';
 
 export {

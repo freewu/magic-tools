@@ -1,5 +1,5 @@
 const AppName = 'UA 解析器';
-const Icon = '';
+const Icon = 'Scan';
 const Type = 'webmaster';
 
 export {

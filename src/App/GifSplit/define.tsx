@@ -1,5 +1,5 @@
 const AppName = 'GIF 拆解';
-const Icon = '';
+const Icon = 'Scissor';
 const Type = 'image';
 
 export {

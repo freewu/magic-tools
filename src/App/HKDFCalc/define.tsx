@@ -1,5 +1,5 @@
 const AppName = 'HKDF 计算';
-const Icon = '';
+const Icon = 'DeploymentUnit';
 const Type = 'value-calc';
 
 export {

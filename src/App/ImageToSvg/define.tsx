@@ -1,5 +1,5 @@
 const AppName = '图片转 SVG';
-const Icon = '';
+const Icon = 'Sketch';
 const Type = 'image';
 
 export {

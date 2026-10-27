@@ -1,5 +1,5 @@
 const AppName = 'ASCII 文字';
-const Icon = '';
+const Icon = 'Form';
 const Type = 'misc';
 
 export {

@@ -1,5 +1,5 @@
 const AppName = '面积转换';
-const Icon = '';
+const Icon = 'BorderOuter';
 const Type = 'convert';
 
 export {

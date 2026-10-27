@@ -1,5 +1,5 @@
 const AppName = '距离转换';
-const Icon = '';
+const Icon = 'ColumnHeight';
 const Type = 'convert';
 
 export {

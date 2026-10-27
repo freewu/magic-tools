@@ -1,5 +1,5 @@
 const AppName = '图片水印';
-const Icon = '';
+const Icon = 'Copyright';
 const Type = 'image';
 
 export {

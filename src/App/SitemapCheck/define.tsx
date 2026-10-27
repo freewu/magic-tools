@@ -1,5 +1,5 @@
 const AppName = 'Sitemap 检查';
-const Icon = '';
+const Icon = 'Apartment';
 const Type = 'webmaster';
 
 export {

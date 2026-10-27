@@ -1,5 +1,5 @@
 const AppName = '字幕格式转换';
-const Icon = '';
+const Icon = 'FileWord';
 const Type = 'convert';
 
 export {

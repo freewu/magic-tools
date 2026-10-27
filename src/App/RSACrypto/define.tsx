@@ -1,5 +1,5 @@
 const AppName = 'RSA 加解密';
-const Icon = '';
+const Icon = 'Key';
 const Type = 'crypto';
 
 export {

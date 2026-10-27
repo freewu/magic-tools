@@ -1,5 +1,5 @@
 const AppName = 'CRC 校验';
-const Icon = '';
+const Icon = 'CheckCircle';
 const Type = 'value-calc';
 
 export {

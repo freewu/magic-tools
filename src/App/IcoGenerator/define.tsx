@@ -1,5 +1,5 @@
 const AppName = 'ICO 生成';
-const Icon = '';
+const Icon = 'Windows';
 const Type = 'image';
 
 export {

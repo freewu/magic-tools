@@ -1,5 +1,5 @@
 const AppName = '重量转换';
-const Icon = '';
+const Icon = 'Gold';
 const Type = 'convert';
 
 export {

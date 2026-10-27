@@ -1,5 +1,5 @@
 const AppName = 'Zip 压缩';
-const Icon = '';
+const Icon = 'Compress';
 const Type = 'misc';
 
 export {

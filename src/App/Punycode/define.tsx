@@ -1,5 +1,5 @@
 const AppName = 'Punycode 编解码';
-const Icon = '';
+const Icon = 'Chrome';
 const Type = 'codec';
 
 export {

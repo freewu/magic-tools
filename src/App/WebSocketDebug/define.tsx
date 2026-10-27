@@ -1,5 +1,5 @@
 const AppName = 'WebSocket 调试';
-const Icon = '';
+const Icon = 'Api';
 const Type = 'misc';
 
 export {

@@ -1,5 +1,5 @@
 const AppName = 'BCrypt';
-const Icon = '';
+const Icon = 'Lock';
 const Type = 'value-calc';
 
 export {

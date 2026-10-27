@@ -1,5 +1,5 @@
 const AppName = '白板';
-const Icon = '';
+const Icon = 'Highlight';
 const Type = 'generator';
 
 export {

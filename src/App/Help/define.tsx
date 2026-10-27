@@ -1,5 +1,5 @@
 const AppName = '帮助页面';
-const Icon = '';
+const Icon = 'QuestionCircle';
 const Type = 'misc';
 
 export {

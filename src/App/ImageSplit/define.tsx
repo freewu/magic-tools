@@ -1,5 +1,5 @@
 const AppName = '图片分割';
-const Icon = '';
+const Icon = 'SplitCells';
 const Type = 'image';
 
 export {

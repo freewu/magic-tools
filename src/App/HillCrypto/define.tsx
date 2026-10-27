@@ -1,5 +1,5 @@
 const AppName = '希尔加解密';
-const Icon = '';
+const Icon = 'Table';
 const Type = 'crypto';
 
 export {

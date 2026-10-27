@@ -1,5 +1,5 @@
 const AppName = 'Unicode 编解码';
-const Icon = '';
+const Icon = 'FontSize';
 const Type = 'codec';
 
 export {

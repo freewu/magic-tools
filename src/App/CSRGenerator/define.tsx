@@ -1,5 +1,5 @@
 const AppName = 'CSR 申请文件';
-const Icon = '';
+const Icon = 'FileProtect';
 const Type = 'webmaster';
 
 export {

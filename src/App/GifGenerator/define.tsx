@@ -1,5 +1,5 @@
 const AppName = 'GIF 生成';
-const Icon = '';
+const Icon = 'Gif';
 const Type = 'image';
 
 export {

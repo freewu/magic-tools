@@ -1,5 +1,5 @@
 const AppName = 'IP 转换';
-const Icon = '';
+const Icon = 'Wifi';
 const Type = 'convert';
 
 export {

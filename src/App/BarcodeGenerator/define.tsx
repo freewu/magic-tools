@@ -1,5 +1,5 @@
 const AppName = '条形码生成';
-const Icon = '';
+const Icon = 'Barcode';
 const Type = 'generator';
 
 export {

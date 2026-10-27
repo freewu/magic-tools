@@ -1,5 +1,5 @@
 const AppName = '像素图';
-const Icon = '';
+const Icon = 'PicCenter';
 const Type = 'image';
 
 export {

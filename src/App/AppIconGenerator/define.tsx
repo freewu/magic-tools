@@ -1,5 +1,5 @@
 const AppName = 'App Icon 生成';
-const Icon = '';
+const Icon = 'AppstoreAdd';
 const Type = 'image';
 
 export {

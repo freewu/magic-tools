@@ -1,5 +1,5 @@
 const AppName = 'URL 提取';
-const Icon = '';
+const Icon = 'Export';
 const Type = 'webmaster';
 
 export {

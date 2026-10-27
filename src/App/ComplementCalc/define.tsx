@@ -1,5 +1,5 @@
 const AppName = '原码/反码/补码计算';
-const Icon = '';
+const Icon = 'SwapLeft';
 const Type = 'value-calc';
 
 export {

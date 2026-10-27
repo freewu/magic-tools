@@ -1,5 +1,5 @@
 const AppName = 'ASCII 图片';
-const Icon = '';
+const Icon = 'FontColors';
 const Type = 'image';
 
 export {

@@ -1,5 +1,5 @@
 const AppName = 'CSS 配色';
-const Icon = '';
+const Icon = 'BgColors';
 const Type = 'misc';
 
 export {

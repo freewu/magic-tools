@@ -1,5 +1,5 @@
 const AppName = '拼豆图纸';
-const Icon = '';
+const Icon = 'HeatMap';
 const Type = 'generator';
 
 export {

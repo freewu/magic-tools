@@ -1,5 +1,5 @@
 const AppName = 'Chmod 权限';
-const Icon = '';
+const Icon = 'Safety';
 const Type = 'misc';
 
 export {

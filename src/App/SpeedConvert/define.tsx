@@ -1,5 +1,5 @@
 const AppName = '速度转换';
-const Icon = '';
+const Icon = 'Rocket';
 const Type = 'convert';
 
 export {

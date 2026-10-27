@@ -1,5 +1,5 @@
 const AppName = 'PBKDF2 值计算';
-const Icon = '';
+const Icon = 'Sync';
 const Type = 'value-calc';
 
 export {

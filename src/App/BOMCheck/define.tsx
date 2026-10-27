@@ -1,5 +1,5 @@
 const AppName = 'BOM 检查';
-const Icon = '';
+const Icon = 'FileSearch';
 const Type = 'misc';
 
 export {

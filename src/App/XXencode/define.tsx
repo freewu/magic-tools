@@ -1,5 +1,5 @@
 const AppName = 'XXencode 编解码';
-const Icon = '';
+const Icon = 'Download';
 const Type = 'codec';
 
 export {

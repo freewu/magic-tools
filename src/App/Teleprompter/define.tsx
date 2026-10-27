@@ -1,5 +1,5 @@
 const AppName = '提词器';
-const Icon = '';
+const Icon = 'Read';
 const Type = 'misc';
 
 export {

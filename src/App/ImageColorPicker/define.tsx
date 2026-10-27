@@ -1,5 +1,5 @@
 const AppName = '图片取色';
-const Icon = '';
+const Icon = 'Eye';
 const Type = 'image';
 
 export {

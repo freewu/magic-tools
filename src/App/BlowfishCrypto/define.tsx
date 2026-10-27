@@ -1,5 +1,5 @@
 const AppName = 'Blowfish 加解密';
-const Icon = '';
+const Icon = 'Experiment';
 const Type = 'crypto';
 
 export {

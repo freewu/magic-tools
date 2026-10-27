@@ -1,5 +1,5 @@
 const AppName = '占位图片';
-const Icon = '';
+const Icon = 'Border';
 const Type = 'image';
 
 export {

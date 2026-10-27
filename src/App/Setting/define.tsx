@@ -1,5 +1,5 @@
 const AppName = '设置';
-const Icon = '';
+const Icon = 'Setting';
 const Type = 'misc';
 
 export {

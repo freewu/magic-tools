@@ -1,5 +1,5 @@
 const AppName = '文件比较';
-const Icon = '';
+const Icon = 'Diff';
 const Type = 'misc';
 
 export {

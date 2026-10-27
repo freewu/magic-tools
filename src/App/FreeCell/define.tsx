@@ -1,5 +1,5 @@
 const AppName = '空档接龙';
-const Icon = '';
+const Icon = 'CreditCard';
 const Type = 'game';
 // 新版本新增的应用: 应用中心展示 NEW 徽标 (下个版本新增应用时记得改回 false / 移除)
 const IsNew = true;

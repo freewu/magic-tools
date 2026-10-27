@@ -1,5 +1,5 @@
 const AppName = 'SVG 格式化';
-const Icon = '';
+const Icon = 'Sketch';
 const Type = 'formatter';
 
 export {

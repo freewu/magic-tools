@@ -1,5 +1,5 @@
 const AppName = 'UUencode 编解码';
-const Icon = '';
+const Icon = 'Upload';
 const Type = 'codec';
 
 export {

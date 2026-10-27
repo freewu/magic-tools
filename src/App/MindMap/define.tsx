@@ -1,5 +1,5 @@
 const AppName = '思维导图';
-const Icon = '';
+const Icon = 'Apartment';
 const Type = 'formatter';
 
 export {

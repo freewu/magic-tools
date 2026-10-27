@@ -1,5 +1,5 @@
 const AppName = 'Hash 值计算';
-const Icon = '';
+const Icon = 'Solution';
 const Type = 'value-calc';
 
 export {

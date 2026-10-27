@@ -1,5 +1,5 @@
 const AppName = '敏感词检测';
-const Icon = '';
+const Icon = 'Warning';
 const Type = 'misc';
 
 export {

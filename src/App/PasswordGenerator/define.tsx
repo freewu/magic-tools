@@ -1,5 +1,5 @@
 const AppName = '密码生成';
-const Icon = '';
+const Icon = 'EyeInvisible';
 const Type = 'generator';
 
 export {

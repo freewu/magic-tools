@@ -1,5 +1,5 @@
 const AppName = '二维码生成';
-const Icon = '';
+const Icon = 'Qrcode';
 const Type = 'generator';
 
 export {

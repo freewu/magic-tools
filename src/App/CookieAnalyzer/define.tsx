@@ -1,5 +1,5 @@
 const AppName = 'Cookie 分析';
-const Icon = '';
+const Icon = 'Coffee';
 const Type = 'webmaster';
 
 export {

@@ -1,5 +1,5 @@
 const AppName = 'Scrypt';
-const Icon = '';
+const Icon = 'Unlock';
 const Type = 'value-calc';
 
 export {

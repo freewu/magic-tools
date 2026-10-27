@@ -1,5 +1,5 @@
 const AppName = '图片黑白化';
-const Icon = '';
+const Icon = 'Sun';
 const Type = 'image';
 
 export {

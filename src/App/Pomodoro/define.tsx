@@ -1,5 +1,5 @@
 const AppName = '番茄时钟';
-const Icon = '';
+const Icon = 'FieldTime';
 const Type = 'misc';
 
 export {

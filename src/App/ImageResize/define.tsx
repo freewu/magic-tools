@@ -1,5 +1,5 @@
 const AppName = '图片调整';
-const Icon = '';
+const Icon = 'Expand';
 const Type = 'image';
 
 export {

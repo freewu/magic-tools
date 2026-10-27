@@ -1,5 +1,5 @@
 const AppName = '温度转换';
-const Icon = '';
+const Icon = 'Sun';
 const Type = 'convert';
 
 export {

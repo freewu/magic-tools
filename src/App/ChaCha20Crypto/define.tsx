@@ -1,5 +1,5 @@
 const AppName = 'ChaCha20 加解密';
-const Icon = '';
+const Icon = 'Thunderbolt';
 const Type = 'crypto';
 
 export {

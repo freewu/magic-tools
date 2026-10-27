@@ -1,5 +1,5 @@
 const AppName = 'nginx 配置';
-const Icon = '';
+const Icon = 'CloudServer';
 const Type = 'webmaster';
 
 export {

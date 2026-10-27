@@ -1,5 +1,5 @@
 const AppName = '键盘按键信息';
-const Icon = '';
+const Icon = 'MacCommand';
 const Type = 'misc';
 
 export {

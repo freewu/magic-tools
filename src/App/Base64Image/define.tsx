@@ -1,5 +1,5 @@
 const AppName = 'Base64图片';
-const Icon = '';
+const Icon = 'FileImage';
 const Type = 'image';
 
 export {

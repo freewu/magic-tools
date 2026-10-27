@@ -1,5 +1,5 @@
 const AppName = '.gitignore 生成';
-const Icon = '';
+const Icon = 'Fork';
 const Type = 'generator';
 
 export {

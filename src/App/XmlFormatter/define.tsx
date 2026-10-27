@@ -1,5 +1,5 @@
 const AppName = 'XML 格式化';
-const Icon = '';
+const Icon = 'Snippets';
 const Type = 'formatter';
 
 export {

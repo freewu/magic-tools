@@ -1,5 +1,5 @@
 const AppName = 'Shield Badge 生成';
-const Icon = '';
+const Icon = 'Tag';
 const Type = 'image';
 
 export {

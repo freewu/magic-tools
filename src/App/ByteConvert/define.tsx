@@ -1,5 +1,5 @@
 const AppName = '字节转换';
-const Icon = '';
+const Icon = 'Database';
 const Type = 'convert';
 
 export {

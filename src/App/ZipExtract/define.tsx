@@ -1,5 +1,5 @@
 const AppName = 'Zip 解压';
-const Icon = '';
+const Icon = 'FolderOpen';
 const Type = 'misc';
 
 export {

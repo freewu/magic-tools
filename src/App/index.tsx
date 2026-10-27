@@ -194,7 +194,7 @@ const loadAppDefine = async (app :string) :Promise<DefineModule | null> => {
 
 export type AppItem = {
   key: string, // app 编号 也是导航的 url 地址
-  icon: any, //  app icon 图标
+  icon: string, // app icon 图标名 (antd 图标名, 不含 Outlined 后缀; 由 app-icons.ts 映射为组件)
   "label": string, // app 名称
   type: string, // app 类型 
   desktop: boolean, // 是否仅桌面版可用
@@ -209,7 +209,7 @@ const getAppList = async () :Promise<Array<AppItem>> => {
   const result:Array<AppItem> = [];
   mods.forEach((m, i) => {
     if(m) {
-      //const img = (m.Icon === "")? '' : <Icon component={ m.Icon } />;
+      // icon 是 antd 图标名 (define.tsx 的 Icon), 渲染时经 app-icon.ts 的 appIconNode / appIconOf 转成组件
       result.push({ key: list[i], icon: m.Icon, label: m.AppName, type: m.Type, desktop: m.Desktop, web: m.Web, isNew: m.IsNew });
     }
   });

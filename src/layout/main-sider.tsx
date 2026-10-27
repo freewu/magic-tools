@@ -13,6 +13,7 @@ const { Sider } = Layout;
 import { useNavigate } from "react-router-dom"
 import { appList, genMenuList } from "../App";
 import { appNameOf } from "../App/app-i18n";
+import { appIconNode } from "../App/app-icons";
 import { getSiderFlag } from "../lib/setting";
 import { useVisibleAppTypes } from "../hook/use-visible-app-types";
 import { openUrl } from "../lib/tauri";
@@ -81,7 +82,7 @@ const MainSider: React.FC = () => {
       ),
       children: g.children.map((c) => ({
         key: c.key,
-        icon: c.icon,
+        icon: appIconNode(c.icon),
         label: appNameOf(locale, c.key, c.label),
       })),
     }));

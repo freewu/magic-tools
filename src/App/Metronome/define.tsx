@@ -1,5 +1,5 @@
 const AppName = '节拍器';
-const Icon = '';
+const Icon = 'Audio';
 const Type = 'misc';
 
 export {

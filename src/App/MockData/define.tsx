@@ -1,5 +1,5 @@
 const AppName = '数据生成';
-const Icon = '';
+const Icon = 'Database';
 const Type = 'generator';
 
 export {

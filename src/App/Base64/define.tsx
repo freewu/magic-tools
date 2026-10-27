@@ -1,5 +1,5 @@
 const AppName = 'Base64 编解码';
-const Icon = '';
+const Icon = 'Swap';
 const Type = 'codec';
 
 export {

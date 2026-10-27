@@ -1,5 +1,5 @@
 const AppName = 'AES 加解密';
-const Icon = '';
+const Icon = 'SafetyCertificate';
 const Type = 'crypto';
 
 export {

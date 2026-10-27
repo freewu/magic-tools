@@ -1,5 +1,5 @@
 const AppName = 'RC5 加解密';
-const Icon = '';
+const Icon = 'PropertySafety';
 const Type = 'crypto';
 
 export {

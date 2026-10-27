@@ -1,5 +1,5 @@
 const AppName = 'RC2 加解密';
-const Icon = '';
+const Icon = 'Control';
 const Type = 'crypto';
 
 export {

@@ -63,6 +63,10 @@
 
 .app {
   position: relative;
+  /* 图标 + 名称水平居中; 名称过长时在卡片内换行 (卡片高度固定, 保持栅格对齐) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 168px;
   height: 64px;
   border: 1px solid #424c50;
@@ -70,9 +74,25 @@
   margin: 5px;
   color: inherit;
   text-align: center;
-  padding-top:20px;
+  padding: 0 6px;
   opacity: 0.9;
   border-radius: 4px;
+}
+
+/* 应用图标: 与名称同行, 默认略淡; 悬停时高亮 */
+.app-icon {
+  opacity: 0.8;
+  transition: opacity 0.15s, color 0.15s;
+}
+
+/* 应用名称: 允许在图标右侧换行 (不溢出卡片) */
+.app-name {
+  line-height: 1.25;
+}
+
+.app:hover .app-icon {
+  opacity: 1;
+  color: #1677ff;
 }
 
 /* 仅桌面版 / 仅 Web 标识: 卡片右下角小图标 + 文案 (悬停显示完整提示)
