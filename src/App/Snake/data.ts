@@ -75,9 +75,25 @@ export const QUEUE_MAX = 3;
 export const BEST_STORAGE_KEY = 'magic-tools-snake-best';
 export const DEFAULTS_STORAGE_KEY = 'magic-tools-snake-defaults';
 
-/** 棋盘边长 (CSS 长度表达式): 普通模式居中, 全屏模式按视口铺满 */
-export const BOARD_SIZE_CSS = 'min(88vw, 46vh)';
-export const BOARD_SIZE_CSS_FULL = 'min(64vw, 58vh)';
+/** 棋盘尺寸档位 (格子越大越好点, 手机建议用小号) */
+export type SizeKey = 'sm' | 'md' | 'lg';
+
+/** 档位顺序 (界面上按此顺序展示) */
+export const SIZE_ORDER: readonly SizeKey[] = [ 'sm', 'md', 'lg' ];
+
+/** 普通模式下的棋盘边长上限 (px) */
+export const SIZE_PX: Record<SizeKey, number> = { sm: 300, md: 400, lg: 520 };
+
+/** 全屏模式下给得更宽裕 (px) */
+export const SIZE_PX_FULL: Record<SizeKey, number> = { sm: 460, md: 620, lg: 800 };
+
+export const SIZE_DEFAULT: SizeKey = 'md';
+
+/** 棋盘边长 (CSS 长度表达式): 普通模式跟着视口收缩, 全屏模式尽量铺满 */
+export const boardSizeCss = (size: SizeKey, full = false): string => {
+  const px = (full ? SIZE_PX_FULL : SIZE_PX)[size] ?? (full ? SIZE_PX_FULL : SIZE_PX)[SIZE_DEFAULT];
+  return full ? `min(86vw, 74vh, ${px}px)` : `min(90vw, 52vh, ${px}px)`;
+};
 
 /** 蛇头 / 蛇身 / 苹果 / 金苹果 / 障碍配色 */
 export const COLOR_HEAD = '#22c55e';
@@ -92,9 +108,16 @@ export const GRID_LINE = 'rgba(148, 163, 184, 0.22)';
 /** 棋盘 / 蛇身 / 食物 / 方向盘样式 (只做视觉, 不影响逻辑) */
 export const SNAKE_CSS = `
 .sk-stage { box-sizing: border-box; }
-.sk-stage.sk-full { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center;
-  justify-content: center; gap: 20px; padding: 16px; overflow: auto; background: var(--sk-bg, #12161f); }
-.sk-wrap { display: flex; align-items: flex-start; justify-content: center; gap: 16px; flex-wrap: wrap; }
+.sk-stage.sk-full { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column;
+  align-items: stretch; justify-content: flex-start; gap: 8px; padding: 10px 14px 14px;
+  overflow: auto; background: var(--sk-bg, #12161f); }
+.sk-toolbar { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.sk-toolbar-row { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; width: 100%; }
+.sk-spacer { flex: 1 1 auto; }
+.sk-full .sk-toolbar { position: sticky; top: 0; z-index: 30; padding: 8px 10px; border-radius: 10px;
+  background: var(--sk-bar-bg, #12161f); box-shadow: 0 1px 0 var(--sk-bar-line, rgba(148, 163, 184, 0.22)); }
+.sk-board-area { display: flex; align-items: flex-start; justify-content: center; width: 100%; }
+.sk-full .sk-board-area { flex: 1 1 auto; align-items: center; }
 .sk-board-box { position: relative; flex: none; }
 .sk-board { display: grid; grid-template-columns: repeat(${COLS}, 1fr); width: var(--sk-board);
   max-width: 100%; padding: 4px; border-radius: 8px; background: var(--sk-board-bg, #0f1420);
@@ -119,7 +142,7 @@ export const SNAKE_CSS = `
   justify-content: center; border-radius: 8px; background: rgba(15, 20, 32, 0.82); color: #f1f5f9;
   font-weight: 700; text-align: center; padding: 12px; z-index: 2; }
 .sk-dpad { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
-  gap: 6px; width: 156px; }
-.sk-side { display: flex; flex-direction: column; gap: 10px; flex: 1 1 190px; min-width: 190px; }
+  gap: 4px; width: 116px; }
+.sk-hints { display: flex; flex-direction: column; gap: 2px; }
 @media (prefers-reduced-motion: reduce) { .sk-gold { animation: none; } }
 `;

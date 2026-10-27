@@ -1,4 +1,4 @@
-// 贪吃蛇: 经典 20×20 网格贪吃蛇 (四档速度 / 穿墙 / 障碍物 / 金苹果限时高分 / 音效 / 全屏)
+// 贪吃蛇: 经典 20×20 网格贪吃蛇 (四档速度 / 四档尺寸 / 穿墙 / 障碍物 / 金苹果 / 音效 / 全屏)
 // 玩法参考 https://tanchishe.513game.com/
 // 说明: 规则计算全部在 lib.ts (纯函数), 本文件只做渲染与键盘 / 触摸 / 计时 / 音效 / 全屏等副作用
 import { Alert, Button, Card, Divider, Segmented, Space, Switch, Tag, Tooltip, Typography, theme } from 'antd';
@@ -10,7 +10,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '../../hook/app-context';
 import { useLocale } from '../../hook/locale-context';
 import {
-  BOARD_SIZE_CSS, BOARD_SIZE_CSS_FULL, GOLD_LIFE_MS, SCORE_APPLE, SCORE_GOLD, SPEED_ORDER, SNAKE_CSS, type Dir,
+  boardSizeCss, GOLD_LIFE_MS, SCORE_APPLE, SCORE_GOLD, SIZE_ORDER, SPEED_ORDER, SNAKE_CSS, type Dir, type SizeKey,
   type SpeedKey,
 } from './data';
 import {
@@ -29,6 +29,9 @@ type FullscreenDocument = Document & {
 };
 
 type Sfx = 'eat' | 'gold' | 'die' | 'win' | 'start';
+
+const SPEED_LABEL: Record<SpeedKey, string> = { slow: '慢', mid: '标准', fast: '快', insane: '极速' };
+const SIZE_LABEL: Record<SizeKey, string> = { sm: '小', md: '中', lg: '大' };
 
 /** 提示音 (Web Audio 现场合成, 不加载任何音频文件; 不支持时静默跳过) */
 const tone = (ctx: AudioContext, freq: number, at: number, dur: number, vol = 0.06) => {
@@ -212,7 +215,7 @@ const Snake: React.FC = () => {
     if (! active && full) exitFull();
   }, [ active, full, exitFull ]);
 
-  // 音效开关变化 / 卸载时关闭 AudioContext
+  // 卸载时关闭 AudioContext
   useEffect(() => () => {
     const ctx = audioRef.current;
     audioRef.current = null;
@@ -220,8 +223,6 @@ const Snake: React.FC = () => {
   }, []);
 
   // ---- 渲染 ----
-  const head = st.snake[0];
-  const tailKey = st.snake.length > 1 ? cellKey(st.snake[st.snake.length - 1]) : '';
   const segMap = new Map<string, 'head' | 'body' | 'tail'>();
   st.snake.forEach((c, i) => segMap.set(cellKey(c), i === 0 ? 'head' : i === st.snake.length - 1 ? 'tail' : 'body'));
   const wallSet = new Set(st.walls.map(cellKey));
@@ -288,25 +289,82 @@ const Snake: React.FC = () => {
     <div
       key={ label }
       style={ {
-        minWidth: 74,
-        padding: '4px 10px',
+        minWidth: 68,
+        padding: '2px 10px',
         borderRadius: token.borderRadius,
         background: token.colorFillSecondary,
         textAlign: 'center',
       } }
     >
-      <div style={ { fontSize: 12, color: token.colorTextSecondary, lineHeight: '16px' } }>{ label }</div>
-      <div style={ { fontSize: 17, fontWeight: 700, lineHeight: '24px' } } data-stat={ label }>{ value }</div>
+      <div style={ { fontSize: 11, color: token.colorTextSecondary, lineHeight: '15px' } }>{ label }</div>
+      <div style={ { fontSize: 16, fontWeight: 700, lineHeight: '22px' } } data-stat={ label }>{ value }</div>
     </div>
   );
 
+  const statsNode = (
+    <Space size={ 8 } wrap>
+      { stat(t('得分'), st.score) }
+      { stat(t('最高分'), best) }
+      { stat(t('长度'), snakeLength(st)) }
+      { stat(t('速度'), t(SPEED_LABEL[opts.speed])) }
+    </Space>
+  );
+
+  const mainButtonNode = (
+    <Tooltip title={ t('开始 / 暂停 (空格)') }>
+      <Button
+        size="small"
+        type={ running ? 'default' : 'primary' }
+        icon={ running ? <PauseCircleOutlined /> : <PlayCircleOutlined /> }
+        onClick={ toggle }
+      >
+        { running ? t('暂停') : st.status === 'paused' ? t('继续') : t('开始') }
+      </Button>
+    </Tooltip>
+  );
+
+  const restartNode = (
+    <Tooltip title={ t('重新开始') }>
+      <Button size="small" icon={ <ReloadOutlined /> } onClick={ () => start() }>{ t('重来') }</Button>
+    </Tooltip>
+  );
+
+  const actionNode = (
+    <Space size={ 6 } wrap>
+      { mainButtonNode }
+      { restartNode }
+      { full
+        ? <Button size="small" icon={ <FullscreenExitOutlined /> } onClick={ exitFull }>{ t('退出全屏') }</Button>
+        : <Button size="small" icon={ <FullscreenOutlined /> } onClick={ () => setFull(true) }>{ t('全屏') }</Button> }
+    </Space>
+  );
+
   const speedNode = (
-    <Segmented
-      size="small"
-      value={ opts.speed }
-      onChange={ (v) => setOpts({ ...opts, speed: v as SpeedKey }) }
-      options={ SPEED_ORDER.map((k) => ({ value: k, label: t({ slow: '慢', mid: '标准', fast: '快', insane: '极速' }[k]) })) }
-    />
+    <Space size={ 6 }>
+      <Text style={ { fontSize: 12 } }>{ t('速度') }</Text>
+      <Segmented
+        size="small"
+        value={ opts.speed }
+        onChange={ (v) => setOpts({ ...opts, speed: v as SpeedKey }) }
+        options={ SPEED_ORDER.map((k) => ({ value: k, label: t(SPEED_LABEL[k]) })) }
+      />
+    </Space>
+  );
+
+  const sizeNode = (
+    <span data-testid="snake-size">
+      <Space size={ 6 }>
+        <Tooltip title={ t('尺寸只影响棋盘显示大小, 始终是 20×20 格; 手机建议用小号') }>
+          <Text style={ { fontSize: 12 } }>{ t('尺寸') }</Text>
+        </Tooltip>
+        <Segmented
+          size="small"
+          value={ opts.size }
+          onChange={ (v) => setOpts({ ...opts, size: v as SizeKey }) }
+          options={ SIZE_ORDER.map((k) => ({ value: k, label: t(SIZE_LABEL[k]) })) }
+        />
+      </Space>
+    </span>
   );
 
   const switchNode = (
@@ -376,28 +434,28 @@ const Snake: React.FC = () => {
     </div>
   );
 
-  const controlNode = (
-    <Space size={ 6 } wrap>
-      <Tooltip title={ t('开始 / 暂停 (空格)') }>
-        <Button
-          size="small"
-          type={ running ? 'default' : 'primary' }
-          icon={ running ? <PauseCircleOutlined /> : <PlayCircleOutlined /> }
-          onClick={ toggle }
-        >
-          { running ? t('暂停') : st.status === 'paused' ? t('继续') : t('开始') }
-        </Button>
-      </Tooltip>
-      <Tooltip title={ t('重新开始') }>
-        <Button size="small" icon={ <ReloadOutlined /> } onClick={ () => start() }>{ t('重来') }</Button>
-      </Tooltip>
-    </Space>
+  // 记分 / 设置 / 控制统一放在棋盘上方 (全屏模式同样如此)
+  const toolbar = (
+    <div className="sk-toolbar" data-testid="snake-toolbar">
+      <div className="sk-toolbar-row">
+        { statsNode }
+        <span className="sk-spacer" />
+        { actionNode }
+      </div>
+      <div className="sk-toolbar-row">
+        { speedNode }
+        { sizeNode }
+        { switchNode }
+        <span className="sk-spacer" />
+        { dpadNode }
+      </div>
+    </div>
   );
 
   const hintNode = (
-    <Space direction="vertical" size={ 2 }>
+    <div className="sk-hints">
       <Text type="secondary" style={ { fontSize: 12 } }>
-        { t('方向键 / WASD 转向; 手机滑动棋盘, 或点下面的方向键') }
+        { t('方向键 / WASD 转向; 手机滑动棋盘, 或点上面的方向盘') }
       </Text>
       <Text type="secondary" style={ { fontSize: 12 } }>
         { tT('苹果 {a} 分 · 金苹果 {b} 分 (只存在 {s} 秒)', {
@@ -407,29 +465,32 @@ const Snake: React.FC = () => {
       <Text type="secondary" style={ { fontSize: 12 } }>
         { t('撞墙 / 撞到自己 / 撞到障碍物即结束, 棋盘填满则通关') }
       </Text>
-    </Space>
+    </div>
   );
 
-  const sideNode = (
-    <>
-      <Space size={ 8 } wrap>
-        { stat(t('得分'), st.score) }
-        { stat(t('最高分'), best) }
-        { stat(t('长度'), snakeLength(st)) }
-        { stat(t('速度'), t({ slow: '慢', mid: '标准', fast: '快', insane: '极速' }[opts.speed])) }
-      </Space>
-      { speedNode }
-      { switchNode }
-      { controlNode }
-    </>
-  );
+  const alertNode = st.status === 'over' || st.status === 'won' ? (
+    <Alert
+      type={ st.status === 'won' ? 'success' : 'error' }
+      showIcon
+      message={ st.status === 'won' ? t('通关了!') : t('游戏结束') }
+      description={
+        newRecordRef.current
+          ? tT('本局得分 {n}', { n: st.score }) + ' · ' + tT('新纪录! 最高分 {m}', { m: best })
+          : tT('本局得分 {n}', { n: st.score })
+      }
+      action={ <Button size="small" type="primary" onClick={ () => start() }>{ t('再来一局') }</Button> }
+    />
+  ) : null;
 
-  const boardStyle = {
-    '--sk-board': BOARD_SIZE_CSS,
+  const cssVars = {
+    '--sk-board': boardSizeCss(opts.size, full),
     '--sk-cell-bg': token.colorFillQuaternary,
+    '--sk-bg': token.colorBgContainer,
+    '--sk-bar-bg': token.colorBgContainer,
+    '--sk-bar-line': token.colorBorderSecondary,
   } as React.CSSProperties;
 
-  // ---- 全屏: 只保留棋盘与记分 / 控制 ----
+  // ---- 全屏: 工具条吸顶, 棋盘居中, 布局与普通模式一致 (记分 / 设置都在上方) ----
   if (full) {
     return (
       <>
@@ -438,61 +499,36 @@ const Snake: React.FC = () => {
           ref={ stageRef }
           className="sk-stage sk-full"
           data-testid="snake-full"
-          style={ { ...boardStyle, '--sk-board': BOARD_SIZE_CSS_FULL, '--sk-bg': token.colorBgContainer } as React.CSSProperties }
+          style={ cssVars }
         >
-          <div className="sk-side" style={ { alignItems: 'stretch' } }>
-            { sideNode }
-            { dpadNode }
-            <Button size="small" icon={ <FullscreenExitOutlined /> } onClick={ exitFull }>{ t('退出全屏') }</Button>
-          </div>
-          { boardNode }
-          <div className="sk-side">
+          { toolbar }
+          <div className="sk-board-area">{ boardNode }</div>
+          <Space size={ 8 } wrap style={ { justifyContent: 'center' } }>
+            <Tag color="green">{ tT('本局得分 {n}', { n: st.score }) }</Tag>
+            { opts.wrap ? <Tag>{ t('穿墙') }</Tag> : null }
+            { opts.walls ? <Tag>{ t('障碍物') }</Tag> : null }
             <Text type="secondary" style={ { fontSize: 12 } }>{ t('Esc 退出全屏') }</Text>
-          </div>
+          </Space>
         </div>
       </>
     );
   }
 
   return (
-    <div className="sk-stage" style={ boardStyle }>
+    <div className="sk-stage" style={ cssVars }>
       <style>{ SNAKE_CSS }</style>
       <Space direction="vertical" size={ 16 } style={ { width: '100%' } }>
-        <Card
-          size="small"
-          title={ t('贪吃蛇') }
-          extra={
-            <Button size="small" icon={ <FullscreenOutlined /> } onClick={ () => setFull(true) }>{ t('全屏') }</Button>
-          }
-        >
+        <Card size="small" title={ t('贪吃蛇') }>
           <Space direction="vertical" size={ 12 } style={ { width: '100%' } }>
-            <div className="sk-wrap">
-              { boardNode }
-              <div className="sk-side" style={ { minWidth: 190 } }>
-                { sideNode }
-                { dpadNode }
-                <Space size={ 4 } wrap>
-                  <Tag color="green">{ tT('本局得分 {n}', { n: st.score }) }</Tag>
-                  { opts.wrap ? <Tag>{ t('穿墙') }</Tag> : null }
-                  { opts.walls ? <Tag>{ t('障碍物') }</Tag> : null }
-                </Space>
-                { hintNode }
-              </div>
-            </div>
-
-            { st.status === 'over' || st.status === 'won' ? (
-              <Alert
-                type={ st.status === 'won' ? 'success' : 'error' }
-                showIcon
-                message={ st.status === 'won' ? t('通关了!') : t('游戏结束') }
-                description={
-                  newRecordRef.current
-                    ? tT('本局得分 {n}', { n: st.score }) + ' · ' + tT('新纪录! 最高分 {m}', { m: best })
-                    : tT('本局得分 {n}', { n: st.score })
-                }
-                action={ <Button size="small" type="primary" onClick={ () => start() }>{ t('再来一局') }</Button> }
-              />
-            ) : null }
+            { toolbar }
+            <div className="sk-board-area">{ boardNode }</div>
+            <Space size={ 4 } wrap>
+              <Tag color="green">{ tT('本局得分 {n}', { n: st.score }) }</Tag>
+              { opts.wrap ? <Tag>{ t('穿墙') }</Tag> : null }
+              { opts.walls ? <Tag>{ t('障碍物') }</Tag> : null }
+            </Space>
+            { alertNode }
+            { hintNode }
           </Space>
         </Card>
 

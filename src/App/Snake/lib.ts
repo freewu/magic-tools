@@ -13,6 +13,8 @@ import {
   ROWS,
   SCORE_APPLE,
   SCORE_GOLD,
+  SIZE_DEFAULT,
+  SIZE_ORDER,
   SPEED_DEFAULT,
   SPEED_MS,
   SPEED_ORDER,
@@ -20,6 +22,7 @@ import {
   START_SNAKE,
   WALL_MAP,
   type Dir,
+  type SizeKey,
   type SpeedKey,
 } from './data';
 
@@ -304,6 +307,8 @@ export const clearBestScores = (): void => {
 export interface SnakeOptions {
   /** 速度档位 */
   speed: SpeedKey;
+  /** 棋盘尺寸档位 (只影响视觉, 棋盘始终保持 20×20) */
+  size: SizeKey;
   /** 穿墙模式: 从一边出去, 从对边进来 */
   wrap: boolean;
   /** 是否出现障碍物 */
@@ -314,6 +319,7 @@ export interface SnakeOptions {
 
 export const DEFAULT_OPTIONS: SnakeOptions = {
   speed: SPEED_DEFAULT,
+  size: SIZE_DEFAULT,
   wrap: false,
   walls: false,
   sound: true,
@@ -322,9 +328,13 @@ export const DEFAULT_OPTIONS: SnakeOptions = {
 /** 任意输入 -> 合法速度档位 */
 export const normalizeSpeed = (v: unknown): SpeedKey => (SPEED_ORDER.includes(v as SpeedKey) ? v as SpeedKey : SPEED_DEFAULT);
 
+/** 任意输入 -> 合法尺寸档位 */
+export const normalizeSize = (v: unknown): SizeKey => (SIZE_ORDER.includes(v as SizeKey) ? v as SizeKey : SIZE_DEFAULT);
+
 /** 任意输入 -> 完整合法的选项 */
 export const normalizeOptions = (raw?: Partial<SnakeOptions> | null): SnakeOptions => ({
   speed: normalizeSpeed(raw?.speed),
+  size: normalizeSize(raw?.size),
   wrap: raw?.wrap === undefined ? DEFAULT_OPTIONS.wrap : raw.wrap === true,
   walls: raw?.walls === undefined ? DEFAULT_OPTIONS.walls : raw.walls === true,
   sound: raw?.sound === undefined ? DEFAULT_OPTIONS.sound : raw.sound === true,

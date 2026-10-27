@@ -1,10 +1,11 @@
 import {
-  BEST_STORAGE_KEY, COLS, GOLD_CHANCE, GOLD_LIFE_MS, QUEUE_MAX, ROWS, SCORE_APPLE, SCORE_GOLD, SPEED_MS,
-  START_SNAKE, WALL_MAP,
+  BEST_STORAGE_KEY, boardSizeCss, COLS, GOLD_CHANCE, GOLD_LIFE_MS, QUEUE_MAX, ROWS, SCORE_APPLE, SCORE_GOLD,
+  SIZE_DEFAULT, SIZE_ORDER, SIZE_PX, SIZE_PX_FULL, SPEED_MS, START_SNAKE, WALL_MAP,
 } from './data';
 import {
   begin, cellKey, clearBestScores, createState, createWalls, DEFAULT_OPTIONS, expireFood, freeCells,
-  getBestScore, getDefaultOptions, isTypingTarget, isWall, keyToInput, normalizeOptions, normalizeSpeed, pause,
+  getBestScore, getDefaultOptions, isTypingTarget, isWall, keyToInput, normalizeOptions, normalizeSize,
+  normalizeSpeed, pause,
   patchDefaultOptions, placeFood, setBestScore, setDefaultOptions, snakeLength, speedMs, step, swipeToDir,
   togglePause, turn, type Rng, type SnakeState,
 } from './lib';
@@ -328,18 +329,38 @@ describe('最高分', () => {
 describe('默认设置', () => {
   test('缺省值', () => {
     expect(getDefaultOptions()).toEqual(DEFAULT_OPTIONS);
-    expect(DEFAULT_OPTIONS).toEqual({ speed: 'mid', wrap: false, walls: false, sound: true });
+    expect(DEFAULT_OPTIONS).toEqual({ speed: 'mid', size: 'md', wrap: false, walls: false, sound: true });
   });
 
   test('写入 / 局部更新 / 归一化', () => {
-    setDefaultOptions({ speed: 'insane', wrap: true } as never);
-    expect(getDefaultOptions()).toEqual({ speed: 'insane', wrap: true, walls: false, sound: true });
+    setDefaultOptions({ speed: 'insane', size: 'lg', wrap: true } as never);
+    expect(getDefaultOptions()).toEqual({ speed: 'insane', size: 'lg', wrap: true, walls: false, sound: true });
     patchDefaultOptions({ walls: true, sound: false });
-    expect(getDefaultOptions()).toEqual({ speed: 'insane', wrap: true, walls: true, sound: false });
+    expect(getDefaultOptions()).toEqual({ speed: 'insane', size: 'lg', wrap: true, walls: true, sound: false });
     expect(normalizeSpeed('nope')).toBe('mid');
+    expect(normalizeSize('nope')).toBe(SIZE_DEFAULT);
     expect(normalizeOptions({ speed: 'fast', wrap: 'yes' as never })).toEqual({
-      speed: 'fast', wrap: false, walls: false, sound: true,
+      speed: 'fast', size: 'md', wrap: false, walls: false, sound: true,
     });
+    // 缺 size 的旧存档也要补上默认值
+    expect(normalizeOptions({ speed: 'slow' })).toEqual({
+      speed: 'slow', size: 'md', walls: false, wrap: false, sound: true,
+    });
+  });
+
+  test('尺寸档位: 顺序 / 上限 / CSS 表达式', () => {
+    expect([ ...SIZE_ORDER ]).toEqual([ 'sm', 'md', 'lg' ]);
+    expect(SIZE_PX.sm).toBeLessThan(SIZE_PX.md);
+    expect(SIZE_PX.md).toBeLessThan(SIZE_PX.lg);
+    // 全屏给得更大
+    SIZE_ORDER.forEach((k) => expect(SIZE_PX_FULL[k]).toBeGreaterThan(SIZE_PX[k]));
+    // 表达式里带上该档位的像素上限, 并限制在视口内
+    SIZE_ORDER.forEach((k) => {
+      expect(boardSizeCss(k)).toBe(`min(90vw, 52vh, ${SIZE_PX[k]}px)`);
+      expect(boardSizeCss(k, true)).toBe(`min(86vw, 74vh, ${SIZE_PX_FULL[k]}px)`);
+    });
+    // 非法档位回退默认档
+    expect(boardSizeCss('nope' as never)).toBe(`min(90vw, 52vh, ${SIZE_PX[SIZE_DEFAULT]}px)`);
   });
 
   test('存档损坏时回退默认', () => {

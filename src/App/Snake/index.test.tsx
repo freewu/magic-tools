@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import Snake from './index';
-import { BEST_STORAGE_KEY, SPEED_MS, WALL_MAP } from './data';
+import { BEST_STORAGE_KEY, boardSizeCss, SIZE_DEFAULT, SPEED_MS, WALL_MAP } from './data';
 
 // app-context 依赖 App/index.tsx 的顶层 await + import.meta.glob (jest commonjs 不支持), 故打桩
 jest.mock('../../hook/app-context', () => ({
@@ -228,12 +228,54 @@ describe('贪吃蛇页面', () => {
     expect(sw).not.toBeChecked();
   });
 
-  test('读取默认设置 (速度 / 穿墙 / 障碍物)', () => {
+  test('切换尺寸档位会改变棋盘大小 (始终 20×20)', () => {
+    const { container } = render(<Snake />);
+    const stage = container.querySelector('.sk-stage') as HTMLElement;
+    const boardVar = () => (stage.getAttribute('style') ?? '');
+    expect(boardVar()).toContain(boardSizeCss(SIZE_DEFAULT));
+    fireEvent.click(within(screen.getByTestId('snake-size')).getByText('大'));
+    expect(boardVar()).toContain(boardSizeCss('lg'));
+    fireEvent.click(within(screen.getByTestId('snake-size')).getByText('小'));
+    expect(boardVar()).toContain(boardSizeCss('sm'));
+    // 尺寸只改视觉, 格子数不变
+    expect(cellCount(container)).toBe(400);
+    expect(statText(container, '长度')).toBe('3');
+  });
+
+  test('得分 / 设置 / 控制都在棋盘上方 (含全屏)', () => {
+    const { container } = render(<Snake />);
+    const toolbar0 = container.querySelector('[data-testid="snake-toolbar"]') as HTMLElement;
+    const board0 = container.querySelector('[data-testid="snake-board"]') as HTMLElement;
+    expect(toolbar0.compareDocumentPosition(board0) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // 工具条里既有记分框, 也有速度 / 尺寸 / 开关 / 方向盘
+    const toolbar = container.querySelector('[data-testid="snake-toolbar"]') as HTMLElement;
+    [ '得分', '最高分', '长度', '速度' ].forEach((k) => {
+      expect(toolbar.querySelector(`[data-stat="${k}"]`)).toBeTruthy();
+    });
+    expect(toolbar.querySelector('[data-testid="snake-dpad"]')).toBeTruthy();
+    expect(toolbar.querySelector('[data-testid="snake-size"]')).toBeTruthy();
+    expect(toolbar.querySelector('[data-testid="snake-wrap"]')).toBeTruthy();
+
+    // 全屏模式: 工具条同样在棋盘上方, 棋盘搬进全屏容器
+    fireEvent.click(screen.getByRole('button', { name: /全屏/ }));
+    const full = screen.getByTestId('snake-full');
+    const fToolbar = full.querySelector('[data-testid="snake-toolbar"]') as HTMLElement;
+    const fBoard = full.querySelector('[data-testid="snake-board"]') as HTMLElement;
+    expect(!!(fToolbar.compareDocumentPosition(fBoard) & Node.DOCUMENT_POSITION_FOLLOWING)).toBeTruthy();
+    expect(fToolbar.querySelector('[data-stat="得分"]')).toBeTruthy();
+    expect(full.querySelector('[data-testid="snake-dpad"]')).toBeTruthy();
+    // 全屏下尺寸档位更大
+    expect((full.getAttribute('style') ?? '')).toContain(boardSizeCss(SIZE_DEFAULT, true));
+  });
+
+  test('读取默认设置 (速度 / 尺寸 / 穿墙 / 障碍物)', () => {
     localStorage.setItem('magic-tools-snake-defaults', JSON.stringify({
-      speed: 'fast', wrap: true, walls: true, sound: false,
+      speed: 'fast', size: 'lg', wrap: true, walls: true, sound: false,
     }));
     const { container } = render(<Snake />);
     expect(statText(container, '速度')).toBe('快');
+    // 默认尺寸从存档读取
+    expect(container.querySelector('.sk-stage')?.getAttribute('style') ?? '').toContain(boardSizeCss('lg'));
     expect(screen.getByTestId('snake-wrap')).toBeChecked();
     expect(screen.getByTestId('snake-walls')).toBeChecked();
     expect(screen.getByTestId('snake-sound')).not.toBeChecked();

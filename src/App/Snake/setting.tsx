@@ -1,6 +1,6 @@
 import { Button, Divider, Form, Segmented, Switch, message } from 'antd';
 import { useState } from 'react';
-import { SPEED_ORDER, type SpeedKey } from './data';
+import { SIZE_ORDER, SPEED_ORDER, type SizeKey, type SpeedKey } from './data';
 import { clearBestScores, getDefaultOptions, patchDefaultOptions, type SnakeOptions } from './lib';
 import { u } from './lang';
 import { useLocale } from '../../hook/locale-context';
@@ -15,6 +15,7 @@ export const SnakeSetting: React.FC = () => {
 
   const patch = (p: Partial<SnakeOptions>) => setOpts(patchDefaultOptions(p));
   const speedLabel = (k: SpeedKey) => t({ slow: '慢', mid: '标准', fast: '快', insane: '极速' }[k]);
+  const sizeLabel = (k: SizeKey) => t({ sm: '小', md: '中', lg: '大' }[k]);
 
   return (
     <>
@@ -27,6 +28,16 @@ export const SnakeSetting: React.FC = () => {
           value={ opts.speed }
           onChange={ (v) => patch({ speed: v as SpeedKey }) }
           options={ SPEED_ORDER.map((k) => ({ value: k, label: speedLabel(k) })) }
+        />
+      </Form.Item>
+      <Form.Item
+        label={ st('默认尺寸') }
+        extra={ st('尺寸只影响棋盘显示大小, 始终是 20×20 格; 手机建议用小号') }
+      >
+        <Segmented
+          value={ opts.size }
+          onChange={ (v) => patch({ size: v as SizeKey }) }
+          options={ SIZE_ORDER.map((k) => ({ value: k, label: sizeLabel(k) })) }
         />
       </Form.Item>
       <Form.Item label={ st('默认穿墙模式') } extra={ st('穿墙: 从一边出去, 从对边进来') }>

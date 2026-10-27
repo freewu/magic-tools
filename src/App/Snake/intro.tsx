@@ -8,8 +8,9 @@ const zh = `<h2>这个工具做什么</h2>
 <ul>
 <li><p><b>方向键</b> (或 <b>W A S D</b>): 转向 —— 蛇每走一格吃一个转向指令, 连按两下可以连续拐两个弯 (不能 180 度掉头)</p></li>
 <li><p><b>空格</b> / <b>回车</b>: 开局 / 暂停 / 继续; <b>P</b> 或 <b>Esc</b> 也能暂停</p></li>
-<li><p>手机 / 平板: <b>在棋盘上滑动</b>即可转向, 也可以点右侧的 <b>方向盘</b> 按钮</p></li>
-<li><p>右侧 <b>速度</b> 四档随时可换 (慢 280ms / 标准 200ms / 快 150ms / 极速 110ms 一格)</p></li>
+<li><p>手机 / 平板: <b>在棋盘上滑动</b>即可转向, 也可以点棋盘上方的 <b>方向盘</b> 按钮</p></li>
+<li><p><b>速度</b> 四档随时可换 (慢 280ms / 标准 200ms / 快 150ms / 极速 110ms 一格)</p></li>
+<li><p><b>尺寸</b> 四档随时可换 (小 / 中 / 大): 只改棋盘显示大小, 始终是 20×20 格; 手机建议用小号, 大屏可用大号</p></li>
 </ul>
 
 <h2>计分</h2>
@@ -22,6 +23,7 @@ const zh = `<h2>这个工具做什么</h2>
 
 <h2>界面说明</h2>
 <ul>
+<li><p><b>记分与设置都在棋盘上方</b>: 第一行是 得分 / 最高分 / 长度 / 速度 与 开始 · 重来 · 全屏, 第二行是 速度 / 尺寸 / 穿墙 / 障碍物 / 音效 与方向盘 —— 全屏模式下同样是这套顶部工具条 (吸顶不随棋盘中轴移动)</p></li>
 <li><p><b>穿墙</b>: 打开后从棋盘一边出去会从对边进来, 不会撞墙</p></li>
 <li><p><b>障碍物</b>: 打开后棋盘上固定出现 12 格障碍 (开局时铺设, 进行中切换则下一局生效)</p></li>
 <li><p><b>音效</b>: 吃到食物 / 撞到时用 Web Audio 现场合成提示音, 不加载任何音频文件</p></li>
@@ -30,7 +32,7 @@ const zh = `<h2>这个工具做什么</h2>
 
 <h2>设置</h2>
 <ul>
-<li><p>设置中心 → 游戏 → 「贪吃蛇」里可以修改 <b>默认速度</b>、<b>默认穿墙</b>、<b>默认障碍物</b> 与 <b>默认音效</b>, 还能一键清空最高分记录</p></li>
+<li><p>设置中心 → 游戏 → 「贪吃蛇」里可以修改 <b>默认速度</b>、<b>默认尺寸</b>、<b>默认穿墙</b>、<b>默认障碍物</b> 与 <b>默认音效</b>, 还能一键清空最高分记录</p></li>
 <li><p>最高分只保存在本机, 换设备或清缓存即丢失, 不会同步到任何服务器</p></li>
 </ul>`;
 
@@ -41,8 +43,9 @@ const tw = `<h2>這個工具做什麼</h2>
 <ul>
 <li><p><b>方向鍵</b> (或 <b>W A S D</b>): 轉向 —— 蛇每走一格消耗一個轉向指令, 連按兩下可以連續拐兩個彎 (不能 180 度迴轉)</p></li>
 <li><p><b>空白鍵</b> / <b>Enter</b>: 開局 / 暫停 / 繼續; <b>P</b> 或 <b>Esc</b> 也能暫停</p></li>
-<li><p>手機 / 平板: <b>在棋盤上滑動</b>即可轉向, 也可以點右側的 <b>方向盤</b> 按鈕</p></li>
-<li><p>右側 <b>速度</b> 四段隨時可換 (慢 280ms / 標準 200ms / 快 150ms / 極速 110ms 一格)</p></li>
+<li><p>手機 / 平板: <b>在棋盤上滑動</b>即可轉向, 也可以點棋盤上方的 <b>方向盤</b> 按鈕</p></li>
+<li><p><b>速度</b> 四段隨時可換 (慢 280ms / 標準 200ms / 快 150ms / 極速 110ms 一格)</p></li>
+<li><p><b>尺寸</b> 三檔隨時可換 (小 / 中 / 大): 只改棋盤顯示大小, 始終是 20×20 格; 手機建議用小號, 大螢幕可用大號</p></li>
 </ul>
 
 <h2>計分</h2>
@@ -55,6 +58,7 @@ const tw = `<h2>這個工具做什麼</h2>
 
 <h2>介面說明</h2>
 <ul>
+<li><p><b>記分與設定都在棋盤上方</b>: 第一列是 得分 / 最高分 / 長度 / 速度 與 開始 · 重來 · 全螢幕, 第二列是 速度 / 尺寸 / 穿牆 / 障礙物 / 音效 與方向盤 —— 全螢幕模式下同樣是這套頂部工具列 (固定在頂端)</p></li>
 <li><p><b>穿牆</b>: 打開後從棋盤一邊出去會從對邊進來, 不會撞牆</p></li>
 <li><p><b>障礙物</b>: 打開後棋盤上固定出現 12 格障礙 (開局時鋪設, 進行中切換則下一局生效)</p></li>
 <li><p><b>音效</b>: 吃到食物 / 撞到時用 Web Audio 現場合成提示音, 不載入任何音訊檔</p></li>
@@ -63,7 +67,7 @@ const tw = `<h2>這個工具做什麼</h2>
 
 <h2>設定</h2>
 <ul>
-<li><p>設定中心 → 遊戲 → 「貪吃蛇」裡可以修改 <b>預設速度</b>、<b>預設穿牆</b>、<b>預設障礙物</b> 與 <b>預設音效</b>, 還能一鍵清空最高分記錄</p></li>
+<li><p>設定中心 → 遊戲 → 「貪吃蛇」裡可以修改 <b>預設速度</b>、<b>預設尺寸</b>、<b>預設穿牆</b>、<b>預設障礙物</b> 與 <b>預設音效</b>, 還能一鍵清空最高分記錄</p></li>
 <li><p>最高分只儲存在本機, 換裝置或清快取即遺失, 不會同步到任何伺服器</p></li>
 </ul>`;
 
@@ -74,8 +78,9 @@ const en = `<h2>What this tool does</h2>
 <ul>
 <li><p><b>Arrow keys</b> (or <b>W A S D</b>): turn — one queued turn is consumed per cell, so two quick presses make two corners (180° turns are rejected)</p></li>
 <li><p><b>Space</b> / <b>Enter</b>: start / pause / resume; <b>P</b> or <b>Esc</b> also pauses</p></li>
-<li><p>Phone / tablet: <b>swipe on the board</b> to turn, or tap the <b>D-pad</b> buttons on the right</p></li>
+<li><p>Phone / tablet: <b>swipe on the board</b> to turn, or tap the <b>D-pad</b> above the board</p></li>
 <li><p>The <b>speed</b> segment switches instantly between slow 280 ms, normal 200 ms, fast 150 ms and insane 110 ms per cell</p></li>
+<li><p>The <b>size</b> segment (S / M / L) only changes how large the board is drawn — it is always 20×20 cells; pick S on phones and L on big screens</p></li>
 </ul>
 
 <h2>Scoring</h2>
@@ -88,6 +93,7 @@ const en = `<h2>What this tool does</h2>
 
 <h2>On screen</h2>
 <ul>
+<li><p><b>Score and settings live in a top bar</b>: the first row shows score / best / length / speed plus start · restart · fullscreen, the second row has speed / size / wrap / obstacles / sound and the D-pad — fullscreen keeps exactly the same top bar (sticky at the top)</p></li>
 <li><p><b>Wrap</b>: going off one edge re-enters from the opposite side instead of crashing</p></li>
 <li><p><b>Walls</b>: adds 12 fixed obstacle cells, laid out when a round starts (switching mid-round applies to the next round)</p></li>
 <li><p><b>Sound</b>: eating and crashing beeps are synthesised with Web Audio — no audio files are loaded</p></li>
@@ -96,7 +102,7 @@ const en = `<h2>What this tool does</h2>
 
 <h2>Settings</h2>
 <ul>
-<li><p>Settings → Games → “Snake” sets the <b>default speed</b>, <b>wrap</b>, <b>obstacles</b> and <b>sound</b> defaults, and can clear the best score</p></li>
+<li><p>Settings → Games → “Snake” sets the <b>default speed</b>, <b>size</b>, <b>wrap</b>, <b>obstacles</b> and <b>sound</b> defaults, and can clear the best score</p></li>
 <li><p>The best score lives only in the browser's localStorage — clearing the cache or switching devices loses it, and nothing is ever synced</p></li>
 </ul>`;
 

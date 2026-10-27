@@ -776,6 +776,10 @@ const ROWS: Record<string, Row> = {
     '預設速度與開關, 開局後也能在頁面上隨時改',
     'Default speed and switches — you can still change them on the page during a round',
   ],
+  '尺寸只影响棋盘显示大小, 始终是 20×20 格; 手机建议用小号': [
+    '尺寸只影響棋盤顯示大小, 始終是 20×20 格; 手機建議用小號',
+    'Size only changes how large the board is drawn — it is always 20×20; pick S on phones',
+  ],
   '默认穿墙模式': ['預設穿牆模式', 'Wrap by default'],
   '默认显示障碍物': ['預設顯示障礙物', 'Obstacles by default'],
   '默认播放音效': ['預設播放音效', 'Sound by default'],

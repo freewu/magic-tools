@@ -18,6 +18,15 @@ const rows: Record<string, [string, string]> = {
   '标准': ['標準', 'Normal'],
   '快': ['快', 'Fast'],
   '极速': ['極速', 'Insane'],
+  '尺寸': ['尺寸', 'Size'],
+  '小': ['小', 'S'],
+  '中': ['中', 'M'],
+  '大': ['大', 'L'],
+  '棋盘尺寸': ['棋盤尺寸', 'Board size'],
+  '尺寸只影响棋盘显示大小, 始终是 20×20 格; 手机建议用小号': [
+    '尺寸只影響棋盤顯示大小, 始終是 20×20 格; 手機建議用小號',
+    'Size only changes how large the board is drawn — it is always 20×20; pick S on phones',
+  ],
   // 开关
   '穿墙': ['穿牆', 'Wrap'],
   '障碍物': ['障礙物', 'Walls'],
@@ -55,8 +64,8 @@ const rows: Record<string, [string, string]> = {
   '开始 / 暂停 (空格)': ['開始 / 暫停 (空白鍵)', 'Start / pause (Space)'],
   '暂停 / 继续 (P)': ['暫停 / 繼續 (P)', 'Pause / resume (P)'],
   // 说明文字
-  '方向键 / WASD 转向; 手机滑动棋盘, 或点下面的方向键': [
-    '方向鍵 / WASD 轉向; 手機滑動棋盤, 或點下面的方向鍵',
+  '方向键 / WASD 转向; 手机滑动棋盘, 或点上面的方向盘': [
+    '方向鍵 / WASD 轉向; 手機滑動棋盤, 或點上面的方向盤',
     'Arrow keys / WASD to steer · swipe the board on touch screens, or use the D-pad',
   ],
   '苹果 {a} 分 · 金苹果 {b} 分 (只存在 {s} 秒)': [
