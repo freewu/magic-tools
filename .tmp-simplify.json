@@ -1,0 +1,118 @@
+{
+  "V2.24.0": {
+    "zh": [
+      "新增应用: 2048、俄罗斯方块、扫雷、NES 模拟器、GameBoy 模拟器 (新增「游戏」分类, 工具总数 151 → 156)",
+      "新增功能: 设置中心可勾选应用中心要展示的分类, 侧边栏与应用中心实时同步过滤 (不影响收藏); NES / GameBoy 模拟器全屏时画面浮出半透明虚拟按键 (透明度可调, 键盘 / 手柄按下同步高亮)",
+      "问题修复: NES 模拟器拖入 ROM 没有反应、载入后没有声音、画面黑屏 (帧缓冲缺 alpha 通道且 R / B 颠倒)"
+    ],
+    "tw": [
+      "新增應用: 2048、俄羅斯方塊、踩地雷、NES 模擬器、GameBoy 模擬器 (新增「遊戲」分類, 工具總數 151 → 156)",
+      "新增功能: 設定中心可勾選應用中心要展示的分類, 側邊欄與應用中心即時同步過濾 (不影響收藏); NES / GameBoy 模擬器全螢幕時畫面浮出半透明虛擬按鍵 (透明度可調, 鍵盤 / 手把按下同步高亮)",
+      "問題修正: NES 模擬器拖入 ROM 沒有反應、載入後沒有聲音、畫面黑屏 (影格緩衝缺 alpha 通道且 R / B 顛倒)"
+    ],
+    "en": [
+      "New apps: 2048, Tetris, Minesweeper, NES Emulator and GameBoy Emulator (a new Games category; tools 151 → 156)",
+      "New features: Settings can choose which categories the App Center shows, filtering the sidebar and the App Center live (Favorites untouched); the NES and GameBoy emulators float a translucent pad over the picture in fullscreen (adjustable opacity, keyboard and gamepad presses light it up)",
+      "Fixes: NES ROMs dropped on the page were ignored, there was no sound after loading, and the picture stayed black (framebuffer missing its alpha channel with R / B swapped)"
+    ]
+  },
+  "V2.23.2": {
+    "zh": [
+      "体验改进: Mermaid 编辑器的渲染引擎由 mermaid 换成 pele (零依赖单文件引擎, 仍内置 32 种图形示例); 图表配色跟随「背景」设置, 切换背景不再重新渲染; 错误提示按类型分类并给出「第 N 行, 第 M 列」定位; 图表里的 HTML 只按纯文本渲染, 链接与外部图片默认不生效",
+      "问题修复: 首屏白预载 3.6MB 的 mermaid 分包 (入口静态依赖了用不到的引擎), 改为纯按需加载, 首屏预载 gzip 1523KB → 585KB",
+      "帮助页「使用组件」把 Mermaid 11.17.2 换为 Pele 1.6.0"
+    ],
+    "tw": [
+      "體驗改進: Mermaid 編輯器的渲染引擎由 mermaid 換成 pele (零相依單檔引擎, 仍內建 32 種圖形範例); 圖表配色跟隨「背景」設定, 切換背景不再重新渲染; 錯誤提示依類型分類並給出「第 N 行, 第 M 列」定位; 圖表中的 HTML 只按純文字渲染, 連結與外部圖片預設不生效",
+      "問題修正: 首屏白預載 3.6MB 的 mermaid 分包 (入口靜態相依了用不到的引擎), 改為純按需載入, 首屏預載 gzip 1523KB → 585KB",
+      "說明頁「使用元件」把 Mermaid 11.17.2 換為 Pele 1.6.0"
+    ],
+    "en": [
+      "Improvements: the Mermaid Editor now renders with pele instead of mermaid (a dependency-free single-file engine, still shipping 32 diagram samples); diagram colours follow the Background setting and switching backgrounds no longer re-renders; errors are grouped by kind with line / column positions; HTML inside diagrams is rendered as plain text and links or remote images stay inert",
+      "Fixes: the first screen preloaded a 3.6MB mermaid chunk it never used — it is now loaded strictly on demand, cutting preloaded gzip from 1523KB to 585KB",
+      "The Help components list moved from Mermaid 11.17.2 to Pele 1.6.0"
+    ]
+  },
+  "V2.23.1": {
+    "zh": [
+      "新增功能: 敏感词检测新增扩展词库 (17 个分类 / 约 7.4 万条, 勾选后才按需加载) 与打码预览 (高亮被打码位置, 可复制结果); XML / HTML 格式化新增结构树视图; Markdown 编辑器 / Mermaid 编辑器新增全屏模式",
+      "体验改进: XML / HTML 格式化拆成「格式化结果 / 结构树」分页签并支持打开本地文件与原生保存; Markdown 系工具支持打开本地文件并沿用原文件名保存; 敏感词打码字符可选可填; CSS 配色色卡编码跟随颜色类型; 应用中心撤下上一版本新增应用的 NEW 徽标"
+    ],
+    "tw": [
+      "新增功能: 敏感詞檢測新增擴充詞庫 (17 個分類 / 約 7.4 萬筆, 勾選後才按需載入) 與打碼預覽 (高亮被打碼位置, 可複製結果); XML / HTML 格式化新增結構樹視圖; Markdown 編輯器 / Mermaid 編輯器新增全螢幕模式",
+      "體驗改進: XML / HTML 格式化拆成「格式化結果 / 結構樹」分頁籤並支援開啟本機檔案與原生儲存; Markdown 系列工具支援開啟本機檔案並沿用原檔名儲存; 敏感詞打碼字元可選可填; CSS 配色色卡編碼跟隨顏色類型; 應用中心撤下上一版本新增應用的 NEW 徽標"
+    ],
+    "en": [
+      "New features: Sensitive Word Detection gained an extended lexicon (17 categories, about 74k entries, loaded only when ticked) and a masking preview that highlights masked spots and can copy the result; XML and HTML Formatter gained a structure-tree view; the Markdown and Mermaid editors gained fullscreen",
+      "Improvements: XML / HTML Formatter now separates formatted output and the structure tree into tabs, opens local files and saves through the native dialog; Markdown-style tools open local files and reuse the file name when saving; masking characters are selectable or free-form; CSS Colors code labels follow the chosen colour type; the App Center dropped the previous version’s NEW badges"
+    ]
+  },
+  "V2.23.0": {
+    "zh": [
+      "新增应用: 拼豆图纸、假装开会、Zip 压缩、Zip 解压、GIF 拆解、GIF 生成 (工具总数 145 → 151)",
+      "新增功能: 应用中心新增 NEW 徽标 (应用在 define.tsx 里导出 IsNew = true 即展示, 用于标记本版本新增的应用); Shield Badge 生成的 SVG 源码支持格式化查看与单行切换",
+      "体验改进: Zip 压缩 / 解压窗口宽度改为铺满内容区"
+    ],
+    "tw": [
+      "新增應用: 拼豆圖紙、假裝開會、Zip 壓縮、Zip 解壓、GIF 拆解、GIF 產生 (工具總數 145 → 151)",
+      "新增功能: 應用中心新增 NEW 徽標 (應用在 define.tsx 匯出 IsNew = true 即展示, 用來標記本版本新增的應用); Shield Badge 產生的 SVG 原始碼支援格式化檢視與單行切換",
+      "體驗改進: Zip 壓縮 / 解壓視窗寬度改為鋪滿內容區"
+    ],
+    "en": [
+      "New apps: Bead Pattern, Fake Meeting, Zip Compress, Zip Extract, GIF Splitter and GIF Maker (tools 145 → 151)",
+      "New features: the App Center shows a NEW badge for apps that export IsNew = true from their define.tsx, marking the apps added in this release; Shield Badge can now pretty-print its SVG source or show it as a single line",
+      "Improvements: the Zip Compress / Extract windows now fill the content area"
+    ]
+  },
+  "V2.22.2": {
+    "zh": [
+      "新增功能: 中文拼音新增拼音注音排版 (拼音以小字显示在汉字正上方, 可切换拼音文本, 整段转换保留多音字上下文); CSS 配色新增拼豆 / 绣线色卡 (MARD / COCO / Artkal / Perler / Hama / DMC) 并支持按系列分组展示",
+      "体验改进: 色卡上的色号文字改为反色显示, 深色与中间色调也看得清; 节拍器倒计时改为 3~10 秒数字倒计时 (每秒一个预备拍); 经纬度格式转换的示例改为顶部彩色标签; 四个编解码工具按钮增加间距; Gzip 编解码输入输出铺满整宽; SM9 的「密钥生成」页更名「密钥管理」",
+      "问题修复: 经纬度格式转换输入为空时结果区整块消失 (现在始终显示四种格式的结果区)"
+    ],
+    "tw": [
+      "新增功能: 中文拼音新增拼音注音排版 (拼音以小字顯示在漢字正上方, 可切換拼音文字, 整段轉換保留多音字上下文); CSS 配色新增拼豆 / 繡線色卡 (MARD / COCO / Artkal / Perler / Hama / DMC) 並支援依系列分組展示",
+      "體驗改進: 色卡上的色號文字改為反色顯示, 深色與中間色調也看得清; 節拍器倒數改為 3~10 秒數字倒數 (每秒一個預備拍); 經緯度格式轉換的範例改為頂部彩色標籤; 四個編解碼工具按鈕增加間距; Gzip 編解碼輸入輸出鋪滿整寬; SM9 的「金鑰產生」頁更名「金鑰管理」",
+      "問題修正: 經緯度格式轉換輸入為空時結果區整塊消失 (現在始終顯示四種格式的結果區)"
+    ],
+    "en": [
+      "New features: Chinese Pinyin gained ruby annotation (pinyin in small type above each character, switchable to plain pinyin text, converted as a whole so heteronyms keep their context); CSS Colors gained bead and floss palettes (MARD / COCO / Artkal / Perler / Hama / DMC) grouped by series",
+      "Improvements: colour-code labels are drawn in the inverse colour so dark and mid tones stay readable; the Metronome counts down 3–10 seconds with a preparatory beat each second; Latitude / Longitude shows its examples as coloured tags at the top; the four codec tools got proper button spacing; Gzip fields fill the width; SM9 renamed Key Generation to Key Management",
+      "Fixes: Latitude / Longitude hid the whole result area when the input was empty — all four formats now always show"
+    ]
+  },
+  "V2.22.1": {
+    "zh": [
+      "新增功能: 思维导图支持整页全屏, 参数改下拉选择, 三个导出按钮合并为「导出图片」(SVG / PNG / WebP); 即时渲染 Markdown 支持全屏; 六个换算页新增常用预设彩色标签; ASCII 文字字体选择改为弹窗 (可预览 289 款字体, 带搜索与首字母筛选); SM9 加解密合并为单页 (用户 ID 只读, 设置页可按 ID 生成密钥); IP 转换的结果区常驻",
+      "体验改进: 七个换算工具改用 bignumber.js 精确计算, 消除浮点误差; Cisco Type 7 更名为 Cisco Type 7 加解密并统一为上下双框布局; 15 个加解密工具按钮增加间距",
+      "问题修复: 换算页预设标签与单位挤在同一行、标签文案冗余; 官网下载卡片在手机端 4 列挤压"
+    ],
+    "tw": [
+      "新增功能: 思維導圖支援整頁全螢幕, 參數改下拉選擇, 三個匯出按鈕合併為「匯出圖片」(SVG / PNG / WebP); 即時渲染 Markdown 支援全螢幕; 六個換算頁新增常用預設彩色標籤; ASCII 文字字型選擇改為彈窗 (可預覽 289 款字型, 帶搜尋與首字母篩選); SM9 加解密合併為單頁 (使用者 ID 唯讀, 設定頁可依 ID 產生金鑰); IP 轉換的結果區常駐",
+      "體驗改進: 七個換算工具改用 bignumber.js 精確計算, 消除浮點誤差; Cisco Type 7 更名為 Cisco Type 7 加解密並統一為上下雙框版面; 15 個加解密工具按鈕增加間距",
+      "問題修正: 換算頁預設標籤與單位擠在同一行、標籤文案冗餘; 官網下載卡片在手機端 4 欄擠壓"
+    ],
+    "en": [
+      "New features: Mind Map gained a full-page fullscreen mode, dropdown parameters and a single Export Image button offering SVG / PNG / WebP; Instant Markdown gained fullscreen; the six converters got one-click preset tags; ASCII Art picks fonts from a dialog previewing all 289 figlet fonts with search and first-letter filters; SM9 merged its encrypt / decrypt tabs into one page with a read-only user ID; IP Converter keeps its result area visible",
+      "Improvements: the seven unit converters use bignumber.js for exact arithmetic, removing floating-point drift; Cisco Type 7 became Cisco Type 7 Cipher with the same two-box layout as the other ciphers; 15 cipher tools got button spacing",
+      "Fixes: preset tags collided with units on the converter pages, tag labels were redundant, and the website download cards squeezed into four columns on phones"
+    ]
+  },
+  "V2.22.0": {
+    "zh": [
+      "新增应用: 祖冲之序列密码 (国密 ZUC, Rust + WebAssembly, 纯本机计算)、聊天生成器 (9 种平台风格, 文字 / 图片 / 语音 / 时间四类消息可排序, 导出 PNG)",
+      "新增功能: 聊天生成器支持微信专属红包 / 转账卡片 (切到其他平台自动退化为纯文字), 免打扰开关与按平台区分的标题栏",
+      "问题修复: 聊天生成器预览外框黑边过大、iOS / 安卓风格切换看不出差异、深色模式下消息行底色刺眼、电量配色规则"
+    ],
+    "tw": [
+      "新增應用: 祖沖之序列密碼 (國密 ZUC, Rust + WebAssembly, 純本機計算)、聊天產生器 (9 種平台風格, 文字 / 圖片 / 語音 / 時間四類訊息可排序, 匯出 PNG)",
+      "新增功能: 聊天產生器支援微信專屬紅包 / 轉帳卡片 (切到其他平台自動退化為純文字), 勿擾開關與依平台區分的標題列",
+      "問題修正: 聊天產生器預覽外框黑邊過大、iOS / 安卓風格切換看不出差異、深色模式下訊息列底色刺眼、電量配色規則"
+    ],
+    "en": [
+      "New apps: ZUC Cipher (the Chinese GB/T 33133 stream cipher, Rust + WebAssembly, computed locally) and Chat Generator (nine platform styles, four message kinds that can be reordered, PNG export)",
+      "New features: Chat Generator supports WeChat-only red packet and transfer cards (they degrade to plain text on other platforms), a do-not-disturb switch and per-platform title bars",
+      "Fixes: oversized black borders in the Chat Generator preview, indistinguishable iOS / Android styles, glaring message rows in dark mode and the battery colour rules"
+    ]
+  }
+}
