@@ -1,106 +1,97 @@
 {
-  "V2.21.1": {
+  "V2.16.1": {
     "zh": [
-      "新增功能: 设置中心新增配置导入 / 导出 (导出全部本地设置与各应用的默认配置为 JSON, 导入时校验并合并写回, 完成后自动重载生效)",
-      "体验改进: 我的收藏支持按类型分组展示 (分组视图下自动停用拖动排序); 「收藏按类型展示」的默认值可在设置中心配置, 改动实时同步到已打开的收藏页"
+      "体验改进: 经纬度格式转换新增 6 个示例坐标一键载入 (均取自同一地点, 方便对照四种格式的写法差异)"
     ],
     "tw": [
-      "新增功能: 設定中心新增設定匯入 / 匯出 (匯出全部本機設定與各應用的預設設定為 JSON, 匯入時驗證並合併寫回, 完成後自動重新載入生效)",
-      "體驗改進: 我的收藏支援依類型分組展示 (分組檢視下自動停用拖曳排序); 「收藏依類型展示」的預設值可在設定中心設定, 變更即時同步到已開啟的收藏頁"
+      "體驗改進: 經緯度格式轉換新增 6 個範例座標一鍵載入 (均取自同一地點, 方便對照四種格式的寫法差異)"
     ],
     "en": [
-      "New features: Settings gained config import / export (dumps every local setting plus each app’s default options to JSON, then validates and merges on import, reloading the page when done)",
-      "Improvements: Favorites can be grouped by category (drag sorting is disabled in that view), with the default configurable in Settings and synced live to an open Favorites page"
+      "Improvements: Latitude / Longitude added six one-click sample coordinates — all from the same place, so the four formats can be compared directly"
     ]
   },
-  "V2.21.0": {
+  "V2.16.0": {
     "zh": [
-      "新增功能: 新增系统级页面「我的收藏」(收藏 / 取消收藏、按名称搜索、一键清空, 应用卡片右上角一键收藏, 状态全局实时同步), 支持拖动排序与可拖动悬浮入口 (位置持久化, 右键复位, 角标显示收藏数); 提词器新增阅读基准线 (颜色可自定义, 可拖动调整位置); 番茄时钟全屏支持空格 / 回车开始与暂停",
-      "体验改进: 收藏卡片用光标区分「按住拖动排序」与「点击打开应用」; 应用中心「默认展示应用」下拉新增「我的收藏」选项",
-      "问题修复: 桌面版收藏拖动排序失效 (改用 Pointer Events 实现); 番茄时钟「跳过当前阶段」按钮与阶段页签挤在同一行"
+      "新增应用: 经纬度格式转换 (十进制 / 度分秒 / 度分 / 国家标准四种写法互转, 自动识别输入格式, 带 N/S/E/W 方向字母时自动判定经纬度顺序, 越界给出明确提示)"
     ],
     "tw": [
-      "新增功能: 新增系統級頁面「我的收藏」(收藏 / 取消收藏、依名稱搜尋、一鍵清空, 應用卡片右上角一鍵收藏, 狀態全域即時同步), 支援拖曳排序與可拖曳懸浮入口 (位置持久化, 右鍵復位, 角標顯示收藏數); 提詞器新增閱讀基準線 (顏色可自訂, 可拖曳調整位置); 番茄時鐘全螢幕支援空白鍵 / Enter 開始與暫停",
-      "體驗改進: 收藏卡片用游標區分「按住拖曳排序」與「點擊開啟應用」; 應用中心「預設展示應用」下拉新增「我的收藏」選項",
-      "問題修正: 桌面版收藏拖曳排序失效 (改用 Pointer Events 實作); 番茄時鐘「跳過目前階段」按鈕與階段頁籤擠在同一列"
+      "新增應用: 經緯度格式轉換 (十進位 / 度分秒 / 度分 / 國家標準四種寫法互轉, 自動辨識輸入格式, 帶 N/S/E/W 方向字母時自動判定經緯度順序, 超出範圍給出明確提示)"
     ],
     "en": [
-      "New features: a new system page Favorites (star / unstar, search by name, clear all, a star on every App Center card, synced globally in real time) with drag sorting and a draggable floating launcher (position persisted, right-click to reset, badge showing the count); the Teleprompter gained a reading baseline (custom colour, draggable position); fullscreen Pomodoro responds to Space / Enter",
-      "Improvements: cursor shapes on Favorites cards distinguish “hold to reorder” from “click to open”; the App Center’s default-page dropdown gained a Favorites entry",
-      "Fixes: drag sorting did not work in the desktop build (it now uses Pointer Events) and Pomodoro’s skip button collided with the stage tabs"
+      "New apps: Latitude / Longitude Converter, converting one coordinate between decimal, degrees-minutes-seconds, degrees-minutes and the national DDMM.mm notation — with format autodetection, automatic order detection when N/S/E/W letters are present, and clear out-of-range warnings"
     ]
   },
-  "V2.20.0": {
+  "V2.15.1": {
     "zh": [
-      "新增应用: 番茄时钟 (专注 / 短休 / 长休自动轮换, 按截止时刻推算切后台不漂移, 桌面通知, 5 种合成音色或自定义音频, 纯色 / 图片背景与阶段配色, 全屏)、白板 (Excalidraw 驱动的无限画布, 自动保存到本机, 全屏, 不联网不上传)",
-      "问题修复: 桌面版启动失败 (通知插件权限配置类型写错导致初始化 panic); 白板渲染不开 (容器高度塌陷与样式未加载)"
+      "问题修复: 图片转 SVG 在桌面端无法矢量化 (CSP 的 script-src 未放行 WebAssembly, 导致 VTracer 编译 wasm 被拦截), 现补充 'wasm-unsafe-eval' 与 'unsafe-eval'",
+      "体验改进: 矢量化失败若源于 CSP 拦截 WebAssembly, 改为提示「当前环境禁止运行 WebAssembly」并保留原始报错"
     ],
     "tw": [
-      "新增應用: 番茄時鐘 (專注 / 短休 / 長休自動輪換, 依截止時刻推算切背景不漂移, 桌面通知, 5 種合成音色或自訂音訊, 純色 / 圖片背景與階段配色, 全螢幕)、白板 (Excalidraw 驅動的無限畫布, 自動儲存到本機, 全螢幕, 不連網不上傳)",
-      "問題修正: 桌面版啟動失敗 (通知外掛權限設定型別寫錯導致初始化 panic); 白板無法渲染 (容器高度塌陷與樣式未載入)"
+      "問題修正: 圖片轉 SVG 在桌面端無法向量化 (CSP 的 script-src 未放行 WebAssembly, 導致 VTracer 編譯 wasm 被攔截), 現補上 'wasm-unsafe-eval' 與 'unsafe-eval'",
+      "體驗改進: 向量化失敗若源於 CSP 攔截 WebAssembly, 改為提示「目前環境禁止執行 WebAssembly」並保留原始錯誤"
     ],
     "en": [
-      "New apps: Pomodoro (focus / short break / long break rotate automatically, deadline-based timing that survives backgrounding, desktop notifications, five synthesised tones or your own audio, solid or picture backgrounds with per-stage colours, fullscreen) and Whiteboard (an Excalidraw-powered infinite canvas that autosaves locally, works fullscreen and never goes online)",
-      "Fixes: the desktop build failed to start (a notification plugin permission typed as an object instead of null panicked during Tauri setup) and the Whiteboard would not render (collapsed container height plus missing styles)"
+      "Fixes: Image to SVG could not vectorise in the desktop build — the CSP script-src blocked WebAssembly, so VTracer failed to compile its wasm; the policy now allows 'wasm-unsafe-eval' and 'unsafe-eval'",
+      "Improvements: when vectorising fails because the CSP blocks WebAssembly, the error now says so instead of implying the image is too large"
     ]
   },
-  "V2.19.0": {
+  "V2.15.0": {
     "zh": [
-      "新增应用: 敏感词检测 (Aho–Corasick 扫描, 通用 / 小红书 / 微信公众号三套词库, 给出危险等级 / 命中位置 / 替换建议, 一键打码与 TXT / HTML 报告导出, 宽松匹配能揪出「微 信」这类绕过写法)",
-      "新增功能: 提词器新增开始前倒计时 (关闭 / 3~30 秒, 舞台大数字覆盖层, 期间再点开始立即开滚); 节拍器新增预排拍 (关闭 / 1 / 2 / 4 / 8 拍, 660Hz + 琥珀色与正拍区分)",
-      "其它: Windows 发布新增内置完整 WebView2 离线运行时的 NSIS 安装包, 没有装 WebView2 的机器也能直接用"
+      "新增应用: 图片转 SVG (基于 VTracer 将位图描线成矢量 SVG, 彩色分层 / 黑白二值两种颜色模式, 13 项参数 + 7 组预设, 参数变化自动重算, 可查看源码并保存为 SVG, 引擎按需加载)"
     ],
     "tw": [
-      "新增應用: 敏感詞檢測 (Aho–Corasick 掃描, 通用 / 小紅書 / 微信公眾號三套詞庫, 給出危險等級 / 命中位置 / 替換建議, 一鍵打碼與 TXT / HTML 報告匯出, 寬鬆比對能揪出「微 信」這類繞過寫法)",
-      "新增功能: 提詞器新增開始前倒數 (關閉 / 3~30 秒, 舞台大數字覆蓋層, 期間再按開始立即開滾); 節拍器新增預排拍 (關閉 / 1 / 2 / 4 / 8 拍, 660Hz + 琥珀色與正拍區分)",
-      "其它: Windows 發佈新增內建完整 WebView2 離線執行階段的 NSIS 安裝檔, 沒裝 WebView2 的機器也能直接用"
+      "新增應用: 圖片轉 SVG (基於 VTracer 將點陣圖描線成向量 SVG, 彩色分層 / 黑白二值兩種顏色模式, 13 項參數 + 7 組預設, 參數變更自動重算, 可檢視原始碼並存成 SVG, 引擎按需載入)"
     ],
     "en": [
-      "New apps: Sensitive Word Detection (Aho–Corasick scanning with three lexicons — general, Xiaohongshu and WeChat official accounts — reporting severity, positions and replacement hints, one-click masking and TXT / HTML reports, with a loose mode that catches obfuscations like “微 信”)",
-      "New features: the Teleprompter counts down before scrolling (off or 3–30 seconds, a big overlay on stage, pressing start again skips it); the Metronome gained count-in bars (off or 1 / 2 / 4 / 8 beats at 660Hz in amber, distinct from the downbeat)",
-      "Also: the Windows release added an NSIS installer bundling the full offline WebView2 runtime, so machines without WebView2 can install it directly"
+      "New apps: Image to SVG, tracing bitmaps into vector SVG with VTracer — colour-layered and black-and-white modes, 13 parameters plus seven presets, automatic re-tracing on change, source view and SVG download, with the engine loaded on demand"
     ]
   },
-  "V2.18.0": {
+  "V2.14.0": {
     "zh": [
-      "新增应用: BOM 检查、像素图、思维导图、节拍器、屏幕录制 (仅 Web 版)、二维码解析 (工具总数 134 → 140)",
-      "新增功能: 应用中心为仅 Web 版可用的工具增加「仅 Web」徽标, 与「仅桌面版」同一套样式",
-      "其它: 构建工具链升级到 Vite 8 (Rolldown) 与 TypeScript 5.9, 前端构建耗时从约 26 秒降到约 2 秒"
+      "新增应用: .gitignore 生成 (64 个现成模板 + 11 个常用技术栈组合 + 自定义追加与跨模板去重, 可直接保存为 .gitignore)、即时渲染 Markdown (基于 Vditor 的所见即所得编辑器, 三种模式, 支持 KaTeX 公式与代码高亮, 可导出 .md / .html)",
+      "体验改进: .gitignore 生成的模板库改为下拉多选、常用组合改为下拉套用并去掉页面级搜索框; 帮助页「使用组件」补充 Vditor / Mermaid / Shiki / SVGO / JsBarcode 等 11 个第三方组件"
     ],
     "tw": [
-      "新增應用: BOM 檢查、像素圖、思維導圖、節拍器、螢幕錄製 (僅 Web 版)、QR Code 解析 (工具總數 134 → 140)",
-      "新增功能: 應用中心為僅 Web 版可用的工具增加「僅 Web」徽標, 與「僅桌面版」同一套樣式",
-      "其它: 建置工具鏈升級到 Vite 8 (Rolldown) 與 TypeScript 5.9, 前端建置耗時從約 26 秒降到約 2 秒"
+      "新增應用: .gitignore 產生 (64 個現成範本 + 11 個常用技術堆疊組合 + 自訂追加與跨範本去重, 可直接存成 .gitignore)、即時渲染 Markdown (基於 Vditor 的所見即所得編輯器, 三種模式, 支援 KaTeX 公式與程式碼高亮, 可匯出 .md / .html)",
+      "體驗改進: .gitignore 產生的範本庫改為下拉多選、常用組合改為下拉套用並移除頁面層級搜尋框; 說明頁「使用元件」補充 Vditor / Mermaid / Shiki / SVGO / JsBarcode 等 11 個第三方元件"
     ],
     "en": [
-      "New apps: BOM Check, Pixel Art, Mind Map, Metronome, Screen Recorder (Web only) and QR Code Reader (tools 134 → 140)",
-      "New features: App Center cards mark Web-only tools with a “Web only” badge matching the existing “Desktop only” style",
-      "Also: the toolchain moved to Vite 8 (Rolldown) and TypeScript 5.9, cutting the renderer build from about 26 seconds to about 2"
+      "New apps: .gitignore Generator (64 ready-made templates, 11 tech-stack bundles, custom additions with cross-template de-duplication, saved straight as .gitignore) and Instant Markdown (a Vditor WYSIWYG editor with three modes, KaTeX maths, code highlighting and .md / .html export)",
+      "Improvements: the .gitignore template library switched to multi-select dropdowns and a bundle picker with no page-level search; the Help components list gained Vditor, Mermaid, Shiki, SVGO, JsBarcode and seven more"
     ]
   },
-  "V2.17.1": {
+  "V2.13.0": {
     "zh": [
-      "体验改进: 侧边栏宽度可拖动调整 (180~420 px, 宽度自动记忆, 双击分隔条恢复默认, 聚焦后可用 ← / → 微调), 收起时自动隐藏; 设置中心新增「侧边栏宽度」滑杆, 调整立即生效"
+      "新增应用: JavaScript 格式化 (美化 / 压缩 / 混淆打包 / 解密还原四合一, 美化与压缩后用 token 指纹提示「语义未变」)、iptables 规则、tc 规则、nginx 配置 (三个站长工具, 既解析已有规则也能按表单生成命令 / 配置)",
+      "体验改进: nginx 配置的开关键改为复选框让面板更紧凑; 桌面端默认窗口尺寸调整为 1200×728; 去掉三个站长工具顶部的说明区"
     ],
     "tw": [
-      "體驗改進: 側邊欄寬度可拖曳調整 (180~420 px, 寬度自動記憶, 雙擊分隔列恢復預設, 聚焦後可用 ← / → 微調), 收起時自動隱藏; 設定中心新增「側邊欄寬度」滑桿, 調整立即生效"
+      "新增應用: JavaScript 格式化 (美化 / 壓縮 / 混淆打包 / 解密還原四合一, 美化與壓縮後用 token 指紋提示「語意未變」)、iptables 規則、tc 規則、nginx 設定 (三個站長工具, 既能解析既有規則也能依表單產生指令 / 設定)",
+      "體驗改進: nginx 設定的開關鍵改為核取方塊讓面板更緊湊; 桌面端預設視窗尺寸調整為 1200×728; 移除三個站長工具頂部的說明區"
     ],
     "en": [
-      "Improvements: the sidebar width can be dragged (180–420 px, remembered across launches, double-click the splitter to reset, arrow keys to nudge) and hides itself when collapsed; Settings gained a matching Sidebar width slider that applies immediately"
+      "New apps: JavaScript Formatter (beautify / minify / obfuscate / unpack in one box, with a token fingerprint confirming the semantics survived) plus three ops tools — iptables Rules, tc Rules and nginx Config — that both parse existing rules and generate commands or configs from a form",
+      "Improvements: nginx options became checkboxes for a denser panel, the desktop window defaults to 1200×728, and the three ops tools lost their top intro blocks"
     ]
   },
-  "V2.17.0": {
+  "V2.12.0": {
     "zh": [
-      "新增功能: 新增 SM9 加解密 (国密标识密码, GmSSL 编译为 WebAssembly, 本机生成主密钥对、按用户 ID 提取私钥并完成加密解密 / 签名验签); JWT 编解码器新增「生成」页签 (HS256 / HS384 / HS512 与 none, 可编辑 Header / Payload 并一键写入 iat / exp)",
-      "体验改进: JWT 编解码器改为「解析 / 生成」双页签; 应用中心支持搜索 (按应用名 / 目录名 / 分类名, 多关键词为「与」关系, 无匹配时给出空状态)"
+      "新增应用: 提词器、Mermaid 编辑器 (实时预览, 内置 32 个示例)、CSR 申请文件、图片水印、图片负片 / 黑白化 / 锐化 / 取色、DNS / Whois / MTR 查询 (仅桌面版), 并新增「生成器」分类",
+      "新增功能: 正则表达式新增「代码生成」页签 (21 种语言, 带语法高亮与一键复制); 提词器新增逐行焦点高亮与按阅读进度逐字点亮; IP 转换新增 IPv6 写法换算",
+      "问题修复: 时间戳转换上月末 / 下月末取成 00:00:00 与跨月日期年份算错; Mermaid 编辑器的缩放 / 背景 / 面板开关异常; 正则输入框占位符里的 \\d 未转义",
+      "体验改进: 网页 TDK 信息检测改为仅桌面版; JSONL 转换的工具条上移; 时间戳转换的 GPS / 北斗 / 伽利略改为分组框展示; 去掉 7 个工具顶部的说明区"
     ],
     "tw": [
-      "新增功能: 新增 SM9 加解密 (國密標識密碼, GmSSL 編譯為 WebAssembly, 本機產生主金鑰對、依使用者 ID 擷取私鑰並完成加解密 / 簽章驗章); JWT 編解碼器新增「產生」頁籤 (HS256 / HS384 / HS512 與 none, 可編輯 Header / Payload 並一鍵寫入 iat / exp)",
-      "體驗改進: JWT 編解碼器改為「解析 / 產生」雙頁籤; 應用中心支援搜尋 (依應用名 / 目錄名 / 分類名, 多關鍵字為「且」關係, 無符合時給出空狀態)"
+      "新增應用: 提詞器、Mermaid 編輯器 (即時預覽, 內建 32 個範例)、CSR 申請檔、圖片浮水印、圖片負片 / 黑白化 / 銳化 / 取色、DNS / Whois / MTR 查詢 (僅桌面版), 並新增「產生器」分類",
+      "新增功能: 正規表示式新增「程式碼產生」頁籤 (21 種語言, 帶語法高亮與一鍵複製); 提詞器新增逐行焦點高亮與依閱讀進度逐字點亮; IP 轉換新增 IPv6 寫法換算",
+      "問題修正: 時間戳轉換上月末 / 下月末取成 00:00:00 與跨月日期年份算錯; Mermaid 編輯器的縮放 / 背景 / 面板開關異常; 正規表示式輸入框佔位符裡的 \\d 未轉義",
+      "體驗改進: 網頁 TDK 資訊檢測改為僅桌面版; JSONL 轉換的工具列上移; 時間戳轉換的 GPS / 北斗 / 伽利略改為分組框展示; 移除 7 個工具頂部的說明區"
     ],
     "en": [
-      "New features: SM9 Cipher (the Chinese identity-based scheme, GmSSL compiled to WebAssembly: generate master key pairs, extract a user key from an ID and encrypt / decrypt or sign / verify locally) and a Generate tab in JWT Codec (HS256 / HS384 / HS512 and none, editable header and payload, one-click iat / exp)",
-      "Improvements: JWT Codec now splits into Decode and Generate tabs, and the App Center gained a search box (app name, folder name or category, space-separated terms are ANDed, with an empty state when nothing matches)"
+      "New apps: Teleprompter, Mermaid Editor (live preview with 32 built-in samples), CSR Request, Image Watermark, Image Negative / Grayscale / Sharpen / Colour Picker, and DNS / Whois / MTR Lookup (desktop only) — plus a new Generators category",
+      "New features: Regex gained a Code Generation tab (21 languages with syntax highlighting and one-click copy), the Teleprompter got line focus and progress-based character lighting, and IP Converter gained IPv6 notations",
+      "Fixes: Timestamp Converter used 00:00:00 for end-of-month dates and mis-computed years when the target month was shorter; Mermaid Editor had broken zoom, background and panel toggles; the regex placeholder showed d instead of \\d",
+      "Improvements: Web TDK Check is desktop-only now, the JSONL toolbar moved to the top, Timestamp Converter groups GPS / BeiDou / Galileo blocks, and seven tools lost their top intro blocks"
     ]
   }
 }
