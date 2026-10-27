@@ -12,12 +12,12 @@ import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { AppContext } from '../../hook/app-context';
 import { useLocale } from '../../hook/locale-context';
 import {
-  CELL_SIZES, CLOCK_TICK_MS, HEIGHT_MAX, HEIGHT_MIN, LEVELS, LONG_PRESS_MS, MINESWEEPER_CSS, MINES_MIN,
+  CELL_SIZES, CLOCK_TICK_MS, HEIGHT_MAX, HEIGHT_MIN, HINT_MS, LEVELS, LONG_PRESS_MS, MINESWEEPER_CSS, MINES_MIN,
   SAFE_AREA, WIDTH_MAX, WIDTH_MIN, type Dims, type Level,
 } from './data';
 import {
   chordCell, createBoard, dimsOf, faceOf, flagCount, formatBest, formatTime, getBestTime, getDefaultOptions,
-  isTypingTarget, isWin, levelOf, normalizeDims, revealCell, setBestTime, setMark, showMines, startGame,
+  hintCells, isTypingTarget, isWin, levelOf, normalizeDims, revealCell, setBestTime, setMark, showMines, startGame,
   wrongFlags, type Board, type GameStatus,
 } from './lib';
 import { u, uT } from './lang';
@@ -63,6 +63,8 @@ const Minesweeper: React.FC = () => {
   const [ full, setFull ] = useState(false);
   const [ customOpen, setCustomOpen ] = useState(false);
   const [ draft, setDraft ] = useState<Dims>(dims);
+  /** 双击数字格的闪烁提示: 周边未翻开的格子下标 + 序号 (序号变化让 CSS 动画重播) */
+  const [ hint, setHint ] = useState<{ cells: number[], seq: number }>({ cells: [], seq: 0 });
 
   const stageRef = useRef<HTMLDivElement | null>(null);
   /** 开局时间戳 (0 = 还没点第一下) */
@@ -71,8 +73,35 @@ const Minesweeper: React.FC = () => {
   const pressRef = useRef<number | null>(null);
   /** 长按已插旗: 屏蔽随后的 click, 避免又翻开一格 */
   const skipClickRef = useRef(false);
+  /** 闪烁提示的定时清除 */
+  const hintTimer = useRef<number | null>(null);
 
   const scale = dims;
+
+  /** 清除闪烁提示 (重开 / 翻开新格子时) */
+  const clearHint = useCallback(() => {
+    if (hintTimer.current !== null) {
+      window.clearTimeout(hintTimer.current);
+      hintTimer.current = null;
+    }
+    setHint((h) => (h.cells.length === 0 ? h : { cells: [], seq: h.seq }));
+  }, []);
+
+  /** 双击 / 中键数字格: 周边未翻开的格子闪一下, 方便找到还没点的地方 */
+  const flashHint = useCallback((i: number) => {
+    const list = hintCells(board, i);
+    if (list.length === 0) return;
+    if (hintTimer.current !== null) window.clearTimeout(hintTimer.current);
+    setHint((h) => ({ cells: list, seq: h.seq + 1 }));
+    hintTimer.current = window.setTimeout(() => {
+      hintTimer.current = null;
+      setHint((h) => ({ cells: [], seq: h.seq }));
+    }, HINT_MS);
+  }, [ board ]);
+
+  useEffect(() => () => {
+    if (hintTimer.current !== null) window.clearTimeout(hintTimer.current);
+  }, []);
 
   /** 重开一局 (切难度 / 换尺寸 / 点表情按钮) */
   const newGame = useCallback((nextLevel: Level, next: Dims) => {
@@ -82,8 +111,9 @@ const Minesweeper: React.FC = () => {
     setStatus('ready');
     setElapsed(0);
     startRef.current = 0;
+    clearHint();
     setBest(getBestTime(next.width, next.height, next.mines));
-  }, []);
+  }, [ clearHint ]);
 
   /** 结算: 踩雷亮出全部地雷, 通关则记录最快用时 */
   const settle = useCallback((next: Board) => {
@@ -113,6 +143,12 @@ const Minesweeper: React.FC = () => {
     settle(res.board);
   }, [ board, status, settle ]);
 
+  /** 双击 / 中键: 先闪烁提示周边未开的格子, 再尝试连开 */
+  const hintAndChord = useCallback((i: number) => {
+    flashHint(i);
+    chordAt(i);
+  }, [ chordAt, flashHint ]);
+
   /** 左键翻开 (未开局的第一次点击先按安全区布雷) */
   const revealAt = useCallback((i: number) => {
     if (status === 'won' || status === 'lost') return;
@@ -129,8 +165,9 @@ const Minesweeper: React.FC = () => {
       startRef.current = Date.now();
       setStatus('playing');
     }
+    clearHint();
     settle(revealCell(base, i).board);
-  }, [ board, chordAt, settle, status ]);
+  }, [ board, chordAt, clearHint, settle, status ]);
 
   /** 右键 / 长按插旗 */
   const markAt = useCallback((i: number) => {
@@ -277,6 +314,7 @@ const Minesweeper: React.FC = () => {
           const boom = status === 'lost' && board.exploded === i;
           const mine = c.revealed && c.mine && !boom;
           const badFlag = wrong.has(i);
+          const hinting = !c.revealed && hint.cells.includes(i);
           const cls = [
             'ms-cell',
             c.revealed ? 'ms-open' : '',
@@ -284,6 +322,7 @@ const Minesweeper: React.FC = () => {
             mine ? 'ms-mine' : '',
             badFlag ? 'ms-wrong' : '',
             !c.revealed && c.mark === 'flag' ? 'ms-flag' : '',
+            hinting ? 'ms-hint' : '',
           ].filter(Boolean).join(' ');
           const content = badFlag
             ? '❌'
@@ -300,7 +339,7 @@ const Minesweeper: React.FC = () => {
                       : '';
           return (
             <button
-              key={ i }
+              key={ hinting ? `${i}-${hint.seq}` : i }
               type="button"
               className={ cls }
               data-cell={ i }
@@ -308,6 +347,7 @@ const Minesweeper: React.FC = () => {
               data-mark={ c.mark }
               data-mine={ c.mine && c.revealed ? 1 : 0 }
               data-n={ c.revealed && !c.mine && c.adj > 0 ? c.adj : undefined }
+              data-hint={ hinting ? 1 : undefined }
               onClick={ () => {
                 if (skipClickRef.current) {
                   skipClickRef.current = false;
@@ -319,11 +359,11 @@ const Minesweeper: React.FC = () => {
                 e.preventDefault();
                 markAt(i);
               } }
-              onDoubleClick={ () => chordAt(i) }
+              onDoubleClick={ () => hintAndChord(i) }
               onPointerDown={ (e) => {
                 if (e.button === 1) {
                   e.preventDefault();
-                  chordAt(i);
+                  hintAndChord(i);
                   return;
                 }
                 // 鼠标左键不参与长按插旗 (触屏 / 触控笔 / 未知指针都按长按处理)
@@ -475,7 +515,7 @@ const Minesweeper: React.FC = () => {
           { alertsNode }
           { boardNode }
           <Text type="secondary" style={ { fontSize: 12, textAlign: 'center' } }>
-            { t('左键翻开 · 右键插旗 (旗 → 问号 → 空) · 双击数字一键连开 · 触屏长按插旗') }
+            { t('左键翻开 · 右键插旗 (旗 → 问号 → 空) · 双击数字闪烁提示周边 · 触屏长按插旗') }
           </Text>
           <Text type="secondary" style={ { fontSize: 12 } }>{ t('Esc 退出全屏') }</Text>
         </div>
@@ -524,9 +564,10 @@ const Minesweeper: React.FC = () => {
 
             <Space direction="vertical" size={ 2 }>
               <Text type="secondary" style={ { fontSize: 12 } }>
-                { t('左键翻开 · 右键插旗 (旗 → 问号 → 空) · 双击数字一键连开 · 触屏长按插旗') }
+                { t('左键翻开 · 右键插旗 (旗 → 问号 → 空) · 双击数字闪烁提示周边 · 触屏长按插旗') }
               </Text>
               <Text type="secondary" style={ { fontSize: 12 } }>
+                { t('双击数字格时, 周围未翻开的格子会闪烁提示; 旗数正好等于该数字时同时连开') }
                 { t('数字格周围插满对应数量的旗子后, 双击或中键点数字即可一次翻开其余格子') }
               </Text>
               <Text type="secondary" style={ { fontSize: 12 } }>

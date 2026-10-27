@@ -221,6 +221,16 @@ export const chordCell = (board: Board, i: number): RevealResult | null => {
   return { board: cur, hitMine: false, opened };
 };
 
+/**
+ * 提示 (双击数字格): 返回该数字格周围所有「未翻开」的格子下标
+ * 只做视觉提示, 不改动棋盘; 非数字格 (未翻开 / 数字为 0) 返回空数组
+ */
+export const hintCells = (board: Board, i: number): number[] => {
+  const cell = board.cells[i];
+  if (!cell || !cell.revealed || cell.adj === 0) return [];
+  return neighbors(i, board.width, board.height).filter((n) => !board.cells[n].revealed);
+};
+
 /** 切换标记: 空 → 旗 → (允许问号时) 问号 → 空 */
 export const toggleMark = (cell: Cell, allowQuestion: boolean): CellMark => {
   if (cell.revealed) return cell.mark;

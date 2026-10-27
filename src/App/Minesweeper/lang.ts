@@ -44,9 +44,13 @@ const rows: Record<string, [string, string]> = {
   '点表情按钮或「新游戏」再来一局': ['點表情按鈕或「新遊戲」再來一局', 'Press the face or “New game” for another round'],
   '本局已结束, 点表情按钮快速重开': ['本局已結束, 點表情按鈕快速重開', 'This round is over — press the face to restart'],
   // 说明 / 提示
-  '左键翻开 · 右键插旗 (旗 → 问号 → 空) · 双击数字一键连开 · 触屏长按插旗': [
-    '左鍵翻開 · 右鍵插旗 (旗 → 問號 → 空) · 雙擊數字一鍵連開 · 觸屏長按插旗',
-    'Left click to dig · right click to flag (flag → question → blank) · double click a number to chord · long press on touch',
+  '左键翻开 · 右键插旗 (旗 → 问号 → 空) · 双击数字闪烁提示周边 · 触屏长按插旗': [
+    '左鍵翻開 · 右鍵插旗 (旗 → 問號 → 空) · 雙擊數字閃爍提示周邊 · 觸屏長按插旗',
+    'Left click to dig · right click to flag (flag → question → blank) · double click a number to flash its hidden neighbours · long press on touch',
+  ],
+  '双击数字格时, 周围未翻开的格子会闪烁提示; 旗数正好等于该数字时同时连开': [
+    '雙擊數字格時, 周圍未翻開的格子會閃爍提示; 旗數正好等於該數字時同時連開',
+    'Double clicking a number flashes the hidden cells around it; if the flags match the number they are opened at the same time',
   ],
   '数字格周围插满对应数量的旗子后, 双击或中键点数字即可一次翻开其余格子': [
     '數字格周圍插滿對應數量的旗子後, 雙擊或中鍵點數字即可一次翻開其餘格子',

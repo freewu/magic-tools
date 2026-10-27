@@ -8,7 +8,7 @@ const zh = `<h2>这个工具做什么</h2>
 <ul>
 <li><p><b>左键</b>: 翻开格子 (第一次点击的位置及其 3×3 邻域内不会放雷, 开局必定安全)</p></li>
 <li><p><b>右键</b>: 插旗 → 问号 → 清空 (问号档可在设置中心关闭)</p></li>
-<li><p><b>双击</b> 已翻开的数字格 (或 <b>中键</b> 点击): 一键连开 —— 当周围旗子数量<strong>等于</strong>该数字时, 一次翻开其余未插旗的格子</p></li>
+<li><p><b>双击</b> 已翻开的数字格 (或 <b>中键</b> 点击): 周围<strong>未翻开</strong>的格子会闪烁 3 下提示; 当周围旗子数量<strong>等于</strong>该数字时, 同时一次翻开其余未插旗的格子 (一键连开)</p></li>
 <li><p><b>触屏</b>: 轻点翻开, <b>长按</b>插旗</p></li>
 <li><p><b>R</b>: 重开一局; 点表情按钮 <b>🙂</b> 同样是重开</p></li>
 </ul>
@@ -42,7 +42,7 @@ const tw = `<h2>這個工具做什麼</h2>
 <ul>
 <li><p><b>左鍵</b>: 翻開格子 (第一次點擊的位置及其 3×3 鄰域內不會放雷, 開局必定安全)</p></li>
 <li><p><b>右鍵</b>: 插旗 → 問號 → 清空 (問號檔可在設定中心關閉)</p></li>
-<li><p><b>雙擊</b> 已翻開的數字格 (或 <b>中鍵</b> 點擊): 一鍵連開 —— 當周圍旗子數量<strong>等於</strong>該數字時, 一次翻開其餘未插旗的格子</p></li>
+<li><p><b>雙擊</b> 已翻開的數字格 (或 <b>中鍵</b> 點擊): 周圍<strong>未翻開</strong>的格子會閃爍 3 下提示; 當周圍旗子數量<strong>等於</strong>該數字時, 同時一次翻開其餘未插旗的格子 (一鍵連開)</p></li>
 <li><p><b>觸屏</b>: 輕點翻開, <b>長按</b>插旗</p></li>
 <li><p><b>R</b>: 重開一局; 點表情按鈕 <b>🙂</b> 同樣是重開</p></li>
 </ul>
@@ -76,7 +76,7 @@ const en = `<h2>What this tool does</h2>
 <ul>
 <li><p><b>Left click</b>: dig a square (the first click and its 3×3 neighbourhood never contain mines, so the opening move is always safe)</p></li>
 <li><p><b>Right click</b>: flag → question mark → clear (the question stage can be disabled in Settings)</p></li>
-<li><p><b>Double click</b> a revealed number (or <b>middle click</b>): chord — when the flags around it <strong>equal</strong> the number, the remaining unflagged neighbours open at once</p></li>
+<li><p><b>Double click</b> a revealed number (or <b>middle click</b>): the hidden cells around it <strong>flash three times</strong> as a hint; when the flags around it <strong>equal</strong> the number, the remaining unflagged neighbours open at once (chord)</p></li>
 <li><p><b>Touch</b>: tap to dig, <b>long press</b> to flag</p></li>
 <li><p><b>R</b>: restart; the face button <b>🙂</b> does the same</p></li>
 </ul>

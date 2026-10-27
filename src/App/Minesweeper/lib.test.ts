@@ -2,7 +2,7 @@ import {
   boardWithMines, bestKey, chordCell, clearBestTimes, coordsOf, createBoard, dimsOf, faceOf, flagCount,
   formatBest, formatTime, getBestTime, getBestTimes, getDefaultOptions, indexOf, isSameOptions, isTypingTarget,
   isWin, levelOf, minesLeft, neighbors, normalizeDims, normalizeOptions, patchDefaultOptions, placeMines,
-  revealCell, revealedCount, safeZone, setBestTime, setDefaultOptions, setMark, showMines, startGame, toggleMark,
+  hintCells, revealCell, revealedCount, safeZone, setBestTime, setDefaultOptions, setMark, showMines, startGame, toggleMark,
   wrongFlags, DEFAULT_OPTIONS, type Cell,
 } from './lib';
 import { PRESETS, SAFE_AREA } from './data';
@@ -136,6 +136,40 @@ describe('翻开与连开', () => {
     expect(res).not.toBeNull();
     expect(res?.hitMine).toBe(false);
     expect(revealedCount(res!.board)).toBeGreaterThan(revealedCount(board));
+  });
+
+  test('hintCells: 只给出数字格周围未翻开的格子', () => {
+    // 5×5 仅 (0,0) 是雷: 翻开 (1,1) (数字 1) 后, 它周围除自己外都没翻开
+    const board = revealCell(tinyBoard(), indexOf(1, 1, 5)).board;
+    const hint = hintCells(board, indexOf(1, 1, 5));
+    expect(hint).toHaveLength(8);
+    expect(hint).not.toContain(indexOf(1, 1, 5));
+    hint.forEach((i) => expect(board.cells[i].revealed).toBe(false));
+    // 与 neighbors 的集合一致
+    expect([ ...hint ].sort((a, b) => a - b))
+      .toEqual(neighbors(indexOf(1, 1, 5), 5, 5).sort((a, b) => a - b));
+  });
+
+  test('hintCells: 已翻开的邻格与插旗格的处理', () => {
+    let board = revealCell(tinyBoard(), indexOf(1, 1, 5)).board;
+    // 手工翻开一个邻格: 它不再出现在提示里
+    board = { ...board, cells: board.cells.map((c, i) => (i === indexOf(2, 2, 5) ? { ...c, revealed: true } : c)) };
+    expect(hintCells(board, indexOf(1, 1, 5))).not.toContain(indexOf(2, 2, 5));
+    // 插旗格仍算「未翻开」, 仍会提示 (照常闪一下, 提醒这里有标记)
+    board = setMark(board, indexOf(0, 0, 5), true);
+    expect(hintCells(board, indexOf(1, 1, 5))).toContain(0);
+  });
+
+  test('hintCells: 未翻开的格子 / 数字为 0 的格子没有提示', () => {
+    const board = tinyBoard();
+    // 未翻开: 不提示
+    expect(hintCells(board, indexOf(1, 1, 5))).toEqual([]);
+    // 数字为 0 的空地: 不提示
+    const zero = revealCell(board, indexOf(4, 4, 5)).board;
+    expect(zero.cells[indexOf(4, 4, 5)].adj).toBe(0);
+    expect(hintCells(zero, indexOf(4, 4, 5))).toEqual([]);
+    // 越界下标: 不抛错
+    expect(hintCells(zero, 999)).toEqual([]);
   });
 
   test('chord: 旗插错位置会踩雷', () => {

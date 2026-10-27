@@ -36,6 +36,9 @@ export const CELL_DEFAULT = 26;
 /** 触屏长按插旗的判定时长 (ms) */
 export const LONG_PRESS_MS = 380;
 
+/** 双击数字格时「闪烁提示」周边未开格子持续时长 (ms), 与 CSS 动画 0.4s × 3 对齐 */
+export const HINT_MS = 1200;
+
 /** 格子间距 (px) */
 export const BOARD_GAP = 2;
 
@@ -87,5 +90,15 @@ export const MINESWEEPER_CSS = `
 .ms-cell[data-n="7"] { color: #111827; }
 .ms-cell[data-n="8"] { color: #6b7280; }
 .ms-face { font-size: 20px; line-height: 1; width: 34px; height: 30px; padding: 0; }
-@media (prefers-reduced-motion: reduce) { .ms-cell { transition: none; } }
+/* 双击数字格的提示: 周边未翻开的格子闪烁 3 下 (0.4s × 3, 与 HINT_MS 对齐) */
+.ms-cell.ms-hint { animation: ms-hint 0.4s ease-in-out 3; z-index: 1; }
+@keyframes ms-hint {
+  0%, 100% { box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.35); filter: none; }
+  50% { box-shadow: inset 0 0 0 2px #fbbf24, 0 0 6px 2px rgba(251, 191, 36, 0.7); filter: brightness(1.35); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ms-cell { transition: none; }
+  /* 减少动态效果: 不做闪烁, 改为常亮描边 */
+  .ms-cell.ms-hint { animation: none; box-shadow: inset 0 0 0 2px #fbbf24, 0 0 6px 2px rgba(251, 191, 36, 0.55); }
+}
 `;

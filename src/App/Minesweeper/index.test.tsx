@@ -1,7 +1,8 @@
 import '@testing-library/jest-dom';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import Minesweeper from './index';
-import { startGame } from './lib';
+import { neighbors, revealCell, startGame } from './lib';
+import { HINT_MS } from './data';
 
 // app-context 依赖 App/index.tsx 的顶层 await + import.meta.glob (jest commonjs 不支持), 故打桩
 jest.mock('../../hook/app-context', () => ({
@@ -215,6 +216,68 @@ describe('扫雷页面', () => {
     expect(target.dataset.mark).toBe('flag');
     expect(target.dataset.open).toBe('0');
     expect(left()).toBe(9);
+  });
+
+  test('双击数字格: 周边未翻开的格子闪烁提示, 到时自动消失', () => {
+    jest.useFakeTimers();
+    const { container } = render(<Minesweeper />);
+    fireEvent.click(cellAt(container, 40));
+    const number = cells(container).find((c) => c.dataset.open === '1' && Number(c.dataset.n) > 0);
+    expect(number).toBeTruthy();
+    const idx = Number(number!.dataset.cell);
+
+    fireEvent.doubleClick(number!);
+
+    const hinted = cells(container).filter((c) => c.dataset.hint === '1');
+    const hiddenAround = neighbors(idx, 9, 9)
+      .filter((n) => cellAt(container, n)?.dataset.open === '0')
+      .sort((a, b) => a - b);
+    expect(hiddenAround.length).toBeGreaterThan(0);
+    expect(hinted.map((c) => Number(c.dataset.cell)).sort((a, b) => a - b)).toEqual(hiddenAround);
+    hinted.forEach((c) => expect(c.className).toContain('ms-hint'));
+    // 数字格自身不闪
+    expect(cellAt(container, idx).dataset.hint).toBeUndefined();
+
+    // 提示只持续 HINT_MS, 之后自动清除
+    act(() => { jest.advanceTimersByTime(HINT_MS + 20); });
+    expect(cells(container).filter((c) => c.dataset.hint === '1')).toHaveLength(0);
+  });
+
+  test('双击未翻开的格子 / 已翻开的空格: 没有闪烁提示', () => {
+    const { container } = render(<Minesweeper />);
+    fireEvent.doubleClick(cellAt(container, 0));
+    expect(cells(container).filter((c) => c.dataset.hint === '1')).toHaveLength(0);
+
+    // 首点泛洪后找一个数字为 0 的空地双击
+    fireEvent.click(cellAt(container, 40));
+    const blank = cells(container).find((c) => c.dataset.open === '1' && c.dataset.n === undefined);
+    fireEvent.doubleClick(blank!);
+    expect(cells(container).filter((c) => c.dataset.hint === '1')).toHaveLength(0);
+  });
+
+  test('双击数字格: 旗数正好对上时连同连开', () => {
+    const rng = () => 0.42;
+    jest.spyOn(Math, 'random').mockImplementation(rng);
+    const { container } = render(<Minesweeper />);
+    const FIRST = 40;
+    fireEvent.click(cellAt(container, FIRST));
+
+    // 用同一随机源复算: 找一个已翻开的数字格, 且它周围还有「未翻开的非雷格」(连开才会真的多翻格子)
+    const oracle = revealCell(startGame(9, 9, 10, FIRST, rng), FIRST).board;
+    const center = oracle.cells.findIndex((c, i) => c.revealed && !c.mine && c.adj > 0
+      && neighbors(i, 9, 9).some((n) => !oracle.cells[n].revealed && !oracle.cells[n].mine));
+    expect(center).toBeGreaterThanOrEqual(0);
+
+    // 按复算结果给它周围的雷插旗 (旗数正好等于数字), 再双击连开
+    neighbors(center, 9, 9)
+      .filter((n) => oracle.cells[n].mine && !oracle.cells[n].revealed)
+      .forEach((n) => fireEvent.contextMenu(cellAt(container, n)));
+    const before = opened(container);
+    fireEvent.doubleClick(cellAt(container, center));
+
+    expect(opened(container)).toBeGreaterThan(before);
+    // 连开之后这些格子已经翻开, 不会再挂着闪烁提示
+    expect(cells(container).filter((c) => c.dataset.hint === '1' && c.dataset.open === '1')).toHaveLength(0);
   });
 
   test('中键连开: 旗数不足时不翻开周围格子', () => {
