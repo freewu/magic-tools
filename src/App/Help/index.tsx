@@ -21,7 +21,7 @@ const Help = () => {
           developerList.map((item, index) => {
             return (
               <a key={ item.name + index } href={ item.url } target="_blank" title={ item.name } >
-                <Avatar size={64} src={ item.avater } />
+                <Avatar size={64} src={ item.avatar } />
               </a>  
             );
           })

@@ -1,6 +1,8 @@
 // Help 页数据: 使用组件 / 开发者 / 开发时间线
 // 开发时间线 (eventList) 三语: zh-CN 与 update.md 各版本节同步 (发布说明原文), zh-TW / en 为译文
 import { buildBadgeSvg, svgToDataUrl } from '../ShieldBadgeGenerator/lib';
+// 开发者头像: 本地图片 (原 Gravatar 头像已下载进仓库), 运行期不联网
+import developerAvatar from '../../../assets/bluefrog.png';
 
 /** 使用组件: 本地生成 shields.io 风格 badge 展示 (名称 + 版本号), 不请求网络 */
 export interface HelpComponent {
@@ -78,8 +80,9 @@ export const componentBadgeSrc = (item: HelpComponent) =>
   );
 
 // 开发者列表
+// 头像: 本地文件 assets/bluefrog.png (随构建打包, 图标缺失/离线也不影响)
 export const developerList = [
-  { name: "bluefrog",url: "https://github.com/freewu",avater: "https://www.gravatar.com/avatar/c2bd3e109318983039778c259cc78db890c1b1f93b574a95c76807759c386db9" },
+  { name: "bluefrog", url: "https://github.com/freewu", avatar: developerAvatar },
 ];
 
 export type LKey = 'zh-CN' | 'zh-TW' | 'en';

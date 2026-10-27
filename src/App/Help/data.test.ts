@@ -2,6 +2,7 @@
 import {
   compomentList,
   componentBadgeSrc,
+  developerList,
   DEFAULT_BADGE_COLOR,
   DEFAULT_BADGE_LABEL_COLOR,
 } from './data';
@@ -42,8 +43,7 @@ describe('Help 使用组件 badge', () => {
     expect(svg).not.toContain('>a&b<');
   });
 
-  test('组件清单: 名称唯一 / 均有版本号 / 均为 https 主页 / badge 均可本地生成', () => {
-    expect(compomentList.length).toBeGreaterThan(0);
+  test('组件清单: 名称唯一 / 均有版本号 / 均为 https 主页 / badge 均可本地生成', () => {    expect(compomentList.length).toBeGreaterThan(0);
     const names = compomentList.map((c) => c.name);
     expect(new Set(names).size).toBe(names.length);
 
@@ -55,6 +55,17 @@ describe('Help 使用组件 badge', () => {
       const svg = svgOf(componentBadgeSrc(item));
       expect(svg).toContain(`>${item.version.replace(/&/g, '&amp;')}<`);
       expect(svg).toContain(`fill="#${item.color || DEFAULT_BADGE_COLOR}"`);
+    });
+  });
+});
+
+describe('Help 开发者头像', () => {
+  test('头像用本地图片, 不再引用 Gravatar 远程地址', () => {
+    expect(developerList.length).toBeGreaterThan(0);
+    developerList.forEach((dev) => {
+      expect(dev.avatar).toBeTruthy();
+      expect(dev.avatar.startsWith('http')).toBe(false);
+      expect(dev.avatar).not.toContain('gravatar');
     });
   });
 });
