@@ -1,10 +1,13 @@
 // Sega 模拟器纯逻辑单测: 选项读写 / ROM 文件名 / 播放器页 URL / 消息解析
 import {
-  DEFAULT_OPTIONS, coreLabelOf, coreOfRomName, extOf, formatFileSize, getDefaultOptions, isFileLike, isRomFileName,
-  normalizeOptions, normalizeVolume, parsePlayerMessage, patchDefaultOptions, pickRomFile, playerLang, playerUrl,
-  romBaseName, setDefaultOptions,
+  DEFAULT_OPTIONS, coreLabelOf, coreOfRomName, extOf, formatFileSize, getDefaultOptions, getKeys, isCustomKeys,
+  isFileLike, isRomFileName, keyLabelOf, keyOwner, keysParam, keysToIds, normalizeKeys, normalizeOptions,
+  normalizeVolume, parsePlayerMessage, patchDefaultOptions, pickRomFile, playerLang, playerUrl, resetKeys,
+  romBaseName, setDefaultOptions, setKeys,
 } from './lib';
-import { SETTINGS_STORAGE_KEY, VOLUME_DEFAULT, VOLUME_MAX } from './data';
+import {
+  BUTTON_IDS, DEFAULT_KEYS, KEYS_STORAGE_KEY, SEGA_BUTTONS, SETTINGS_STORAGE_KEY, VOLUME_DEFAULT, VOLUME_MAX,
+} from './data';
 
 beforeEach(() => {
   localStorage.clear();
@@ -95,18 +98,28 @@ describe('ROM 文件名', () => {
 });
 
 describe('播放器页 URL', () => {
-  test('带 lang / volume / core 参数, 并清掉 hash', () => {
-    const url = playerUrl({ locale: 'zh-CN', volume: 55, core: 'segaMS' }, 'http://localhost:1212/index.html#/SegaEmulator');
-    expect(url).toBe('http://localhost:1212/emulatorjs/player.html?lang=zh-CN&volume=55&core=segaMS');
-    expect(new URL(url).hash).toBe('');
+  test('带 lang / volume / core / keys 参数, 并清掉 hash', () => {
+    const url = new URL(playerUrl(
+      { locale: 'zh-CN', volume: 55, core: 'segaMS' },
+      'http://localhost:1212/index.html#/SegaEmulator'
+    ));
+    expect(url.origin + url.pathname).toBe('http://localhost:1212/emulatorjs/player.html');
+    expect(url.searchParams.get('lang')).toBe('zh-CN');
+    expect(url.searchParams.get('volume')).toBe('55');
+    expect(url.searchParams.get('core')).toBe('segaMS');
+    // 键位按默认值带上 (空值表示用默认键位)
+    expect(url.searchParams.get('keys')).toBe(keysParam(DEFAULT_KEYS));
+    expect(url.hash).toBe('');
   });
 
   test('Web 版子路径 (/tools/) 也解析到同目录下的播放器页', () => {
-    const url = playerUrl(
+    const url = new URL(playerUrl(
       { locale: 'en', volume: 100 },
       'https://freewu.github.io/magic-tools/tools/#/SegaEmulator'
-    );
-    expect(url).toBe('https://freewu.github.io/magic-tools/tools/emulatorjs/player.html?lang=en-US&volume=100&core=segaMD');
+    ));
+    expect(url.origin + url.pathname).toBe('https://freewu.github.io/magic-tools/tools/emulatorjs/player.html');
+    expect(url.searchParams.get('lang')).toBe('en-US');
+    expect(url.searchParams.get('core')).toBe('segaMD');
   });
 
   test('音量越界先归一化再写进 URL', () => {
@@ -119,6 +132,101 @@ describe('播放器页 URL', () => {
     expect(playerLang('zh-TW')).toBe('zh-CN');
     expect(playerLang('en')).toBe('en-US');
     expect(playerLang('ja')).toBe('en-US');
+  });
+});
+
+describe('键位 (键盘按键)', () => {
+  test('默认键位: 十字键 = 方向键, Z/X/C = A/B/C, A/S/D = X/Y/Z, Enter/V = Start/Mode', () => {
+    expect(SEGA_BUTTONS).toEqual([ 'Up', 'Down', 'Left', 'Right', 'A', 'B', 'C', 'X', 'Y', 'Z', 'Start', 'Mode' ]);
+    expect(DEFAULT_KEYS.Up).toBe(38);
+    expect(DEFAULT_KEYS.Down).toBe(40);
+    expect(DEFAULT_KEYS.Left).toBe(37);
+    expect(DEFAULT_KEYS.Right).toBe(39);
+    expect([ DEFAULT_KEYS.A, DEFAULT_KEYS.B, DEFAULT_KEYS.C ]).toEqual([ 90, 88, 67 ]);
+    expect([ DEFAULT_KEYS.X, DEFAULT_KEYS.Y, DEFAULT_KEYS.Z ]).toEqual([ 65, 83, 68 ]);
+    expect(DEFAULT_KEYS.Start).toBe(13);
+    expect(DEFAULT_KEYS.Mode).toBe(86);
+    // 每个按键都有默认值, 且互不重复
+    expect(new Set(SEGA_BUTTONS.map((b) => DEFAULT_KEYS[b])).size).toBe(SEGA_BUTTONS.length);
+  });
+
+  test('按钮编号与 EmulatorJS (RetroArch 布局) 一致', () => {
+    expect(BUTTON_IDS.B).toBe(0);
+    expect(BUTTON_IDS.A).toBe(1);
+    expect(BUTTON_IDS.Mode).toBe(2);
+    expect(BUTTON_IDS.Start).toBe(3);
+    expect([ BUTTON_IDS.Up, BUTTON_IDS.Down, BUTTON_IDS.Left, BUTTON_IDS.Right ]).toEqual([ 4, 5, 6, 7 ]);
+    expect([ BUTTON_IDS.C, BUTTON_IDS.Y, BUTTON_IDS.X, BUTTON_IDS.Z ]).toEqual([ 8, 9, 10, 11 ]);
+  });
+
+  test('normalizeKeys: 缺项 / 非法值 / 重复键都回退默认', () => {
+    expect(normalizeKeys(null)).toEqual(DEFAULT_KEYS);
+    // 只给一部分: 其余用默认
+    expect(normalizeKeys({ A: 75 }).A).toBe(75);
+    expect(normalizeKeys({ A: 75 }).B).toBe(DEFAULT_KEYS.B);
+    // 非法值 (0 / 负数 / 超范围 / 非数字)
+    expect(normalizeKeys({ A: 0 }).A).toBe(DEFAULT_KEYS.A);
+    expect(normalizeKeys({ A: -3 }).A).toBe(DEFAULT_KEYS.A);
+    expect(normalizeKeys({ A: 9999 }).A).toBe(DEFAULT_KEYS.A);
+    expect(normalizeKeys({ A: '75' }).A).toBe(DEFAULT_KEYS.A);
+    // 两个按键抢同一个键: 后面的回退默认
+    const dup = normalizeKeys({ A: 75, B: 75 });
+    expect(dup.A).toBe(75);
+    expect(dup.B).toBe(DEFAULT_KEYS.B);
+  });
+
+  test('读写 / 恢复默认 / 是否自定义', () => {
+    expect(getKeys()).toEqual(DEFAULT_KEYS);
+    expect(isCustomKeys(getKeys())).toBe(false);
+
+    const saved = setKeys({ ...DEFAULT_KEYS, A: 75 });
+    expect(saved.A).toBe(75);
+    expect(JSON.parse(localStorage.getItem(KEYS_STORAGE_KEY) ?? '{}').A).toBe(75);
+    expect(getKeys()).toEqual(saved);
+    expect(isCustomKeys(getKeys())).toBe(true);
+
+    expect(resetKeys()).toEqual(DEFAULT_KEYS);
+    expect(getKeys()).toEqual(DEFAULT_KEYS);
+    expect(isCustomKeys(getKeys())).toBe(false);
+  });
+
+  test('存储内容损坏时回退默认键位', () => {
+    localStorage.setItem(KEYS_STORAGE_KEY, '{not json');
+    expect(getKeys()).toEqual(DEFAULT_KEYS);
+    localStorage.setItem(KEYS_STORAGE_KEY, '"abc"');
+    expect(getKeys()).toEqual(DEFAULT_KEYS);
+  });
+
+  test('keyOwner: 找到占用该键的按键, 可排除自己', () => {
+    const keys = { ...DEFAULT_KEYS, A: 75 };
+    expect(keyOwner(keys, 75)).toBe('A');
+    expect(keyOwner(keys, 75, 'A')).toBeNull();
+    expect(keyOwner(keys, 1234)).toBeNull();
+  });
+
+  test('keyLabelOf: 字母大写 / 方向键用箭头 / 其它用名字或编号', () => {
+    expect(keyLabelOf(90)).toBe('Z');
+    expect(keyLabelOf(38)).toBe('↑');
+    expect(keyLabelOf(13)).toBe('Enter');
+    expect(keyLabelOf(32)).toBe('Space');
+    expect(keyLabelOf(112)).toBe('F1');
+    expect(keyLabelOf(96)).toBe('Num0');
+    expect(keyLabelOf(53)).toBe('5');
+    expect(keyLabelOf(186)).toBe(';');
+    // 未收录的键显示编号, 无效值显示 '-'
+    expect(keyLabelOf(200)).toBe('#200');
+    expect(keyLabelOf(0)).toBe('-');
+    expect(keyLabelOf(Number.NaN)).toBe('-');
+  });
+
+  test('keysToIds / keysParam: 键位表转成「按钮编号 -> keyCode」', () => {
+    expect(keysToIds(DEFAULT_KEYS)).toEqual({
+      4: 38, 5: 40, 6: 37, 7: 39, 1: 90, 0: 88, 8: 67, 10: 65, 9: 83, 11: 68, 3: 13, 2: 86,
+    });
+    const custom = { ...DEFAULT_KEYS, Start: 32 };
+    expect(JSON.parse(keysParam(custom))['3']).toBe(32);
+    // 非法值不写进参数 (播放器页保持它自己的默认)
+    expect(JSON.parse(keysParam({ ...DEFAULT_KEYS, Mode: 0 }))['2']).toBeUndefined();
   });
 });
 

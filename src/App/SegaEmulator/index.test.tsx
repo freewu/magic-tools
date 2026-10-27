@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import SegaEmulator from './index';
+import { DEFAULT_KEYS, KEYS_STORAGE_KEY } from './data';
 
 // app-context 依赖 App/index.tsx 的顶层 await + import.meta.glob (jest commonjs 不支持), 故打桩
 jest.mock('../../hook/app-context', () => ({
@@ -19,6 +20,15 @@ const postFromPlayer = (data: unknown, source?: unknown) => {
   act(() => {
     window.dispatchEvent(new MessageEvent('message', { data, source: source as Window }));
   });
+};
+
+/** 当前渲染出来的键位 (data-testid -> 显示文本) */
+const keyText = (btn: string) => screen.getByTestId(`sega-key-${btn}`).textContent ?? '';
+
+/** 绑定一个键: 点按键进入待绑定, 再按键盘上的新键 */
+const bindKey = (btn: string, code: number, key = 'k') => {
+  fireEvent.click(screen.getByTestId(`sega-key-${btn}`));
+  fireEvent.keyDown(window, { key, keyCode: code });
 };
 
 beforeEach(() => {
@@ -165,6 +175,128 @@ describe('Sega 模拟器页面', () => {
 
     fireEvent.load(frame);
     expect(await screen.findByText('模拟核心载入失败')).toBeInTheDocument();
+  });
+
+  test('按键配置: 12 个按键都显示默认键位', () => {
+    render(<SegaEmulator />);
+
+    // 说明区里也有「按键配置」字样, 这里只认卡片标题
+    expect(screen.getByText('按键配置', { selector: '.ant-card-head-title' })).toBeInTheDocument();
+    const rows = [ 'Up', 'Down', 'Left', 'Right', 'A', 'B', 'C', 'X', 'Y', 'Z', 'Start', 'Mode' ];
+    rows.forEach((btn) => {
+      expect(screen.getByTestId(`sega-key-${btn}`)).toBeInTheDocument();
+    });
+    // 默认: 方向键 / Z X C / A S D / Enter / V
+    expect(keyText('Up')).toContain('↑');
+    expect(keyText('A')).toContain('Z');
+    expect(keyText('B')).toContain('X');
+    expect(keyText('C')).toContain('C');
+    expect(keyText('X')).toContain('A');
+    expect(keyText('Y')).toContain('S');
+    expect(keyText('Z')).toContain('D');
+    expect(keyText('Start')).toContain('Enter');
+    expect(keyText('Mode')).toContain('V');
+    // 默认状态: 标签为「默认」, 「恢复默认」不可点
+    expect(screen.getByText('默认')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /恢复默认/ })).toBeDisabled();
+  });
+
+  test('点按键再按新键即可重绑, 并写入 localStorage', () => {
+    render(<SegaEmulator />);
+    const row = screen.getByTestId('sega-key-A');
+
+    fireEvent.click(row);
+    // 待绑定状态: 显示占位文案
+    expect(keyText('A')).toContain('按新键…');
+
+    fireEvent.keyDown(window, { key: 'k', keyCode: 75 });
+    expect(keyText('A')).toContain('K');
+    expect(screen.getByTestId('sega-key-A').className).toContain('is-custom');
+    expect(screen.getByText('自定义')).toBeInTheDocument();
+    expect(JSON.parse(localStorage.getItem(KEYS_STORAGE_KEY) ?? '{}').A).toBe(75);
+    // 绑定完成后退出待绑定状态
+    expect(keyText('A')).not.toContain('按新键…');
+  });
+
+  test('Esc 取消绑定, 键位不变', () => {
+    render(<SegaEmulator />);
+    fireEvent.click(screen.getByTestId('sega-key-A'));
+    fireEvent.keyDown(window, { key: 'Escape', keyCode: 27 });
+
+    expect(keyText('A')).toContain('Z');
+    expect(screen.getByTestId('sega-key-A').className).not.toContain('is-binding');
+    expect(localStorage.getItem(KEYS_STORAGE_KEY)).toBeNull();
+  });
+
+  test('点别处 / 窗口失去焦点都会取消绑定 (避免下次按键被当成绑定)', () => {
+    render(<SegaEmulator />);
+    const row = () => screen.getByTestId('sega-key-A');
+
+    // 点到按键区之外
+    fireEvent.click(row());
+    expect(keyText('A')).toContain('按新键…');
+    fireEvent.pointerDown(document.body);
+    expect(keyText('A')).toContain('Z');
+
+    // 窗口失焦 (比如去点模拟器 iframe)
+    fireEvent.click(row());
+    expect(keyText('A')).toContain('按新键…');
+    act(() => {
+      window.dispatchEvent(new Event('blur'));
+    });
+    expect(keyText('A')).toContain('Z');
+    expect(localStorage.getItem(KEYS_STORAGE_KEY)).toBeNull();
+  });
+
+  test('绑定到已被占用的键会被拒绝并提示', async () => {
+    render(<SegaEmulator />);
+    // Z 已经给了 A, 再想给 B 也绑 Z
+    bindKey('B', 90, 'z');
+
+    expect(await screen.findByText('Z 已经分配给 A 了, 请先给它换一个键')).toBeInTheDocument();
+    // 仍停在待绑定状态, 可以直接再按另一个键
+    expect(keyText('B')).toContain('按新键…');
+    fireEvent.keyDown(window, { key: 'Escape', keyCode: 27 });
+    expect(keyText('B')).toContain('X');
+    expect(localStorage.getItem(KEYS_STORAGE_KEY)).toBeNull();
+  });
+
+  test('「恢复默认」把键位改回去', async () => {
+    render(<SegaEmulator />);
+    bindKey('A', 75, 'k');
+    expect(keyText('A')).toContain('K');
+
+    fireEvent.click(screen.getByRole('button', { name: /恢复默认/ }));
+    expect(await screen.findByText('已恢复默认键位')).toBeInTheDocument();
+    expect(keyText('A')).toContain('Z');
+    expect(screen.getByText('默认')).toBeInTheDocument();
+    expect(JSON.parse(localStorage.getItem(KEYS_STORAGE_KEY) ?? '{}')).toEqual(DEFAULT_KEYS);
+  });
+
+  test('本机保存的键位会在下次打开时读回', () => {
+    localStorage.setItem(KEYS_STORAGE_KEY, JSON.stringify({ ...DEFAULT_KEYS, Start: 32 }));
+    render(<SegaEmulator />);
+
+    expect(keyText('Start')).toContain('Space');
+    expect(screen.getByText('自定义')).toBeInTheDocument();
+  });
+
+  test('iframe 地址带上键位, 改键位时实时推给播放器页', async () => {
+    render(<SegaEmulator />);
+    pick(fileOf('sonic.md'));
+
+    const frame = (await screen.findByTestId('sega-frame')) as HTMLIFrameElement;
+    const src = new URL(frame.getAttribute('src') ?? '', 'http://localhost/');
+    const keys = JSON.parse(src.searchParams.get('keys') ?? '{}');
+    // 按钮编号 -> keyCode: A(1)=Z(90), Start(3)=Enter(13)
+    expect(keys['1']).toBe(DEFAULT_KEYS.A);
+    expect(keys['3']).toBe(DEFAULT_KEYS.Start);
+
+    const push = jest.fn();
+    (frame.contentWindow as unknown as { __mtSetKeys: jest.Mock }).__mtSetKeys = push;
+    bindKey('Start', 32, ' ');
+    expect(push).toHaveBeenCalledTimes(1);
+    expect(push.mock.calls[0][0]['3']).toBe(32);
   });
 
   test('鼠标拖动经过舞台时高亮拖放区', () => {

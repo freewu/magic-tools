@@ -46,6 +46,29 @@ const rows: Record<string, [string, string]> = {
     'Browsers need a click or key press before audio is allowed to play',
   ],
   '全屏时可按 Esc 退出': ['全螢幕時可按 Esc 退出', 'Press Esc to leave fullscreen'],
+  // 按键配置
+  '按键配置': ['按鍵設定', 'Button mapping'],
+  '点一下按键再按键盘上的新键即可重绑, 改完立刻生效 (游戏运行中也能改)': [
+    '點一下按鍵再按鍵盤上的新鍵即可重綁, 改完立刻生效 (遊戲執行中也能改)',
+    'Click a button, then press a new key. Changes apply immediately, even mid-game',
+  ],
+  '按新键…': ['按新鍵…', 'Press a key…'],
+  '默认': ['預設', 'Default'],
+  '自定义': ['自訂', 'Custom'],
+  '恢复默认': ['恢復預設', 'Reset to default'],
+  '已恢复默认键位': ['已恢復預設鍵位', 'Default keys restored'],
+  '{key} 已经分配给 {name} 了, 请先给它换一个键': [
+    '{key} 已經分配給 {name} 了, 請先給它換一個鍵',
+    '{key} is already mapped to {name} — rebind that one first',
+  ],
+  '默认: 方向键 = 十字键, Z / X / C = A / B / C, A / S / D = X / Y / Z, Enter = Start, V = Mode': [
+    '預設: 方向鍵 = 十字鍵, Z / X / C = A / B / C, A / S / D = X / Y / Z, Enter = Start, V = Mode',
+    'Defaults: arrow keys = D-pad, Z / X / C = A / B / C, A / S / D = X / Y / Z, Enter = Start, V = Mode',
+  ],
+  '触屏设备请用画面上的虚拟手柄; 外接手柄无需设置, 可以与键盘同时使用': [
+    '觸屏裝置請用畫面上的虛擬手柄; 外接手柄無需設定, 可以與鍵盤同時使用',
+    'On touch devices use the on-screen pad; USB / Bluetooth gamepads need no setup and work alongside the keyboard',
+  ],
   // 设置
   '默认音量': ['預設音量', 'Default volume'],
   '进入模拟器时的音量, 也可在模拟器底部菜单里随时调整': [

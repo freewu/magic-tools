@@ -43,6 +43,43 @@ export const VOLUME_DEFAULT = 80;
 /** 设置持久化 key */
 export const SETTINGS_STORAGE_KEY = 'magic-tools-segaemulator-settings';
 
+/** 键位持久化 key */
+export const KEYS_STORAGE_KEY = 'magic-tools-segaemulator-keys';
+
+// ---- 手柄按键 / 键位 ----
+
+/** 手柄按键: 十字键 + Genesis 六键手柄的 A~Z + Start / Mode */
+export type SegaButton = 'Up' | 'Down' | 'Left' | 'Right' | 'A' | 'B' | 'C' | 'X' | 'Y' | 'Z' | 'Start' | 'Mode';
+
+/** 按键展示顺序 (十字键 -> 动作键 -> Start / Mode) */
+export const SEGA_BUTTONS: readonly SegaButton[] = [
+  'Up', 'Down', 'Left', 'Right', 'A', 'B', 'C', 'X', 'Y', 'Z', 'Start', 'Mode',
+];
+
+/**
+ * 按键 -> EmulatorJS (RetroArch 布局) 的按钮编号
+ * 与 EmulatorJS 的 segaMD 虚拟手柄 / 控制菜单一致: B=0 A=1 Mode=2 Start=3 Up..Right=4..7 C=8 Y=9 X=10 Z=11
+ */
+export const BUTTON_IDS: Record<SegaButton, number> = {
+  B: 0, A: 1, Mode: 2, Start: 3, Up: 4, Down: 5, Left: 6, Right: 7, C: 8, Y: 9, X: 10, Z: 11,
+};
+
+/** 按键显示名 (十字键用中文, 动作键用真机上的丝印) */
+export const BUTTON_LABELS: Record<SegaButton, string> = {
+  Up: '上', Down: '下', Left: '左', Right: '右',
+  A: 'A', B: 'B', C: 'C', X: 'X', Y: 'Y', Z: 'Z', Start: 'Start', Mode: 'Mode',
+};
+
+/**
+ * 默认键位 (KeyboardEvent.keyCode)
+ * 十字键 = 方向键; A / B / C = Z / X / C; X / Y / Z = A / S / D; Start = Enter; Mode = V
+ */
+export const DEFAULT_KEYS: Record<SegaButton, number> = {
+  Up: 38, Down: 40, Left: 37, Right: 39,
+  A: 90, B: 88, C: 67, X: 65, Y: 83, Z: 68,
+  Start: 13, Mode: 86,
+};
+
 /** 播放器页 -> 父页面的消息类型 (见 player.html) */
 export const MSG_LOADING = 'sega-loading';
 export const MSG_READY = 'sega-ready';
@@ -101,5 +138,58 @@ export const SEGA_CSS = `
 .sega-drop-hint {
   font-size: 12px;
   opacity: .65;
+}
+/* 按键配置: 每格一个按钮, 点一下进入待绑定 (虚线高亮), 再按键盘上的新键 */
+.sega-keys {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+.sega-key {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid var(--sega-line);
+  border-radius: 6px;
+  background: var(--sega-bg);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: border-color .2s, background .2s;
+}
+.sega-key:hover {
+  border-color: #1677ff;
+  background: var(--sega-bg-hover);
+}
+.sega-key.is-binding {
+  border-style: dashed;
+  border-color: #1677ff;
+  background: var(--sega-bg-hover);
+}
+.sega-key-name {
+  font-size: 12px;
+  color: var(--sega-fg);
+  white-space: nowrap;
+}
+.sega-key-val {
+  min-width: 34px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--sega-bg-hover);
+  color: var(--sega-fg);
+  font: 12px/16px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  text-align: center;
+  white-space: nowrap;
+}
+.sega-key.is-custom .sega-key-val {
+  background: rgba(22, 119, 255, .16);
+  color: #1677ff;
+}
+.sega-key.is-binding .sega-key-val {
+  background: transparent;
+  color: #1677ff;
 }
 `;

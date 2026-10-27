@@ -1,8 +1,9 @@
 // Sega 模拟器: 选项读写 / ROM 文件名解析 / 播放器页 URL / 消息解析等纯逻辑
 // 页面 (index.tsx) 只做渲染与副作用, 这里全部是可直接单测的纯函数
 import {
-  CORE_BY_EXT, CORE_LABELS, DEFAULT_CORE, MSG_ERROR, MSG_LOADING, MSG_READY, MSG_ROM_FILE, MSG_STARTED, PLAYER_PAGE,
-  ROM_EXTENSIONS, SETTINGS_STORAGE_KEY, VOLUME_DEFAULT, VOLUME_MAX, VOLUME_MIN,
+  BUTTON_IDS, CORE_BY_EXT, CORE_LABELS, DEFAULT_CORE, DEFAULT_KEYS, KEYS_STORAGE_KEY, MSG_ERROR, MSG_LOADING, MSG_READY,
+  MSG_ROM_FILE, MSG_STARTED, PLAYER_PAGE, ROM_EXTENSIONS, SEGA_BUTTONS, SETTINGS_STORAGE_KEY, VOLUME_DEFAULT, VOLUME_MAX,
+  VOLUME_MIN, type SegaButton,
 } from './data';
 
 /** 模拟器选项 (设置中心「默认音量 / 启动后自动全屏」) */
@@ -57,6 +58,108 @@ export const setDefaultOptions = (raw?: Partial<SegaOptions> | null): SegaOption
 export const patchDefaultOptions = (patch: Partial<SegaOptions>): SegaOptions =>
   setDefaultOptions({ ...getDefaultOptions(), ...patch });
 
+// ---- 键位 (键盘按键) ----
+
+/** 键位表: 每个手柄按键对应一个 KeyboardEvent.keyCode */
+export type SegaKeys = Record<SegaButton, number>;
+
+/** 是否为合法的按键码 (0 表示未绑定, 这里不接受) */
+const isKeyCode = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isFinite(value) && value > 0 && value < 256;
+
+/**
+ * 任意输入 -> 完整合法的键位表
+ * 规则: 缺失 / 非法的项回退默认; 两个按键绑同一个键时, 后一个回退默认 (默认值也被占用则清成 0)
+ */
+export const normalizeKeys = (raw?: Partial<Record<string, unknown>> | null): SegaKeys => {
+  const out = {} as SegaKeys;
+  const used = new Set<number>();
+  const source = raw && typeof raw === 'object' ? raw : {};
+  // 先按默认填, 保证顺序稳定
+  SEGA_BUTTONS.forEach((btn) => {
+    const value = (source as Record<string, unknown>)[btn];
+    const code = isKeyCode(value) && !used.has(value) ? value : 0;
+    if (code) used.add(code);
+    out[btn] = code;
+  });
+  SEGA_BUTTONS.forEach((btn) => {
+    if (out[btn]) return;
+    const fallback = DEFAULT_KEYS[btn];
+    if (!used.has(fallback)) {
+      out[btn] = fallback;
+      used.add(fallback);
+    }
+  });
+  return out;
+};
+
+/** 读取本机保存的键位 (读取失败 / 未保存过一律回退默认) */
+export const getKeys = (): SegaKeys => {
+  try {
+    const raw = localStorage.getItem(KEYS_STORAGE_KEY);
+    if (!raw) return normalizeKeys(null);
+    return normalizeKeys(JSON.parse(raw) as Record<string, unknown>);
+  } catch {
+    return normalizeKeys(null);
+  }
+};
+
+/** 写入键位 (已归一化; 返回真正写入的值) */
+export const setKeys = (raw?: Partial<Record<string, unknown>> | null): SegaKeys => {
+  const next = normalizeKeys(raw);
+  try {
+    localStorage.setItem(KEYS_STORAGE_KEY, JSON.stringify(next));
+  } catch {
+    /* 忽略 */
+  }
+  return next;
+};
+
+/** 恢复默认键位 (返回默认值, 同时写回本机) */
+export const resetKeys = (): SegaKeys => setKeys(DEFAULT_KEYS);
+
+/** 是否改过默认键位 */
+export const isCustomKeys = (keys: SegaKeys): boolean =>
+  SEGA_BUTTONS.some((btn) => keys[btn] !== DEFAULT_KEYS[btn]);
+
+/** 找一个已经占用该按键的手柄按键 (没有返回 null) */
+export const keyOwner = (keys: SegaKeys, code: number, except?: SegaButton): SegaButton | null =>
+  SEGA_BUTTONS.find((btn) => btn !== except && keys[btn] === code) ?? null;
+
+/** keyCode -> 显示文本 (字母大写, 方向键用箭头, 未收录的键显示编号) */
+export const keyLabelOf = (code: number): string => {
+  const named: Record<number, string> = {
+    8: 'Backspace', 9: 'Tab', 13: 'Enter', 16: 'Shift', 17: 'Ctrl', 18: 'Alt', 19: 'Pause', 20: 'Caps', 27: 'Esc',
+    32: 'Space', 33: 'PgUp', 34: 'PgDn', 35: 'End', 36: 'Home', 37: '←', 38: '↑', 39: '→', 40: '↓',
+    45: 'Insert', 46: 'Delete', 91: 'Win', 92: 'Win', 93: 'Menu',
+    186: ';', 187: '=', 188: ',', 189: '-', 190: '.', 191: '/', 192: '`',
+    219: '[', 220: '\\', 221: ']', 222: "'",
+  };
+  if (!isKeyCode(code)) return '-';
+  if (named[code]) return named[code];
+  if (code >= 48 && code <= 57) return String(code - 48);
+  if (code >= 65 && code <= 90) return String.fromCharCode(code);
+  if (code >= 96 && code <= 105) return `Num${code - 96}`;
+  if (code >= 112 && code <= 123) return `F${code - 111}`;
+  return `#${code}`;
+};
+
+/**
+ * 键位表 -> 播放器页需要的「按钮编号 -> keyCode」映射
+ * 播放器页只按编号赋值, 不用认识按键名字, 两边保持解耦
+ */
+export const keysToIds = (keys: SegaKeys): Record<string, number> => {
+  const ids: Record<string, number> = {};
+  SEGA_BUTTONS.forEach((btn) => {
+    const code = keys[btn];
+    if (isKeyCode(code)) ids[String(BUTTON_IDS[btn])] = code;
+  });
+  return ids;
+};
+
+/** 键位表 -> 播放器页 URL 参数 (JSON 字符串) */
+export const keysParam = (keys: SegaKeys): string => JSON.stringify(keysToIds(keys));
+
 // ---- ROM 文件名 ----
 
 /** 小写扩展名 (带点; 无扩展名返回空串) */
@@ -110,6 +213,8 @@ export type PlayerUrlOptions = {
   volume: number;
   /** 核心名, 缺省按 Mega Drive */
   core?: string;
+  /** 键位表, 缺省用默认键位 */
+  keys?: SegaKeys;
 };
 
 /**
@@ -122,6 +227,7 @@ export const playerUrl = (opts: PlayerUrlOptions, href?: string): string => {
   url.searchParams.set('lang', playerLang(opts.locale));
   url.searchParams.set('volume', String(normalizeVolume(opts.volume)));
   url.searchParams.set('core', opts.core ?? DEFAULT_CORE);
+  url.searchParams.set('keys', keysParam(opts.keys ?? normalizeKeys(null)));
   url.hash = '';
   return url.href;
 };

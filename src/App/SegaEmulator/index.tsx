@@ -8,13 +8,15 @@
 //   3. 文件名 / 选项 / 消息解析等纯逻辑在 lib.ts。
 import { Alert, Button, Card, Descriptions, Divider, Space, Tag, Typography, message, theme } from 'antd';
 import {
-  FullscreenExitOutlined, FullscreenOutlined, ReloadOutlined, UploadOutlined,
+  FullscreenExitOutlined, FullscreenOutlined, ReloadOutlined, UndoOutlined, UploadOutlined,
 } from '@ant-design/icons';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ROM_ACCEPT, SEGA_CSS } from './data';
 import {
-  coreLabelOf, coreOfRomName, formatFileSize, getDefaultOptions, isRomFileName, parsePlayerMessage, pickRomFile,
-  playerUrl,
+  BUTTON_LABELS, DEFAULT_KEYS, ROM_ACCEPT, SEGA_BUTTONS, SEGA_CSS, type SegaButton,
+} from './data';
+import {
+  coreLabelOf, coreOfRomName, formatFileSize, getDefaultOptions, getKeys, isCustomKeys, isRomFileName, keyLabelOf,
+  keyOwner, keysToIds, parsePlayerMessage, pickRomFile, playerUrl, resetKeys, setKeys, type SegaKeys,
 } from './lib';
 import { u, uT } from './lang';
 import SegaEmulatorIntro from './intro';
@@ -27,8 +29,11 @@ type FullscreenDocument = Document & {
   webkitFullscreenElement?: Element | null;
   webkitExitFullscreen?: () => Promise<void> | void;
 };
-/** 播放器页暴露给本页 (同源) 的启动入口 */
-type PlayerWindow = Window & { __mtStartRom?: (file: File) => void };
+/** 播放器页暴露给本页 (同源) 的入口: 启动 ROM / 实时更新键位 */
+type PlayerWindow = Window & {
+  __mtStartRom?: (file: File) => void;
+  __mtSetKeys?: (ids: Record<string, number>) => void;
+};
 
 /** 错误提示: 标题固定, 细节来自播放器页 (没有细节时给默认文案) */
 type PlayerError = { title: string; detail: string };
@@ -51,6 +56,9 @@ const SegaEmulator: React.FC = () => {
   const [ romName, setRomName ] = useState('');
   const [ frameSrc, setFrameSrc ] = useState('');
   const [ frameKey, setFrameKey ] = useState(0);
+  // 键位: 点一下按键 -> 按新键; 存本机, 并实时推给播放器页 (游戏运行中也能改)
+  const [ keys, setKeysState ] = useState<SegaKeys>(() => getKeys());
+  const [ binding, setBinding ] = useState<SegaButton | null>(null);
   const [ phase, setPhase ] = useState<Phase>('idle');
   const [ error, setError ] = useState<PlayerError | null>(null);
   const [ full, setFull ] = useState(false);
@@ -61,6 +69,16 @@ const SegaEmulator: React.FC = () => {
   const romFileRef = useRef<File | null>(null);
   const localeRef = useRef(locale);
   localeRef.current = locale;
+  const keysRef = useRef(keys);
+  keysRef.current = keys;
+  const keysGridRef = useRef<HTMLDivElement | null>(null);
+
+  /** 写本机并同步给正在跑的模拟器 (没启动时只是更新 iframe 里的备用键位) */
+  const applyKeys = useCallback((next: SegaKeys) => {
+    setKeysState(next);
+    const win = (frameRef.current?.contentWindow ?? null) as PlayerWindow | null;
+    win?.__mtSetKeys?.(keysToIds(next));
+  }, []);
 
   const fullscreenElement = () => (document as FullscreenDocument).fullscreenElement
     ?? (document as FullscreenDocument).webkitFullscreenElement
@@ -109,6 +127,7 @@ const SegaEmulator: React.FC = () => {
       locale: localeRef.current,
       volume: optsRef.current.volume,
       core: coreOfRomName(file.name),
+      keys: keysRef.current,
     }));
     // 换 key 强制重建 iframe: EmulatorJS 一个页面只能实例化一次
     setFrameKey((k) => k + 1);
@@ -186,6 +205,54 @@ const SegaEmulator: React.FC = () => {
       document.removeEventListener('webkitfullscreenchange', onChange);
     };
   }, []);
+
+  // 待绑定状态: 抓一次键盘事件 (捕获阶段, 先于页面其它快捷键), Esc 取消;
+  // 点到别处 (比如去点模拟器画面) 也取消, 否则下一次按键会被当成绑定目标而不是游戏输入
+  useEffect(() => {
+    if (!binding) return;
+    const onPointerDown = (e: Event) => {
+      const grid = keysGridRef.current;
+      const target = e.target as Node | null;
+      if (grid && target && grid.contains(target)) return;
+      if (target && (target as HTMLElement).closest?.(`[data-testid="sega-key-${binding}"]`)) return;
+      setBinding(null);
+    };
+    const onBlur = () => setBinding(null);
+    const onKeyDown = (e: KeyboardEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.key === 'Escape') {
+        setBinding(null);
+        return;
+      }
+      const code = typeof e.keyCode === 'number' ? e.keyCode : 0;
+      if (code <= 0) return;
+      const owner = keyOwner(keysRef.current, code, binding);
+      if (owner) {
+        message.warning(uT(localeRef.current, '{key} 已经分配给 {name} 了, 请先给它换一个键', {
+          key: keyLabelOf(code),
+          name: BUTTON_LABELS[owner],
+        }));
+        return;
+      }
+      applyKeys(setKeys({ ...keysRef.current, [binding]: code }));
+      setBinding(null);
+    };
+    window.addEventListener('keydown', onKeyDown, true);
+    window.addEventListener('pointerdown', onPointerDown, true);
+    window.addEventListener('blur', onBlur);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown, true);
+      window.removeEventListener('pointerdown', onPointerDown, true);
+      window.removeEventListener('blur', onBlur);
+    };
+  }, [ applyKeys, binding ]);
+
+  const resetAllKeys = () => {
+    applyKeys(resetKeys());
+    setBinding(null);
+    message.success(u(localeRef.current, '已恢复默认键位'));
+  };
 
   const restart = () => {
     if (!romFileRef.current) return;
@@ -298,6 +365,63 @@ const SegaEmulator: React.FC = () => {
                 { full ? ` · ${t('全屏时可按 Esc 退出')}` : '' }
               </Text>
             ) : null }
+          </Space>
+        </Card>
+
+        <Card
+          size="small"
+          title={ t('按键配置') }
+          extra={
+            <Space size={ 8 } wrap>
+              <Tag color={ isCustomKeys(keys) ? 'blue' : undefined }>
+                { t(isCustomKeys(keys) ? '自定义' : '默认') }
+              </Tag>
+              <Button
+                size="small"
+                icon={ <UndoOutlined /> }
+                disabled={ !isCustomKeys(keys) }
+                onClick={ resetAllKeys }
+              >
+                { t('恢复默认') }
+              </Button>
+            </Space>
+          }
+        >
+          <Space direction="vertical" size={ 8 } style={ { width: '100%' } }>
+            <Text type="secondary" style={ { fontSize: 12 } }>
+              { t('点一下按键再按键盘上的新键即可重绑, 改完立刻生效 (游戏运行中也能改)') }
+            </Text>
+            <div className="sega-keys" ref={ keysGridRef }>
+              { SEGA_BUTTONS.map((btn) => {
+                const custom = keys[btn] !== DEFAULT_KEYS[btn];
+                const on = binding === btn;
+                return (
+                  <div
+                    key={ btn }
+                    role="button"
+                    tabIndex={ 0 }
+                    className={ `sega-key${custom ? ' is-custom' : ''}${on ? ' is-binding' : ''}` }
+                    data-testid={ `sega-key-${btn}` }
+                    aria-label={ `${BUTTON_LABELS[btn]} ${on ? t('按新键…') : keyLabelOf(keys[btn])}` }
+                    onClick={ () => setBinding(on ? null : btn) }
+                    onKeyDown={ (e) => {
+                      if (e.key !== 'Enter' && e.key !== ' ') return;
+                      e.preventDefault();
+                      setBinding(on ? null : btn);
+                    } }
+                  >
+                    <span className="sega-key-name">{ BUTTON_LABELS[btn] }</span>
+                    <span className="sega-key-val">{ on ? t('按新键…') : keyLabelOf(keys[btn]) }</span>
+                  </div>
+                );
+              }) }
+            </div>
+            <Text type="secondary" style={ { fontSize: 12 } }>
+              { t('默认: 方向键 = 十字键, Z / X / C = A / B / C, A / S / D = X / Y / Z, Enter = Start, V = Mode') }
+            </Text>
+            <Text type="secondary" style={ { fontSize: 12 } }>
+              { t('触屏设备请用画面上的虚拟手柄; 外接手柄无需设置, 可以与键盘同时使用') }
+            </Text>
           </Space>
         </Card>
 
