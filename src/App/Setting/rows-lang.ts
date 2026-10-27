@@ -769,6 +769,28 @@ const ROWS: Record<string, Row> = {
     '選好 ROM 後立刻進入全螢幕 (手機 / 平板建議開啟)',
     'Go fullscreen as soon as a ROM is picked (recommended on phones and tablets)',
   ],
+  // ---- 贪吃蛇 (Snake) ----
+  '贪吃蛇': ['貪吃蛇', 'Snake'],
+  '默认速度': ['預設速度', 'Default speed'],
+  '默认速度与开关, 开局后也能在页面上随时改': [
+    '預設速度與開關, 開局後也能在頁面上隨時改',
+    'Default speed and switches — you can still change them on the page during a round',
+  ],
+  '默认穿墙模式': ['預設穿牆模式', 'Wrap by default'],
+  '默认显示障碍物': ['預設顯示障礙物', 'Obstacles by default'],
+  '默认播放音效': ['預設播放音效', 'Sound by default'],
+  '穿墙: 从一边出去, 从对边进来': [
+    '穿牆: 從一邊出去, 從對邊進來',
+    'Wrap: exit one edge and re-enter from the opposite side',
+  ],
+  '障碍物: 棋盘上固定出现 12 格障碍': [
+    '障礙物: 棋盤上固定出現 12 格障礙',
+    'Walls: 12 fixed obstacle cells on the board',
+  ],
+  '吃到食物 / 撞到障碍时会发出提示音, 用 Web Audio 合成, 不加载任何音频文件': [
+    '吃到食物 / 撞到障礙時會發出提示音, 用 Web Audio 合成, 不載入任何音訊檔',
+    'Beeps on eating and crashing are synthesised with Web Audio — no audio files are loaded',
+  ],
 };
 
 /**

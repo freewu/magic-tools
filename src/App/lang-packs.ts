@@ -163,6 +163,7 @@ import GameBoy from './GameBoy/lang';
 import FreeCell from './FreeCell/lang';
 import SpiderSolitaire from './SpiderSolitaire/lang';
 import SegaEmulator from './SegaEmulator/lang';
+import Snake from './Snake/lang';
 
 export const langPacks = {
   Hash: Hash,
@@ -328,4 +329,5 @@ export const langPacks = {
   FreeCell,
   SpiderSolitaire,
   SegaEmulator,
+  Snake,
 };

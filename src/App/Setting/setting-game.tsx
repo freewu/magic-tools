@@ -7,6 +7,7 @@ import { GameBoySetting } from "../GameBoy/setting";
 import { FreeCellSetting } from "../FreeCell/setting";
 import { SpiderSolitaireSetting } from "../SpiderSolitaire/setting";
 import { SegaEmulatorSetting } from "../SegaEmulator/setting";
+import { SnakeSetting } from "../Snake/setting";
 
 export const SettingGame = () => {
 
@@ -20,6 +21,7 @@ export const SettingGame = () => {
       <FreeCellSetting />
       <SpiderSolitaireSetting />
       <SegaEmulatorSetting />
+      <SnakeSetting />
     </Form>
   )
 }

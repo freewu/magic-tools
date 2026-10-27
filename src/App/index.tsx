@@ -163,6 +163,7 @@ const list = [
   'FreeCell',
   'SpiderSolitaire',
   'SegaEmulator',
+  'Snake',
 ];
 
 import { defineLoader } from './app-modules';
