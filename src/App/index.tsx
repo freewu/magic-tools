@@ -136,6 +136,7 @@ const list = [
   'SitemapCheck',
   'KeywordDensity',
   'WebTDKCheck',
+  'VideoExtract',
   'DnsQuery',
   'WhoisQuery',
   'MtrQuery',

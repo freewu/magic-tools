@@ -14,6 +14,7 @@ use tauri::{
 };
 
 mod dns_query;
+mod media_fetch;
 mod mtr_engine;
 mod mtr_probe;
 mod web_fetch;
@@ -166,6 +167,9 @@ pub fn run() {
         // 网页 TDK 检测: Rust 侧抓取网页源码 (绕过浏览器 CORS)
         .invoke_handler(tauri::generate_handler![
             web_fetch::fetch_url_body,
+            media_fetch::media_fetch,
+            media_fetch::media_download,
+            media_fetch::media_download_cancel,
             dns_query::dns_query,
             dns_query::reverse_dns,
             whois_query::whois_query,
