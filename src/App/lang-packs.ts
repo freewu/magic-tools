@@ -147,6 +147,7 @@ import ZipExtract from './ZipExtract/lang';
 import ScreenRecorder from './ScreenRecorder/lang';
 import QrDecode from './QrDecode/lang';
 import SensitiveWord from './SensitiveWord/lang';
+import GridPaper from './GridPaper/lang';
 import Pomodoro from './Pomodoro/lang';
 import IptablesRules from './IptablesRules/lang';
 import TcRules from './TcRules/lang';
@@ -320,6 +321,7 @@ export const langPacks = {
   ScreenRecorder,
   QrDecode,
   SensitiveWord,
+  GridPaper,
   Pomodoro,
   Game2048,
   Tetris,

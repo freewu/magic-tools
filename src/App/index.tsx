@@ -154,6 +154,7 @@ const list = [
   'ScreenRecorder',
   'QrDecode',
   'SensitiveWord',
+  'GridPaper',
   'Pomodoro',
   'Game2048',
   'Tetris',
