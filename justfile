@@ -25,6 +25,20 @@ set quiet := false
 #   / src/App/Help/data.tsx 更新日志 / update.md
 version := env_var_or_default("VERSION", "2.25.0")
 
+# --- 命令解析 (Windows 适配, 勿删) --------------------------------------------
+# just 在 Windows 上用 PATH 里的 `sh` 执行 recipe (本机是 Cygwin 的 sh)。Node 安装目录
+# (如 D:\env\nodejs) 里的 `npm` / `npx` 是**无扩展名的 bash 包装脚本** (#!/usr/bin/env bash),
+# 而 Cygwin sh 的 PATH 里 C:\Windows\System32 排在 Cygwin bin 之前, 于是 shebang 命中的
+# `bash` 是 WSL 启动器 C:\Windows\System32\bash.exe, 结果报:
+#   /bin/bash: /cygdrive/d/env/nodejs/npm: No such file or directory  (exit 127)
+# => Windows 上统一走 `.cmd` 版本 (原生批处理, 不经过 bash)。
+npm := if os() == "windows" { "npm.cmd" } else { "npm" }
+npx := if os() == "windows" { "npx.cmd" } else { "npx" }
+# 同理 `bash` 在 Windows 上也会命中 WSL 启动器 (脚本会在 WSL 里跑, 工具链与 Windows 不一致),
+# 需要跑 .sh 脚本时可用 BASH 环境变量指定真正的 bash, 例如:
+#   setx BASH "C:\Program Files\Git\bin\bash.exe"
+bash := env_var_or_default("BASH", "bash")
+
 # Default command: show usage help
 default: help
 
@@ -45,25 +59,25 @@ dev-init:
 
 # Development mode: start Vite dev server (beforeDevCommand) + Tauri window
 dev:
-    npm run tauri dev
+    {{npm}} run tauri dev
 
 # Start the React renderer dev server only (http://localhost:1212, for browser debugging)
 dev-renderer:
-    npm run dev:renderer
+    {{npm}} run dev:renderer
 
 # Build the React renderer only into dist/
 build-renderer:
-    npm run build:renderer
+    {{npm}} run build:renderer
 
 # 组装可部署站点 _site/ (根目录 = docs 官网, /tools/ = Web 版), 与 GitHub Pages / Cloudflare Pages 一致
 # 本地预览: npx serve _site (或 python3 -m http.server -d _site)
 site:
-    npm run build:site
+    {{npm}} run build:site
 
 # Preview the built renderer locally (serve dist/ at http://localhost:4173)
 # 注意: 不要直接双击 dist/index.html (file:// 下浏览器禁 ES Module 分包, 会黑屏)
 preview:
-    npm run preview:renderer
+    {{npm}} run preview:renderer
 
 # 1) vite build -> dist/ (纯前端, base './' 已适配 Pages 子路径)
 # 2) scripts/trigger-pages.sh: 优先 gh workflow run, 无 gh 时复用 git 凭据调 REST API
@@ -73,31 +87,31 @@ preview:
 # 前提: 代码先 git push origin master; 仓库 Settings -> Pages -> Source = GitHub Actions
 # Build and deploy the pure-web version to GitHub Pages (vite build + trigger deploy workflow)
 web:
-    npm run build:renderer
+    {{npm}} run build:renderer
     @echo "✓ Web 版构建完成 (dist/, 纯前端无 Tauri 能力)"
-    bash scripts/trigger-pages.sh
+    "{{bash}}" scripts/trigger-pages.sh
 
 # Build the production app: renderer + Rust + installers (bundle)
 build:
-    npm run tauri build
+    {{npm}} run tauri build
 
 # Build a specific bundle target: just bundle nsis | appimage | deb | msi | dmg | rpm ...
 bundle target:
-    npm run tauri build -- --bundles {{target}}
+    {{npm}} run tauri build -- --bundles {{target}}
 
 # Usage: just release            -> build a single portable exe (no installer), copy to release/
 #        just release nsis       -> build only the given format (nsis/msi/appimage/deb/dmg/rpm/app)
 # 默认单体免安装 exe (--no-bundle, 需系统 WebView2); 会额外输出开始时间 / 结束时间 / 耗时
 # Build and copy installers into release/ (default: portable exe); prints start/end/elapsed time
 release target="":
-    bash scripts/release.sh {{target}}
+    "{{bash}}" scripts/release.sh {{target}}
 
 # 1. Build all installers
 # 2. gh release create creates/overwrites the release (creates it if missing)
 # 3. Upload artifacts per platform (failing globs are ignored, e.g. no nsis on Linux)
 # Build and publish to GitHub Releases - needs gh CLI (gh auth login)
 publish:
-    npm run tauri build
+    {{npm}} run tauri build
     gh release create v{{version}} --generate-notes --latest
     -gh release upload v{{version}} src-tauri/target/release/bundle/nsis/*.exe --clobber
     -gh release upload v{{version}} src-tauri/target/release/bundle/appimage/*.AppImage --clobber
@@ -108,33 +122,33 @@ publish:
 
 # Run ESLint
 lint:
-    npm run lint
+    {{npm}} run lint
 
 # Run Jest unit tests
 # 全量跑所有测试 (提交前 / 改动涉及全局注册表或公共库时; 约 2 分钟)
 test:
-    npm test
+    {{npm}} test
 
 # Run Jest unit tests for a tool (or several, space separated in one argument),
 # e.g. `just test-app Whiteboard` or `just test-app "Whiteboard Metronome"`
 # 日常开发只跑改动/新增工具的测试即可 (jest 按路径子串匹配)
 test-app app:
-    npm test '--' {{app}}
+    {{npm}} test '--' {{app}}
 
 # Clean build artifacts (dist/ + Rust target/)
 clean:
-    npm run clean:renderer
+    {{npm}} run clean:renderer
     cargo clean --manifest-path src-tauri/Cargo.toml
 
 # Check the Tauri development environment
 doctor:
-    npm run tauri info
+    {{npm}} run tauri info
 
 # Regenerate app icons from assets/logo.png into src-tauri/icons/
 # Requirements: put a square 1024x1024 PNG at assets/logo.png first, then run this recipe
 # Outputs: src-tauri/icons/* (32x32.png, 128x128.png, icon.ico, icon.icns, ...)
 icon:
-    npx tauri icon assets/logo.png
+    {{npx}} tauri icon assets/logo.png
 
 # [Rule 1] Commit all changes with a summary message and push to remote
 # Usage: just commit "feat: add new tool"
@@ -167,5 +181,5 @@ lexicon src="":
 # Use this when the dev server exited abnormally and the port is still occupied
 # Kill leftover dev server process on port 1212 (Windows)
 kill-dev:
-    powershell -Command "Get-NetTCPConnection -LocalPort 1212 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }"
+    powershell -Command 'Get-NetTCPConnection -LocalPort 1212 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }'
     echo "Cleaned up processes occupying port 1212"
