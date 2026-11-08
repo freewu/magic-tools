@@ -1,6 +1,31 @@
-# MagicTools v2.25.0
+# MagicTools v2.26.0
 
 ## 更新内容
+
+### ✨ 新增
+
+- 新增「**格子纸 (Grid Paper)**」：生成可打印的方格纸 / 点阵纸 / 横线纸；纸张支持 **A3 / A4 / B5 / B6**（ISO 216 标准尺寸，默认 A4）与纵向 / 横向两种方向；格子大小 2–50mm 连续可调（3 / 5 / 8 / 10mm 一键切换），页边距、线宽、线色（灰 / 蓝 / 淡绿 / 淡红）、页数、加粗间隔（每 N 格一条加粗线）都能即时调整，右侧预览同步刷新，点一下即可打印或另存为 PDF；页面内容全部是 **SVG 矢量线**，打印与导出 PDF 都不会有锯齿，参数本机记住，下次打开沿用
+
+### 🛠 体验优化
+
+- **全部应用配上图标**：各应用 `define.tsx` 的 `Icon` 统一改为 **antd 图标名**，新增 `src/App/app-icons.ts` 集中映射（只显式导入实际用到的图标，不把整套 `@ant-design/icons` 打进产物）；侧边栏菜单与应用中心卡片现在都显示图标，卡片改为「图标 + 名称」同一行居中、名称过长自动换行，悬停时图标高亮为蓝色
+- 「**扫雷**」双击已翻开的数字格（或中键点击）时，周围**未翻开**的格子会**闪烁 3 下**提示该数字还剩哪些格子没处理，夫数正好等于数字时再一并连开；系统开启「减少动态效果」时不闪，改为常亮金色描边
+- 帮助页「使用组件」的 badge 改为**本地生成 SVG**（复用「Shield Badge 生成」的同一套渲染），开发者头像改用仓库内的 `assets/bluefrog.png`，离线 / 内网环境不再请求 `img.shields.io` 与 Gravatar；组件清单补充 Excalidraw / bignumber.js / jsnes / boytacean / EmulatorJS，并同步 Tauri 版本号
+- 帮助页的开发时间线做了**瘦身**：V2.4.1 ～ V2.25.0 的历史条目压缩成「新增应用 / 新增功能 / 体验改进 / 问题修复」几行摘要，时间线页面明显变短、打开更快，历史版本号与关键词仍可检索
+
+### 🐛 修复
+
+- 修复 Windows 上跑 justfile 的 recipe（如 `just dev`）报 `/bin/bash: /cygdrive/.../npm: No such file or directory` 的问题：just 在 Windows 下用 PATH 里的 `sh` 执行，而 Node 安装目录里的 `npm` / `npx` 是无扩展名的 bash 包装脚本，shebang 会命中 PATH 里的 WSL 启动器；现在 Windows 上统一改走 `npm.cmd` / `npx.cmd`，需要执行 `.sh` 脚本时可用 `BASH` 环境变量指定真正的 bash
+
+### 🛠 工程 / CI
+
+- `app-icons.ts` 只显式导入实际用到的 antd 图标，并新增 `src/__tests__/app-icons.test.ts` 校验「每个应用的 `Icon` 都有对应映射」与「映射表没有多余导入」，避免出现空图标或产物膨胀
+- 移除临时加入又撤下的「视频提取」（仅桌面版）应用，相关前端页面、Rust `media_fetch` 模块与注册一并清理
+- 测试文件 **384 → 387** 个（新增「格子纸」的 `lib.test.ts` + `index.test.tsx` 与 `src/__tests__/app-icons.test.ts`），全量单元测试保持全绿；`tsc --noEmit` 与 `npm run build:renderer` 通过
+
+### 📊 页面总数
+
+- 工具总数 **160 → 161**（新增 格子纸），分类保持 10 个，其中「其它」由 22 个增加到 23 个
 
 ### ✨ 新增
 

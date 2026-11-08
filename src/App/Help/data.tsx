@@ -94,6 +94,30 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-11-08 V2.26.0 Release", "2026-11-08 V2.26.0 Release", "2026-11-08 V2.26.0 Release"),
+    items: trio(
+      [
+        "新增应用: 格子纸 (工具总数 160 → 161, 「其它」由 22 个增加到 23 个)",
+        "新增功能: 格子纸支持 A3 / A4 / B5 / B6 四种纸张与纵向 / 横向, 方格 / 点阵 / 横线三种格型, 格子大小 2–50mm (3 / 5 / 8 / 10mm 一键切换), 页边距 / 线宽 / 线色 / 页数 / 加粗间隔即时可调, 右侧预览实时刷新, 一键打印或另存为 PDF (SVG 矢量, 参数本机记住)",
+        "体验改进: 全部应用配上图标 (define.tsx 的 Icon 改为 antd 图标名, 由 app-icons.ts 集中映射), 侧边栏与应用中心卡片都显示图标且悬停高亮; 扫雷双击数字格时周边未翻开的格子闪烁 3 下提示; 帮助页组件 badge 改为本地生成 SVG, 开发者头像改用本地图片, 离线 / 内网也能正常显示; 帮助页开发时间线压缩历史条目, 页面更短更快",
+        "问题修复: Windows 上 justfile 的 recipe (如 just dev) 报 /bin/bash: /cygdrive/.../npm: No such file or directory (改用 npm.cmd / npx.cmd)",
+      ],
+      [
+        "新增應用: 格子紙 (工具總數 160 → 161, 「其它」由 22 個增加到 23 個)",
+        "新增功能: 格子紙支援 A3 / A4 / B5 / B6 四種紙張與縱向 / 橫向, 方格 / 點陣 / 橫線三種格型, 格子大小 2–50mm (3 / 5 / 8 / 10mm 一鍵切換), 頁邊距 / 線寬 / 線色 / 頁數 / 加粗間隔即時可調, 右側預覽即時更新, 一鍵列印或另存為 PDF (SVG 向量, 參數本機記住)",
+        "體驗改進: 全部應用配上圖示 (define.tsx 的 Icon 改為 antd 圖示名, 由 app-icons.ts 集中對應), 側邊欄與應用中心卡片都顯示圖示且滑鼠移上去會高亮; 踩地雷雙擊數字格時周邊未翻開的格子閃爍 3 下提示; 說明頁元件 badge 改為本機產生 SVG, 開發者頭像改用本機圖片, 離線 / 內網也能正常顯示; 說明頁開發時間軸壓縮歷史條目, 頁面更短更快",
+        "問題修正: Windows 上 justfile 的 recipe (如 just dev) 報 /bin/bash: /cygdrive/.../npm: No such file or directory (改用 npm.cmd / npx.cmd)",
+      ],
+      [
+        "New app: Grid Paper (tools 160 → 161, Misc 22 → 23)",
+        "New features: Grid Paper prints square-grid, dot-grid or ruled paper on A3 / A4 / B5 / B6 in portrait or landscape, with cell size 2–50mm (3 / 5 / 8 / 10mm presets), margin, line width, line colour, page count and major-line interval all adjustable live; the preview refreshes as you type and one click prints or saves a PDF (vector SVG, options remembered locally)",
+        "Improvements: every app now has an icon (define.tsx `Icon` became an antd icon name mapped by app-icons.ts) shown in the sidebar and on App Center cards with a hover highlight; Minesweeper flashes the hidden cells around a double-clicked number three times; the Help page renders component badges as local SVG and uses a bundled avatar so it works offline or on an intranet, and its timeline now keeps condensed summaries for old releases",
+        "Fixes: justfile recipes such as `just dev` failed on Windows with /bin/bash: /cygdrive/.../npm: No such file or directory (now uses npm.cmd / npx.cmd)",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-10-27 V2.25.0 Release", "2026-10-27 V2.25.0 Release", "2026-10-27 V2.25.0 Release"),
     items: trio(
       [

@@ -23,7 +23,7 @@ set quiet := false
 # Note: 修改版本号时需同步以下位置 (完整清单见 README「版本修改」):
 #   package.json / src-tauri/Cargo.toml / src-tauri/tauri.conf.json / 本文件默认值
 #   / src/App/Help/data.tsx 更新日志 / update.md
-version := env_var_or_default("VERSION", "2.25.0")
+version := env_var_or_default("VERSION", "2.26.0")
 
 # --- 命令解析 (Windows 适配, 勿删) --------------------------------------------
 # just 在 Windows 上用 PATH 里的 `sh` 执行 recipe (本机是 Cygwin 的 sh)。Node 安装目录
