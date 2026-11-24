@@ -94,6 +94,27 @@ const trio = (zh: string[], tw: string[], en: string[]) => ({ 'zh-CN': zh, 'zh-T
 export const eventList: HelpEvent[] = [
   {
     color: "green",
+    title: tri("2026-11-25 V2.27.0 Release", "2026-11-25 V2.27.0 Release", "2026-11-25 V2.27.0 Release"),
+    items: trio(
+      [
+        "新增应用: 罗马数字 (工具总数 161 → 162, 「类型转换」由 20 个增加到 21 个)",
+        "新增功能: 罗马数字支持阿拉伯数字 ↔ 罗马数字双向互转 (1 - 3999), 布局与 Base64 编解码一致; 接受大小写混写, 拒绝 IIII / IC / VX 等非标准写法并提示原因; 内置三语说明 (符号表 / 减法组合表 / 转换规则 / 示例)",
+        "体验改进: 格子纸撤下应用中心的 NEW 徽标 (由罗马数字接替)",
+      ],
+      [
+        "新增應用: 羅馬數字 (工具總數 161 → 162, 「類型轉換」由 20 個增加到 21 個)",
+        "新增功能: 羅馬數字支援阿拉伯數字 ↔ 羅馬數字雙向互轉 (1 - 3999), 版面與 Base64 編解碼一致; 接受大小寫混寫, 拒絕 IIII / IC / VX 等非標準寫法並提示原因; 內建三語說明 (符號表 / 減法組合表 / 轉換規則 / 範例)",
+        "體驗改進: 格子紙撤下應用中心的 NEW 徽標 (由羅馬數字接替)",
+      ],
+      [
+        "New app: Roman Numerals (tools 161 → 162, Converters 20 → 21)",
+        "New features: two-way Arabic ↔ Roman numeral conversion for 1 - 3999 with the same layout as Base64 Encode / Decode; mixed case is accepted while non-standard forms such as IIII / IC / VX are rejected with a reason, and a three-language explanation covers the symbol table, subtractive pairs, rules and examples",
+        "Improvements: Grid Paper dropped its App Center NEW badge (now used by Roman Numerals)",
+      ],
+    ),
+  },
+  {
+    color: "green",
     title: tri("2026-11-08 V2.26.0 Release", "2026-11-08 V2.26.0 Release", "2026-11-08 V2.26.0 Release"),
     items: trio(
       [

@@ -2,11 +2,11 @@
 
 # 🧰 Magic Tools
 
-**全能開發工具箱 —— 10 大分類、160 個實用工具，桌面 + Web 雙端。**
+**全能開發工具箱 —— 10 大分類、162 個實用工具，桌面 + Web 雙端。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
-![version](https://img.shields.io/badge/magic--tools-v2.26.0-007EC6?style=flat-square&labelColor=24292F) ![ci](https://img.shields.io/github/actions/workflow/status/freewu/magic-tools/ci.yml?style=flat-square&label=CI&labelColor=24292F&logo=githubactions&logoColor=fff) ![Tauri](https://img.shields.io/badge/Tauri-2-0E7490?style=flat-square&labelColor=24292F&logo=tauri&logoColor=fff) ![React](https://img.shields.io/badge/React-18-087EA4?style=flat-square&labelColor=24292F&logo=react&logoColor=fff) ![Ant Design](https://img.shields.io/badge/Ant_Design-5-0170FE?style=flat-square&labelColor=24292F&logo=antdesign&logoColor=fff) ![MIT License](https://img.shields.io/badge/license-MIT-4F46E5?style=flat-square&labelColor=24292F)
+![version](https://img.shields.io/badge/magic--tools-v2.27.0-007EC6?style=flat-square&labelColor=24292F) ![ci](https://img.shields.io/github/actions/workflow/status/freewu/magic-tools/ci.yml?style=flat-square&label=CI&labelColor=24292F&logo=githubactions&logoColor=fff) ![Tauri](https://img.shields.io/badge/Tauri-2-0E7490?style=flat-square&labelColor=24292F&logo=tauri&logoColor=fff) ![React](https://img.shields.io/badge/React-18-087EA4?style=flat-square&labelColor=24292F&logo=react&logoColor=fff) ![Ant Design](https://img.shields.io/badge/Ant_Design-5-0170FE?style=flat-square&labelColor=24292F&logo=antdesign&logoColor=fff) ![MIT License](https://img.shields.io/badge/license-MIT-4F46E5?style=flat-square&labelColor=24292F)
 
 [下載桌面版](#-下載) · [線上體驗](https://freewu.github.io/magic-tools/) · [提交 Issue](https://github.com/freewu/magic-tools/issues/new)
 
@@ -36,8 +36,8 @@ Hash 值計算 · HmacHash 值計算 · SHA3 Hash 值計算 · Keccak Hash 值�
 ### 🔄 編解碼 *(13)*
 Base64 編解碼 · URL 編解碼 · Unicode 編解碼 · Punycode 編解碼 · UUencode 編解碼 · XXencode 編解碼 · BCD 編解碼 · 摩斯密碼編解碼 · JWT 編解碼器 · HTTP Basic Auth 編解碼 · BaseX 編解碼 · Base58 編解碼 · Gzip 編解碼
 
-### ⚖️ 類型轉換 *(20)*
-時間戳轉換 · 顏色格式轉換 · 進制轉換 · 樹形和路徑轉換 · GPS 座標轉換 · 經緯度格式轉換 · IP 轉換(IPv4/IPv6 ↔ 十進位/十六進位/二進位) · 下載連結轉換 · JSONL 轉換 · 人民幣大寫 · 位元組轉換 · 中文拼音 · 溫度轉換 · 距離轉換 · 配置轉換 · 字幕格式轉換 · 速度轉換 · 容量轉換 · 面積轉換 · 重量轉換
+### ⚖️ 類型轉換 *(21)*
+時間戳轉換 · 顏色格式轉換 · 進制轉換 · 樹形和路徑轉換 · GPS 座標轉換 · 經緯度格式轉換 · IP 轉換(IPv4/IPv6 ↔ 十進位/十六進位/二進位) · 下載連結轉換 · JSONL 轉換 · 人民幣大寫 · 位元組轉換 · 中文拼音 · 溫度轉換 · 距離轉換 · 配置轉換 · 字幕格式轉換 · 速度轉換 · 容量轉換 · 面積轉換 · 重量轉換 · 羅馬數字(阿拉伯數字 ↔ 羅馬數字, 1 - 3999)
 
 ### 🛠️ 格式化 *(12)*
 Markdown 編輯器 · 即時渲染 Markdown 編輯器(Vditor: 即時渲染/分割/所見即所得三種模式, KaTeX 公式, 匯出 .md 與自帶樣式的 .html) · Mermaid 編輯器(即時預覽, 內建 30+ 圖形類型範例, 匯出 SVG/PNG/WebP) · 心智圖(Markdown 大綱轉 markmap 互動式心智圖, 折疊層級/縮放平移, 配色與字號, 匯出 SVG/PNG/WebP) · JSON 格式化 · JSON5 格式化 · JavaScript 格式化(美化/壓縮/混淆加密/解密還原) · SQL 格式化 · XML 格式化 · HTML 格式化 · SVG 格式化 · 中英文自動排版
@@ -54,8 +54,8 @@ Base64 圖片 · ASCII 圖片 · 程式碼截圖 · ICO 生成 · App Icon 生�
 ### 🌐 站長工具 *(16)*
 HTML 標籤去除 · 瀏覽器指紋 · CSR 申請文件(本機產生 RSA 私鑰 + PKCS#10 請求, 支援 SAN) · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 檢查 · 關鍵詞密度 · 網頁TDK 資訊檢測 · DNS 查詢(僅桌面版) · Whois 查詢(僅桌面版) · MTR 查詢(僅桌面版: traceroute + ping, 逐跳丟包/RTT/抖動) · robots.txt 生成 · iptables 規則(日常情境一鍵產生: 開放連接埠 / 封鎖 IP / 封鎖網段 / 連接埠轉發; 也可解析現有規則或依表單產生指令, 支援 iptables-save) · tc 規則(HTB / TBF / netem 限速與弱網模擬, 入口限速走 ifb) · nginx 設定(靜態站點 / SPA / PHP / 反向代理, 含 TLS、gzip、靜態快取、限流、防盜連, 直接產生 vhost 設定檔)
 
-### 🧩 其他 *(18)*
-CSS 配色 · 行數統計 · 正則表達式 · 檔案比較 · 鍵盤按鍵資訊 · Chmod 權限 · ASCII 文字 · CIDR 計算器 · WebSocket 偵錯 · 提詞器(調速/淡入淡出/逐行高亮/閱讀基準線可開關、自訂顏色並上下調整位置/全螢幕, 開始前可先倒計時, 空格 開始·暫停·取消倒計時, 預設值可在設定裡改/頁面一鍵儲存) · BOM 檢查(偵測 / 移除 / 新增 UTF-8·UTF-16·UTF-32 BOM, 編碼推測與文字預覽) · 節拍器(20~300 BPM, 拍號與拍內細分, 3 種音色 + 音量, 開始前預排拍倒計時, 全螢幕閃爍圓點, 連擊測速) · 螢幕錄製(瀏覽器專享: 擷取螢幕/視窗/分頁, 可選系統聲音與麥克風, 影格率·位元率·解析度可選, 一鍵儲存 WebM/MP4) · 二維碼解析(上傳/拖曳/貼上二維碼圖片, 用 jsQR 讀出內容: 網址·WiFi 配網·名片·郵件·電話·簡訊·座標·動態密碼, 結構化欄位顯示, 預覽圖上框出二維碼位置, 反色策略可調, 本機歷史記錄) · 敏感詞檢測(Aho–Corasick 掃描, 通用/小紅書/微信公眾號三套詞庫: 危險等級、命中位置與替換建議, 一鍵打碼與報告匯出, 寬鬆匹配可揪出「微 信」這類繞過寫法) · 番茄鐘(專注/短休/長休循環, 5 種內建合成提示音或指定自己的音訊檔, 提示音可設重複次數, 彈窗通知桌面端用系統彈窗, 時鐘背景與專注/休息數字配色可調, 背景可換成自己的圖片, 全螢幕支援空格/Enter 開始·暫停) · Zip 壓縮(拖曳檔案或資料夾並保留目錄層級, 壓縮等級 0~9, 自訂壓縮檔名, 重名自動加序號, 顯示壓縮前後體積) · Zip 解壓(項目清單依大小/時間顯示, 全選/反選, 文字與圖片線上預覽, 依壓縮檔內層級解壓到指定目錄, 單一項目也可直接下載, 中文檔名編碼 auto/UTF-8/GBK/Big5)
+### 🧩 其他 *(19)*
+CSS 配色 · 行數統計 · 正則表達式 · 檔案比較 · 格子紙(可列印方格 / 點陣 / 橫線紙, A3·A4·B5·B6) · 鍵盤按鍵資訊 · Chmod 權限 · ASCII 文字 · CIDR 計算器 · WebSocket 偵錯 · 提詞器(調速/淡入淡出/逐行高亮/閱讀基準線可開關、自訂顏色並上下調整位置/全螢幕, 開始前可先倒計時, 空格 開始·暫停·取消倒計時, 預設值可在設定裡改/頁面一鍵儲存) · BOM 檢查(偵測 / 移除 / 新增 UTF-8·UTF-16·UTF-32 BOM, 編碼推測與文字預覽) · 節拍器(20~300 BPM, 拍號與拍內細分, 3 種音色 + 音量, 開始前預排拍倒計時, 全螢幕閃爍圓點, 連擊測速) · 螢幕錄製(瀏覽器專享: 擷取螢幕/視窗/分頁, 可選系統聲音與麥克風, 影格率·位元率·解析度可選, 一鍵儲存 WebM/MP4) · 二維碼解析(上傳/拖曳/貼上二維碼圖片, 用 jsQR 讀出內容: 網址·WiFi 配網·名片·郵件·電話·簡訊·座標·動態密碼, 結構化欄位顯示, 預覽圖上框出二維碼位置, 反色策略可調, 本機歷史記錄) · 敏感詞檢測(Aho–Corasick 掃描, 通用/小紅書/微信公眾號三套詞庫: 危險等級、命中位置與替換建議, 一鍵打碼與報告匯出, 寬鬆匹配可揪出「微 信」這類繞過寫法) · 番茄鐘(專注/短休/長休循環, 5 種內建合成提示音或指定自己的音訊檔, 提示音可設重複次數, 彈窗通知桌面端用系統彈窗, 時鐘背景與專注/休息數字配色可調, 背景可換成自己的圖片, 全螢幕支援空格/Enter 開始·暫停) · Zip 壓縮(拖曳檔案或資料夾並保留目錄層級, 壓縮等級 0~9, 自訂壓縮檔名, 重名自動加序號, 顯示壓縮前後體積) · Zip 解壓(項目清單依大小/時間顯示, 全選/反選, 文字與圖片線上預覽, 依壓縮檔內層級解壓到指定目錄, 單一項目也可直接下載, 中文檔名編碼 auto/UTF-8/GBK/Big5)
 
 > 另有內建頁面：**應用中心**(支援按應用名稱 / 分類名稱搜尋 + 分類篩選)、**我的收藏**(常用工具集中收藏, 懸浮入口可拖到任意位置)、**說明與更新日誌**、**設定**。
 
@@ -95,7 +95,7 @@ magic-tools
 │   │   ├── app-modules.ts    # 建置期用 import.meta.glob 靜態收集 (取代 webpack context 動態匯入)
 │   │   ├── app-i18n.ts       # 應用註冊表: appNameOf() 等取各工具/固定頁三語名稱
 │   │   ├── lang-packs.ts     # 彙總各工具 lang.ts 的預設語言包 (default 匯出)
-│   │   └── <工具>/           # 每工具一個目錄 (目前 160 個, 清單見下) — 兩步註冊
+│   │   └── <工具>/           # 每工具一個目錄 (目前 162 個, 清單見下) — 兩步註冊
 │   │       ├── define.tsx    # 註冊中繼資料: AppName(zh-CN 預設名) / Icon / Type(分組)
 │   │       ├── index.tsx     # 工具頁面元件 (預設匯出, 懶載入)
 │   │       ├── lang.ts       # 預設語言包 + 三語詞條 (zh 短語即 key, 值=[zh-TW, en]) + 本地取詞函式
@@ -114,7 +114,7 @@ magic-tools
 
 ### `src/App/` 現有工具清單
 
-[`src/App/`](src/App/) 下現有 **160** 個工具目錄, 每個目錄 = 一個工具, 由其中 `define.tsx` 宣告。**新增工具需兩步登記**：(1) 把目錄名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 陣列 (該陣列決定側邊欄/應用中心選單順序與路由; `import.meta.glob` 只負責發現頁面元件, 不決定選單); (2) 把其 `lang.ts` 預設匯出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名稱與介面文案才能隨語言切換。按下表 `Type` 分組列出 (與側邊欄/上方功能總覽一致), 括號內為目錄數。除下列公共檔案外, 個別工具另有私有檔案 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
+[`src/App/`](src/App/) 下現有 **162** 個工具目錄, 每個目錄 = 一個工具, 由其中 `define.tsx` 宣告。**新增工具需兩步登記**：(1) 把目錄名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 陣列 (該陣列決定側邊欄/應用中心選單順序與路由; `import.meta.glob` 只負責發現頁面元件, 不決定選單); (2) 把其 `lang.ts` 預設匯出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名稱與介面文案才能隨語言切換。按下表 `Type` 分組列出 (與側邊欄/上方功能總覽一致), 括號內為目錄數。除下列公共檔案外, 個別工具另有私有檔案 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
 
 **🔐 加解密 *(23)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `SM9Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto` · `ZucCrypto`
 
@@ -122,7 +122,7 @@ magic-tools
 
 **🔄 編解碼 *(13)*** — `BCDCodec` · `Base58Codec` · `Base64` · `BaseXCodec` · `BasicAuthCodec` · `GzipCodec` · `JWTDecoder` · `MorseCodec` · `Punycode` · `URL` · `UUencode` · `Unicode` · `XXencode`
 
-**⚖️ 類型轉換 *(20)*** — `AreaConvert` · `ByteConvert` · `ColorConvert` · `ConfigConvert` · `DistanceConvert` · `DownloadLinkConvert` · `GPSConvert` · `LatLngConvert` · `IPConvert` · `JSONLConvert` · `NumberConvert` · `PinyinConvert` · `RMBConvert` · `SpeedConvert` · `SubtitleConvert` · `TemperatureConvert` · `Time` · `TreePathConvert` · `VolumeConvert` · `WeightConvert`
+**⚖️ 類型轉換 *(20)*** — `AreaConvert` · `ByteConvert` · `ColorConvert` · `ConfigConvert` · `DistanceConvert` · `DownloadLinkConvert` · `GPSConvert` · `LatLngConvert` · `IPConvert` · `JSONLConvert` · `NumberConvert` · `PinyinConvert` · `RMBConvert` · `RomanNumeral` · `SpeedConvert` · `SubtitleConvert` · `TemperatureConvert` · `Time` · `TreePathConvert` · `VolumeConvert` · `WeightConvert`
 
 **🛠️ 格式化 *(12)*** — `CnEnSpacing` · `HtmlFormat` · `JSON5Formatter` · `JsFormatter` · `JsonFormatter` · `MarkdownEditor` · `MermaidEditor` · `MindMap` · `SQLFormatter` · `SvgFormat` · `VditorMarkdown` · `XmlFormatter`
 
@@ -134,7 +134,7 @@ magic-tools
 
 **🎮 遊戲 *(9)*** — `Game2048` · `Tetris` · `Minesweeper` · `NesEmulator` · `GameBoy` · `FreeCell` · `SpiderSolitaire` · `SegaEmulator` · `Snake`
 
-**🧩 其他 *(18)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `Metronome` · `Pomodoro` · `QrDecode` · `RegexTester` · `ScreenRecorder` · `SensitiveWord` · `Teleprompter` · `WebSocketDebug` · `ZipCompress` · `ZipExtract`
+**🧩 其他 *(18)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `GridPaper` · `KeyboardKeyInfo` · `LineCount` · `Metronome` · `Pomodoro` · `QrDecode` · `RegexTester` · `ScreenRecorder` · `SensitiveWord` · `Teleprompter` · `WebSocketDebug` · `ZipCompress` · `ZipExtract`
 
 > 內建頁面 `AppStore`(應用中心) / `Favorites`(我的收藏) / `Help` / `Setting` 也位於 `src/App/` 下 (註冊 `Type = 'misc'`), 但屬固定頁面而非工具。
 

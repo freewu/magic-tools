@@ -2,11 +2,11 @@
 
 # 🧰 Magic Tools
 
-**An all-in-one developer toolbox — 160 utilities in 10 categories, cross-platform desktop & Web.**
+**An all-in-one developer toolbox — 162 utilities in 10 categories, cross-platform desktop & Web.**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
-![version](https://img.shields.io/badge/magic--tools-v2.26.0-007EC6?style=flat-square&labelColor=24292F) ![ci](https://img.shields.io/github/actions/workflow/status/freewu/magic-tools/ci.yml?style=flat-square&label=CI&labelColor=24292F&logo=githubactions&logoColor=fff) ![Tauri](https://img.shields.io/badge/Tauri-2-0E7490?style=flat-square&labelColor=24292F&logo=tauri&logoColor=fff) ![React](https://img.shields.io/badge/React-18-087EA4?style=flat-square&labelColor=24292F&logo=react&logoColor=fff) ![Ant Design](https://img.shields.io/badge/Ant_Design-5-0170FE?style=flat-square&labelColor=24292F&logo=antdesign&logoColor=fff) ![MIT License](https://img.shields.io/badge/license-MIT-4F46E5?style=flat-square&labelColor=24292F)
+![version](https://img.shields.io/badge/magic--tools-v2.27.0-007EC6?style=flat-square&labelColor=24292F) ![ci](https://img.shields.io/github/actions/workflow/status/freewu/magic-tools/ci.yml?style=flat-square&label=CI&labelColor=24292F&logo=githubactions&logoColor=fff) ![Tauri](https://img.shields.io/badge/Tauri-2-0E7490?style=flat-square&labelColor=24292F&logo=tauri&logoColor=fff) ![React](https://img.shields.io/badge/React-18-087EA4?style=flat-square&labelColor=24292F&logo=react&logoColor=fff) ![Ant Design](https://img.shields.io/badge/Ant_Design-5-0170FE?style=flat-square&labelColor=24292F&logo=antdesign&logoColor=fff) ![MIT License](https://img.shields.io/badge/license-MIT-4F46E5?style=flat-square&labelColor=24292F)
 
 [Download Desktop](#-download) &nbsp;·&nbsp; [Try Online](https://freewu.github.io/magic-tools/) &nbsp;·&nbsp; [Report Issue](https://github.com/freewu/magic-tools/issues/new)
 
@@ -36,8 +36,8 @@ Hash (MD5/SHA1/SHA2/SM3/…) · HMAC · SHA-3 · Keccak · BCrypt · Scrypt · P
 ### 🔄 Codecs & Encoders *(13)*
 Base64 · URL · Unicode · Punycode · UUencode · XXencode · BCD · Morse code (with audio/WAV) · JWT decoder & encoder · HTTP Basic Auth · BaseX · Base58 · Gzip
 
-### ⚖️ Converters *(20)*
-Unix timestamp · Color format · Radix (BIN/OCT/DEC/HEX) · Tree ↔ path · GPS coordinates · Lat/long format · IP converter (IPv4/IPv6 ↔ decimal/hex/binary) · Download-link converter · JSONL · RMB uppercase (CNY) · Byte units · Chinese Pinyin · Temperature · Distance · Config (INI/JSON/YAML/TOML/properties) · Subtitle (SRT/ASS/…) · Speed · Volume · Area · Weight
+### ⚖️ Converters *(21)*
+Unix timestamp · Color format · Radix (BIN/OCT/DEC/HEX) · Tree ↔ path · GPS coordinates · Lat/long format · IP converter (IPv4/IPv6 ↔ decimal/hex/binary) · Download-link converter · JSONL · RMB uppercase (CNY) · Byte units · Chinese Pinyin · Temperature · Distance · Config (INI/JSON/YAML/TOML/properties) · Subtitle (SRT/ASS/…) · Speed · Volume · Area · Weight · Roman numerals (Arabic ↔ Roman, 1 - 3999)
 
 ### 🛠️ Formatters & Editors *(12)*
 Markdown editor (live preview + LaTeX subset) · Instant-render Markdown editor (Vditor: instant / split / WYSIWYG modes, KaTeX math, export .md and styled .html) · Mermaid editor (live preview, 30+ built-in diagram samples, export SVG/PNG/WebP) · Mind map (Markdown outline → interactive markmap: fold levels, zoom / pan, palettes, font size, export SVG / PNG / WebP) · JSON · JSON5 · JavaScript (beautify / minify / obfuscate / deobfuscate) · SQL · XML · HTML · SVG · CN/EN typography spacing
@@ -54,8 +54,8 @@ QR code (batch, logo/label) · Barcode (CODE128/EAN/UPC/CODE39/ITF/MSI/Pharmacod
 ### 🌐 Webmaster Tools *(16)*
 HTML stripper · Browser fingerprint · CSR request generator (WebCrypto RSA + PKCS#10, SAN, key + CSR download) · URL extractor · Cookie analyzer · User-Agent parser · Sitemap checker · Keyword density · TDK checker · DNS lookup (desktop only) · Whois lookup (desktop only) · MTR trace — traceroute + ping per-hop loss / RTT / jitter (desktop only) · robots.txt generator · iptables rule parser / generator (one-click scenarios — open port / block IP / block subnet / port forwarding — plus parse &amp; generate, iptables-save support) · tc traffic-control rule generator (HTB / TBF / netem, ingress via ifb) · nginx config generator (static / SPA / PHP / reverse proxy, TLS, gzip, static caching, rate limiting, hotlink protection — vhost-ready file)
 
-### 🧩 Utilities *(18)*
-CSS colors · Line counter · Regex tester (17 presets) · File diff · Keyboard key info · Chmod calculator · ASCII text art · CIDR calculator · WebSocket debugger · Teleprompter (speed / fade / line focus / a reading guide line you can toggle, colour and move up or down / fullscreen, countdown before it starts, Space to play·pause·cancel countdown, defaults editable in Settings / saveable from the page) · BOM inspector (detect / strip / add a UTF-8·UTF-16·UTF-32 BOM, encoding guess and text preview) · Metronome (20–300 BPM, time signature + beat subdivision, 3 click timbres, volume, count-in beats before the beat starts, fullscreen flashing dot, tap tempo) · Screen recorder (Web-only: capture screen / window / tab, optional system audio + microphone, frame rate · bitrate · resolution, one-click save as WebM / MP4) · QR code decoder (read a QR image with jsQR: URL / WiFi / vCard / mailto / tel / SMS / geo / OTP, structured fields, code located on the preview, editable inversion strategy, history) · Sensitive word check (Aho–Corasick scan with General / Xiaohongshu / WeChat word lists: risk levels, matched positions and rewrites, one-click masking plus report export, loose matching that still catches 「微 信」-style bypasses) · Pomodoro timer (focus / short / long break cycles, 5 built-in synth alert sounds or your own audio file, repeatable alerts, system notification — native on desktop, browser Notification on Web, adjustable clock background (solid colour or your own image — one shared image or separate focus / break images) and per-phase digit colours; Space / Enter start·pause in fullscreen) · Zip compress (drag in files or folders keeping the folder structure, compression level 0–9, custom archive name, automatic renumbering on duplicates, before / after size) · Zip extract (entry list with size and time, select all / invert, inline preview of text and images, extract into a folder keeping the archive hierarchy or download a single entry, Chinese filename encoding auto / UTF-8 / GBK / Big5)
+### 🧩 Utilities *(19)*
+CSS colors · Line counter · Regex tester (17 presets) · File diff · Grid paper (printable square-grid / dot-grid / ruled paper, A3·A4·B5·B6) · Keyboard key info · Chmod calculator · ASCII text art · CIDR calculator · WebSocket debugger · Teleprompter (speed / fade / line focus / a reading guide line you can toggle, colour and move up or down / fullscreen, countdown before it starts, Space to play·pause·cancel countdown, defaults editable in Settings / saveable from the page) · BOM inspector (detect / strip / add a UTF-8·UTF-16·UTF-32 BOM, encoding guess and text preview) · Metronome (20–300 BPM, time signature + beat subdivision, 3 click timbres, volume, count-in beats before the beat starts, fullscreen flashing dot, tap tempo) · Screen recorder (Web-only: capture screen / window / tab, optional system audio + microphone, frame rate · bitrate · resolution, one-click save as WebM / MP4) · QR code decoder (read a QR image with jsQR: URL / WiFi / vCard / mailto / tel / SMS / geo / OTP, structured fields, code located on the preview, editable inversion strategy, history) · Sensitive word check (Aho–Corasick scan with General / Xiaohongshu / WeChat word lists: risk levels, matched positions and rewrites, one-click masking plus report export, loose matching that still catches 「微 信」-style bypasses) · Pomodoro timer (focus / short / long break cycles, 5 built-in synth alert sounds or your own audio file, repeatable alerts, system notification — native on desktop, browser Notification on Web, adjustable clock background (solid colour or your own image — one shared image or separate focus / break images) and per-phase digit colours; Space / Enter start·pause in fullscreen) · Zip compress (drag in files or folders keeping the folder structure, compression level 0–9, custom archive name, automatic renumbering on duplicates, before / after size) · Zip extract (entry list with size and time, select all / invert, inline preview of text and images, extract into a folder keeping the archive hierarchy or download a single entry, Chinese filename encoding auto / UTF-8 / GBK / Big5)
 
 > Plus built-in app pages: **App Center** (search by app or category name, plus category filter), **My Favorites** (keep your favourite tools in one place; the floating shortcut can be dragged anywhere), **Help & changelog**, **Settings**.
 
@@ -95,15 +95,15 @@ magic-tools
 │   │   ├── app-modules.ts    # build-time collection via import.meta.glob (replaces webpack context)
 │   │   ├── app-i18n.ts       # app registry: appNameOf() trilingual names for tools & fixed pages
 │   │   ├── lang-packs.ts     # aggregates every tool's default language pack (lang.ts default export)
-│   │   └── <Tool>/           # one folder per tool (160, grouped list below) — 2-step registration
+│   │   └── <Tool>/           # one folder per tool (162, grouped list below) — 2-step registration
 │   │       ├── define.tsx    # registration metadata: AppName (zh-CN default) / Icon / Type (category)
 │   │       ├── index.tsx     # tool page component (default export; lazy-loaded)
 │   │       ├── lang.ts       # default language pack + rows (zh phrase = key → [zh-TW, en]) + lookup helpers
 │   │       ├── lib.ts        # pure logic shared by the page and its unit tests (most tools)
-│   │       ├── lib.test.ts   # jest unit tests (147 tools; 开发时用 `npm test -- src/App/<工具>` 只跑该工具)
-│   │       ├── data.ts       # option tables / constants / types (79 tools)
-│   │       ├── setting.tsx   # this tool's panel inside the Settings center (77 tools)
-│   │       └── intro.tsx     # About / instructions content, trilingual (59 tools)
+│   │       ├── lib.test.ts   # jest unit tests (160 tools; 开发时用 `npm test -- src/App/<工具>` 只跑该工具)
+│   │       ├── data.ts       # option tables / constants / types (89 tools)
+│   │       ├── setting.tsx   # this tool's panel inside the Settings center (88 tools)
+│   │       └── intro.tsx     # About / instructions content, trilingual (70 tools)
 │   ├── layout/           # main frame: sidebar / content
 │   ├── hook/             # global state: theme / app context
 │   └── lib/              # shared utilities
@@ -114,7 +114,7 @@ magic-tools
 
 ### Existing tools under `src/App/`
 
-160 tool folders live under [`src/App/`](src/App/) and each holds one tool declared by its `define.tsx`. **Adding a tool takes two steps:** (1) append the folder name to the `list` array in [`src/App/index.tsx`](src/App/index.tsx) — that hand-maintained registry drives the sidebar / App Center menu order and routing, while `import.meta.glob` only discovers the page component; (2) add its `lang.ts` default export to [`src/App/lang-packs.ts`](src/App/lang-packs.ts) so names/UI strings can be translated. Grouped below by the `Type` registered in `define.tsx` (same categories as the sidebar / [feature overview](#-feature-overview)). Some tools add tool-specific files besides the common ones (e.g. `AESCrypto/gcm.ts`, `Hash/sm3.ts`+`keccak.ts`, `CronRules/parse.tsx`, `Setting/setting-*.tsx`):
+162 tool folders live under [`src/App/`](src/App/) and each holds one tool declared by its `define.tsx`. **Adding a tool takes two steps:** (1) append the folder name to the `list` array in [`src/App/index.tsx`](src/App/index.tsx) — that hand-maintained registry drives the sidebar / App Center menu order and routing, while `import.meta.glob` only discovers the page component; (2) add its `lang.ts` default export to [`src/App/lang-packs.ts`](src/App/lang-packs.ts) so names/UI strings can be translated. Grouped below by the `Type` registered in `define.tsx` (same categories as the sidebar / [feature overview](#-feature-overview)). Some tools add tool-specific files besides the common ones (e.g. `AESCrypto/gcm.ts`, `Hash/sm3.ts`+`keccak.ts`, `CronRules/parse.tsx`, `Setting/setting-*.tsx`):
 
 **🔐 Cryptography *(23)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `SM9Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto` · `ZucCrypto`
 
@@ -122,7 +122,7 @@ magic-tools
 
 **🔄 Codecs & Encoders *(13)*** — `BCDCodec` · `Base58Codec` · `Base64` · `BaseXCodec` · `BasicAuthCodec` · `GzipCodec` · `JWTDecoder` · `MorseCodec` · `Punycode` · `URL` · `UUencode` · `Unicode` · `XXencode`
 
-**⚖️ Converters *(20)*** — `AreaConvert` · `ByteConvert` · `ColorConvert` · `ConfigConvert` · `DistanceConvert` · `DownloadLinkConvert` · `GPSConvert` · `LatLngConvert` · `IPConvert` · `JSONLConvert` · `NumberConvert` · `PinyinConvert` · `RMBConvert` · `SpeedConvert` · `SubtitleConvert` · `TemperatureConvert` · `Time` · `TreePathConvert` · `VolumeConvert` · `WeightConvert`
+**⚖️ Converters *(21)*** — `AreaConvert` · `ByteConvert` · `ColorConvert` · `ConfigConvert` · `DistanceConvert` · `DownloadLinkConvert` · `GPSConvert` · `LatLngConvert` · `IPConvert` · `JSONLConvert` · `NumberConvert` · `PinyinConvert` · `RMBConvert` · `RomanNumeral` · `SpeedConvert` · `SubtitleConvert` · `TemperatureConvert` · `Time` · `TreePathConvert` · `VolumeConvert` · `WeightConvert`
 
 **🛠️ Formatters & Editors *(12)*** — `CnEnSpacing` · `HtmlFormat` · `JSON5Formatter` · `JsFormatter` · `JsonFormatter` · `MarkdownEditor` · `MermaidEditor` · `MindMap` · `SQLFormatter` · `SvgFormat` · `VditorMarkdown` · `XmlFormatter`
 
@@ -134,7 +134,7 @@ magic-tools
 
 **🎮 Games *(9)*** — `Game2048` · `Tetris` · `Minesweeper` · `NesEmulator` · `GameBoy` · `FreeCell` · `SpiderSolitaire` · `SegaEmulator` · `Snake`
 
-**🧩 Utilities *(18)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `Metronome` · `Pomodoro` · `QrDecode` · `RegexTester` · `ScreenRecorder` · `SensitiveWord` · `Teleprompter` · `WebSocketDebug` · `ZipCompress` · `ZipExtract`
+**🧩 Utilities *(18)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `GridPaper` · `KeyboardKeyInfo` · `LineCount` · `Metronome` · `Pomodoro` · `QrDecode` · `RegexTester` · `ScreenRecorder` · `SensitiveWord` · `Teleprompter` · `WebSocketDebug` · `ZipCompress` · `ZipExtract`
 
 > Built-in pages `AppStore`（App Center）/ `Favorites`（My Favorites）/ `Help` / `Setting` also live in `src/App/` (registered with `Type = 'misc'`), but are fixed pages rather than tools.
 

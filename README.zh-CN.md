@@ -2,11 +2,11 @@
 
 # 🧰 Magic Tools
 
-**全能开发工具箱 —— 10 大分类、160 个实用工具，桌面 + Web 双端。**
+**全能开发工具箱 —— 10 大分类、162 个实用工具，桌面 + Web 双端。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
-![version](https://img.shields.io/badge/magic--tools-v2.26.0-007EC6?style=flat-square&labelColor=24292F) ![ci](https://img.shields.io/github/actions/workflow/status/freewu/magic-tools/ci.yml?style=flat-square&label=CI&labelColor=24292F&logo=githubactions&logoColor=fff) ![Tauri](https://img.shields.io/badge/Tauri-2-0E7490?style=flat-square&labelColor=24292F&logo=tauri&logoColor=fff) ![React](https://img.shields.io/badge/React-18-087EA4?style=flat-square&labelColor=24292F&logo=react&logoColor=fff) ![Ant Design](https://img.shields.io/badge/Ant_Design-5-0170FE?style=flat-square&labelColor=24292F&logo=antdesign&logoColor=fff) ![MIT License](https://img.shields.io/badge/license-MIT-4F46E5?style=flat-square&labelColor=24292F)
+![version](https://img.shields.io/badge/magic--tools-v2.27.0-007EC6?style=flat-square&labelColor=24292F) ![ci](https://img.shields.io/github/actions/workflow/status/freewu/magic-tools/ci.yml?style=flat-square&label=CI&labelColor=24292F&logo=githubactions&logoColor=fff) ![Tauri](https://img.shields.io/badge/Tauri-2-0E7490?style=flat-square&labelColor=24292F&logo=tauri&logoColor=fff) ![React](https://img.shields.io/badge/React-18-087EA4?style=flat-square&labelColor=24292F&logo=react&logoColor=fff) ![Ant Design](https://img.shields.io/badge/Ant_Design-5-0170FE?style=flat-square&labelColor=24292F&logo=antdesign&logoColor=fff) ![MIT License](https://img.shields.io/badge/license-MIT-4F46E5?style=flat-square&labelColor=24292F)
 
 [下载桌面版](#-下载) · [在线体验](https://freewu.github.io/magic-tools/) · [提交 Issue](https://github.com/freewu/magic-tools/issues/new)
 
@@ -36,8 +36,8 @@ Hash 值计算 · HmacHash 值计算 · SHA3 Hash 值计算 · Keccak Hash 值�
 ### 🔄 编解码 *(13)*
 Base64 编解码 · URL 编解码 · Unicode 编解码 · Punycode 编解码 · UUencode 编解码 · XXencode 编解码 · BCD 编解码 · 摩斯码编解码 · JWT 编解码器 · HTTP Basic Auth 编解码 · BaseX 编解码 · Base58 编解码 · Gzip 编解码
 
-### ⚖️ 类型转换 *(20)*
-时间戳转换 · 颜色格式转换 · 进制转换 · 树形和路径转换 · GPS坐标转换 · 经纬度格式转换 · IP 转换(IPv4/IPv6 ↔ 十进制/十六进制/二进制) · 下载链接转换 · JSONL 转换 · 人民币大写 · 字节转换 · 中文拼音 · 温度转换 · 距离转换 · 配置转换 · 字幕格式转换 · 速度转换 · 容量转换 · 面积转换 · 重量转换
+### ⚖️ 类型转换 *(21)*
+时间戳转换 · 颜色格式转换 · 进制转换 · 树形和路径转换 · GPS坐标转换 · 经纬度格式转换 · IP 转换(IPv4/IPv6 ↔ 十进制/十六进制/二进制) · 下载链接转换 · JSONL 转换 · 人民币大写 · 字节转换 · 中文拼音 · 温度转换 · 距离转换 · 配置转换 · 字幕格式转换 · 速度转换 · 容量转换 · 面积转换 · 重量转换 · 罗马数字(阿拉伯数字 ↔ 罗马数字, 1 - 3999)
 
 ### 🛠️ 格式化 *(12)*
 Markdown 编辑器 · 即时渲染 Markdown 编辑器(Vditor: 即时渲染/分屏/所见即所得三种模式, KaTeX 公式, 导出 .md 与自带样式的 .html) · Mermaid 编辑器(实时预览, 内置 30+ 图形类型示例, 导出 SVG/PNG/WebP) · 思维导图(Markdown 大纲转 markmap 交互式导图, 折叠层级/缩放平移, 配色与字号, 导出 SVG/PNG/WebP) · JSON 格式化 · JSON5 格式化 · JavaScript 格式化(美化/压缩/混淆加密/解密还原) · SQL 格式化 · XML 格式化 · HTML 格式化 · SVG 格式化 · 中英文自动排版
@@ -54,8 +54,8 @@ Base64图片 · ASCII 图片 · 代码截图 · ICO 生成 · App Icon 生成 ·
 ### 🌐 站长工具 *(16)*
 HTML 标签去除 · 浏览器指纹 · CSR 申请文件(本机生成 RSA 私钥 + PKCS#10 请求, 支持 SAN) · URL 提取 · Cookie 分析 · UA 解析器 · Sitemap 检查 · 关键词密度 · 网页TDK信息检测 · DNS 查询(仅桌面版) · Whois 查询(仅桌面版) · MTR 查询(仅桌面版: traceroute + ping, 逐跳丢包/RTT/抖动) · robots.txt 生成 · iptables 规则(日常场景一键生成: 开放端口 / 封禁 IP / 封禁网段 / 端口转发; 也可解析已有规则或按表单生成命令, 支持 iptables-save) · tc 规则(HTB / TBF / netem 限速与弱网模拟, 入口限速走 ifb) · nginx 配置(静态站点 / SPA / PHP / 反向代理, 含 TLS、gzip、静态缓存、限流、防盗链, 直接生成 vhost 配置文件)
 
-### 🧩 其它 *(18)*
-CSS 配色 · 行数统计 · 正则表达式 · 文件比较 · 键盘按键信息 · Chmod 权限 · ASCII 文字 · CIDR 计算器 · WebSocket 调试 · 提词器(调速/淡入淡出/逐行高亮/阅读基准线可开关、自定义颜色并上下调整位置/全屏, 开始前可先倒计时, 空格 开始·暂停·取消倒计时, 默认值可在设置里改/页面一键保存) · BOM 检查(检测 / 去除 / 添加 UTF-8·UTF-16·UTF-32 BOM, 编码推测与文本预览) · 节拍器(20~300 BPM, 拍号与拍内细分, 3 种音色 + 音量, 开始前预排拍倒计时, 全屏闪烁圆点, 连击测速) · 屏幕录制(浏览器专享: 采集屏幕/窗口/标签页, 可选系统声音与麦克风, 帧率·码率·分辨率可选, 一键保存 WebM/MP4) · 二维码解析(上传/拖拽/粘贴二维码图片, 用 jsQR 读出内容: 网址·WiFi 配网·名片·邮件·电话·短信·坐标·动态口令, 结构化字段展示, 预览图上框出二维码位置, 反色策略可调, 本地历史记录) · 敏感词检测(Aho–Corasick 扫描, 通用/小红书/微信公众号三套词库: 危险等级、命中位置与替换建议, 一键打码与报告导出, 宽松匹配可揪出「微 信」这类绕过写法) · 番茄时钟(专注/短休/长休循环, 5 种内置合成提示音或指定自己的音频文件, 提示音可设重复次数, 弹窗通知桌面端用系统弹窗, 时钟背景与专注/休息数字配色可调, 背景可换成自己的图片, 全屏支持空格/回车 开始·暂停) · Zip 压缩(拖拽文件或文件夹并保留目录层级, 压缩级别 0~9, 自定义包名, 重名自动加序号, 显示压缩前后体积) · Zip 解压(条目列表按大小/时间展示, 全选/反选, 文本与图片在线预览, 按包内层级解压到指定目录, 单个条目也可直接下载, 中文文件名编码 auto/UTF-8/GBK/Big5)
+### 🧩 其它 *(19)*
+CSS 配色 · 行数统计 · 正则表达式 · 文件比较 · 格子纸(可打印方格 / 点阵 / 横线纸, A3·A4·B5·B6) · 键盘按键信息 · Chmod 权限 · ASCII 文字 · CIDR 计算器 · WebSocket 调试 · 提词器(调速/淡入淡出/逐行高亮/阅读基准线可开关、自定义颜色并上下调整位置/全屏, 开始前可先倒计时, 空格 开始·暂停·取消倒计时, 默认值可在设置里改/页面一键保存) · BOM 检查(检测 / 去除 / 添加 UTF-8·UTF-16·UTF-32 BOM, 编码推测与文本预览) · 节拍器(20~300 BPM, 拍号与拍内细分, 3 种音色 + 音量, 开始前预排拍倒计时, 全屏闪烁圆点, 连击测速) · 屏幕录制(浏览器专享: 采集屏幕/窗口/标签页, 可选系统声音与麦克风, 帧率·码率·分辨率可选, 一键保存 WebM/MP4) · 二维码解析(上传/拖拽/粘贴二维码图片, 用 jsQR 读出内容: 网址·WiFi 配网·名片·邮件·电话·短信·坐标·动态口令, 结构化字段展示, 预览图上框出二维码位置, 反色策略可调, 本地历史记录) · 敏感词检测(Aho–Corasick 扫描, 通用/小红书/微信公众号三套词库: 危险等级、命中位置与替换建议, 一键打码与报告导出, 宽松匹配可揪出「微 信」这类绕过写法) · 番茄时钟(专注/短休/长休循环, 5 种内置合成提示音或指定自己的音频文件, 提示音可设重复次数, 弹窗通知桌面端用系统弹窗, 时钟背景与专注/休息数字配色可调, 背景可换成自己的图片, 全屏支持空格/回车 开始·暂停) · Zip 压缩(拖拽文件或文件夹并保留目录层级, 压缩级别 0~9, 自定义包名, 重名自动加序号, 显示压缩前后体积) · Zip 解压(条目列表按大小/时间展示, 全选/反选, 文本与图片在线预览, 按包内层级解压到指定目录, 单个条目也可直接下载, 中文文件名编码 auto/UTF-8/GBK/Big5)
 
 > 另有内置页面：**应用中心**(支持按应用名 / 分类名搜索 + 分类筛选)、**我的收藏**(常用工具集中收藏, 悬浮入口可拖到任意位置)、**帮助与更新日志**、**设置**。
 
@@ -95,15 +95,15 @@ magic-tools
 │   │   ├── app-modules.ts    # 构建期用 import.meta.glob 静态收集 (替代 webpack context 动态导入)
 │   │   ├── app-i18n.ts       # 应用注册表: appNameOf() 等取各工具/固定页三语名称
 │   │   ├── lang-packs.ts     # 汇总各工具 lang.ts 的默认语言包 (default 导出)
-│   │   └── <工具>/           # 每工具一个目录 (当前 160 个, 清单见下) — 两步注册
+│   │   └── <工具>/           # 每工具一个目录 (当前 162 个, 清单见下) — 两步注册
 │   │       ├── define.tsx    # 注册元数据: AppName(zh-CN 默认名) / Icon / Type(分组)
 │   │       ├── index.tsx     # 工具页面组件 (默认导出, 懒加载)
 │   │       ├── lang.ts       # 默认语言包 + 三语词条 (zh 短语即 key, 值=[zh-TW, en]) + 本地取词函数
 │   │       ├── lib.ts        # 纯函数逻辑, 页面与单测共用 (绝大多数工具)
-│   │       ├── lib.test.ts   # jest 单测 (147 个工具; 开发时用 `npm test -- src/App/<工具>` 只跑该工具)
-│   │       ├── data.ts       # 选项/常量表与类型 (79 个工具)
-│   │       ├── setting.tsx   # 设置中心内本工具的设置面板 (77 个工具)
-│   │       └── intro.tsx     # About/说明 三语内容 (59 个工具)
+│   │       ├── lib.test.ts   # jest 单测 (160 个工具; 开发时用 `npm test -- src/App/<工具>` 只跑该工具)
+│   │       ├── data.ts       # 选项/常量表与类型 (89 个工具)
+│   │       ├── setting.tsx   # 设置中心内本工具的设置面板 (88 个工具)
+│   │       └── intro.tsx     # About/说明 三语内容 (70 个工具)
 │   ├── layout/           # 主框架: 侧边栏/内容区
 │   ├── hook/             # 全局状态: 主题/应用上下文
 │   └── lib/              # 通用工具库
@@ -114,7 +114,7 @@ magic-tools
 
 ### `src/App/` 现有工具清单
 
-[`src/App/`](src/App/) 下现有 **160** 个工具目录, 每个目录 = 一个工具, 由其中 `define.tsx` 声明。**新增工具需两步登记**：(1) 把目录名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 数组 (该数组决定侧边栏/应用中心菜单顺序与路由; `import.meta.glob` 只负责发现页面组件, 不决定菜单); (2) 把其 `lang.ts` 默认导出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名称与界面文案才能随语言切换。按下表 `Type` 分组列出 (与侧边栏/上方功能总览一致), 括号内为目录数。除下列公共文件外, 个别工具另有私有文件 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
+[`src/App/`](src/App/) 下现有 **162** 个工具目录, 每个目录 = 一个工具, 由其中 `define.tsx` 声明。**新增工具需两步登记**：(1) 把目录名追加到 [`src/App/index.tsx`](src/App/index.tsx) 的 `list` 数组 (该数组决定侧边栏/应用中心菜单顺序与路由; `import.meta.glob` 只负责发现页面组件, 不决定菜单); (2) 把其 `lang.ts` 默认导出加入 [`src/App/lang-packs.ts`](src/App/lang-packs.ts), 名称与界面文案才能随语言切换。按下表 `Type` 分组列出 (与侧边栏/上方功能总览一致), 括号内为目录数。除下列公共文件外, 个别工具另有私有文件 (如 `AESCrypto/gcm.ts`、`Hash/sm3.ts`+`keccak.ts`、`CronRules/parse.tsx`、`Setting/setting-*.tsx` 等):
 
 **🔐 加解密 *(23)*** — `AESCrypto` · `BlowfishCrypto` · `CaesarCrypto` · `ChaCha20Crypto` · `CiscoType7` · `DESCrypto` · `HillCrypto` · `RC2Crypto` · `RC4Crypto` · `RC5Crypto` · `RC6Crypto` · `RSACrypto` · `RabbitCrypto` · `RailFenceCrypto` · `SM2Crypto` · `SM4Crypto` · `SM9Crypto` · `TEACrypto` · `TripleDESCrypto` · `VigenereCrypto` · `XTEACrypto` · `XXTEACrypto` · `ZucCrypto`
 
@@ -122,7 +122,7 @@ magic-tools
 
 **🔄 编解码 *(13)*** — `BCDCodec` · `Base58Codec` · `Base64` · `BaseXCodec` · `BasicAuthCodec` · `GzipCodec` · `JWTDecoder` · `MorseCodec` · `Punycode` · `URL` · `UUencode` · `Unicode` · `XXencode`
 
-**⚖️ 类型转换 *(20)*** — `AreaConvert` · `ByteConvert` · `ColorConvert` · `ConfigConvert` · `DistanceConvert` · `DownloadLinkConvert` · `GPSConvert` · `LatLngConvert` · `IPConvert` · `JSONLConvert` · `NumberConvert` · `PinyinConvert` · `RMBConvert` · `SpeedConvert` · `SubtitleConvert` · `TemperatureConvert` · `Time` · `TreePathConvert` · `VolumeConvert` · `WeightConvert`
+**⚖️ 类型转换 *(21)*** — `AreaConvert` · `ByteConvert` · `ColorConvert` · `ConfigConvert` · `DistanceConvert` · `DownloadLinkConvert` · `GPSConvert` · `LatLngConvert` · `IPConvert` · `JSONLConvert` · `NumberConvert` · `PinyinConvert` · `RMBConvert` · `RomanNumeral` · `SpeedConvert` · `SubtitleConvert` · `TemperatureConvert` · `Time` · `TreePathConvert` · `VolumeConvert` · `WeightConvert`
 
 **🛠️ 格式化 *(12)*** — `CnEnSpacing` · `HtmlFormat` · `JSON5Formatter` · `JsFormatter` · `JsonFormatter` · `MarkdownEditor` · `MermaidEditor` · `MindMap` · `SQLFormatter` · `SvgFormat` · `VditorMarkdown` · `XmlFormatter`
 
@@ -134,7 +134,7 @@ magic-tools
 
 **🎮 游戏 *(9)*** — `Game2048` · `Tetris` · `Minesweeper` · `NesEmulator` · `GameBoy` · `FreeCell` · `SpiderSolitaire` · `SegaEmulator` · `Snake`
 
-**🧩 其它 *(18)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `KeyboardKeyInfo` · `LineCount` · `Metronome` · `Pomodoro` · `QrDecode` · `RegexTester` · `ScreenRecorder` · `SensitiveWord` · `Teleprompter` · `WebSocketDebug` · `ZipCompress` · `ZipExtract`
+**🧩 其它 *(19)*** — `AsciiTextArt` · `BOMCheck` · `CIDRCalc` · `Chmod` · `Color` · `FileDiff` · `GridPaper` · `KeyboardKeyInfo` · `LineCount` · `Metronome` · `Pomodoro` · `QrDecode` · `RegexTester` · `ScreenRecorder` · `SensitiveWord` · `Teleprompter` · `WebSocketDebug` · `ZipCompress` · `ZipExtract`
 
 > 内置页面 `AppStore`(应用中心) / `Favorites`(我的收藏) / `Help` / `Setting` 也位于 `src/App/` 下 (注册 `Type = 'misc'`), 但属固定页面而非工具。
 
