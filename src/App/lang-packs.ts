@@ -12,6 +12,7 @@ import Time from './Time/lang';
 import Color from './Color/lang';
 import ColorConvert from './ColorConvert/lang';
 import NumberConvert from './NumberConvert/lang';
+import RomanNumeral from './RomanNumeral/lang';
 import TreePathConvert from './TreePathConvert/lang';
 import QRCodeGenerator from './QRCodeGenerator/lang';
 import BarcodeGenerator from './BarcodeGenerator/lang';
@@ -179,6 +180,7 @@ export const langPacks = {
   Color: Color,
   ColorConvert: ColorConvert,
   NumberConvert: NumberConvert,
+  RomanNumeral: RomanNumeral,
   TreePathConvert: TreePathConvert,
   QRCodeGenerator: QRCodeGenerator,
   BarcodeGenerator: BarcodeGenerator,

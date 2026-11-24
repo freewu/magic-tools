@@ -16,6 +16,7 @@ const list = [
   'Color',
   'ColorConvert',
   'NumberConvert',
+  'RomanNumeral',
   'TreePathConvert',
   'QRCodeGenerator',
   'BarcodeGenerator',
